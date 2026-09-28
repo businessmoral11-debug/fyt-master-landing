@@ -954,6 +954,23 @@ function AwardBadge() {
   // the tap-to-toggle state for touch devices, which have no hover;
   // `whileHover` covers the mouse case on desktop on top of it.
   const [zoomed, setZoomed] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  // Reset the zoom automatically on any page scroll (desktop hover state
+  // and mobile tap-toggle state alike), since a hover/tap can be left
+  // "stuck" zoomed in while the user then scrolls the page away.
+  useEffect(() => {
+    if (!zoomed && !hovered) return;
+    const handleScroll = () => {
+      setZoomed(false);
+      setHovered(false);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [zoomed, hovered]);
+
+  const isZoomed = zoomed || hovered;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -970,9 +987,9 @@ function AwardBadge() {
         type="button"
         aria-label="Zoom the award badge image"
         onClick={() => setZoomed((z) => !z)}
-        onMouseLeave={() => setZoomed(false)}
-        whileHover={{ scale: 1.9 }}
-        animate={{ scale: zoomed ? 1.9 : 1 }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        animate={{ scale: isZoomed ? 2.4 : 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
         className="relative z-10 shrink-0 bg-transparent border-0 p-0 cursor-zoom-in"
       >
