@@ -948,33 +948,51 @@ function TrustStripDesktop() {
 // Styled to match the trust pill's own understated chrome (subtle
 // border + blur) rather than standing out with a glow.
 function AwardBadge() {
+  // Image and text have separate behavior: hovering/tapping the badge
+  // IMAGE zooms it in place (magnifying-glass feel), never navigates.
+  // Tapping/clicking the TEXT navigates to the award page. `zoomed` is
+  // the tap-to-toggle state for touch devices, which have no hover;
+  // `whileHover` covers the mouse case on desktop on top of it.
+  const [zoomed, setZoomed] = useState(false);
   return (
-    <motion.a
-      href="https://brandsreviewmagazine.com/award-list-2026/"
-      target="_blank"
-      rel="noopener noreferrer"
+    <motion.div
       initial={{ opacity: 0, y: 14 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.55, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className="flex items-center gap-[16px] lg:gap-[18px] px-[18px] py-[12px] lg:px-[24px] lg:py-[15px] rounded-[16px] shrink-0 no-underline cursor-pointer border backdrop-blur-[7px]"
+      className="flex items-center gap-[16px] lg:gap-[18px] px-[18px] py-[12px] lg:px-[24px] lg:py-[15px] rounded-[16px] shrink-0 border backdrop-blur-[7px]"
       style={{
         background: "rgba(212,175,127,0.06)",
         borderColor: "rgba(212,175,127,0.3)",
       }}
     >
-      <img
-        src={imgAwardBadge}
-        alt="BRM Brands Review Magazine - Fastest Growing Prop Trading Firm Global 2026"
-        className="w-[52px] h-[42px] lg:w-[62px] lg:h-[50px] object-contain shrink-0"
-      />
-      <div className="flex flex-col gap-[3px]">
+      <motion.button
+        type="button"
+        aria-label="Zoom the award badge image"
+        onClick={() => setZoomed((z) => !z)}
+        onMouseLeave={() => setZoomed(false)}
+        whileHover={{ scale: 1.9 }}
+        animate={{ scale: zoomed ? 1.9 : 1 }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        className="relative z-10 shrink-0 bg-transparent border-0 p-0 cursor-zoom-in"
+      >
+        <img
+          src={imgAwardBadge}
+          alt="BRM Brands Review Magazine - Fastest Growing Prop Trading Firm Global 2026"
+          className="w-[52px] h-[42px] lg:w-[62px] lg:h-[50px] object-contain pointer-events-none"
+          style={{ filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.45))" }}
+        />
+      </motion.button>
+      <a
+        href="https://brandsreviewmagazine.com/award-list-2026/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex flex-col gap-[3px] no-underline cursor-pointer"
+      >
         <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#d4af7f] text-[10px] lg:text-[11px] tracking-[1.5px] uppercase whitespace-nowrap">Officially Awarded</p>
         <p className="font-['Inter:Bold',sans-serif] font-bold text-white text-[14px] lg:text-[16px] leading-[1.15] whitespace-nowrap">Fastest Growing Prop Trading Firm 2026</p>
-      </div>
-    </motion.a>
+      </a>
+    </motion.div>
   );
 }
 
