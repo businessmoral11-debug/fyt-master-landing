@@ -1,0 +1,389 @@
+@import 'tailwindcss' source(none);
+@source '../**/*.{js,ts,jsx,tsx}';
+
+@import 'tw-animate-css';
+
+/* Hide the browser's default scrollbar (classic Windows-style thick bar
+   with arrow buttons) sitewide — page still scrolls normally, just with no
+   visible track/thumb chrome. */
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Native, browser-driven smooth scrolling for anchor-link jumps (nav links,
+   the promo banner's #challenge jump) only — this affects programmatic/hash
+   scrolling, never continuous wheel/touch scrolling, which the browser
+   already handles natively and smoothly on its own. Respects the same
+   reduced-motion preference every other animation on this page does. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Continuous (not hover-gated) shine sweep for primary CTA pills — works on
+   touch/mobile where :hover never fires. Add className="cta-shine" (needs
+   position:relative + overflow:hidden, which this class itself provides). */
+.cta-shine { position: relative; overflow: hidden; }
+.cta-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.4) 50%, transparent 65%);
+  background-size: 250% 100%;
+  animation: cta-shine-sweep 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes cta-shine-sweep {
+  0%, 55% { background-position: 200% 0; }
+  85% { background-position: -60% 0; }
+  100% { background-position: -60% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cta-shine::after { animation: none; }
+}
+
+@keyframes fyt-marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes fyt-promo-sheen {
+  0% { transform: translate3d(-140%, 0, 0); }
+  45% { transform: translate3d(220%, 0, 0); }
+  100% { transform: translate3d(220%, 0, 0); }
+}
+
+/* Soft breathe on the promo-banner urgency pill. */
+@keyframes fyt-promo-urgency-pulse {
+  0%, 100% { box-shadow: 0 2px 8px rgba(220,38,38,0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
+  50% { box-shadow: 0 2px 12px rgba(220,38,38,0.55), inset 0 1px 0 rgba(255,255,255,0.28); }
+}
+
+/* Soft sheen for the pricing-card "new traders" offer. */
+@keyframes fyt-alt-promo-sheen {
+  0% { transform: translate3d(-130%, 0, 0); }
+  45% { transform: translate3d(180%, 0, 0); }
+  100% { transform: translate3d(180%, 0, 0); }
+}
+
+/* Shared "count-up number shimmer" utility — a soft blue-white shimmer
+   sweeping across an animated number, gated behind [data-shimmer="true"]
+   (omitted under reduced motion). Used by both ProofInNumbers' CountUpStat
+   and the Recent Rewards reward-amount cards. Most of each cycle sits still
+   at background-position 200% (the gradient band parked off to the side,
+   so the text reads as plain solid color) with a brief sweep from 85% to
+   92% of the cycle. Default cadence (9s cycle / 1.6s initial delay) can be
+   overridden per-usage via inline `animationDuration`/`animationDelay`. */
+@keyframes count-shimmer {
+  0%, 85%, 100% { background-position: 200% 0; }
+  92% { background-position: -200% 0; }
+}
+
+.count-shimmer[data-shimmer="true"] {
+  background-image: linear-gradient(110deg, currentColor 40%, #eaf2ff 50%, currentColor 60%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: count-shimmer 9s ease-in-out infinite;
+  animation-delay: 1.6s;
+}
+
+/* Proof in Numbers: hovering any stat card slightly brightens the
+   left↔right connection line — CSS-only (no React state/re-render) via
+   :has(), opacity only. */
+.proof-connection-line {
+  transition: opacity 300ms ease;
+}
+.proof-panel:has(.proof-card:hover) .proof-connection-line {
+  opacity: 0.5;
+}
+
+/* World map (Global Community section): a route "occasionally activating"
+   — a slow, subtle opacity rise on top of its resting 45-60% base, never
+   the dramatic 0->full draw-in the earlier pass used. Staggered per-route
+   via animation-delay so it never reads as "all routes brighten at once."
+   No scan line in this pass — a literal scanning sweep reads as
+   sci-fi/security-HUD, which this redesign is explicitly moving away
+   from. */
+@keyframes world-map-route-activate {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+/* World map: a hub's small, independent "soft pulse every few seconds" —
+   opacity + a gentle scale, never an expanding ring/halo (explicitly ruled
+   out: "no oversized halos"). */
+@keyframes world-map-hub-breathe {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* World map: background particles drifting almost imperceptibly. */
+@keyframes world-map-particle-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(6px, -8px, 0); }
+}
+
+/* World map: the whole map graphic gently bobs (1-2px) so it reads as
+   "floating" even when the cursor isn't driving the parallax. */
+@keyframes world-map-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -2px, 0); }
+}
+
+/* World map: the atmospheric glow behind the continents breathes very
+   slowly — opacity only, never a scale/position change. */
+@keyframes world-map-glow-breathe {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Shared "traveling light" sweep for thin hairlines (FAQ/Footer top
+   border, FAQ divider-on-open) — a soft bright band crossing left->right
+   then fading, width-fraction-corrected for a w-1/4 bar (see the Hero/
+   LivePayouts reflection-sweep fix earlier this session for why -120%/
+   420%, not -100%/100%, is what actually clears a quarter-width bar). */
+@keyframes blue-light-sweep {
+  0% { transform: translate3d(-120%, 0, 0); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translate3d(420%, 0, 0); opacity: 0; }
+}
+
+/* Footer: the logo's backing glow breathes slowly — opacity + a barely
+   perceptible scale, never a hard pulse. */
+@keyframes footer-logo-glow-breathe {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.08); }
+}
+
+/* Footer: the premium CTA strip's backing glow, same calm breathing
+   language as the logo's. */
+@keyframes footer-cta-glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.85; }
+}
+
+/* Featured Reward Certificates (featuredCertificates.tsx): hide the
+   horizontal scrollbar on the coverflow track — it still scrolls via
+   drag/wheel/touch/auto-advance, just no visible scrollbar chrome. */
+.cert-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.cert-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Trusted Support Team's 4-icon row (App.tsx, ProductShowcase): mobile-only
+   horizontal scroll so the 4 icons stay on one row instead of wrapping —
+   same "scrolls, but no visible scrollbar chrome" treatment as the two
+   tracks above. */
+.support-features-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.support-features-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Idle float for each certificate card — a separate CSS-animation layer
+   from the rAF-driven coverflow rotation/scale (written directly to a
+   sibling/ancestor element's style.transform), so the two transforms never
+   fight for the same property on the same frame. */
+@keyframes cert-card-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.cert-card-float { animation: cert-card-float 5s ease-in-out infinite; }
+
+/* Certificate card face: base border/shadow + hover state, kept as plain
+   CSS (not inline style) so the :hover rule can actually win — an inline
+   style value always beats a class, hover or not. */
+.cert-card-face {
+  border: 1px solid rgba(230,235,244,0.12);
+  box-shadow: 0 10px 30px -16px rgba(10,16,32,0.4), 0 0 0 1px rgba(37,99,255,0.06);
+  transition: transform 300ms ease-out, border-color 300ms ease-out, box-shadow 300ms ease-out;
+}
+.cert-card-face:hover {
+  border-color: rgba(37,99,255,0.4);
+  box-shadow: 0 22px 50px -20px rgba(37,99,255,0.5), 0 0 40px -8px rgba(37,99,255,0.25);
+}
+
+/* Diagonal shimmer/glass sweep — hover-only (not idle-looping: with many
+   cards visible at once, a constant unsynced sweep on every card reads as
+   busy, per the brief). A single background-position transition, so it
+   costs nothing while at rest. */
+.cert-card-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.14) 50%, transparent 60%);
+  background-size: 250% 250%;
+  background-position: 130% 130%;
+  transition: background-position 700ms ease-out;
+  pointer-events: none;
+}
+.cert-card-face:hover::after {
+  background-position: -30% -30%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cert-card-float { animation: none; }
+  .cert-card-face,
+  .cert-card-face::after {
+    transition: none;
+  }
+}
+
+/* Globe section: floating country cards gently bob (3-5px), independent of
+   their own entrance/hover motion (Framer Motion's `transition` prop
+   replaces rather than merges with a component's other transitions, so the
+   continuous loop lives here in plain CSS on an outer wrapper instead). */
+@keyframes globe-card-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.globe-card-float { animation: globe-card-float 5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .globe-card-float { animation: none; }
+}
+
+/* Prove Your Skill: the 5 pain-point pills' idle bob, moved off Framer
+   Motion's JS-driven rAF loop onto a plain CSS animation — a
+   compositor-only loop that doesn't compete with the tilt/hover motion
+   values also running on these cards, and doesn't visibly "snap" back into
+   its cycle after a hover interrupts it (the two live on separate
+   elements). animation-delay is set per-card via inline style for the
+   stagger. */
+@keyframes prove-skill-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.prove-skill-float { animation: prove-skill-float 6s ease-in-out infinite; will-change: transform; }
+@media (prefers-reduced-motion: reduce) {
+  .prove-skill-float { animation: none; }
+}
+
+/* Hero background stars for mobile/coarse-pointer/reduced-motion visitors
+   (App.tsx's HeroCssStarfield) — HeroSceneGate's real WebGL starfield
+   (HeroScene.tsx) only ever mounts on desktop-with-fine-pointer, by design
+   (avoids a second GPU-heavy scene on mobile), which previously meant no
+   stars rendered there at all. This is a pure-CSS substitute: no canvas, no
+   WebGL context, no per-frame JS — three tiled radial-gradient layers
+   (hand-placed dot coordinates repeated via background-size, not random
+   per-visitor) at different tile sizes/opacities for a scattered, layered
+   look, plus a single shared opacity keyframe for a subtle twinkle. Same
+   "tiny, mostly white, hard-edged, sparingly tinted" character as the
+   desktop starfield, at zero GPU-context cost. */
+.hero-css-starfield {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hero-css-starfield > div {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+}
+.hero-css-starfield-layer-1 {
+  background-image:
+    radial-gradient(1px 1px at 18px 24px, #fff, transparent 100%),
+    radial-gradient(1px 1px at 77px 61px, #fff, transparent 100%),
+    radial-gradient(1.2px 1.2px at 134px 15px, #fff, transparent 100%),
+    radial-gradient(1px 1px at 46px 108px, #fff, transparent 100%),
+    radial-gradient(1px 1px at 172px 92px, #fff, transparent 100%),
+    radial-gradient(1.2px 1.2px at 8px 156px, #fff, transparent 100%),
+    radial-gradient(1px 1px at 101px 143px, #fff, transparent 100%),
+    radial-gradient(1px 1px at 152px 180px, #fff, transparent 100%),
+    radial-gradient(1px 1px at 63px 191px, #fff, transparent 100%),
+    radial-gradient(1.2px 1.2px at 190px 44px, #fff, transparent 100%);
+  background-size: 210px 210px;
+  opacity: 0.55;
+}
+.hero-css-starfield-layer-2 {
+  background-image:
+    radial-gradient(1.6px 1.6px at 40px 52px, #fff, transparent 100%),
+    radial-gradient(1.4px 1.4px at 190px 130px, #fff, transparent 100%),
+    radial-gradient(1.6px 1.6px at 270px 30px, #fff, transparent 100%),
+    radial-gradient(1.4px 1.4px at 110px 220px, #fff, transparent 100%),
+    radial-gradient(1.8px 1.8px at 250px 200px, #fff, transparent 100%),
+    radial-gradient(1.4px 1.4px at 20px 180px, #fff, transparent 100%);
+  background-size: 320px 320px;
+  background-position: 60px 20px;
+  opacity: 0.7;
+  animation: hero-star-twinkle 5s ease-in-out infinite;
+}
+.hero-css-starfield-layer-3 {
+  /* The "very small tinted fraction" — pale blue + pale yellow, sparse. */
+  background-image:
+    radial-gradient(1.4px 1.4px at 80px 60px, #bfd4ff, transparent 100%),
+    radial-gradient(1.3px 1.3px at 300px 220px, #ffe9bf, transparent 100%),
+    radial-gradient(1.4px 1.4px at 420px 90px, #bfd4ff, transparent 100%),
+    radial-gradient(1.3px 1.3px at 160px 340px, #ffe9bf, transparent 100%);
+  background-size: 480px 480px;
+  background-position: 30px 140px;
+  opacity: 0.6;
+  animation: hero-star-twinkle 7s ease-in-out infinite reverse;
+}
+@keyframes hero-star-twinkle {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-css-starfield-layer-2,
+  .hero-css-starfield-layer-3 {
+    animation: none;
+  }
+}
+
+/* Once the Hero section scrolls far enough out of view, App.tsx's Hero()
+   adds this class to stop its always-mounted ambient animations (starfield
+   twinkle, orbit sweep beam, orbit label glow) from continuing to run
+   in the background for the rest of the page's scroll session. Pausing
+   alone isn't enough: `will-change: transform` on `.hero-sweep-arm` keeps
+   its GPU compositor layer (a resident texture) allocated regardless of
+   whether the animation is running, so this also drops it back to `auto`
+   here — that's what actually releases the memory, not just the pause. */
+.hero-anims-paused .hero-css-starfield-layer-2,
+.hero-anims-paused .hero-css-starfield-layer-3,
+.hero-anims-paused .hero-sweep-arm,
+.hero-anims-paused .hero-sweep-arm-mobile,
+.hero-anims-paused [class*="hero-glow"] {
+  animation-play-state: paused;
+}
+.hero-anims-paused .hero-sweep-arm,
+.hero-anims-paused .hero-sweep-arm-mobile {
+  will-change: auto;
+}
+
+/* Same idea for Prove Your Skill's 5 floating cards — ProveYourSkill() adds
+   this class (via its own, separate observer, unrelated to the section's
+   scroll-pinned useScroll target) once scrolled far enough away. */
+.prove-skill-anims-paused .prove-skill-float {
+  animation-play-state: paused;
+  will-change: auto;
+}
+
+/* Pre-promotes each entrance-reveal card (opacity/x/y written per scroll
+   frame by ProveSkillRevealCard) to its own GPU layer up front, so the
+   compositor isn't creating/tearing down the layer mid-animation -- that
+   layer churn is what reads as flicker/stutter on mobile. Deliberately NOT
+   toggled off by .prove-skill-anims-paused (unlike the float animation
+   above): re-adding will-change to a one-shot reveal card as it re-enters
+   the 600px margin forces the browser to re-promote/re-flatten that layer,
+   which itself reads as a brief blink right at the section boundary on
+   lower-power mobile GPUs. Five small elements staying promoted costs
+   nothing worth trading for that. */
+.prove-skill-reveal-card {
+  will-change: opacity, transform;
+}
+

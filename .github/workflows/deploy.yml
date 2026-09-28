@@ -1,0 +1,48 @@
+name: Deploy React to Hostinger
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build
+
+      # Hostinger shared hosting: SSH on 65002. Only sync dist/ into react-home —
+      # never public_html root or other WordPress paths.
+      - name: Deploy dist to wp-content/react-home via SSH
+        env:
+          HOST: ${{ secrets.HOSTINGER_FTP_SERVER }}
+          USERNAME: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          SSHPASS: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq sshpass rsync
+          REMOTE_PATH="/home/${USERNAME}/public_html/wp-content/react-home"
+          sshpass -e ssh -p 65002 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            "${USERNAME}@${HOST}" "mkdir -p '${REMOTE_PATH}'"
+          sshpass -e rsync -avz --delete \
+            -e "ssh -p 65002 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            ./dist/ \
+            "${USERNAME}@${HOST}:${REMOTE_PATH}/"
