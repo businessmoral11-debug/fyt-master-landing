@@ -933,15 +933,11 @@ function TrustStripMobile() {
 
 function TrustStripDesktop() {
   return (
-    <div className="hidden lg:grid bg-black relative w-full grid-cols-2 items-center px-[80px] py-[32px]">
-      <div className="flex justify-center">
-        <div className={TRUST_STRIP_BOX_CLASSES} style={{ background: "rgba(255,255,255,0.05)" }}>
-          <TrustStripContent />
-        </div>
+    <div className="hidden lg:flex bg-black relative w-full items-center justify-center px-[80px] py-[32px] gap-[56px]">
+      <div className={TRUST_STRIP_BOX_CLASSES} style={{ background: "rgba(255,255,255,0.05)" }}>
+        <TrustStripContent />
       </div>
-      <div className="flex justify-center">
-        <AwardBadge />
-      </div>
+      <AwardBadge />
     </div>
   );
 }
@@ -989,7 +985,7 @@ function AwardBadge() {
 // that whole section, trust strip included.
 function AwardBadgeMobileBar() {
   return (
-    <div className="lg:hidden bg-black relative w-full flex items-center justify-center px-[20px] py-[24px]">
+    <div className="lg:hidden bg-black relative w-full flex items-center justify-center px-[20px] pt-[10px] pb-[20px]">
       <AwardBadge />
     </div>
   );
