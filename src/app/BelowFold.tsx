@@ -12,6 +12,7 @@ import imgPressBenzinga from "@/assets/live-site/press-logos/benzinga.webp";
 import imgPressDigitalJournal from "@/assets/live-site/press-logos/digitaljournal.webp";
 import imgPressYahoo from "@/assets/live-site/press-logos/yahoo.webp";
 import imgPressTrustedProp from "@/assets/live-site/press-logos/the-trusted-prop.png";
+import imgAwardBadge from "@/assets/live-site/awards/fastest-growing-prop-firm-2026.png";
 import imgMatchTraderLogo from "@/assets/live-site/platform-logos/match-trader.png";
 import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5.png";
 import { STEP_PLANS, STEP_SIZES, getEntry, checkoutUrl, fmtSize, planFlag, PLATFORM_OPTIONS, CHECKOUT_COUPON_CODE, type StepId, type PlanId, type PlatformId } from "@/app/data/pricing";
@@ -429,8 +430,40 @@ function FeaturedIn() {
           <FeaturedInDesktopRow />
           <FeaturedInMobileRow />
         </motion.div>
+        <AwardBadge />
       </div>
     </div>
+  );
+}
+
+function AwardBadge() {
+  return (
+    <motion.a
+      href="https://brandsreviewmagazine.com/award-list-2026/"
+      target="_blank"
+      rel="noopener noreferrer"
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.55, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ scale: 1.015 }}
+      whileTap={{ scale: 0.98 }}
+      className="flex items-center gap-[12px] lg:gap-[16px] px-[16px] py-[10px] lg:px-[22px] lg:py-[12px] rounded-[16px] max-w-[420px] mx-auto no-underline cursor-pointer transition-shadow duration-300 hover:shadow-[0_12px_32px_-12px_rgba(212,175,127,0.35)]"
+      style={{
+        background: "linear-gradient(90deg, rgba(212,175,127,0.08) 0%, rgba(212,175,127,0.03) 100%)",
+        border: "1px solid rgba(212,175,127,0.28)",
+        boxShadow: "inset 0px 1px 8px rgba(212,175,127,0.06)",
+      }}
+    >
+      <img
+        src={imgAwardBadge}
+        alt="BRM Brands Review Magazine - Fastest Growing Prop Trading Firm Global 2026"
+        className="w-[36px] h-[29px] lg:w-[44px] lg:h-[35px] object-contain shrink-0"
+      />
+      <p className="font-['Inter:Medium',sans-serif] font-medium text-[#e5c9a3] text-[12px] lg:text-[13px] leading-[16px] tracking-[0.01em] text-left">
+        Officially Awarded as <span className="text-white font-semibold">Fastest Growing Prop Trading Firm 2026</span>
+      </p>
+    </motion.a>
   );
 }
 
