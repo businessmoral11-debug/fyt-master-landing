@@ -12,6 +12,18 @@ body {
   -ms-overflow-style: none;
 }
 
+/* Stop the browser's native "pull-to-refresh" gesture (Android Chrome,
+   some mobile browsers) from firing when a fast scroll + tap near the top
+   of the page reads as a pull-down. This was reloading the whole page
+   mid-scroll — nothing in the app itself ever calls location.reload(), so
+   this browser gesture was the only source of the unexpected refreshes.
+   `contain` still allows normal scroll bounce/rubber-banding, it only
+   stops the gesture from escaping to the browser chrome. */
+html,
+body {
+  overscroll-behavior-y: contain;
+}
+
 /* Native, browser-driven smooth scrolling for anchor-link jumps (nav links,
    the promo banner's #challenge jump) only — this affects programmatic/hash
    scrolling, never continuous wheel/touch scrolling, which the browser
