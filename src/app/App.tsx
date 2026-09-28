@@ -1300,7 +1300,7 @@ function Hero() {
     >
       <HeroBackground />
       {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-[20px] lg:px-[88px] w-full lg:absolute lg:top-[64px] lg:h-[496px]">
+      <div className="relative z-10 flex flex-col items-center justify-center text-center px-[20px] lg:px-[88px] w-full lg:absolute lg:top-[40px] lg:h-[496px]">
         <div className="flex justify-center max-w-full shrink-0 min-h-[40px] lg:min-h-0 scale-90 origin-center lg:scale-100">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
