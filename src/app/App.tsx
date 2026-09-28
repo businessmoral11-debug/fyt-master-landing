@@ -11,6 +11,7 @@ import imgPressBarchart from "@/assets/live-site/press-logos/barchart.webp";
 import imgPressBenzinga from "@/assets/live-site/press-logos/benzinga.webp";
 import imgPressDigitalJournal from "@/assets/live-site/press-logos/digitaljournal.webp";
 import imgPressYahoo from "@/assets/live-site/press-logos/yahoo.webp";
+import imgAwardBadge from "@/assets/live-site/awards/fastest-growing-prop-firm-2026.png";
 import imgMatchTraderLogo from "@/assets/live-site/platform-logos/match-trader.png";
 import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5.png";
 import { STEP_PLANS, STEP_SIZES, getEntry, checkoutUrl, fmtSize, planFlag, PLATFORM_OPTIONS, type StepId, type PlanId, type PlatformId } from "@/app/data/pricing";
@@ -932,10 +933,64 @@ function TrustStripMobile() {
 
 function TrustStripDesktop() {
   return (
-    <div className="hidden lg:flex bg-black relative w-full items-center justify-center px-[80px] py-[32px]">
-      <div className={TRUST_STRIP_BOX_CLASSES} style={{ background: "rgba(255,255,255,0.05)" }}>
-        <TrustStripContent />
+    <div className="hidden lg:grid bg-black relative w-full grid-cols-2 items-center px-[80px] py-[32px]">
+      <div className="flex justify-center">
+        <div className={TRUST_STRIP_BOX_CLASSES} style={{ background: "rgba(255,255,255,0.05)" }}>
+          <TrustStripContent />
+        </div>
       </div>
+      <div className="flex justify-center">
+        <AwardBadge />
+      </div>
+    </div>
+  );
+}
+
+// Award badge — sits to the right of the trust strip on desktop
+// (TrustStripDesktop, equal-width columns so both sides balance) and in
+// its own bar directly below the hero on mobile (AwardBadgeMobileBar).
+// Styled to match the trust pill's own understated chrome (subtle
+// border + blur) rather than standing out with a glow.
+function AwardBadge() {
+  return (
+    <motion.a
+      href="https://brandsreviewmagazine.com/award-list-2026/"
+      target="_blank"
+      rel="noopener noreferrer"
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.55, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className="flex items-center gap-[16px] lg:gap-[18px] px-[18px] py-[12px] lg:px-[24px] lg:py-[15px] rounded-[16px] shrink-0 no-underline cursor-pointer border backdrop-blur-[7px]"
+      style={{
+        background: "rgba(212,175,127,0.06)",
+        borderColor: "rgba(212,175,127,0.3)",
+      }}
+    >
+      <img
+        src={imgAwardBadge}
+        alt="BRM Brands Review Magazine - Fastest Growing Prop Trading Firm Global 2026"
+        className="w-[52px] h-[42px] lg:w-[62px] lg:h-[50px] object-contain shrink-0"
+      />
+      <div className="flex flex-col gap-[3px]">
+        <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#d4af7f] text-[10px] lg:text-[11px] tracking-[1.5px] uppercase whitespace-nowrap">Officially Awarded</p>
+        <p className="font-['Inter:Bold',sans-serif] font-bold text-white text-[14px] lg:text-[16px] leading-[1.15] whitespace-nowrap">Fastest Growing Prop Trading Firm 2026</p>
+      </div>
+    </motion.a>
+  );
+}
+
+// Mobile-only counterpart to the AwardBadge in TrustStripDesktop above.
+// The hero's own mobile trust strip is absolutely positioned inside the
+// hero graphic itself (TrustStripMobile), so this renders as an ordinary
+// full-width dark bar right after the hero ends — reading as "just below"
+// that whole section, trust strip included.
+function AwardBadgeMobileBar() {
+  return (
+    <div className="lg:hidden bg-black relative w-full flex items-center justify-center px-[20px] py-[24px]">
+      <AwardBadge />
     </div>
   );
 }
@@ -1394,6 +1449,7 @@ export default function App() {
         <Nav />
       </div>
       <Hero />
+      <AwardBadgeMobileBar />
       <TrustStripDesktop />
       <BelowFoldErrorBoundary>
         <Suspense fallback={null}>
