@@ -569,7 +569,7 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
     <span
       role="timer"
       aria-label={`${Number(left.hh)} hours ${Number(left.mm)} minutes left`}
-      className={`inline-flex shrink-0 items-center rounded-full font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] tabular-nums text-white ${compact ? "h-[16px] px-[7px] text-[7.5px]" : "h-[22px] px-[10px] text-[9px]"}`}
+      className={`inline-flex shrink-0 items-center rounded-full font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] tabular-nums text-white ${compact ? "h-[16px] px-[7px] text-[7.5px]" : "h-[24px] px-[12px] text-[11px] lg:h-[25px] lg:text-[12px]"}`}
       style={{
         background: "#DC2626",
         border: "1px solid rgba(255,255,255,0.28)",
