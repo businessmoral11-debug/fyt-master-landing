@@ -36,8 +36,8 @@ export const PROMO_ITEMS: PromoItem[] = [
   { kind: "code", label: "The NEW FYT Deal", text: "35% off + Buy 1 Get 2", code: PROMO_CODE },
 ];
 
-/** Offer ends Wednesday 30 Sep 07:59:59 (UTC+6) — extended 2h from the prior deadline of Wed 30 Sep 05:59:59 (UTC+6). */
-export const PROMO_DEADLINE = "2026-09-30T07:59:59+06:00";
+/** Offer ends Wednesday 30 Sep 13:59:59 (UTC+6), extended 6h from 07:59:59 (UTC+6). */
+export const PROMO_DEADLINE = "2026-09-30T13:59:59+06:00";
 
 export interface Countdown {
   days: number;
