@@ -1004,7 +1004,7 @@ function AwardBadge() {
         href="https://brandsreviewmagazine.com/award-list-2026/"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex flex-col gap-[3px] no-underline cursor-pointer"
+        className="flex flex-col gap-[3px] no-underline cursor-pointer text-left items-start"
       >
         <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#d4af7f] text-[10px] lg:text-[11px] tracking-[1.5px] uppercase whitespace-nowrap">Officially Awarded</p>
         <p className="font-['Inter:Bold',sans-serif] font-bold text-white text-[14px] lg:text-[16px] leading-[1.15] whitespace-nowrap">Fastest Growing Prop Trading Firm 2026</p>
@@ -1018,10 +1018,13 @@ function AwardBadge() {
 // hero graphic itself (TrustStripMobile), so this renders as an ordinary
 // full-width dark bar right after the hero ends — reading as "just below"
 // that whole section, trust strip included.
+/** Mobile-only bar below the hero — now holds the Trustindex widget, swapped
+ * with the award badge which moved up to the top of the hero (see
+ * HeroTrustindexGate). Kept the original name to minimize the diff. */
 function AwardBadgeMobileBar() {
   return (
     <div className="lg:hidden bg-black relative w-full flex items-center justify-center px-[20px] pt-[10px] pb-[20px]">
-      <AwardBadge />
+      <HeroTrustindexMobileWidget />
     </div>
   );
 }
@@ -1273,7 +1276,10 @@ function HeroTrustindexGate() {
     return () => query.removeEventListener("change", update);
   }, []);
 
-  return isDesktop ? <HeroTrustindexWidget /> : <HeroTrustindexMobileWidget />;
+  // Mobile: swapped with the award badge (which now sits here at the top,
+  // while the mobile Trustindex widget moved down to AwardBadgeMobileBar's
+  // old spot, below the hero) — desktop is unchanged.
+  return isDesktop ? <HeroTrustindexWidget /> : <AwardBadge />;
 }
 
 const HERO_ANIMATIONS_ACTIVE_MARGIN_PX = 600;
@@ -1296,7 +1302,7 @@ function Hero() {
   return (
     <div
       ref={heroRef}
-      className={`bg-black relative flex flex-col items-center overflow-hidden shrink-0 w-full min-h-[620px] lg:h-[1080px] py-[64px] lg:py-0 ${animationsActive ? "" : "hero-anims-paused"}`}
+      className={`bg-black relative flex flex-col items-center overflow-hidden shrink-0 w-full min-h-[620px] lg:h-[1080px] pt-[28px] pb-[64px] lg:py-0 ${animationsActive ? "" : "hero-anims-paused"}`}
     >
       <HeroBackground />
       {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
