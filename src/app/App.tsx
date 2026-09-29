@@ -1018,10 +1018,13 @@ function AwardBadge() {
 // hero graphic itself (TrustStripMobile), so this renders as an ordinary
 // full-width dark bar right after the hero ends — reading as "just below"
 // that whole section, trust strip included.
+/** Mobile-only bar below the hero — now holds the Trustindex widget, swapped
+ * with the award badge which moved up to the top of the hero (see
+ * HeroTrustindexGate). Kept the original name to minimize the diff. */
 function AwardBadgeMobileBar() {
   return (
     <div className="lg:hidden bg-black relative w-full flex items-center justify-center px-[20px] pt-[10px] pb-[20px]">
-      <AwardBadge />
+      <HeroTrustindexMobileWidget />
     </div>
   );
 }
@@ -1273,7 +1276,10 @@ function HeroTrustindexGate() {
     return () => query.removeEventListener("change", update);
   }, []);
 
-  return isDesktop ? <HeroTrustindexWidget /> : <HeroTrustindexMobileWidget />;
+  // Mobile: swapped with the award badge (which now sits here at the top,
+  // while the mobile Trustindex widget moved down to AwardBadgeMobileBar's
+  // old spot, below the hero) — desktop is unchanged.
+  return isDesktop ? <HeroTrustindexWidget /> : <AwardBadge />;
 }
 
 const HERO_ANIMATIONS_ACTIVE_MARGIN_PX = 600;
