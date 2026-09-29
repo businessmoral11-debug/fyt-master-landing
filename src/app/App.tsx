@@ -1004,7 +1004,7 @@ function AwardBadge() {
         href="https://brandsreviewmagazine.com/award-list-2026/"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex flex-col gap-[3px] no-underline cursor-pointer"
+        className="flex flex-col gap-[3px] no-underline cursor-pointer text-left items-start"
       >
         <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#d4af7f] text-[10px] lg:text-[11px] tracking-[1.5px] uppercase whitespace-nowrap">Officially Awarded</p>
         <p className="font-['Inter:Bold',sans-serif] font-bold text-white text-[14px] lg:text-[16px] leading-[1.15] whitespace-nowrap">Fastest Growing Prop Trading Firm 2026</p>
@@ -1302,7 +1302,7 @@ function Hero() {
   return (
     <div
       ref={heroRef}
-      className={`bg-black relative flex flex-col items-center overflow-hidden shrink-0 w-full min-h-[620px] lg:h-[1080px] py-[64px] lg:py-0 ${animationsActive ? "" : "hero-anims-paused"}`}
+      className={`bg-black relative flex flex-col items-center overflow-hidden shrink-0 w-full min-h-[620px] lg:h-[1080px] pt-[28px] pb-[64px] lg:py-0 ${animationsActive ? "" : "hero-anims-paused"}`}
     >
       <HeroBackground />
       {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
