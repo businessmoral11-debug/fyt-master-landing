@@ -113,6 +113,10 @@ for (const vp of BENCH_ONLY ? [] : viewports) {
   `;
   log.push(`[bench ${BENCH_LABEL}] ${await frameStats("idle-at-challenge-3s", `document.getElementById("challenge").scrollIntoView(); await new Promise(r => setTimeout(r, 3000));`)}`);
   if (!BENCH_ONLY) {
+    log.push(`[diag] canvases=${await page.evaluate(() => [...document.querySelectorAll("canvas")].map((c) => `${c.width}x${c.height}@${Math.round(c.getBoundingClientRect().top)}`).join(","))}`);
+    log.push(`[diag] running CSS animations=${await page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running").map((a) => (a.animationName || a.constructor.name) + ":" + (a.effect?.target?.className?.toString?.().slice(0, 40) ?? "")).slice(0, 40).join(" | "))}`);
+    log.push(`[bench ${BENCH_LABEL}] ${await frameStats("idle-css-anims-paused", `const st=document.createElement("style"); st.id="__p"; st.textContent="*,*::before,*::after{animation-play-state:paused!important}"; document.head.appendChild(st); await new Promise(r => setTimeout(r, 3000));`)}`);
+    log.push(`[bench ${BENCH_LABEL}] ${await frameStats("idle-css-paused-no-canvas", `document.querySelectorAll("canvas").forEach(c => c.style.display="none"); await new Promise(r => setTimeout(r, 3000)); document.getElementById("__p")?.remove(); document.querySelectorAll("canvas").forEach(c => c.style.display="");`)}`);
     await cdp.send("Profiler.enable");
     await cdp.send("Profiler.setSamplingInterval", { interval: 200 });
     await cdp.send("Profiler.start");
