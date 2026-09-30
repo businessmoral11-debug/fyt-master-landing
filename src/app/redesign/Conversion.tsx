@@ -143,6 +143,8 @@ function relativeTime(iso: string | null, now: number): string {
 /** Live marquee of the latest verified rewards (same public feed as the rewards table). */
 export function PayoutTicker() {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const onScreen = useInView(ref, { margin: "150px" });
   const [items, setItems] = useState<PublicPayout[]>([]);
   const now = useNow(false);
   useEffect(() => {
@@ -159,7 +161,7 @@ export function PayoutTicker() {
   if (items.length === 0) return null;
   const track = reduce ? items : [...items, ...items];
   return (
-    <div className="fyt-rd relative w-full overflow-hidden" style={{ background: "rgba(255,255,255,0.025)", borderBottom: "1px solid rgba(148,178,255,0.12)" }} aria-label="Recent verified rewards">
+    <div ref={ref} className="fyt-rd relative w-full overflow-hidden" style={{ background: "rgba(255,255,255,0.025)", borderBottom: "1px solid rgba(148,178,255,0.12)" }} aria-label="Recent verified rewards">
       <div className="mx-auto flex w-full max-w-[1440px] items-center">
         <div className="z-[1] flex shrink-0 items-center gap-[8px] py-[12px] pl-[20px] pr-[14px] lg:pl-[80px]" style={{ background: "linear-gradient(90deg, #06101f 70%, transparent)" }}>
           <span className="relative flex size-[8px]">
@@ -169,7 +171,7 @@ export function PayoutTicker() {
           <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86efac]">Live Rewards</span>
         </div>
         <div className="fyt-marquee-mask min-w-0 flex-1 overflow-hidden">
-          <ul className={`flex items-center ${reduce ? "flex-wrap gap-[24px]" : "fyt-rd-marquee w-max"}`} style={reduce ? undefined : { animationDuration: "60s" }}>
+          <ul className={`flex items-center ${reduce ? "flex-wrap gap-[24px]" : "fyt-rd-marquee w-max"}`} style={reduce ? undefined : { animationDuration: "60s", animationPlayState: onScreen ? "running" : "paused" }}>
             {track.map((p, i) => {
               const flag = countryFlagUrl(p.countryCode);
               return (

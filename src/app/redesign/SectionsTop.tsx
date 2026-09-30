@@ -42,15 +42,17 @@ const PRESS = [
 
 export function FeaturedIn() {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLElement>(null);
+  const onScreen = useInView(ref, { margin: "150px" });
   const track = reduce ? PRESS : [...PRESS, ...PRESS, ...PRESS, ...PRESS];
   return (
-    <section className="fyt-rd relative w-full shrink-0 overflow-hidden" style={{ background: C.ink }} aria-label="As featured in">
+    <section ref={ref} className="fyt-rd relative w-full shrink-0 overflow-hidden" style={{ background: C.ink }} aria-label="As featured in">
       <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.25), transparent)" }} aria-hidden="true" />
       <div className="absolute inset-x-0 bottom-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.18), transparent)" }} aria-hidden="true" />
       <div className="relative mx-auto flex w-full max-w-[1280px] flex-col items-center gap-[18px] px-[20px] py-[34px] lg:flex-row lg:gap-[40px] lg:px-[80px] lg:py-[30px]">
         <p className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#6f7a94] lg:w-[150px]">As featured in</p>
         <div className="fyt-marquee-mask w-full min-w-0 overflow-hidden">
-          <div className={`flex items-center ${reduce ? "flex-wrap justify-center gap-x-[40px] gap-y-[16px]" : "fyt-rd-marquee w-max"}`}>
+          <div className={`flex items-center ${reduce ? "flex-wrap justify-center gap-x-[40px] gap-y-[16px]" : "fyt-rd-marquee w-max"}`} style={{ animationPlayState: onScreen ? "running" : "paused" }}>
             {track.map((logo, i) => (
               <img
                 key={`${logo.alt}-${i}`}
