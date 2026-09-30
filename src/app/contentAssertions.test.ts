@@ -1124,8 +1124,9 @@ describe("Promo banner", () => {
     const navIdx = app.indexOf("<Nav />");
     expect(bannerIdx).toBeGreaterThan(-1);
     expect(navIdx).toBeGreaterThan(bannerIdx);
-    expect(app).toContain('<div className="sticky top-0 z-40 w-full">');
-    const stickyIdx = app.indexOf('<div className="sticky top-0 z-40 w-full">');
+    // Fixed header + spacer (so phones can fold the header without reflowing the page).
+    expect(app).toContain('<div ref={ref} className="fixed inset-x-0 top-0 z-40 w-full">');
+    const stickyIdx = app.indexOf("<SiteHeader>");
     expect(stickyIdx).toBeGreaterThan(-1);
     expect(stickyIdx).toBeLessThan(bannerIdx);
     const navBody = sliceToNextFunction(app, "function Nav()");

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo, memo, lazy, Suspense, Component, Fragment, type MouseEvent, type ReactNode } from "react";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import * as Accordion from "@radix-ui/react-accordion";
 import svgPaths from "@/imports/FytLandingPage/svg-1sqldvgw4z";
@@ -70,7 +70,7 @@ import { motion, useScroll, useTransform, useMotionTemplate, useReducedMotion, u
 import { AnimatePresence } from "motion/react";
 import { useMotionValue, useSpring, useMotionValueEvent, useAnimation } from "motion/react";
 import { useMagnetic } from "@/app/motion/magnetic";
-import { useScrollShrink } from "@/app/motion/navScroll";
+import { useMobileHeaderMode, useScrollShrink, type MobileHeaderMode } from "@/app/motion/navScroll";
 import { useTilt } from "@/app/motion/tilt";
 import { useCursorGlow } from "@/app/motion/cursorGlow";
 import { AmbientBlob, StaticGlow, NOISE_BG, AccentLine } from "@/app/ambient";
@@ -481,15 +481,23 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
+/** Phone header mode (compact / nav tucked away), shared by the banner and the nav. */
+const HeaderModeContext = createContext<MobileHeaderMode>({ compact: false, navHidden: false });
+
 function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const scrolled = useScrollShrink(40);
+  const { compact, navHidden } = useContext(HeaderModeContext);
+  const tucked = navHidden && !menuOpen;
   return (
     <div className="w-full">
       <div>
         <div
-          className="fyt-nav-glass border-b rounded-b-[22px] transition-[background-color,backdrop-filter,box-shadow] duration-300 ease-out"
+          className="fyt-nav-glass relative z-[1] border-b rounded-b-[22px] transition-[background-color,backdrop-filter,box-shadow,transform,opacity] duration-300 ease-out"
           style={{
+            transform: tucked ? "translate3d(0,-100%,0)" : "translate3d(0,0,0)",
+            opacity: tucked ? 0 : 1,
+            pointerEvents: tucked ? "none" : undefined,
             background: scrolled ? "rgba(10,14,24,0.85)" : "rgba(10,14,24,0.35)",
             backdropFilter: scrolled ? "blur(16px) saturate(180%)" : "blur(12px) saturate(180%)",
             WebkitBackdropFilter: scrolled ? "blur(16px) saturate(180%)" : "blur(12px) saturate(180%)",
@@ -497,21 +505,20 @@ function Nav() {
             boxShadow: scrolled ? "0 16px 48px rgba(0,0,0,0.45)" : "0 12px 40px rgba(0,0,0,0.35)",
           }}
         >
-          {/* Height is intentionally constant (not scroll-shrunk): the sticky
-              nav's own box height participates in normal document flow, so
-              animating it reflowed everything below -- including the Hero --
-              on every crossing of the shrink threshold. The background/blur/
-              shadow "scrolled" polish above is unaffected (paint-only, no
-              layout impact) and stays. */}
-          <div className="flex flex-row items-center rounded-[inherit] size-full h-[72px] lg:h-[76px]">
+          {/* The header is position:fixed with a spacer (see SiteHeader), so on
+              phones the bar can slim down after scrolling without reflowing
+              the page below it. Desktop keeps the full height. */}
+          <div className={`flex flex-row items-center rounded-[inherit] size-full transition-[height] duration-300 ease-out ${compact ? "h-[54px]" : "h-[72px]"} lg:h-[76px]`}>
             <div className="content-stretch grid grid-cols-3 items-center px-[20px] lg:px-[26px] relative size-full max-w-[1280px] mx-auto">
-              <div className="col-start-1 justify-self-start"><Brand /></div>
+              <div className={`col-start-1 justify-self-start origin-left transition-transform duration-300 ease-out ${compact ? "scale-[0.84]" : ""} lg:scale-100`}><Brand /></div>
               <div className="col-start-2 justify-self-center"><Links /></div>
               <div className="col-start-3 justify-self-end flex items-center">
                 {/* Desktop right cluster */}
                 <div className="hidden lg:flex"><NavRight /></div>
                 {/* Mobile: hamburger only — Log in + Start evaluation live in the overlay */}
-                <HamburgerButton onClick={() => setMenuOpen(true)} />
+                <div className={`origin-right transition-transform duration-300 ease-out ${compact ? "scale-[0.84]" : ""}`}>
+                  <HamburgerButton onClick={() => setMenuOpen(true)} />
+                </div>
               </div>
             </div>
           </div>
@@ -524,6 +531,8 @@ function Nav() {
 
 
 const PROMO_BANNER_ACTIVE_MARGIN_PX = 600;
+/** "40% off + Buy 1 Get 3" for the one-line phone banner (drops "Limited Time:" and "Instantly"). */
+const PROMO_DEAL_SHORT = PROMO_DEAL_LINE.replace(/^limited time:\s*/i, "").replace(/\s*instantly\s*$/i, "");
 const PROMO_BANNER_GRADIENT =
   "linear-gradient(90deg, #172554 0%, #1d4ed8 28%, #2563eb 50%, #1d4ed8 72%, #172554 100%)";
 
@@ -590,6 +599,7 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
 
 function PromoBanner() {
   const reduceMotion = useReducedMotion();
+  const { compact } = useContext(HeaderModeContext);
   const bannerRef = useRef<HTMLDivElement>(null);
   const [nearViewport, setNearViewport] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -654,7 +664,7 @@ function PromoBanner() {
       onClick={scrollToPricing}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); scrollToPricing(); } }}
       aria-label="View current promotions, jump to pricing"
-      className="group/promo relative shrink-0 w-full cursor-pointer overflow-hidden"
+      className="group/promo relative z-[2] shrink-0 w-full cursor-pointer overflow-hidden"
       style={{
         background: PROMO_BANNER_GRADIENT,
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.25), 0 8px 28px rgba(37,99,235,0.35)",
@@ -677,24 +687,34 @@ function PromoBanner() {
         />
       )}
 
-      {/* Mobile: 2 lines. Deal + CODE on top; benefits + countdown below */}
-      <div className="relative mx-auto flex w-full flex-col items-center justify-center gap-[5px] px-[6px] py-[7px] md:hidden">
+      {/* Mobile. At the top: 2 lines (deal + CODE, then benefits + countdown).
+          After scrolling: folds to one slim line (short deal + CODE + countdown). */}
+      <div className={`relative mx-auto flex w-full flex-col items-center justify-center px-[6px] transition-[padding] duration-300 ease-out md:hidden ${compact ? "py-[6px]" : "py-[7px]"}`}>
         <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
           <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[10px] tracking-[0.01em] min-[380px]:text-[10.5px]">
-            {PROMO_DEAL_LINE}
+            {compact ? PROMO_DEAL_SHORT : PROMO_DEAL_LINE}
           </span>
           <CodePill compact />
+          {compact && <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} />}
         </div>
-        <div className="flex items-center justify-center gap-x-[5px] whitespace-nowrap">
-          {PROMO_BENEFITS.map((text, i) => (
-            <Fragment key={text}>
-              {i > 0 && <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />}
-              <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[8.5px] tracking-[0.01em] text-white/85">
-                {text}
-              </span>
-            </Fragment>
-          ))}
-          <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} />
+        <div
+          className="grid w-full transition-[grid-template-rows,opacity] duration-300 ease-out"
+          style={{ gridTemplateRows: compact ? "0fr" : "1fr", opacity: compact ? 0 : 1 }}
+          aria-hidden={compact || undefined}
+        >
+          <div className="overflow-hidden">
+            <div className="flex items-center justify-center gap-x-[5px] whitespace-nowrap pt-[5px]">
+              {PROMO_BENEFITS.map((text, i) => (
+                <Fragment key={text}>
+                  {i > 0 && <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />}
+                  <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[8.5px] tracking-[0.01em] text-white/85">
+                    {text}
+                  </span>
+                </Fragment>
+              ))}
+              {!compact && <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} />}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1067,8 +1087,7 @@ function HeroBackground() {
       {HERO_RADAR_ENABLED && <style>{HERO_SWEEP_CSS}</style>}
 
       {/* Same backdrop as the "Proof in Numbers" section: navy base, faint
-          technical grid, two soft blue glows and a rising curve along the
-          bottom. All static (no animation), so it costs nothing per frame. */}
+          technical grid, two soft blue glows. All static (no animation), so it costs nothing per frame. */}
       <div className="absolute inset-0 fyt-stars opacity-70" />
       <div className="absolute inset-0 fyt-grid-dark" />
       <div
@@ -1079,21 +1098,6 @@ function HeroBackground() {
         className="absolute rounded-full"
         style={{ right: "-10%", bottom: "-6%", width: 640, height: 640, background: "radial-gradient(circle, rgba(59,130,246,0.14), transparent 65%)" }}
       />
-      <svg viewBox="0 0 1200 300" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-[38%] w-full lg:h-[46%]" fill="none">
-        <defs>
-          <linearGradient id="hero-curve-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#2563eb" stopOpacity="0.16" />
-            <stop offset="100%" stopColor="#2563eb" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="hero-curve-stroke" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#2563eb" stopOpacity="0" />
-            <stop offset="30%" stopColor="#3b82f6" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#93c5fd" stopOpacity="0.8" />
-          </linearGradient>
-        </defs>
-        <path d="M0 290 C 260 280, 460 250, 640 190 S 980 60, 1200 10 L1200 300 L0 300 Z" fill="url(#hero-curve-fill)" />
-        <path d="M0 290 C 260 280, 460 250, 640 190 S 980 60, 1200 10" stroke="url(#hero-curve-stroke)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-      </svg>
 
       <HeroSceneGate />
 
@@ -1511,6 +1515,41 @@ function IntercomLauncher() {
   );
 }
 
+/**
+ * Fixed header + a spacer that reserves its full (expanded) height in the page.
+ * Because the header is fixed rather than sticky, it can fold down on phones
+ * while scrolling without shifting any content below it.
+ */
+function SiteHeader({ children }: { children: ReactNode }) {
+  const mode = useMobileHeaderMode();
+  const ref = useRef<HTMLDivElement>(null);
+  const compactRef = useRef(mode.compact);
+  compactRef.current = mode.compact;
+  const [spacer, setSpacer] = useState(0);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      if (!compactRef.current) setSpacer(el.offsetHeight);
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <HeaderModeContext.Provider value={mode}>
+      <div ref={ref} className="fixed inset-x-0 top-0 z-40 w-full">
+        {children}
+      </div>
+      <div aria-hidden="true" className="w-full shrink-0" style={{ height: spacer }} />
+    </HeaderModeContext.Provider>
+  );
+}
+
 export default function App() {
   useEffect(prefetchBelowFoldChunks, []);
   useEffect(() => {
@@ -1519,11 +1558,11 @@ export default function App() {
   return (
     <div className="bg-[#070810] content-stretch flex flex-col items-start relative w-full min-h-screen">
       <CursorSpotlight />
-      <div className="sticky top-0 z-40 w-full">
+      <SiteHeader>
         <DesktopTopDisclaimer />
         <PromoBanner />
         <Nav />
-      </div>
+      </SiteHeader>
       <Hero />
       <AwardBadgeMobileBar />
       <TrustStripDesktop />
