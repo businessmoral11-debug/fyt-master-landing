@@ -5,8 +5,8 @@ import { countryFlagUrl, fetchFeaturedPayouts, formatPayoutAmount, type PublicPa
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import { EASE } from "./ui";
 
-/** "35% off" from "35% off + Buy 1 Get 2 Instantly" — follows the promo data automatically. */
-const DEAL_SHORT = PROMO_DEAL_LINE.split("+")[0].trim();
+/** "40% off" pulled from the deal line (e.g. "Limited Time: 40% off + Buy 1 Get 3 Instantly"), so it follows the promo data automatically. */
+const DEAL_SHORT = (PROMO_DEAL_LINE.match(/\d+%\s*off/i)?.[0] ?? PROMO_DEAL_LINE.split("+")[0]).trim();
 
 function useNow(active = true) {
   const [now, setNow] = useState(() => Date.now());
@@ -49,6 +49,8 @@ export function PricingOffer() {
   const ref = useRef<HTMLDivElement>(null);
   const onScreen = useInView(ref, { margin: "100px" });
   const left = formatHoursLeft(PROMO_DEADLINE, useNow(onScreen));
+  const days = Math.floor(Number(left.hh) / 24);
+  const hours = String(Number(left.hh) % 24).padStart(2, "0");
   return (
     <motion.div
       ref={ref}
@@ -73,12 +75,18 @@ export function PricingOffer() {
             <span className="inline-flex items-center gap-[6px] rounded-full bg-[#0b1220] px-[10px] py-[4px] text-[12px] font-semibold tracking-[0.06em] text-white" style={{ border: "1px solid rgba(148,178,255,0.25)" }}>
               <span className="text-[#93c5fd]">CODE</span> {PROMO_CODE}
             </span>
-            Coupon Auto applied
+            Applied at checkout
           </p>
         </div>
         {!left.expired && (
-          <div className="flex items-start gap-[8px]" role="timer" aria-label={`${Number(left.hh)} hours ${Number(left.mm)} minutes left`}>
-            <Digit value={left.hh} label="Hours" />
+          <div className="flex items-start gap-[6px] sm:gap-[8px]" role="timer" aria-label={`${days} days ${Number(hours)} hours ${Number(left.mm)} minutes left`}>
+            {days > 0 && (
+              <>
+                <Digit value={String(days).padStart(2, "0")} label="Days" />
+                <span className="pt-[10px] text-[22px] font-semibold text-[#5b6b8f]">:</span>
+              </>
+            )}
+            <Digit value={hours} label="Hours" />
             <span className="pt-[10px] text-[22px] font-semibold text-[#5b6b8f]">:</span>
             <Digit value={left.mm} label="Min" />
             <span className="pt-[10px] text-[22px] font-semibold text-[#5b6b8f]">:</span>

@@ -193,3 +193,15 @@
 @media (prefers-reduced-motion: reduce) {
   .fyt-shimmer-on .fyt-gradient-text, .fyt-ring::before, .fyt-rd-ping-gated { animation: none; }
 }
+
+/* Trustindex reviews inside the redesigned Trust section: drop the widget's
+   own white box so it sits on the section background, and collapse its
+   padding while the reviews haven't rendered (they only load on the live
+   domain), so no empty band is left between the videos and the CTA. */
+.fyt-ti-bare .ti-dark-shell {
+  background: transparent !important;
+}
+.fyt-ti-bare .ti-dark-shell > div:not(:has(.ti-widget)) {
+  padding-top: 0;
+  padding-bottom: 0;
+}

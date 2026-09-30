@@ -412,10 +412,10 @@ export function Testimonials() {
           <TestimonialsMobileCarousel onPlayVideo={setActiveVideo} />
         </TestimonialsRevealContext.Provider>
       </div>
-      <div className="relative mt-[48px] w-full lg:mt-[64px]">
+      <div className="fyt-ti-bare relative mt-[8px] w-full lg:mt-[16px]">
         <TrustindexWidget />
       </div>
-      <div className="relative flex justify-center px-[20px] pb-[72px] pt-[44px] lg:pb-[120px] lg:pt-[64px]">
+      <div className="relative flex justify-center px-[20px] pb-[72px] pt-[36px] lg:pb-[120px] lg:pt-[48px]">
         <Reveal>
           <Pill href="#challenge" onClick={() => pauseHeavyScenesForNav()}>
             Join 21,500+ Traders

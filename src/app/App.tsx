@@ -938,7 +938,7 @@ function TrustStripMobile() {
 
 function TrustStripDesktop() {
   return (
-    <div className="hidden lg:flex bg-black relative w-full items-center justify-center px-[80px] py-[32px] gap-[56px]">
+    <div className="hidden lg:flex bg-[#050913] relative w-full items-center justify-center px-[80px] py-[32px] gap-[56px]">
       <div className={TRUST_STRIP_BOX_CLASSES} style={{ background: "rgba(255,255,255,0.05)" }}>
         <TrustStripContent />
       </div>
@@ -1028,7 +1028,7 @@ function AwardBadge() {
  * HeroTrustindexGate). Kept the original name to minimize the diff. */
 function AwardBadgeMobileBar() {
   return (
-    <div className="lg:hidden bg-black relative w-full flex items-center justify-center px-[20px] pt-[10px] pb-[20px]">
+    <div className="lg:hidden bg-[#050913] relative w-full flex items-center justify-center px-[20px] pt-[10px] pb-[20px]">
       <HeroTrustindexMobileWidget />
     </div>
   );
@@ -1058,8 +1058,42 @@ function HeroBackground() {
   }, []);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-none bg-black" aria-hidden>
+    <div
+      ref={containerRef}
+      className="absolute inset-0 overflow-hidden pointer-events-none"
+      style={{ background: "linear-gradient(180deg, #03060d 0%, #050913 100%)" }}
+      aria-hidden
+    >
       {HERO_RADAR_ENABLED && <style>{HERO_SWEEP_CSS}</style>}
+
+      {/* Same backdrop as the "Proof in Numbers" section: navy base, faint
+          technical grid, two soft blue glows and a rising curve along the
+          bottom. All static (no animation), so it costs nothing per frame. */}
+      <div className="absolute inset-0 fyt-stars opacity-70" />
+      <div className="absolute inset-0 fyt-grid-dark" />
+      <div
+        className="absolute rounded-full"
+        style={{ left: "-12%", top: "-10%", width: 720, height: 720, background: "radial-gradient(circle, rgba(37,99,235,0.2), transparent 65%)" }}
+      />
+      <div
+        className="absolute rounded-full"
+        style={{ right: "-10%", bottom: "-6%", width: 640, height: 640, background: "radial-gradient(circle, rgba(59,130,246,0.14), transparent 65%)" }}
+      />
+      <svg viewBox="0 0 1200 300" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-[38%] w-full lg:h-[46%]" fill="none">
+        <defs>
+          <linearGradient id="hero-curve-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#2563eb" stopOpacity="0.16" />
+            <stop offset="100%" stopColor="#2563eb" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="hero-curve-stroke" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#2563eb" stopOpacity="0" />
+            <stop offset="30%" stopColor="#3b82f6" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#93c5fd" stopOpacity="0.8" />
+          </linearGradient>
+        </defs>
+        <path d="M0 290 C 260 280, 460 250, 640 190 S 980 60, 1200 10 L1200 300 L0 300 Z" fill="url(#hero-curve-fill)" />
+        <path d="M0 290 C 260 280, 460 250, 640 190 S 980 60, 1200 10" stroke="url(#hero-curve-stroke)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+      </svg>
 
       <HeroSceneGate />
 
@@ -1073,7 +1107,7 @@ function HeroBackground() {
       {/* Vignette (spec: radial at 50% 62%) */}
       <div
         className="absolute inset-0"
-        style={{ background: "radial-gradient(82% 82% at 50% 62%, rgba(0,0,0,0) 34%, rgba(0,0,0,0.42) 74%, rgba(0,0,0,0.92) 100%)" }}
+        style={{ background: "radial-gradient(82% 82% at 50% 62%, rgba(3,6,13,0) 40%, rgba(3,6,13,0.35) 78%, rgba(3,6,13,0.75) 100%)" }}
       />
     </div>
   );
@@ -1307,7 +1341,7 @@ function Hero() {
   return (
     <div
       ref={heroRef}
-      className={`bg-black relative flex flex-col items-center overflow-hidden shrink-0 w-full min-h-[620px] lg:h-[1080px] pt-[28px] pb-[64px] lg:py-0 ${animationsActive ? "" : "hero-anims-paused"}`}
+      className={`bg-[#03060d] relative flex flex-col items-center overflow-hidden shrink-0 w-full min-h-[620px] lg:h-[1080px] pt-[28px] pb-[64px] lg:py-0 ${animationsActive ? "" : "hero-anims-paused"}`}
     >
       <HeroBackground />
       {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
