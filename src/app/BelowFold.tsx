@@ -1696,15 +1696,9 @@ export function Pricing() {
     if (allTouched) setCelebrated(true);
   }, [allTouched]);
 
-  const [changeTick, setChangeTick] = useState(0);
-  const isFirstChangeRender = useRef(true);
-  useEffect(() => {
-    if (isFirstChangeRender.current) {
-      isFirstChangeRender.current = false;
-      return;
-    }
-    setChangeTick((t) => t + 1);
-  }, [step, plan, platform, size]);
+  // No per-change tick any more: the cards no longer flash on every toggle,
+  // and bumping state here cost a second full re-render of the picker.
+  const changeTick = 0;
 
   const entry = getEntry(step, plan, platform, size)!;
   const planLabel = STEP_PLANS[step].find((p) => p.id === plan)?.label ?? "";
@@ -1876,12 +1870,11 @@ export function Pricing() {
                       >
                         {active && (
                           <motion.div
-                            layoutId="pricing-model-pill"
                             className="absolute inset-0 rounded-[10px]"
                             style={PILL_CTA_GRADIENT_STYLE}
-                            initial={{ scale: 0.85 }}
-                            animate={{ scale: 1 }}
-                            transition={{ layout: { type: "spring", stiffness: 500, damping: 35 } }}
+                            initial={{ scale: 0.92, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                           />
                         )}
                         <span className="relative z-[1] flex items-center gap-[8px]">
@@ -1928,12 +1921,11 @@ export function Pricing() {
                         >
                           {active && (
                             <motion.div
-                              layoutId="pricing-type-pill"
                               className="absolute inset-0 rounded-[10px]"
                               style={PILL_CTA_GRADIENT_STYLE}
-                              initial={{ scale: 0.85 }}
-                              animate={{ scale: 1 }}
-                              transition={{ layout: { type: "spring", stiffness: 500, damping: 35 } }}
+                              initial={{ scale: 0.92, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                             />
                           )}
                           <span className="relative z-[1] flex items-center gap-[8px]">
@@ -1981,12 +1973,11 @@ export function Pricing() {
                       >
                         {active && (
                           <motion.div
-                            layoutId="pricing-platform-pill"
                             className="absolute inset-0 rounded-[10px]"
                             style={PILL_CTA_GRADIENT_STYLE}
-                            initial={{ scale: 0.85 }}
-                            animate={{ scale: 1 }}
-                            transition={{ layout: { type: "spring", stiffness: 500, damping: 35 } }}
+                            initial={{ scale: 0.92, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                           />
                         )}
                         <img
@@ -2020,12 +2011,11 @@ export function Pricing() {
                     >
                       {active ? (
                         <motion.div
-                          layoutId="pricing-size-pill"
                           className="absolute inset-0 rounded-[10px]"
                           style={PILL_CTA_GRADIENT_STYLE}
-                          initial={{ scale: 0.85 }}
-                          animate={{ scale: 1 }}
-                          transition={{ layout: { type: "spring", stiffness: 500, damping: 35 } }}
+                          initial={{ scale: 0.92, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                         />
                       ) : (
                         <div aria-hidden className="absolute inset-0 rounded-[10px] pointer-events-none" style={{ border: "1px solid rgba(255,255,255,0.1)" }} />
@@ -2252,12 +2242,11 @@ export function Pricing() {
                     >
                       {active && (
                         <motion.div
-                          layoutId="pricing-mobile-tab-pill"
                           className="absolute inset-0 rounded-[10px]"
                           style={PILL_CTA_GRADIENT_STYLE}
-                          initial={{ scale: 0.85 }}
-                          animate={{ scale: 1 }}
-                          transition={{ layout: { type: "spring", stiffness: 500, damping: 35 } }}
+                          initial={{ scale: 0.92, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                         />
                       )}
                       <span className="relative z-[1] font-['Inter:Medium',sans-serif] font-medium text-[14px]" style={{ color: active ? "#eef0f6" : "#9da2b4" }}>{opt.label}</span>
