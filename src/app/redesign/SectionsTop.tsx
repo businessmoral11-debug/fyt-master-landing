@@ -164,23 +164,25 @@ export function ProveYourSkill() {
               key={card.id}
               variants={staggerChild}
               onPointerMove={spotlightMove}
-              className={`fyt-spot fyt-spot-light group flex items-start gap-[16px] rounded-[22px] bg-white p-[22px] transition-[transform,box-shadow] duration-500 hover:-translate-y-[4px] hover:shadow-[0_28px_60px_-28px_rgba(37,99,235,0.45)] lg:min-h-[132px] lg:p-[30px] ${i === PROVE_SKILL_CARDS.length - 1 ? "sm:col-span-2" : ""}`}
+              className={`fyt-spot fyt-spot-light group flex flex-col gap-[18px] rounded-[22px] bg-white p-[22px] transition-[transform,box-shadow] duration-500 hover:-translate-y-[4px] hover:shadow-[0_28px_60px_-28px_rgba(37,99,235,0.45)] lg:p-[28px] ${i === PROVE_SKILL_CARDS.length - 1 ? "sm:col-span-2" : ""}`}
               style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 18px 40px -30px rgba(15,23,42,0.35)" }}
             >
-              <span
-                className="relative flex size-[46px] shrink-0 items-center justify-center rounded-[14px] transition-colors duration-500 group-hover:bg-[#2563eb]"
-                style={{ background: "#eef4ff" }}
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="stroke-[#2563eb] transition-colors duration-500 group-hover:stroke-white">
-                  {PROVE_ICONS[card.id]}
-                </svg>
+              <span className="flex items-center justify-between">
+                <span
+                  className="relative flex size-[46px] shrink-0 items-center justify-center rounded-[14px] transition-colors duration-500 group-hover:bg-[#2563eb]"
+                  style={{ background: "#eef4ff" }}
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="stroke-[#2563eb] transition-colors duration-500 group-hover:stroke-white">
+                    {PROVE_ICONS[card.id]}
+                  </svg>
+                </span>
+                <span className="tabular text-[12px] font-semibold tracking-[0.1em]" style={{ color: "#a3b3d4" }} aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
               </span>
-              <p className="flex-1 pt-[2px] text-[17px] font-medium leading-[1.45] tracking-[-0.01em] lg:text-[19px]" style={{ color: C.textLight }}>
+              <p className="text-[17px] font-medium leading-[1.45] tracking-[-0.01em] lg:text-[19px]" style={{ color: C.textLight }}>
                 {card.text}
               </p>
-              <span className="tabular pt-[4px] text-[12px] font-semibold tracking-[0.1em]" style={{ color: "#a3b3d4" }} aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
             </motion.li>
           ))}
         </motion.ul>
