@@ -1378,7 +1378,7 @@ function Hero() {
 }
 
 
-const BelowFold = lazy(() => import("@/app/BelowFold").then((m) => ({ default: m.BelowFold })));
+const BelowFold = lazy(() => import("@/app/redesign/RedesignBelowFold").then((m) => ({ default: m.BelowFold })));
 
 class BelowFoldErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   state = { hasError: false };

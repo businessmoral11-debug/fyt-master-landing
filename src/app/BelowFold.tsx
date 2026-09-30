@@ -434,7 +434,7 @@ function FeaturedIn() {
   );
 }
 
-const PROVE_SKILL_CARDS = [
+export const PROVE_SKILL_CARDS = [
   { id: "consistency", text: "Consistency rules limit natural performance." },
   { id: "time-limits", text: "Time limits create pressure." },
   { id: "hidden-rules", text: "Hidden rules cause breaches." },
@@ -672,14 +672,14 @@ function ProveYourSkill() {
 }
 
 
-const PROOF_STATS = [
+export const PROOF_STATS = [
   { value: KEY_METRICS[0].value, label: "In Rewards", icon: "dollar" },
   { value: KEY_METRICS[1].value, label: "Traders", icon: "people" },
   { value: KEY_METRICS[2].value, label: "Countries", icon: "globe" },
   { value: "24-48H", label: "Processing", icon: "lightning" },
 ] as const;
 
-function ProofStatIcon({ kind }: { kind: "dollar" | "people" | "globe" | "lightning" }) {
+export function ProofStatIcon({ kind }: { kind: "dollar" | "people" | "globe" | "lightning" }) {
   const common = { width: 20, height: 20, viewBox: "0 0 20 20", fill: "none", "aria-hidden": "true" } as const;
   if (kind === "dollar") {
     return (
@@ -1249,7 +1249,7 @@ function useIsDesktopGlobeViewport(): boolean {
   return isDesktop;
 }
 
-function TradingGlobeSlot() {
+export function TradingGlobeSlot() {
   const isDesktop = useIsDesktopGlobeViewport();
   const [shouldInit, setShouldInit] = useState(false);
   const [nearViewport, setNearViewport] = useState(false);
@@ -1706,7 +1706,7 @@ function PlanCompareShortcut({ step }: { step: StepId }) {
 
 const PRICING_ANIMATIONS_ACTIVE_MARGIN_PX = 600;
 
-function Pricing() {
+export function Pricing() {
   const [step, setStep] = useState<StepId>("2-Step");
   const [plan, setPlan] = useState<PlanId>("prime");
   const [platform, setPlatform] = useState<PlatformId>("match-trader");
@@ -2470,7 +2470,7 @@ function PaymentMoreButton() {
   );
 }
 
-function PaymentOptions() {
+export function PaymentOptions() {
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [animsActive, setAnimsActive] = useState(true);
@@ -2521,14 +2521,14 @@ function PaymentOptions() {
 }
 
 
-const HOW_IT_WORKS_STEPS = [
+export const HOW_IT_WORKS_STEPS = [
   { n: 1, label: "Choose", desc: "Select the evaluation and account size that fits your style.", icon: "person" },
   { n: 2, label: "Trade", desc: "Reach the target while respecting clear, transparent account rules.", icon: "candles" },
   { n: 3, label: "Get Your Account", desc: "Complete verification and receive your master account.", icon: "shield-check" },
   { n: 4, label: "Reward", desc: "Request your reward from the dashboard and track its status.", icon: "gift" },
 ] as const;
 
-function HowItWorksIcon({ kind }: { kind: (typeof HOW_IT_WORKS_STEPS)[number]["icon"] }) {
+export function HowItWorksIcon({ kind }: { kind: (typeof HOW_IT_WORKS_STEPS)[number]["icon"] }) {
   const common = { width: 22, height: 22, viewBox: "0 0 22 22", fill: "none" } as const;
   const s = "#2563EB";
   if (kind === "person") return <svg {...common}><circle cx="11" cy="7.5" r="3.2" stroke={s} strokeWidth="2" /><path d="M4 18c0-3 3-5.2 7-5.2s7 2.2 7 5.2" stroke={s} strokeWidth="2" strokeLinecap="round" /></svg>;
@@ -2844,7 +2844,7 @@ function VideoCard({ src, name, onPlay }: { src: string; name: string; onPlay: (
   );
 }
 
-function VideoLightbox({ source, onClose }: { source: VideoSource | null; onClose: () => void }) {
+export function VideoLightbox({ source, onClose }: { source: VideoSource | null; onClose: () => void }) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const mouseDownOnBackdropRef = useRef(false);
   const [videoError, setVideoError] = useState(false);
@@ -2935,7 +2935,7 @@ function VideoLightbox({ source, onClose }: { source: VideoSource | null; onClos
   );
 }
 
-const TestimonialsRevealContext = createContext(false);
+export const TestimonialsRevealContext = createContext(false);
 
 function TestimonialSlide({ item, onPlayVideo }: { item: TestimonialSlideItem; onPlayVideo: (video: TestimonialVideo) => void }) {
   if (item.kind === "review") {
@@ -2945,7 +2945,7 @@ function TestimonialSlide({ item, onPlayVideo }: { item: TestimonialSlideItem; o
   return <VideoCard src={item.video.posterUrl} name={item.video.name} onPlay={() => onPlayVideo(item.video)} />;
 }
 
-function TestimonialsDesktopCarousel({ onPlayVideo }: { onPlayVideo: (video: TestimonialVideo) => void }) {
+export function TestimonialsDesktopCarousel({ onPlayVideo }: { onPlayVideo: (video: TestimonialVideo) => void }) {
   const prefersReducedMotion = useReducedMotion();
   const revealed = useContext(TestimonialsRevealContext);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -3043,7 +3043,7 @@ function TestimonialsDesktopCarousel({ onPlayVideo }: { onPlayVideo: (video: Tes
   );
 }
 
-function TestimonialsMobileCarousel({ onPlayVideo }: { onPlayVideo: (video: TestimonialVideo) => void }) {
+export function TestimonialsMobileCarousel({ onPlayVideo }: { onPlayVideo: (video: TestimonialVideo) => void }) {
   const prefersReducedMotion = useReducedMotion();
   const revealed = useContext(TestimonialsRevealContext);
   const [emblaRef, emblaApi] = useEmblaCarousel(
@@ -3125,7 +3125,7 @@ const TRUSTINDEX_DARK_THEME_CSS = `
 .ti-dark-shell .ti-controls-line .dot{background:#3b82f6!important}
 `;
 
-const TrustindexWidget = memo(function TrustindexWidget() {
+export const TrustindexWidget = memo(function TrustindexWidget() {
   const containerRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
 
@@ -3328,7 +3328,7 @@ function Testimonials() {
 }
 
 
-const COMPARISON_ROWS = [
+export const COMPARISON_ROWS = [
   { criteria: "Rewards", fyt: "Weekly Rewards", others: "Bi-Weekly Rewards" },
   { criteria: "Drawdown Type", fyt: "Static drawdown", others: "Relative drawdown" },
   { criteria: "Daily Drawdown", fyt: "Balance based daily drawdown", others: "Equity based daily drawdown" },
@@ -3591,19 +3591,19 @@ function ComparisonTable() {
 }
 
 
-const OVERVIEW_BADGES = [
+export const OVERVIEW_BADGES = [
   { label: "Secure by design", icon: "shield" as const },
   { label: "Real-time updates", icon: "bolt" as const },
   { label: "Built for traders", icon: "trend" as const },
 ] as const;
 
-function OverviewBadgeIcon({ kind }: { kind: (typeof OVERVIEW_BADGES)[number]["icon"] }) {
+export function OverviewBadgeIcon({ kind }: { kind: (typeof OVERVIEW_BADGES)[number]["icon"] }) {
   const common = { width: 14, height: 14, viewBox: "0 0 16 16", fill: "none", stroke: "#3b82f6" } as const;
   if (kind === "shield") return <svg {...common}><path d="M8 1.5l5.5 2v4c0 3.5-2.3 6.2-5.5 7-3.2-.8-5.5-3.5-5.5-7v-4l5.5-2Z" strokeWidth="1.3" strokeLinejoin="round" /><path d="M5.5 8l1.8 1.8L10.8 6" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>;
   if (kind === "bolt") return <svg {...common}><path d="M9 1.5 3.5 9h4l-1 5.5L12.5 7h-4L9 1.5Z" strokeWidth="1.2" strokeLinejoin="round" /></svg>;
   return <svg {...common}><path d="M2 12.5l4-4.5 3 2.5 5-6" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /><path d="M11 4h3v3" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }
-const OVERVIEW_HEADING_TEXT = "Designed around the way you actually operate";
+export const OVERVIEW_HEADING_TEXT = "Designed around the way you actually operate";
 
 const SUPPORT_CHAT_TOPICS = [
   { title: "Maximum Drawdown/Loss Limit", subtitle: "How maximum drawdown works?" },
@@ -3864,16 +3864,16 @@ function SupportChatPanel({ open, onClose }: { open: boolean; onClose: () => voi
   );
 }
 
-const SUPPORT_EMAIL_HREF = "mailto:support@fundingyourtrades.com";
+export const SUPPORT_EMAIL_HREF = "mailto:support@fundingyourtrades.com";
 
-const SUPPORT_FEATURES = [
+export const SUPPORT_FEATURES = [
   { label: "Live Chat", icon: "chat" as const, action: "intercom" as const },
   { label: "Email Support", icon: "email" as const, action: "email" as const },
   { label: "Always On", icon: "clock" as const, action: "none" as const },
   { label: "Expert Help", icon: "star" as const, action: "none" as const },
 ] as const;
 
-function SupportFeatureIcon({ kind }: { kind: (typeof SUPPORT_FEATURES)[number]["icon"] }) {
+export function SupportFeatureIcon({ kind }: { kind: (typeof SUPPORT_FEATURES)[number]["icon"] }) {
   const common = { width: 15, height: 15, viewBox: "0 0 16 16", fill: "none", stroke: "#ffffff" } as const;
   if (kind === "chat") return <svg {...common}><path d="M2 3.5h12v7H6l-3 2.5v-2.5H2v-7Z" strokeWidth="1.3" strokeLinejoin="round" /></svg>;
   if (kind === "email") return <svg {...common}><rect x="2" y="3.5" width="12" height="9" rx="1.5" strokeWidth="1.3" /><path d="M2.5 4.5L8 9l5.5-4.5" strokeWidth="1.3" strokeLinejoin="round" /></svg>;
@@ -4290,11 +4290,30 @@ function Faq() {
 }
 
 
-function SocialIcon({ label, href, children }: { label: string; href: string; children: ReactNode }) {
+export function SocialIcon({ label, href, children }: { label: string; href: string; children: ReactNode }) {
   return (
     <a href={href} aria-label={label} target="_blank" rel="noopener noreferrer" className="inline-flex">
       {children}
     </a>
+  );
+}
+
+/** Footer legal/disclaimer copy — shared by the current and redesigned footers so the text lives in one place. */
+export function FooterLegalText() {
+  return (
+    <>
+      <p className="leading-[1.7] relative shrink-0 w-full">Funding Your Trades provides a simulated trading environment for the purpose of evaluating trading skill. Clients are assigned demo accounts with simulated funds; all trading activity is carried out in a simulated environment and no real capital is deposited or traded. FYT is not a broker and does not provide investment services. Trading in financial markets involves significant risk and is not suitable for everyone. Performance in a simulated environment does not guarantee future results.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Disclaimer</span> - At Funding Your Trades, we provide access to a simulated trading environment designed to evaluate trading skills and strategies. We do not accept deposits for investment, nor do we provide any financial or investment services. Our platform is solely intended to assess your trading performance under simulated market conditions. Any payments made to FundingYourTrades.com are for access to our evaluation programs and trading platforms, not for investment purposes.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">No Investment Advice</span> - The content and information on this website are for educational and informational purposes only. We do not offer investment advice or recommendations to buy, sell, or trade any financial instruments. Participation in our programs should not be considered an endorsement of any trading strategy or financial product.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Trading Risks and Performance</span> - Trading in financial markets involves significant risk and is not suitable for everyone. Performance in our simulated environment does not guarantee future results in a live trading environment. Historical or hypothetical performance shown on our platform is not a promise or indication of future success. Outcomes depend on individual trading strategies, market conditions, and the trader's skill level.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Evaluation Program and Success Rates</span> - Our evaluation programs are designed to challenge traders and assess their trading proficiency. Success rates vary based on market conditions and individual performance. We encourage all participants to carefully review the program rules and guidelines before starting. Passing the evaluation does not guarantee success in live trading environments.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Non-Investment Relationship</span> - Funding Your Trades operates as an evaluation company, not as a broker or investment firm. We do not hold or manage client funds, nor do we engage in any activities that would classify us as a financial service provider. All trading activity on our platform is conducted in a simulated environment.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Refund Policy</span> - Payments made for our evaluation programs are for access to our proprietary trading platform and services. Refunds are only available under specific circumstances outlined in our terms and conditions.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Testimonials and Results</span> - Testimonials and performance results shared on our platform are based on individual experiences and may not reflect typical outcomes. Success stories should not be interpreted as a guarantee of future results.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Third-Party Providers</span> - Our trading platforms and data feeds are supported by third-party service providers. We are not responsible for any technical issues, data delays, or disruptions caused by third-party systems.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full">By using our platform, you acknowledge that you have read, understood, and agreed to this disclaimer. Funding Your Trades and its affiliates are not liable for any decisions or actions taken based on the information provided on this website, nor for any resulting damages, even if advised of the potential risk. Purchases are not considered deposits and are used to cover operational costs, including staff, technology, and business expenses.</p>
+      <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">General Notice</span> - Participation in our programs is at your own risk. We advise you to trade responsibly and never risk more than you can afford to lose. If you are uncertain about any aspects of trading or financial markets, seek advice from a licensed financial professional before participating.</p>
+    </>
   );
 }
 
@@ -4371,17 +4390,7 @@ function Footer() {
           </motion.div>
           <div className="bg-[rgba(255,255,255,0.08)] h-px relative shrink-0 w-full" />
           <div className="[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular',sans-serif] font-normal gap-[20px] items-start not-italic overflow-clip pt-[26px] relative shrink-0 text-[#5f6478] text-[12px] w-full">
-            <p className="leading-[1.7] relative shrink-0 w-full">Funding Your Trades provides a simulated trading environment for the purpose of evaluating trading skill. Clients are assigned demo accounts with simulated funds; all trading activity is carried out in a simulated environment and no real capital is deposited or traded. FYT is not a broker and does not provide investment services. Trading in financial markets involves significant risk and is not suitable for everyone. Performance in a simulated environment does not guarantee future results.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Disclaimer</span> - At Funding Your Trades, we provide access to a simulated trading environment designed to evaluate trading skills and strategies. We do not accept deposits for investment, nor do we provide any financial or investment services. Our platform is solely intended to assess your trading performance under simulated market conditions. Any payments made to FundingYourTrades.com are for access to our evaluation programs and trading platforms, not for investment purposes.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">No Investment Advice</span> - The content and information on this website are for educational and informational purposes only. We do not offer investment advice or recommendations to buy, sell, or trade any financial instruments. Participation in our programs should not be considered an endorsement of any trading strategy or financial product.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Trading Risks and Performance</span> - Trading in financial markets involves significant risk and is not suitable for everyone. Performance in our simulated environment does not guarantee future results in a live trading environment. Historical or hypothetical performance shown on our platform is not a promise or indication of future success. Outcomes depend on individual trading strategies, market conditions, and the trader's skill level.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Evaluation Program and Success Rates</span> - Our evaluation programs are designed to challenge traders and assess their trading proficiency. Success rates vary based on market conditions and individual performance. We encourage all participants to carefully review the program rules and guidelines before starting. Passing the evaluation does not guarantee success in live trading environments.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Non-Investment Relationship</span> - Funding Your Trades operates as an evaluation company, not as a broker or investment firm. We do not hold or manage client funds, nor do we engage in any activities that would classify us as a financial service provider. All trading activity on our platform is conducted in a simulated environment.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Refund Policy</span> - Payments made for our evaluation programs are for access to our proprietary trading platform and services. Refunds are only available under specific circumstances outlined in our terms and conditions.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Testimonials and Results</span> - Testimonials and performance results shared on our platform are based on individual experiences and may not reflect typical outcomes. Success stories should not be interpreted as a guarantee of future results.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">Third-Party Providers</span> - Our trading platforms and data feeds are supported by third-party service providers. We are not responsible for any technical issues, data delays, or disruptions caused by third-party systems.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full">By using our platform, you acknowledge that you have read, understood, and agreed to this disclaimer. Funding Your Trades and its affiliates are not liable for any decisions or actions taken based on the information provided on this website, nor for any resulting damages, even if advised of the potential risk. Purchases are not considered deposits and are used to cover operational costs, including staff, technology, and business expenses.</p>
-            <p className="leading-[1.7] relative shrink-0 w-full"><span className="text-[#eef0f6] font-semibold">General Notice</span> - Participation in our programs is at your own risk. We advise you to trade responsibly and never risk more than you can afford to lose. If you are uncertain about any aspects of trading or financial markets, seek advice from a licensed financial professional before participating.</p>
+            <FooterLegalText />
             <div className="content-stretch flex flex-col lg:flex-row gap-[8px] lg:gap-0 items-start lg:justify-between leading-[normal] relative shrink-0 w-full lg:whitespace-nowrap">
               <p className="relative shrink-0">© 2026 Funding Your Trades. All rights reserved.</p>
               <div className="flex gap-[20px] items-center shrink-0">

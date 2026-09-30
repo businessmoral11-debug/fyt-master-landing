@@ -1,0 +1,106 @@
+/* Redesign design system — shared helpers for src/app/redesign/*.
+   Everything here is transform/opacity/background only so it stays cheap
+   to render while scrolling. */
+
+.fyt-rd {
+  font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01" on;
+}
+.fyt-rd .tabular { font-variant-numeric: tabular-nums; }
+
+/* Cursor-following glowing border on cards (desktop pointers only). The
+   element sets --mx/--my from pointermove; the ring is a masked pseudo
+   element so it never repaints the card's content. */
+.fyt-spot { position: relative; isolation: isolate; }
+.fyt-spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, -30%), rgba(96, 165, 250, 0.75), transparent 62%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+@media (hover: hover) {
+  .fyt-spot:hover::before { opacity: 1; }
+}
+.fyt-spot-light::before {
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, -30%), rgba(37, 99, 235, 0.55), transparent 62%);
+}
+
+/* Faint technical grid used behind dark sections, faded out at the edges. */
+.fyt-grid-dark {
+  background-image:
+    linear-gradient(rgba(148, 178, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 178, 255, 0.055) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
+}
+.fyt-grid-light {
+  background-image:
+    linear-gradient(rgba(37, 99, 235, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 35%, #000 10%, transparent 72%);
+  mask-image: radial-gradient(ellipse 70% 55% at 50% 35%, #000 10%, transparent 72%);
+}
+
+/* Static star field for dark sections (pure CSS, no JS, no animation). */
+.fyt-stars {
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 27% 72%, rgba(255, 255, 255, 0.35), transparent 60%),
+    radial-gradient(1.2px 1.2px at 41% 33%, rgba(191, 219, 254, 0.6), transparent 60%),
+    radial-gradient(1px 1px at 58% 86%, rgba(255, 255, 255, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 66% 12%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(1.3px 1.3px at 79% 57%, rgba(191, 219, 254, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 91% 27%, rgba(255, 255, 255, 0.35), transparent 60%),
+    radial-gradient(1px 1px at 7% 91%, rgba(255, 255, 255, 0.3), transparent 60%);
+  background-size: 520px 520px;
+}
+
+/* Edge-faded horizontal marquee track. */
+.fyt-marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+@keyframes fyt-rd-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.fyt-rd-marquee { animation: fyt-rd-marquee 38s linear infinite; }
+.fyt-rd-marquee:hover { animation-play-state: paused; }
+
+/* Slow shimmer across gradient text highlights. */
+.fyt-gradient-text {
+  background: linear-gradient(100deg, #3b82f6 0%, #7db2ff 35%, #3b82f6 55%, #2563eb 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: fyt-rd-text-shimmer 7s ease-in-out infinite;
+}
+@keyframes fyt-rd-text-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Soft breathing glow for "live" status dots. */
+@keyframes fyt-rd-ping {
+  0% { transform: scale(1); opacity: 0.7; }
+  80%, 100% { transform: scale(2.4); opacity: 0; }
+}
+.fyt-rd-ping { animation: fyt-rd-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fyt-rd-marquee, .fyt-gradient-text, .fyt-rd-ping { animation: none; }
+}
