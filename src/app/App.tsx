@@ -677,30 +677,20 @@ function PromoBanner() {
         />
       )}
 
-      {/* Mobile: 2 lines — benefits + "Daily Reward" up; "Processing" + deal + CODE + urgency below */}
-      <div className="relative mx-auto flex w-full flex-col items-center justify-center gap-[5px] px-[6px] py-[8px] md:hidden">
-        <div className="flex items-center justify-center gap-x-[4px] whitespace-nowrap">
-          {PROMO_BENEFITS.slice(0, 3).map((text, i) => (
+      {/* Mobile: deal on top, then benefits, then CODE + countdown */}
+      <div className="relative mx-auto flex w-full flex-col items-center justify-center gap-[6px] px-[6px] py-[8px] md:hidden">
+        <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[10.5px] tracking-[0.01em]">
+          {PROMO_DEAL_LINE}
+        </span>
+        <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
+          {PROMO_BENEFITS.map((text, i) => (
             <Fragment key={text}>
               {i > 0 && <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />}
-              <span className="font-['DM_Sans',sans-serif] text-[8.5px] font-bold uppercase leading-none tracking-[0.01em] text-white">
+              <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[8.5px] tracking-[0.01em] text-white/85">
                 {text}
               </span>
             </Fragment>
           ))}
-          <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />
-          <span className="font-['DM_Sans',sans-serif] text-[8.5px] font-bold uppercase leading-none tracking-[0.01em] text-white">
-            Daily Reward
-          </span>
-        </div>
-        <div className="flex max-w-full items-center justify-center gap-x-[4px] overflow-hidden whitespace-nowrap">
-          <span className="font-['DM_Sans',sans-serif] text-[8.5px] font-bold uppercase leading-none tracking-[0.01em] text-white">
-            Processing
-          </span>
-          <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />
-          <span className="font-['DM_Sans',sans-serif] text-[8.5px] font-bold uppercase leading-none tracking-[0.01em] text-white">
-            {PROMO_DEAL_LINE}
-          </span>
         </div>
         <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
           <CodePill compact />
@@ -708,24 +698,23 @@ function PromoBanner() {
         </div>
       </div>
 
-      {/* Desktop / tablet: benefits group + offer group (deal, CODE, countdown).
+      {/* Desktop / tablet: deal first, then benefits, then CODE + countdown.
           Each group stays on one line, so a narrow screen wraps between groups, never mid-offer. */}
-      <div className="relative mx-auto hidden min-h-[36px] w-full max-w-[1440px] flex-wrap items-center justify-center gap-x-[12px] gap-y-[6px] px-[12px] py-[8px] md:flex lg:px-[20px] xl:gap-x-[14px] xl:px-[24px]">
-        <div className="flex items-center gap-x-[8px] whitespace-nowrap lg:gap-x-[12px] xl:gap-x-[14px]">
-          {PROMO_BENEFITS.map((text, i) => (
+      <div className="relative mx-auto hidden min-h-[36px] w-full max-w-[1440px] flex-wrap items-center justify-center gap-x-[12px] gap-y-[6px] px-[12px] py-[8px] md:flex lg:gap-x-[14px] lg:px-[20px] xl:px-[24px]">
+        <div className="flex items-center gap-x-[10px] whitespace-nowrap lg:gap-x-[14px]">
+          <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[12px] tracking-[0.02em] lg:text-[13px] xl:text-[14px]">
+            {PROMO_DEAL_LINE}
+          </span>
+          {PROMO_BENEFITS.map((text) => (
             <Fragment key={text}>
-              {i > 0 && <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />}
-              <span className="font-['DM_Sans',sans-serif] text-[11px] font-bold uppercase leading-none tracking-[0.02em] text-white whitespace-nowrap lg:text-[12px] xl:text-[13px]">
+              <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />
+              <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[11px] tracking-[0.02em] text-white/85 lg:text-[12px] xl:text-[13px]">
                 {text}
               </span>
             </Fragment>
           ))}
         </div>
-        <span aria-hidden="true" className="hidden h-[12px] w-px shrink-0 bg-white/25 min-[1400px]:block" />
         <div className="flex items-center gap-x-[8px] whitespace-nowrap lg:gap-x-[10px]">
-          <span className="font-['DM_Sans',sans-serif] text-[11px] font-bold uppercase leading-none tracking-[0.02em] text-white whitespace-nowrap lg:text-[12px] xl:text-[13px]">
-            {PROMO_DEAL_LINE}
-          </span>
           <CodePill />
           <PromoCountdownPill pulse={!reduceMotion && nearViewport} />
         </div>

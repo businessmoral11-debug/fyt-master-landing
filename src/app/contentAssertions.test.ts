@@ -1163,9 +1163,7 @@ describe("Promo banner", () => {
     expect(bannerBody).toContain("copyTextToClipboard(PROMO_CODE)");
     const promo = read("./data/promoBanner.ts");
     expect(promo).toContain("First Reward on Demand");
-    expect(promo).toContain("200% Refund");
     expect(promo).toContain("Free Drawdown Reset");
-    expect(promo).toContain("Daily Reward Processing");
     expect(promo).toContain('export const PROMO_DEAL_LINE = "Limited Time: 40% off + Buy 1 Get 3 Instantly"');
     expect(promo).toContain('export const PROMO_CODE = "AWARD40"');
     expect(promo).not.toContain("PROMO_URGENCY");

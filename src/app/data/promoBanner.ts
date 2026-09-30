@@ -12,16 +12,14 @@ export interface PromoItem {
 /** Top-banner benefit lines (deal line is separate so mobile can stack cleanly). */
 export const PROMO_BENEFITS = [
   "First Reward on Demand",
-  "200% Refund",
   "Free Drawdown Reset",
-  "Daily Reward Processing",
 ] as const;
 
 /** Deal line shown after benefits on the top banner. */
 export const PROMO_DEAL_LINE = "Limited Time: 40% off + Buy 1 Get 3 Instantly";
 
-/** Full desktop banner copy order: benefits + deal. */
-export const PROMO_BANNER_ITEMS = [...PROMO_BENEFITS, PROMO_DEAL_LINE] as const;
+/** Full banner copy order: deal first, then benefits. */
+export const PROMO_BANNER_ITEMS = [PROMO_DEAL_LINE, ...PROMO_BENEFITS] as const;
 
 /** Promo code shown in the top-banner CODE pill (also used at checkout). */
 export const PROMO_CODE = "AWARD40";

@@ -2,12 +2,10 @@ import { describe, it, expect } from "vitest";
 import { formatCountdown, formatHoursLeft, PROMO_ITEMS, PROMO_BENEFITS, PROMO_BANNER_ITEMS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEADLINE } from "./promoBanner";
 
 describe("PROMO_BENEFITS", () => {
-  it("lists the four top-banner benefit lines", () => {
+  it("lists the top-banner benefit lines", () => {
     expect(PROMO_BENEFITS).toEqual([
       "First Reward on Demand",
-      "200% Refund",
       "Free Drawdown Reset",
-      "Daily Reward Processing",
     ]);
   });
 });
@@ -19,13 +17,11 @@ describe("PROMO_DEAL_LINE", () => {
 });
 
 describe("PROMO_BANNER_ITEMS", () => {
-  it("joins benefits and deal for the desktop banner row", () => {
+  it("puts the deal first, then the benefits", () => {
     expect(PROMO_BANNER_ITEMS).toEqual([
-      "First Reward on Demand",
-      "200% Refund",
-      "Free Drawdown Reset",
-      "Daily Reward Processing",
       "Limited Time: 40% off + Buy 1 Get 3 Instantly",
+      "First Reward on Demand",
+      "Free Drawdown Reset",
     ]);
   });
 });
