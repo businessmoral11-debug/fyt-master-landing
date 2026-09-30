@@ -677,12 +677,15 @@ function PromoBanner() {
         />
       )}
 
-      {/* Mobile: deal on top, then benefits, then CODE + countdown */}
-      <div className="relative mx-auto flex w-full flex-col items-center justify-center gap-[6px] px-[6px] py-[8px] md:hidden">
-        <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[10.5px] tracking-[0.01em]">
-          {PROMO_DEAL_LINE}
-        </span>
+      {/* Mobile: 2 lines. Deal + CODE on top; benefits + countdown below */}
+      <div className="relative mx-auto flex w-full flex-col items-center justify-center gap-[5px] px-[6px] py-[7px] md:hidden">
         <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
+          <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[10px] tracking-[0.01em] min-[380px]:text-[10.5px]">
+            {PROMO_DEAL_LINE}
+          </span>
+          <CodePill compact />
+        </div>
+        <div className="flex items-center justify-center gap-x-[5px] whitespace-nowrap">
           {PROMO_BENEFITS.map((text, i) => (
             <Fragment key={text}>
               {i > 0 && <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />}
@@ -691,9 +694,6 @@ function PromoBanner() {
               </span>
             </Fragment>
           ))}
-        </div>
-        <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
-          <CodePill compact />
           <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} />
         </div>
       </div>
