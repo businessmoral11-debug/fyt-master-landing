@@ -16,6 +16,25 @@ const viewports = [
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const browser = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"] });
+
+// Phone header states: top, scrolling down (nav tucked), then scrolling up (compact nav back).
+if (!BENCH_ONLY) {
+  const hctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  const hp = await hctx.newPage();
+  await hp.route(/klaviyo\.com/, (r) => r.abort());
+  await hp.goto(URL, { waitUntil: "networkidle" }).catch(() => {});
+  await sleep(2000);
+  const shot = async (name) => { await sleep(700); await hp.screenshot({ path: `${OUT}/header-${name}.png`, clip: { x: 0, y: 0, width: 390, height: 300 }, timeout: 60000, animations: "disabled" }).catch((e) => log.push("header shot fail " + e.message.split("\n")[0])); };
+  await shot("1-top");
+  for (let y = 0; y <= 2400; y += 200) { await hp.evaluate((v) => window.scrollTo(0, v), y); await sleep(60); }
+  await shot("2-scrolling-down");
+  for (let y = 2400; y >= 2000; y -= 100) { await hp.evaluate((v) => window.scrollTo(0, v), y); await sleep(60); }
+  await shot("3-scrolling-up");
+  const hdr = await hp.evaluate(() => { const el = document.querySelector(".fixed.inset-x-0.top-0.z-40"); const r = el?.getBoundingClientRect(); const nav = el?.querySelector(".fyt-nav-glass")?.getBoundingClientRect(); return { headerH: r?.height, navBottom: nav?.bottom, heroTop: document.querySelector("h1")?.getBoundingClientRect().top + window.scrollY }; });
+  log.push("[header] " + JSON.stringify(hdr));
+  await hp.evaluate(() => window.scrollTo(0, 0)); await shot("4-back-top");
+  await hctx.close();
+}
 for (const vp of BENCH_ONLY ? [] : viewports) {
   const ctx = await browser.newContext({
     viewport: { width: vp.width, height: vp.height },
