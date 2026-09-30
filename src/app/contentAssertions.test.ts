@@ -851,7 +851,7 @@ describe("Prime plan 'No Consistency' badge", () => {
   it("keeps the flag inside the button element, not as a sibling positioned outside it", () => {
     const app = read("./BelowFold.tsx");
     const pricingBody = sliceToNextFunction(app, "function Pricing()");
-    const buttonStart = pricingBody.indexOf("{STEP_PLANS[step].map((opt, i, arr) => {");
+    const buttonStart = pricingBody.indexOf("{STEP_PLANS[step].map((opt) => {");
     expect(buttonStart).toBeGreaterThan(-1);
     const buttonBlockEnd = pricingBody.indexOf("})}", buttonStart);
     const buttonBlock = pricingBody.slice(buttonStart, buttonBlockEnd);
@@ -1070,8 +1070,8 @@ describe("Prime plan 'No Consistency' badge stands out from the selection blue",
     expect(flagBlockStart).toBeGreaterThan(-1);
     const flagBlockEnd = pricingBody.indexOf(")}", flagBlockStart);
     const flagBlock = pricingBody.slice(flagBlockStart, flagBlockEnd);
-    expect(flagBlock).toContain('color: "#22c55e"');
-    expect(flagBlock).toContain('background: "rgba(34,197,94,0.12)"');
+    expect(flagBlock).toContain('color: "#4ade80"');
+    expect(flagBlock).toContain('border: "1px solid rgba(74,222,128,0.45)"');
     expect(flagBlock).not.toContain('color: "#3b82f6"');
   });
 });

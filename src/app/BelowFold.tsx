@@ -1942,7 +1942,7 @@ export function Pricing() {
             }
             aria-hidden={!summaryVisible}
             tabIndex={summaryVisible ? 0 : -1}
-            aria-label={`Start ${STEP_DISPLAY_LABELS[step]} ${planLabel} ${sizeLabel} for $${entry.priceNew.toFixed(2)}`}
+            aria-label={`Start ${STEP_DISPLAY_LABELS[step]} ${planLabel} ${sizeLabel} for $${entry.priceNew.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             className="lg:hidden fixed left-1/2 z-[2147482980] flex max-w-[calc(100vw-140px)] items-center gap-[12px] rounded-full py-[6px] pl-[18px] pr-[6px] no-underline transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
             style={{
               bottom: "max(20px, env(safe-area-inset-bottom, 0px))",
@@ -1956,7 +1956,7 @@ export function Pricing() {
             <span className="flex min-w-0 flex-col gap-[3px] font-['DM_Sans',sans-serif] leading-none">
               <span className="truncate text-[10.5px] font-medium text-white/80">{`${STEP_DISPLAY_LABELS[step]} · ${planLabel} · ${sizeLabel}`}</span>
               <span className="flex items-baseline gap-[6px] whitespace-nowrap">
-                <span className="text-[16px] font-bold tracking-[-0.01em] text-white">${entry.priceNew.toFixed(2)}</span>
+                <span className="text-[16px] font-bold tracking-[-0.01em] text-white">${entry.priceNew.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 <span className="text-[11px] font-semibold text-white/85">Start</span>
               </span>
             </span>
