@@ -2,7 +2,9 @@
 import { chromium } from "playwright";
 import { writeFileSync } from "node:fs";
 
-const URL = "http://127.0.0.1:4173/";
+const URL = process.env.SCREENS_URL || "http://127.0.0.1:4173/";
+const BENCH_ONLY = !!process.env.BENCH_ONLY;
+const BENCH_LABEL = process.env.BENCH_LABEL || "this-branch";
 const OUT = "ci-out";
 const log = [];
 
@@ -14,7 +16,7 @@ const viewports = [
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const browser = await chromium.launch({ args: ["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"] });
-for (const vp of viewports) {
+for (const vp of BENCH_ONLY ? [] : viewports) {
   const ctx = await browser.newContext({
     viewport: { width: vp.width, height: vp.height },
     deviceScaleFactor: vp.dpr,
@@ -73,6 +75,45 @@ for (const vp of viewports) {
   log.push(`[${vp.name}] scrollHeight ${h}`);
   await ctx.close();
 }
+// ---- Smoothness benchmark: phone-sized page, CPU throttled 4x (roughly a
+// mid-range phone). Scrolls the whole page smoothly and taps through the
+// challenge picker, recording how many frames take too long.
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await ctx.route(/klaviyo\.com/, (r) => r.abort());
+  const page = await ctx.newPage();
+  await page.goto(URL, { waitUntil: "load", timeout: 60000 });
+  await sleep(3000);
+  const cdp = await ctx.newCDPSession(page);
+  await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
+  const frameStats = (label, fn) => page.evaluate(async ([label, body]) => {
+    const deltas = [];
+    let last = performance.now();
+    let running = true;
+    const loop = (t) => { deltas.push(t - last); last = t; if (running) requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+    await new Function(`return (async () => { ${body} })()`)();
+    running = false;
+    await new Promise((r) => setTimeout(r, 100));
+    const d = deltas.slice(2);
+    const avg = d.reduce((a, b) => a + b, 0) / d.length;
+    return `${label}: frames=${d.length} avgMs=${avg.toFixed(1)} over33ms=${d.filter((x) => x > 33.4).length} over50ms=${d.filter((x) => x > 50).length} worstMs=${Math.max(...d).toFixed(0)}`;
+  }, [label, fn]);
+  const scrollBody = `
+    window.scrollTo(0, 0); await new Promise(r => setTimeout(r, 300));
+    const H = document.documentElement.scrollHeight - innerHeight;
+    const start = performance.now(); const dur = 12000;
+    await new Promise((resolve) => { const step = () => { const p = Math.min(1, (performance.now() - start) / dur); window.scrollTo(0, H * p); if (p < 1) requestAnimationFrame(step); else resolve(); }; requestAnimationFrame(step); });
+  `;
+  log.push(`[bench ${BENCH_LABEL}] ${await frameStats("scroll-whole-page", scrollBody)}`);
+  const toggleBody = `
+    document.getElementById("challenge").scrollIntoView(); await new Promise(r => setTimeout(r, 800));
+    const groups = [...document.querySelectorAll('#challenge [role="group"] button')];
+    for (let round = 0; round < 3; round++) for (const b of groups) { b.click(); await new Promise(r => setTimeout(r, 120)); }
+  `;
+  log.push(`[bench ${BENCH_LABEL}] ${await frameStats("tap-challenge-picker", toggleBody)}`);
+  await ctx.close();
+}
 await browser.close();
-writeFileSync(`${OUT}/log.txt`, log.join("\n") + "\n");
+writeFileSync(`${OUT}/${BENCH_ONLY ? `bench-${BENCH_LABEL}` : "log"}.txt`, log.join("\n") + "\n");
 console.log(log.join("\n"));

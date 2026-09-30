@@ -46,6 +46,16 @@ jobs:
             VITE_BASE_PATH=/ npx vite preview --port 4173 --strictPort --host 127.0.0.1 > ci-out/preview.txt 2>&1 &
             sleep 4
             node scripts/ci-screens.mjs > ci-out/screens.txt 2>&1; echo "exit $?" >> ci-out/screens.txt
+            # Same smoothness benchmark against saved v1 and the live main branch, for comparison.
+            for ref in redesign-v1 main; do
+              git fetch -q --depth 1 origin "$ref" && git worktree add -q "/tmp/cmp-$ref" FETCH_HEAD
+              (cd "/tmp/cmp-$ref" && npm ci > /dev/null 2>&1 && VITE_BASE_PATH=/ npm run build > /dev/null 2>&1)
+              (cd "/tmp/cmp-$ref" && VITE_BASE_PATH=/ npx vite preview --port 4174 --strictPort --host 127.0.0.1 > /dev/null 2>&1 &)
+              sleep 4
+              SCREENS_URL=http://127.0.0.1:4174/ BENCH_ONLY=1 BENCH_LABEL="$ref" node scripts/ci-screens.mjs >> ci-out/screens.txt 2>&1
+              pkill -f "port 4174" || true
+              sleep 1
+            done
           fi
           exit 0
 

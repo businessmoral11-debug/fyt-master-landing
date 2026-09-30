@@ -83,11 +83,10 @@
 /* Slow shimmer across gradient text highlights. */
 .fyt-gradient-text {
   background: linear-gradient(100deg, #3b82f6 0%, #7db2ff 35%, #3b82f6 55%, #2563eb 100%);
-  background-size: 220% 100%;
+  background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: fyt-rd-text-shimmer 7s ease-in-out infinite;
 }
 @keyframes fyt-rd-text-shimmer {
   0%, 100% { background-position: 0% 50%; }
@@ -120,9 +119,7 @@
   background:
     linear-gradient(#0a1226, #0a1226) padding-box,
     linear-gradient(110deg, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.9), rgba(191, 219, 254, 0.4), rgba(96, 165, 250, 0.15)) border-box;
-  background-size: 100% 100%, 240% 100%;
   border: 1px solid transparent;
-  animation: fyt-rd-border-sweep 6s linear infinite;
 }
 @keyframes fyt-rd-border-sweep {
   from { background-position: 0 0, 0% 0; }

@@ -51,9 +51,10 @@ export function useIsDesktop() {
 /** Thin blue reading-progress bar pinned to the very top of the viewport. */
 export function ScrollProgressBar() {
   const reduce = useReducedMotion();
+  const desktop = useIsDesktop();
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.4 });
-  if (reduce) return null;
+  if (reduce || !desktop) return null;
+  const scaleX = scrollYProgress;
   return (
     <motion.div
       aria-hidden="true"
@@ -148,10 +149,7 @@ export function Eyebrow({ children, tone = "dark", center = false }: { children:
             : { color: "#2563eb", background: "rgba(37,99,235,0.07)", border: "1px solid rgba(37,99,235,0.14)" }
         }
       >
-        <span className="relative flex size-[6px]">
-          <span className="fyt-rd-ping absolute inset-0 rounded-full" style={{ background: tone === "dark" ? "#60a5fa" : "#3b82f6" }} />
-          <span className="relative size-[6px] rounded-full" style={{ background: tone === "dark" ? "#60a5fa" : "#3b82f6" }} />
-        </span>
+        <span className="size-[6px] rounded-full" style={{ background: tone === "dark" ? "#60a5fa" : "#3b82f6", boxShadow: `0 0 8px ${tone === "dark" ? "#60a5fa" : "#3b82f6"}` }} />
         {children}
       </span>
     </Reveal>
@@ -198,7 +196,7 @@ export function Pill({
       : tone === "dark"
         ? { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.14)", color: "#e8ecf6" }
         : { background: "#fff", border: `1px solid ${C.borderLight}`, color: C.textLight, boxShadow: "0 8px 24px -14px rgba(15,23,42,0.25)" };
-  const cls = `${base} ${variant === "primary" ? "cta-shine text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.75),inset_0_1px_0_rgba(255,255,255,0.35)] hover:shadow-[0_18px_44px_-12px_rgba(59,130,246,0.85),inset_0_1px_0_rgba(255,255,255,0.35)]" : ""} ${className}`;
+  const cls = `${base} ${variant === "primary" ? "overflow-hidden text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.75),inset_0_1px_0_rgba(255,255,255,0.35)] hover:shadow-[0_18px_44px_-12px_rgba(59,130,246,0.85),inset_0_1px_0_rgba(255,255,255,0.35)]" : ""} ${className}`;
   const inner = (
     <>
       {variant === "primary" && (

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEADLINE, PROMO_DEAL_LINE, formatHoursLeft } from "@/app/data/promoBanner";
 import { countryFlagUrl, fetchFeaturedPayouts, formatPayoutAmount, type PublicPayout } from "@/app/api/rewardsApi";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
@@ -46,9 +46,12 @@ function Digit({ value, label }: { value: string; label: string }) {
 
 /** Offer + countdown + benefits, shown right above the challenge picker. */
 export function PricingOffer() {
-  const left = formatHoursLeft(PROMO_DEADLINE, useNow());
+  const ref = useRef<HTMLDivElement>(null);
+  const onScreen = useInView(ref, { margin: "100px" });
+  const left = formatHoursLeft(PROMO_DEADLINE, useNow(onScreen));
   return (
     <motion.div
+      ref={ref}
       className="fyt-rd fyt-offer-border relative w-full overflow-hidden rounded-[22px] p-[18px] sm:p-[22px] lg:p-[26px]"
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -227,7 +230,7 @@ export function FloatingCta() {
           animate={{ opacity: 1, y: 0, x: "-50%" }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: 40, x: "-50%" }}
           transition={{ duration: 0.45, ease: EASE }}
-          className="fyt-rd cta-shine group fixed left-1/2 z-[2147482980] flex max-w-[calc(100vw-150px)] items-center gap-[10px] rounded-full py-[8px] pl-[18px] pr-[18px] min-[380px]:pl-[8px] no-underline sm:max-w-none sm:gap-[14px] sm:pr-[22px]"
+          className="fyt-rd group fixed left-1/2 z-[2147482980] flex max-w-[calc(100vw-150px)] items-center gap-[10px] rounded-full py-[8px] pl-[18px] pr-[18px] min-[380px]:pl-[8px] no-underline sm:max-w-none sm:gap-[14px] sm:pr-[22px]"
           style={{
             // Inline so the shared .cta-shine rule (position: relative) can't override it.
             position: "fixed",

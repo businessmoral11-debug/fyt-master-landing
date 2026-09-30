@@ -22,7 +22,7 @@ import {
   SupportFeatureIcon,
   TradingGlobeSlot,
 } from "@/app/BelowFold";
-import { C, EASE, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent } from "./ui";
+import { C, EASE, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent, useIsDesktop } from "./ui";
 
 /* ------------------------------------------------------------------ */
 /* How it works — the connector line draws itself as you scroll        */
@@ -34,15 +34,17 @@ function StepCard({ step, index, progress, vertical }: { step: (typeof HOW_IT_WO
   const at = vertical ? index / total : index / (total - 1);
   const lit = useTransform(progress, [Math.max(0, Math.min(at, 0.98) - 0.12), Math.min(at + 0.02, 1)], [0, 1]);
   const ringOpacity = reduce ? 1 : lit;
-  const glow = useTransform(lit, (v) => `0 0 0 ${6 * v}px rgba(59,130,246,${0.14 * v}), 0 0 ${28 * v}px rgba(59,130,246,${0.55 * v})`);
   return (
     <motion.div variants={staggerChild} className={`relative flex ${vertical ? "flex-row gap-[18px]" : "flex-col items-center text-center gap-[18px]"}`}>
       <div className="relative z-[1] shrink-0">
         <motion.span
           className="relative flex size-[56px] items-center justify-center rounded-full"
-          style={{ background: "#0b1224", border: "1px solid rgba(96,165,250,0.25)", boxShadow: reduce ? "0 0 24px rgba(59,130,246,0.5)" : glow }}
+          style={{ background: "#0b1224", border: "1px solid rgba(96,165,250,0.25)" }}
         >
-          <motion.span className="absolute inset-0 rounded-full" style={{ opacity: ringOpacity, background: "linear-gradient(180deg, #4f8cff, #2563eb)" }} />
+          <motion.span
+            className="absolute inset-0 rounded-full"
+            style={{ opacity: ringOpacity, background: "linear-gradient(180deg, #4f8cff, #2563eb)", boxShadow: "0 0 0 6px rgba(59,130,246,0.14), 0 0 28px rgba(59,130,246,0.55)" }}
+          />
           <span className="relative text-[15px] font-semibold text-white tabular">{String(step.n).padStart(2, "0")}</span>
         </motion.span>
       </div>
@@ -69,8 +71,8 @@ export function HowItWorks() {
   const mobRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: deskP } = useScroll({ target: deskRef, offset: ["start 0.85", "end 0.55"] });
   const { scrollYProgress: mobP } = useScroll({ target: mobRef, offset: ["start 0.75", "end 0.45"] });
-  const deskLine = useSpring(deskP, { stiffness: 120, damping: 26 });
-  const mobLine = useSpring(mobP, { stiffness: 120, damping: 26 });
+  const deskLine = deskP;
+  const mobLine = mobP;
   return (
     <Section tone="dark" id="how-it-works" stars>
       <div className="flex flex-col items-center gap-[18px] text-center">
@@ -283,10 +285,10 @@ export function Comparison() {
 /* ------------------------------------------------------------------ */
 
 function DashboardStage() {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotion() || !useIsDesktop();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center 0.55"] });
-  const p = useSpring(scrollYProgress, { stiffness: 90, damping: 24 });
+  const p = scrollYProgress;
   const rotateX = useTransform(p, [0, 1], [26, 0]);
   const scale = useTransform(p, [0, 1], [0.86, 1]);
   const y = useTransform(p, [0, 1], [60, 0]);
@@ -393,10 +395,7 @@ export function ProductShowcase() {
                 <>
                   <span className="relative flex size-[42px] items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.16)", border: "1px solid rgba(255,255,255,0.22)" }}>
                     {(icon === "chat" || icon === "clock") && (
-                      <span className="absolute right-0 top-0 flex size-[9px]">
-                        <span className="fyt-rd-ping absolute inset-0 rounded-full bg-[#4ade80]" />
-                        <span className="relative size-[9px] rounded-full bg-[#4ade80]" />
-                      </span>
+                      <span className="absolute right-0 top-0 size-[9px] rounded-full bg-[#4ade80] shadow-[0_0_6px_rgba(74,222,128,0.8)]" />
                     )}
                     <SupportFeatureIcon kind={icon} />
                   </span>

@@ -223,6 +223,8 @@ export function FeaturedCertificates() {
     let idleFrames = 0;
     let isVisible = true;
     let forceRecompute = false;
+    // Motion blur while swiping is expensive on phones — desktop pointers only.
+    const allowBlur = window.matchMedia("(pointer: fine)").matches;
 
     function tick() {
       if (!isVisible) return;
@@ -243,7 +245,7 @@ export function FeaturedCertificates() {
 
         if (idleFrames <= 2 || forceRecompute) {
           forceRecompute = false;
-          track.style.filter = idleFrames > 1 || blurPx < 0.05 ? "none" : `blur(${blurPx}px)`;
+          track.style.filter = !allowBlur || idleFrames > 1 || blurPx < 0.05 ? "none" : `blur(${blurPx}px)`;
           const rect = track.getBoundingClientRect();
           const viewportCenter = rect.left + rect.width / 2;
           cardElsRef.current.forEach((el) => {

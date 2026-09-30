@@ -1488,68 +1488,19 @@ function useTouchedOnChange<T>(value: T): boolean {
 }
 
 function PanelCard({ children, className }: { children: ReactNode; className: string }) {
-  const prefersReducedMotion = useReducedMotion();
-  const { changeTick, celebrated } = useContext(PricingFlashContext);
-  const contentControls = useAnimation();
-  const isFirstChangeTick = useRef(true);
-  useEffect(() => {
-    if (isFirstChangeTick.current) {
-      isFirstChangeTick.current = false;
-      return;
-    }
-    if (prefersReducedMotion) return;
-    void contentControls.start({ opacity: pricingContentDipOpacity, transition: PRICING_SWEEP_TRANSITION });
-  }, [changeTick, prefersReducedMotion, contentControls]);
-
+  // Kept deliberately light: the old version floated every card forever and
+  // ran a blurred light-sweep + content fade on every toggle, which made the
+  // picker feel laggy on phones. Now: one entry reveal, CSS-only hover.
   return (
     <motion.div
-      className="h-full"
-      animate={prefersReducedMotion ? undefined : { y: pricingCardFloatY, scale: celebrated ? pricingCompletionCardPulse.scale : 1 }}
-      transition={
-        prefersReducedMotion
-          ? undefined
-          : {
-              y: PRICING_CARD_FLOAT_TRANSITION,
-              scale: celebrated
-                ? { duration: PRICING_COMPLETION_CARD_PULSE_DURATION_S, delay: PRICING_COMPLETION_CARD_PULSE_DELAY_S, ease: "easeOut" }
-                : { duration: 0 },
-            }
-      }
+      className={`${className} group flex-col rounded-[24px] relative h-full transition-[translate,box-shadow,border-color] duration-300 lg:hover:-translate-y-[4px] lg:hover:border-[#60A5FA] lg:hover:shadow-[0_28px_60px_rgba(15,23,42,0.12)]`}
+      style={{ background: "#FFFFFF", border: "1px solid #E8EDF5", boxShadow: "0 20px 50px rgba(15,23,42,0.08)" }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
-      <motion.div
-        className={`${className} group flex-col rounded-[24px] relative h-full`}
-        style={{ background: "#FFFFFF", border: "1px solid #E8EDF5", boxShadow: "0 20px 50px rgba(15,23,42,0.08)" }}
-        initial={{ opacity: 0, y: 20, scale: 0.92 }}
-        whileInView={{ opacity: 1, y: 0, scale: 1 }}
-        viewport={{ once: true, margin: "-60px" }}
-        whileHover={{ y: -4, borderColor: "#60A5FA", boxShadow: "0 28px 60px rgba(15,23,42,0.12)" }}
-        transition={{ type: "spring", stiffness: 300, damping: 24 }}
-      >
-        <div className="absolute inset-0 rounded-[24px] overflow-hidden pointer-events-none" aria-hidden="true">
-          <div
-            className="absolute -inset-px opacity-0 transition-opacity duration-400 group-hover:opacity-100"
-            style={{ background: "radial-gradient(160px circle at 50% 0%, rgba(59,130,246,0.18), transparent 70%)" }}
-          />
-          {!prefersReducedMotion && changeTick > 0 && (
-            <motion.div
-              key={changeTick}
-              aria-hidden="true"
-              className="absolute inset-0"
-              style={{
-                background: "linear-gradient(135deg, transparent 38%, rgba(59,130,246,0.9) 50%, transparent 62%)",
-                backgroundSize: "280% 280%",
-                filter: "blur(3px)",
-              }}
-              initial={{ backgroundPosition: "0% 130%", opacity: 0 }}
-              animate={{ backgroundPosition: "130% 0%", opacity: pricingSweepOpacity }}
-              transition={PRICING_SWEEP_TRANSITION}
-            />
-          )}
-        </div>
-        <motion.div className="relative flex flex-col gap-[20px] p-[32px]" initial={{ opacity: 1 }} animate={contentControls}>
-          {children}
-        </motion.div>
-      </motion.div>
+      <div className="relative flex flex-col gap-[20px] p-[32px]">{children}</div>
     </motion.div>
   );
 }
@@ -1826,9 +1777,7 @@ export function Pricing() {
         className="overflow-clip rounded-[inherit] size-full relative"
       >
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-          <AmbientBlob className="left-[4%] top-[6%]" color="rgba(59,130,246,0.1)" size={580} duration={27} />
-          <AmbientBlob className="right-[6%] bottom-[10%]" color="rgba(96,165,250,0.07)" size={460} duration={22} />
-          <div className="absolute inset-0 opacity-[0.035] mix-blend-overlay" style={{ backgroundImage: PRICING_NOISE_BG }} />
+
           {/* Mouse spotlight over the whole configurator — very subtle. */}
           <div
             className="absolute inset-0"
@@ -1860,9 +1809,7 @@ export function Pricing() {
             >
               <motion.div
                 className="flex items-center justify-center rounded-full size-[44px] shrink-0"
-                style={{ border: "1.5px solid #3b82f6", background: "rgba(59,130,246,0.08)" }}
-                animate={reduceMotion || !animsActive ? undefined : { boxShadow: ["0 0 12px rgba(59,130,246,0.5)", "0 0 20px rgba(59,130,246,0.85)", "0 0 12px rgba(59,130,246,0.5)"] }}
-                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                style={{ border: "1.5px solid #3b82f6", background: "rgba(59,130,246,0.08)", boxShadow: "0 0 16px rgba(59,130,246,0.6)" }}
               >
                 <svg width="14" height="16" viewBox="0 0 14 16" fill="none" className="ml-[2px]"><path d="M1 1L13 8L1 15V1Z" fill="white" /></svg>
               </motion.div>
@@ -1873,8 +1820,6 @@ export function Pricing() {
                     key={i}
                     className="w-[3px] rounded-full"
                     style={{ height: `${h}px`, background: "rgba(59,130,246,0.35)" }}
-                    animate={reduceMotion ? undefined : { height: [`${h}px`, `${Math.max(4, h - 10)}px`, `${h}px`] }}
-                    transition={{ duration: 1 + (i % 3) * 0.3, repeat: Infinity, ease: "easeInOut", delay: i * 0.08 }}
                   />
                 ))}
               </div>
@@ -1958,8 +1903,6 @@ export function Pricing() {
               <motion.div
                 className="hidden lg:block w-px"
                 style={{ background: "linear-gradient(180deg, transparent 0%, rgba(96,165,250,0.35) 50%, transparent 100%)" }}
-                animate={reduceMotion ? undefined : { opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
                 aria-hidden
               />
 
@@ -2016,8 +1959,6 @@ export function Pricing() {
               <motion.div
                 className="hidden lg:block w-px"
                 style={{ background: "linear-gradient(180deg, transparent 0%, rgba(96,165,250,0.35) 50%, transparent 100%)" }}
-                animate={reduceMotion ? undefined : { opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
                 aria-hidden
               />
 
@@ -2184,16 +2125,6 @@ export function Pricing() {
                   boxShadow: "0 1px 0 rgba(255,255,255,0.9) inset",
                 }}
               >
-                {!reduceMotion && animsActive && (
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-y-0 left-0 w-1/2 opacity-25"
-                    style={{
-                      background: "linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.45) 45%, rgba(90,155,255,0.15) 50%, rgba(255,255,255,0.45) 55%, transparent 100%)",
-                      animation: "fyt-alt-promo-sheen 7s ease-in-out infinite",
-                    }}
-                  />
-                )}
 
                 <div className="relative z-[1] flex flex-col items-center gap-[6px] px-[14px] py-[12px] text-center">
                   <span
@@ -2241,18 +2172,7 @@ export function Pricing() {
                   className="rounded-[16px] shrink-0 w-full block no-underline relative overflow-hidden h-[58px]"
                   style={{ background: "linear-gradient(180deg, #5A9BFF 0%, #2563EB 100%)", boxShadow: "0 8px 28px -6px rgba(37,99,235,0.35), inset 0 1px 0 rgba(255,255,255,0.35)" }}
                 >
-                  {!reduceMotion && animsActive && (
-                    <motion.div
-                      aria-hidden="true"
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        background: "linear-gradient(120deg, transparent, rgba(255,255,255,0.18), transparent, rgba(96,165,250,0.25), transparent)",
-                        backgroundSize: "300% 300%",
-                      }}
-                      animate={pricingCtaGradientPosition}
-                      transition={{ duration: PRICING_CTA_GRADIENT_DURATION_S, repeat: Infinity, ease: "linear" }}
-                    />
-                  )}
+
                   {celebrated && !reduceMotion && (
                     <motion.div
                       aria-hidden="true"
@@ -2387,13 +2307,9 @@ export function Pricing() {
 
 function PaymentBadgeShell({ children, index, reduceMotion }: { children: ReactNode; index: number; reduceMotion: boolean | null }) {
   return (
-    <motion.div
-      className="shrink-0"
-      animate={reduceMotion ? undefined : { y: [0, -3, 0] }}
-      transition={reduceMotion ? undefined : { duration: 3.4, repeat: Infinity, ease: "easeInOut", delay: index * 0.18 }}
-    >
+    <div className="shrink-0" data-index={index} data-reduce={reduceMotion ? "true" : undefined}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
