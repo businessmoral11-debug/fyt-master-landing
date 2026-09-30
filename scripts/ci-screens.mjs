@@ -111,6 +111,7 @@ for (const vp of BENCH_ONLY ? [] : viewports) {
     const groups = [...document.querySelectorAll('#challenge [role="group"] button')];
     for (let round = 0; round < 3; round++) for (const b of groups) { b.click(); await new Promise(r => setTimeout(r, 120)); }
   `;
+  log.push(`[bench ${BENCH_LABEL}] ${await frameStats("idle-at-challenge-3s", `document.getElementById("challenge").scrollIntoView(); await new Promise(r => setTimeout(r, 3000));`)}`);
   if (!BENCH_ONLY) {
     await cdp.send("Profiler.enable");
     await cdp.send("Profiler.setSamplingInterval", { interval: 200 });

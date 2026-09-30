@@ -74,8 +74,9 @@ body::-webkit-scrollbar {
 
 /* Soft breathe on the promo-banner urgency pill. */
 @keyframes fyt-promo-urgency-pulse {
-  0%, 100% { box-shadow: 0 2px 8px rgba(220,38,38,0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
-  50% { box-shadow: 0 2px 12px rgba(220,38,38,0.55), inset 0 1px 0 rgba(255,255,255,0.28); }
+  /* transform-only so the always-visible sticky bar never repaints per frame */
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 /* Soft sheen for the pricing-card "new traders" offer. */
