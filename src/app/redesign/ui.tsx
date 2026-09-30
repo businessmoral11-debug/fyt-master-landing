@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from "motion/react";
 
 /** Shared easing for every redesign reveal — fast start, long soft landing. */
 export const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -48,12 +48,25 @@ export function useIsDesktop() {
   return is;
 }
 
+/** True while the element is on (or near) screen — used to run loops only when visible. */
+export function useLive<T extends Element>(margin = "100px") {
+  const ref = useRef<T>(null);
+  const live = useInView(ref, { margin: margin as never });
+  return [ref, live] as const;
+}
+
+/** Adds .fyt-shimmer-on the first time the element scrolls into view. */
+export function useShimmer<T extends Element>() {
+  const ref = useRef<T>(null);
+  const seen = useInView(ref, { once: true, amount: 0.6 });
+  return [ref, seen ? "fyt-shimmer-on" : ""] as const;
+}
+
 /** Thin blue reading-progress bar pinned to the very top of the viewport. */
 export function ScrollProgressBar() {
   const reduce = useReducedMotion();
-  const desktop = useIsDesktop();
   const { scrollYProgress } = useScroll();
-  if (reduce || !desktop) return null;
+  if (reduce) return null;
   const scaleX = scrollYProgress;
   return (
     <motion.div
@@ -139,17 +152,23 @@ export function WordsReveal({ text, className, wordClassName = "", delay = 0 }: 
 }
 
 export function Eyebrow({ children, tone = "dark", center = false }: { children: ReactNode; tone?: "dark" | "light"; center?: boolean }) {
+  const [ref, live] = useLive<HTMLSpanElement>();
+  const dot = tone === "dark" ? "#60a5fa" : "#3b82f6";
   return (
     <Reveal y={12} className={center ? "flex justify-center" : "flex"}>
       <span
-        className="inline-flex items-center gap-[8px] rounded-full px-[12px] py-[6px] text-[11px] font-semibold tracking-[0.18em] uppercase"
+        ref={ref}
+        className={`inline-flex items-center gap-[8px] rounded-full px-[12px] py-[6px] text-[11px] font-semibold tracking-[0.18em] uppercase ${live ? "fyt-live" : ""}`}
         style={
           tone === "dark"
             ? { color: "#93c5fd", background: "rgba(59,130,246,0.1)", border: "1px solid rgba(96,165,250,0.22)" }
             : { color: "#2563eb", background: "rgba(37,99,235,0.07)", border: "1px solid rgba(37,99,235,0.14)" }
         }
       >
-        <span className="size-[6px] rounded-full" style={{ background: tone === "dark" ? "#60a5fa" : "#3b82f6", boxShadow: `0 0 8px ${tone === "dark" ? "#60a5fa" : "#3b82f6"}` }} />
+        <span className="relative flex size-[6px]">
+          <span className="fyt-rd-ping-gated absolute inset-0 rounded-full" style={{ background: dot }} />
+          <span className="relative size-[6px] rounded-full" style={{ background: dot }} />
+        </span>
         {children}
       </span>
     </Reveal>
@@ -196,7 +215,7 @@ export function Pill({
       : tone === "dark"
         ? { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.14)", color: "#e8ecf6" }
         : { background: "#fff", border: `1px solid ${C.borderLight}`, color: C.textLight, boxShadow: "0 8px 24px -14px rgba(15,23,42,0.25)" };
-  const cls = `${base} ${variant === "primary" ? "overflow-hidden text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.75),inset_0_1px_0_rgba(255,255,255,0.35)] hover:shadow-[0_18px_44px_-12px_rgba(59,130,246,0.85),inset_0_1px_0_rgba(255,255,255,0.35)]" : ""} ${className}`;
+  const cls = `${base} ${variant === "primary" ? "cta-shine text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.75),inset_0_1px_0_rgba(255,255,255,0.35)] hover:shadow-[0_18px_44px_-12px_rgba(59,130,246,0.85),inset_0_1px_0_rgba(255,255,255,0.35)]" : ""} ${className}`;
   const inner = (
     <>
       {variant === "primary" && (
@@ -307,10 +326,12 @@ export function SectionTitle({
   size?: "lg" | "xl";
   as?: "h2" | "h3";
 }) {
+  const [shimmerRef, shimmerClass] = useShimmer<HTMLHeadingElement>();
   const sizes = size === "xl" ? "text-[36px] sm:text-[44px] lg:text-[64px]" : "text-[32px] sm:text-[38px] lg:text-[52px]";
   return (
     <As
-      className={`${sizes} font-semibold leading-[1.06] tracking-[-0.035em] ${center ? "text-center" : ""}`}
+      ref={shimmerRef as never}
+      className={`${sizes} font-semibold leading-[1.06] tracking-[-0.035em] ${center ? "text-center" : ""} ${shimmerClass}`}
       style={{ color: tone === "dark" ? C.textDark : C.textLight }}
     >
       <WordsReveal text={lead} />

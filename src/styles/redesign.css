@@ -83,7 +83,8 @@
 /* Slow shimmer across gradient text highlights. */
 .fyt-gradient-text {
   background: linear-gradient(100deg, #3b82f6 0%, #7db2ff 35%, #3b82f6 55%, #2563eb 100%);
-  background-size: 100% 100%;
+  background-size: 220% 100%;
+  background-position: 0% 50%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -144,3 +145,51 @@
 /* Hero CTA shine keeps sweeping after the hero scrolls away — pause it with
    the rest of the hero's animations. */
 .hero-anims-paused .cta-shine::after { animation-play-state: paused; }
+
+/* One-shot shimmer across blue heading words, started only when the heading
+   scrolls into view (class added by JS) — a couple of seconds of work, not
+   an endless loop. */
+.fyt-shimmer-on .fyt-gradient-text {
+  animation: fyt-rd-text-shimmer 2.6s ease-in-out 0.5s 1 both;
+}
+
+/* Rotating light around the offer card border: a big conic gradient spun with
+   transform (compositor only) behind the card, masked to a 1px ring by the
+   card's own background. Runs only while on screen (.fyt-live). */
+.fyt-ring {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.fyt-ring::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 180%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(96, 165, 250, 0.95) 40deg, rgba(191, 219, 254, 0.5) 70deg, transparent 110deg, transparent 360deg);
+  animation: fyt-rd-spin 6s linear infinite;
+  animation-play-state: paused;
+  z-index: -2;
+  will-change: transform;
+}
+.fyt-ring::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: #0a1226;
+  z-index: -1;
+}
+.fyt-ring.fyt-live::before { animation-play-state: running; }
+@keyframes fyt-rd-spin { to { transform: rotate(360deg); } }
+
+/* Pings and other loops only animate inside an on-screen .fyt-live block. */
+.fyt-rd-ping-gated { animation: fyt-rd-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; animation-play-state: paused; }
+.fyt-live .fyt-rd-ping-gated { animation-play-state: running; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fyt-shimmer-on .fyt-gradient-text, .fyt-ring::before, .fyt-rd-ping-gated { animation: none; }
+}

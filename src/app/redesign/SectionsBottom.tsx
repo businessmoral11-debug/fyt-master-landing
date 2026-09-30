@@ -285,11 +285,13 @@ export function Comparison() {
 /* ------------------------------------------------------------------ */
 
 function DashboardStage() {
-  const reduce = useReducedMotion() || !useIsDesktop();
+  const reduce = useReducedMotion();
+  // Phones get a flat (2D) rise-and-grow; the 3D tilt is desktop-only.
+  const tilt3d = useIsDesktop();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center 0.55"] });
   const p = scrollYProgress;
-  const rotateX = useTransform(p, [0, 1], [26, 0]);
+  const rotateX = useTransform(p, [0, 1], [tilt3d ? 26 : 0, 0]);
   const scale = useTransform(p, [0, 1], [0.86, 1]);
   const y = useTransform(p, [0, 1], [60, 0]);
   const glow = useTransform(p, [0, 1], [0.15, 0.7]);

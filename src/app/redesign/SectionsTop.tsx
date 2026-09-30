@@ -22,7 +22,7 @@ import {
   TrustindexWidget,
   VideoLightbox,
 } from "@/app/BelowFold";
-import { C, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent } from "./ui";
+import { C, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent, useShimmer } from "./ui";
 import { PayoutTicker, PricingOffer, PricingTrustLine } from "./Conversion";
 
 const FeaturedCertificates = lazy(() => import("@/app/featuredCertificates").then((m) => ({ default: m.FeaturedCertificates })));
@@ -139,12 +139,13 @@ function OrbVisual({ size = 380 }: { size?: number }) {
 
 export function ProveYourSkill() {
   const reduce = useReducedMotion();
+  const [proveRef, proveShimmer] = useShimmer<HTMLHeadingElement>();
   return (
     <Section tone="light">
       <div className="grid grid-cols-1 items-center gap-[48px] lg:grid-cols-12 lg:gap-[56px]">
         <div className="flex flex-col gap-[22px] lg:col-span-5">
           <Eyebrow tone="light">Why FYT</Eyebrow>
-          <h2 className="text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-[38px] lg:text-[50px]" style={{ color: C.textLight }}>
+          <h2 ref={proveRef} className={`text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-[38px] lg:text-[50px] ${proveShimmer}`} style={{ color: C.textLight }}>
             <WordsReveal text="Prove Your Market Expertise." />
             <br />
             <span className="font-normal" style={{ color: "#3c465c" }}>
@@ -246,6 +247,7 @@ function ProofChartLine() {
 
 export function ProofInNumbers() {
   const reduce = useReducedMotion();
+  const [proofRef, proofShimmer] = useShimmer<HTMLHeadingElement>();
   return (
     <Section tone="dark" stars>
       <ProofChartLine />
@@ -253,7 +255,7 @@ export function ProofInNumbers() {
       <div className="relative grid grid-cols-1 items-center gap-[44px] lg:grid-cols-12 lg:gap-[56px]">
         <div className="flex flex-col gap-[22px] lg:col-span-6">
           <Eyebrow>Proof in Numbers</Eyebrow>
-          <h2 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[42px] lg:text-[56px]" style={{ color: C.textDark }}>
+          <h2 ref={proofRef} className={`text-[34px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[42px] lg:text-[56px] ${proofShimmer}`} style={{ color: C.textDark }}>
             <WordsReveal text="Thousands traded." />
             <br />
             <WordsReveal text="Millions rewarded." wordClassName="fyt-gradient-text" delay={0.2} />
@@ -381,6 +383,7 @@ export function Testimonials() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.2 });
   const revealed = !!reduce || inView;
+  const [trustRef, trustShimmer] = useShimmer<HTMLHeadingElement>();
   return (
     <section className="fyt-rd relative w-full shrink-0 overflow-hidden" style={{ background: `linear-gradient(180deg, #ffffff 0%, ${C.light} 100%)` }}>
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -392,7 +395,7 @@ export function Testimonials() {
           <Eyebrow tone="light" center>
             Trust
           </Eyebrow>
-          <h2 className="max-w-[760px] text-[32px] font-semibold leading-[1.06] tracking-[-0.035em] sm:text-[40px] lg:text-[54px]" style={{ color: C.textLight }}>
+          <h2 ref={trustRef} className={`max-w-[760px] text-[32px] font-semibold leading-[1.06] tracking-[-0.035em] sm:text-[40px] lg:text-[54px] ${trustShimmer}`} style={{ color: C.textLight }}>
             <WordsReveal text="Trusted by" /> <WordsReveal text="21,500+" wordClassName="fyt-gradient-text" delay={0.1} />{" "}
             <WordsReveal text="satisfied clients worldwide." delay={0.2} />
           </h2>

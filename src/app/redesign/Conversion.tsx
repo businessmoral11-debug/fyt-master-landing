@@ -52,7 +52,7 @@ export function PricingOffer() {
   return (
     <motion.div
       ref={ref}
-      className="fyt-rd fyt-offer-border relative w-full overflow-hidden rounded-[22px] p-[18px] sm:p-[22px] lg:p-[26px]"
+      className={`fyt-rd fyt-ring relative w-full overflow-hidden rounded-[22px] p-[18px] sm:p-[22px] lg:p-[26px] ${onScreen ? "fyt-live" : ""}`}
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
@@ -63,7 +63,7 @@ export function PricingOffer() {
         <div className="flex flex-col gap-[10px]">
           <span className="inline-flex w-fit items-center gap-[8px] rounded-full px-[10px] py-[5px] text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#fecaca", background: "rgba(220,38,38,0.16)", border: "1px solid rgba(248,113,113,0.35)" }}>
             <span className="relative flex size-[6px]">
-              <span className="fyt-rd-ping absolute inset-0 rounded-full bg-[#f87171]" />
+              <span className="fyt-rd-ping-gated absolute inset-0 rounded-full bg-[#f87171]" />
               <span className="relative size-[6px] rounded-full bg-[#f87171]" />
             </span>
             {left.expired ? "Offer" : "Offer ends in"}
@@ -161,11 +161,11 @@ export function PayoutTicker() {
   if (items.length === 0) return null;
   const track = reduce ? items : [...items, ...items];
   return (
-    <div ref={ref} className="fyt-rd relative w-full overflow-hidden" style={{ background: "rgba(255,255,255,0.025)", borderBottom: "1px solid rgba(148,178,255,0.12)" }} aria-label="Recent verified rewards">
+    <div ref={ref} className={`fyt-rd relative w-full overflow-hidden ${onScreen ? "fyt-live" : ""}`} style={{ background: "rgba(255,255,255,0.025)", borderBottom: "1px solid rgba(148,178,255,0.12)" }} aria-label="Recent verified rewards">
       <div className="mx-auto flex w-full max-w-[1440px] items-center">
         <div className="z-[1] flex shrink-0 items-center gap-[8px] py-[12px] pl-[20px] pr-[14px] lg:pl-[80px]" style={{ background: "linear-gradient(90deg, #06101f 70%, transparent)" }}>
           <span className="relative flex size-[8px]">
-            <span className="fyt-rd-ping absolute inset-0 rounded-full bg-[#22c55e]" />
+            <span className="fyt-rd-ping-gated absolute inset-0 rounded-full bg-[#22c55e]" />
             <span className="relative size-[8px] rounded-full bg-[#22c55e]" />
           </span>
           <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.18em] text-[#86efac]">Live Rewards</span>
@@ -232,7 +232,7 @@ export function FloatingCta() {
           animate={{ opacity: 1, y: 0, x: "-50%" }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: 40, x: "-50%" }}
           transition={{ duration: 0.45, ease: EASE }}
-          className="fyt-rd group fixed left-1/2 z-[2147482980] flex max-w-[calc(100vw-150px)] items-center gap-[10px] rounded-full py-[8px] pl-[18px] pr-[18px] min-[380px]:pl-[8px] no-underline sm:max-w-none sm:gap-[14px] sm:pr-[22px]"
+          className="fyt-rd cta-shine group fixed left-1/2 z-[2147482980] flex max-w-[calc(100vw-150px)] items-center gap-[10px] rounded-full py-[8px] pl-[18px] pr-[18px] min-[380px]:pl-[8px] no-underline sm:max-w-none sm:gap-[14px] sm:pr-[22px]"
           style={{
             // Inline so the shared .cta-shine rule (position: relative) can't override it.
             position: "fixed",

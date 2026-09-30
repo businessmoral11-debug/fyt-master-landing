@@ -1657,11 +1657,33 @@ function PlanCompareShortcut({ step }: { step: StepId }) {
 
 const PRICING_ANIMATIONS_ACTIVE_MARGIN_PX = 600;
 
+/**
+ * One highlight per option group that slides to the selected option with a
+ * CSS transform (options are equal-width, so the offset is just the index).
+ * Nothing is measured, so it stays smooth on phones.
+ */
+function SlidingPill({ index, count, gap = 0 }: { index: number; count: number; gap?: number }) {
+  if (index < 0 || count <= 0) return null;
+  return (
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute left-0 top-0 bottom-0 rounded-[10px] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
+      style={{
+        ...PILL_CTA_GRADIENT_STYLE,
+        width: `calc((100% - ${gap * (count - 1)}px) / ${count})`,
+        transform: `translate3d(calc(${index} * (100% + ${gap}px)), -3px, 0)`,
+      }}
+    />
+  );
+}
+
 /** Optional extra content the redesign injects around the configurator (offer card, trust line). */
 export const PricingSlotsContext = createContext<{ offerSlot?: ReactNode; afterCheckoutSlot?: ReactNode }>({});
 
 export function Pricing() {
   const { offerSlot, afterCheckoutSlot } = useContext(PricingSlotsContext);
+  const headingRef = useRef<HTMLParagraphElement>(null);
+  const headingSeen = useInView(headingRef, { once: true, amount: 0.6 });
   const [step, setStep] = useState<StepId>("2-Step");
   const [plan, setPlan] = useState<PlanId>("prime");
   const [platform, setPlatform] = useState<PlatformId>("match-trader");
@@ -1787,7 +1809,7 @@ export function Pricing() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="flex-1 flex flex-col gap-[12px] items-center lg:items-start"
             >
-              <p className="font-['DM_Sans',sans-serif] font-semibold leading-[1.06] text-[#eef0f6] text-[34px] lg:text-[54px] tracking-[-0.035em] text-center lg:text-left">
+              <p ref={headingRef} className={`font-['DM_Sans',sans-serif] font-semibold leading-[1.06] text-[#eef0f6] text-[34px] lg:text-[54px] tracking-[-0.035em] text-center lg:text-left ${headingSeen ? "fyt-shimmer-on" : ""}`}>
                 Find the right challenge
                 <br />
                 <span className="text-[#eef0f6]">in </span>
@@ -1853,7 +1875,8 @@ export function Pricing() {
             <div className="flex flex-col lg:flex-row gap-[24px] w-full">
               <div className="flex-1 flex flex-col gap-[12px]">
                 <p className="sr-only lg:not-sr-only lg:static font-['Inter:Regular',sans-serif] font-normal text-[#9da2b4] text-[13px]" id="model-group-label">1. Pick your model</p>
-                <div className="flex flex-1 rounded-[10px]" role="group" aria-labelledby="model-group-label" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                <div className="relative flex flex-1 rounded-[10px]" role="group" aria-labelledby="model-group-label" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <SlidingPill index={(["1-Step", "2-Step", "Instant"] as StepId[]).indexOf(step)} count={3} />
                   {(["1-Step", "2-Step", "Instant"] as StepId[]).map((id, i, arr) => {
                     const active = id === step;
                     const prevActive = i > 0 && arr[i - 1] === step;
@@ -1868,15 +1891,6 @@ export function Pricing() {
                           ...(i > 0 && !active && !prevActive ? { borderLeft: "1px solid rgba(255,255,255,0.1)" } : {}),
                         }}
                       >
-                        {active && (
-                          <motion.div
-                            className="absolute inset-0 rounded-[10px]"
-                            style={PILL_CTA_GRADIENT_STYLE}
-                            initial={{ scale: 0.92, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                          />
-                        )}
                         <span className="relative z-[1] flex items-center gap-[8px]">
                           <span style={{ color: active ? "#ffffff" : "#9da2b4" }}><SelectorIcon kind={STEP_ICONS[id]} /></span>
                           <span className="font-['Inter:Medium',sans-serif] font-medium text-[14px]" style={{ color: active ? "#eef0f6" : "#9da2b4" }}>{STEP_DISPLAY_LABELS[id]}</span>
@@ -1902,7 +1916,8 @@ export function Pricing() {
               <div className="flex-1 flex flex-col gap-[12px]">
                 <p className="sr-only lg:not-sr-only lg:static font-['Inter:Regular',sans-serif] font-normal text-[#9da2b4] text-[13px]" id="type-group-label">2. Choose your type</p>
                 <div className="flex flex-1 items-stretch gap-[8px]">
-                  <div className="flex flex-1 rounded-[10px]" role="group" aria-labelledby="type-group-label" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <div className="relative flex flex-1 rounded-[10px]" role="group" aria-labelledby="type-group-label" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                    <SlidingPill index={STEP_PLANS[step].findIndex((p) => p.id === plan)} count={STEP_PLANS[step].length} />
                     {STEP_PLANS[step].map((opt, i, arr) => {
                       const active = opt.id === plan;
                       const prevActive = i > 0 && arr[i - 1].id === plan;
@@ -1919,15 +1934,6 @@ export function Pricing() {
                             ...(i > 0 && !active && !prevActive ? { borderLeft: "1px solid rgba(255,255,255,0.1)" } : {}),
                           }}
                         >
-                          {active && (
-                            <motion.div
-                              className="absolute inset-0 rounded-[10px]"
-                              style={PILL_CTA_GRADIENT_STYLE}
-                              initial={{ scale: 0.92, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                            />
-                          )}
                           <span className="relative z-[1] flex items-center gap-[8px]">
                             <SelectorIcon kind={PLAN_ICONS[opt.id]} />
                             <span className="font-['Inter:Medium',sans-serif] font-medium text-[14px]">{opt.label}</span>
@@ -1956,7 +1962,8 @@ export function Pricing() {
 
               <div className="flex-1 flex flex-col gap-[12px]">
                 <p className="sr-only lg:not-sr-only lg:static font-['Inter:Regular',sans-serif] font-normal text-[#9da2b4] text-[13px]" id="platform-group-label">3. Choose your platform</p>
-                <div className="flex flex-1 rounded-[10px]" role="group" aria-labelledby="platform-group-label" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                <div className="relative flex flex-1 rounded-[10px]" role="group" aria-labelledby="platform-group-label" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <SlidingPill index={PLATFORM_OPTIONS.findIndex((p) => p.id === platform)} count={PLATFORM_OPTIONS.length} />
                   {PLATFORM_OPTIONS.map((opt, i, arr) => {
                     const active = opt.id === platform;
                     const prevActive = i > 0 && arr[i - 1].id === platform;
@@ -1971,15 +1978,6 @@ export function Pricing() {
                           ...(i > 0 && !active && !prevActive ? { borderLeft: "1px solid rgba(255,255,255,0.1)" } : {}),
                         }}
                       >
-                        {active && (
-                          <motion.div
-                            className="absolute inset-0 rounded-[10px]"
-                            style={PILL_CTA_GRADIENT_STYLE}
-                            initial={{ scale: 0.92, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                          />
-                        )}
                         <img
                           src={PLATFORM_LOGOS[opt.id]}
                           alt=""
@@ -1998,7 +1996,8 @@ export function Pricing() {
 
             <div className="flex flex-col gap-[12px] w-full">
               <p className="sr-only lg:not-sr-only lg:static font-['Inter:Regular',sans-serif] font-normal text-[#9da2b4] text-[13px]" id="size-group-label">4. Pick your account size</p>
-              <div className="flex gap-[10px] w-full" role="group" aria-labelledby="size-group-label">
+              <div className="relative flex gap-[10px] w-full" role="group" aria-labelledby="size-group-label">
+                <SlidingPill index={STEP_SIZES[step].indexOf(size)} count={STEP_SIZES[step].length} gap={10} />
                 {STEP_SIZES[step].map((value) => {
                   const active = value === size;
                   return (
@@ -2009,17 +2008,7 @@ export function Pricing() {
                       className="relative flex-1 flex items-center justify-center py-[12px] rounded-[10px] cursor-pointer transition-[transform,translate] duration-200 hover:scale-[1.02] active:scale-[0.96]"
                       style={{ translate: active ? "0 -3px" : "0 0" }}
                     >
-                      {active ? (
-                        <motion.div
-                          className="absolute inset-0 rounded-[10px]"
-                          style={PILL_CTA_GRADIENT_STYLE}
-                          initial={{ scale: 0.92, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                        />
-                      ) : (
-                        <div aria-hidden className="absolute inset-0 rounded-[10px] pointer-events-none" style={{ border: "1px solid rgba(255,255,255,0.1)" }} />
-                      )}
+                      {!active && <div aria-hidden className="absolute inset-0 rounded-[10px] pointer-events-none" style={{ border: "1px solid rgba(255,255,255,0.1)" }} />}
                       <p
                         className={`relative z-[1] font-['Inter:${active ? "Medium" : "Regular"}',sans-serif] font-${active ? "medium" : "normal"} text-[14px] whitespace-nowrap`}
                         style={{ color: active ? "#ffffff" : "#9da2b4" }}
@@ -2225,7 +2214,8 @@ export function Pricing() {
             {/* Key Rules / Why traders choose this — mobile only (<640px), merged behind a chip switcher */}
             <PricingFlashContext.Provider value={{ changeTick, celebrated }}>
             <PanelCard className="flex sm:hidden">
-              <div className="flex rounded-[10px]" role="group" aria-label="Show Key Rules or Why traders choose this" style={{ border: "1px solid #E8EDF5" }}>
+              <div className="relative flex rounded-[10px]" role="group" aria-label="Show Key Rules or Why traders choose this" style={{ border: "1px solid #E8EDF5" }}>
+                <SlidingPill index={MOBILE_PANEL_TABS.findIndex((t) => t.id === mobilePanelTab)} count={MOBILE_PANEL_TABS.length} />
                 {MOBILE_PANEL_TABS.map((opt, i, arr) => {
                   const active = opt.id === mobilePanelTab;
                   const prevActive = i > 0 && arr[i - 1].id === mobilePanelTab;
@@ -2240,15 +2230,6 @@ export function Pricing() {
                         ...(i > 0 && !active && !prevActive ? { borderLeft: "1px solid rgba(255,255,255,0.1)" } : {}),
                       }}
                     >
-                      {active && (
-                        <motion.div
-                          className="absolute inset-0 rounded-[10px]"
-                          style={PILL_CTA_GRADIENT_STYLE}
-                          initial={{ scale: 0.92, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                        />
-                      )}
                       <span className="relative z-[1] font-['Inter:Medium',sans-serif] font-medium text-[14px]" style={{ color: active ? "#eef0f6" : "#9da2b4" }}>{opt.label}</span>
                     </button>
                   );
