@@ -254,7 +254,7 @@ export function FloatingCta() {
           <span className="whitespace-nowrap text-[14px] font-semibold text-white sm:text-[15px]">Start Challenge</span>
           {!left.expired && (
             <span className="tabular hidden whitespace-nowrap rounded-full px-[10px] py-[5px] text-[12px] font-semibold text-white sm:inline-flex" style={{ background: "rgba(3,6,13,0.28)" }}>
-              {left.hh}:{left.mm}:{left.ss} left
+              {Number(left.hh) >= 24 ? `${Math.floor(Number(left.hh) / 24)}d ${String(Number(left.hh) % 24).padStart(2, "0")}` : left.hh}:{left.mm}:{left.ss} left
             </span>
           )}
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="hidden shrink-0 transition-transform duration-300 group-hover:translate-x-[4px] min-[400px]:block" aria-hidden="true">
