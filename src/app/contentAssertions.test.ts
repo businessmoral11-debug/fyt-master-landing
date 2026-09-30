@@ -930,26 +930,17 @@ describe("Pricing panel: Platform selector (step 3, MatchTrader / Platform 5)", 
   it("labels the four selector groups in order: model, type, platform, size", () => {
     const app = read("./BelowFold.tsx");
     const pricingBody = sliceToNextFunction(app, "function Pricing()");
-    expect(pricingBody).toContain(">1. Pick your model<");
-    expect(pricingBody).toContain(">2. Choose your type<");
-    expect(pricingBody).toContain(">3. Choose your platform<");
-    expect(pricingBody).toContain(">4. Pick your account size<");
+    const order = ['n={1}>Pick your model<', 'n={2} aside={<PlanCompareShortcut step={step} />}>Choose your type<', 'n={3}>Choose your platform<', 'n={4}>Pick your account size<'].map((l) => pricingBody.indexOf(l));
+    order.forEach((i) => expect(i).toBeGreaterThan(-1));
+    expect([...order].sort((a, b) => a - b)).toEqual(order);
   });
 
-  it("keeps the Model/Type/Platform row as a 3-column split on desktop, with a divider between each pair", () => {
+  it("keeps Model, Type and Platform as an equal 3-column grid on desktop", () => {
     const app = read("./BelowFold.tsx");
     const pricingBody = sliceToNextFunction(app, "function Pricing()");
-    expect((pricingBody.match(/className="hidden lg:block w-px"/g) || []).length).toBe(2);
-  });
-
-  it("gives Model, Type, and Platform equal width — no per-column lg: padding asymmetry, gutters come from the parent's flex gap", () => {
-    const app = read("./BelowFold.tsx");
-    const pricingBody = sliceToNextFunction(app, "function Pricing()");
-    expect(pricingBody).toContain('className="flex flex-col lg:flex-row gap-[24px] w-full"');
-    expect((pricingBody.match(/className="flex-1 flex flex-col gap-\[12px\]"/g) || []).length).toBe(3);
+    expect(pricingBody).toContain('className="grid grid-cols-1 lg:grid-cols-3 gap-[22px] lg:gap-[24px] w-full"');
     expect(pricingBody).not.toContain("lg:pr-[24px]");
     expect(pricingBody).not.toContain("lg:pl-[24px]");
-    expect(pricingBody).not.toContain("lg:px-[24px]");
   });
 });
 

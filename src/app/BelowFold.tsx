@@ -146,9 +146,6 @@ import {
   PRICING_CTA_GRADIENT_DURATION_S,
   pricingCtaGradientPosition,
   PRICING_PRICE_SPRING,
-  PRICING_PROGRESS_SEGMENT_TRANSITION,
-  PRICING_COMPLETION_LINE_GLOW_DELAY_S,
-  PRICING_COMPLETION_LINE_GLOW_DURATION_S,
   PRICING_COMPLETION_CARD_PULSE_DELAY_S,
   PRICING_COMPLETION_CARD_PULSE_DURATION_S,
   pricingCompletionCardPulse,
@@ -1567,90 +1564,24 @@ function planCompareCopy(step: StepId): { href: string; label: string; ariaLabel
 
 function PlanCompareShortcut({ step }: { step: StepId }) {
   const { href, label, ariaLabel } = planCompareCopy(step);
-  const anchorRef = useRef<HTMLAnchorElement>(null);
-  const [mobileRevealed, setMobileRevealed] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    const el = anchorRef.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    let showTimeoutId: number | undefined;
-    let hideTimeoutId: number | undefined;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          showTimeoutId = window.setTimeout(() => {
-            setMobileRevealed(true);
-            hideTimeoutId = window.setTimeout(() => setMobileRevealed(false), 5000);
-          }, 4000);
-        } else {
-          if (showTimeoutId !== undefined) window.clearTimeout(showTimeoutId);
-          if (hideTimeoutId !== undefined) window.clearTimeout(hideTimeoutId);
-          setMobileRevealed(false);
-        }
-      },
-      { threshold: 0.6 }
-    );
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-      if (showTimeoutId !== undefined) window.clearTimeout(showTimeoutId);
-      if (hideTimeoutId !== undefined) window.clearTimeout(hideTimeoutId);
-    };
-  }, []);
-
   return (
     <a
-      ref={anchorRef}
       href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={ariaLabel}
-      onKeyDown={(e) => {
-        if (e.key === " ") {
-          e.preventDefault();
-          window.open(href, "_blank", "noopener,noreferrer");
-        }
-      }}
-      className="group/compare relative flex shrink-0 items-center justify-center gap-[6px] lg:gap-[8px] self-stretch px-[12px] lg:px-[16px] rounded-[10px] no-underline transition-transform duration-200 hover:scale-[1.04] active:scale-[0.96]"
-      style={{ border: "1px solid rgba(255,255,255,0.1)" }}
+      title={label}
+      className="group/compare inline-flex shrink-0 items-center gap-[6px] rounded-full px-[10px] py-[4px] text-[12px] font-['Inter:Medium',sans-serif] font-medium text-[#93c5fd] no-underline transition-colors duration-200 hover:bg-[rgba(59,130,246,0.12)] hover:text-white"
+      style={{ border: "1px solid rgba(96,165,250,0.28)" }}
     >
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="shrink-0">
-        <path d="M8 1.2l1.87 3.9 4.24.63-3.06 3 .72 4.27L8 10.97l-3.77 2.03.72-4.27-3.06-3 4.24-.63L8 1.2Z" fill="#ffffff" />
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="shrink-0">
+        <rect x="1.75" y="3" width="5" height="10" rx="1.4" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="9.25" y="3" width="5" height="10" rx="1.4" stroke="currentColor" strokeWidth="1.5" />
       </svg>
-      <span aria-hidden="true" className="w-px h-[16px] shrink-0" style={{ background: "rgba(255,255,255,0.15)" }} />
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 16 16"
-        fill="none"
-        aria-hidden="true"
-        className="shrink-0 drop-shadow-[0_0_4px_rgba(59,130,246,0.55)] transition-[filter] duration-200 group-hover/compare:drop-shadow-[0_0_7px_rgba(59,130,246,0.8)]"
-      >
-        <path d="M8 1.2l1.87 3.9 4.24.63-3.06 3 .72 4.27L8 10.97l-3.77 2.03.72-4.27-3.06-3 4.24-.63L8 1.2Z" fill="#3b82f6" />
+      Compare
+      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="shrink-0 transition-transform duration-200 group-hover/compare:translate-x-[1px] group-hover/compare:-translate-y-[1px]">
+        <path d="M4 2h6v6M10 2 3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      <span
-        aria-hidden="true"
-        className="hidden lg:block absolute -top-[38px] left-1/2 -translate-x-1/2 whitespace-nowrap px-[10px] py-[6px] rounded-[6px] text-[12px] font-['Inter:Medium',sans-serif] font-medium text-[#eef0f6] opacity-0 group-hover/compare:opacity-100 transition-opacity duration-200 pointer-events-none"
-        style={{ background: "#12141c", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 20px -8px rgba(0,0,0,0.5)" }}
-      >
-        {label}
-      </span>
-      <AnimatePresence>
-        {mobileRevealed && (
-          <motion.span
-            aria-hidden="true"
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:hidden absolute -top-[38px] right-0 max-w-[calc(100vw-32px)] whitespace-nowrap px-[10px] py-[6px] rounded-[6px] text-[12px] font-['Inter:Medium',sans-serif] font-medium text-[#eef0f6] pointer-events-none"
-            style={{ background: "#12141c", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 8px 20px -8px rgba(0,0,0,0.5)" }}
-          >
-            {label}
-          </motion.span>
-        )}
-      </AnimatePresence>
     </a>
   );
 }
@@ -1660,20 +1591,44 @@ const PRICING_ANIMATIONS_ACTIVE_MARGIN_PX = 600;
 /**
  * One highlight per option group that slides to the selected option with a
  * CSS transform (options are equal-width, so the offset is just the index).
+ * It sits inside the track's 4px padding, so it never overhangs the edges.
  * Nothing is measured, so it stays smooth on phones.
  */
-function SlidingPill({ index, count, gap = 0 }: { index: number; count: number; gap?: number }) {
+function SlidingPill({ index, count, gap = 0, inset = 4 }: { index: number; count: number; gap?: number; inset?: number }) {
   if (index < 0 || count <= 0) return null;
   return (
     <span
       aria-hidden="true"
-      className="pointer-events-none absolute left-0 top-0 bottom-0 rounded-[10px] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
+      className="pointer-events-none absolute rounded-[10px] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
       style={{
         ...PILL_CTA_GRADIENT_STYLE,
-        width: `calc((100% - ${gap * (count - 1)}px) / ${count})`,
-        transform: `translate3d(calc(${index} * (100% + ${gap}px)), -3px, 0)`,
+        top: inset,
+        bottom: inset,
+        left: inset,
+        width: `calc((100% - ${inset * 2 + gap * (count - 1)}px) / ${count})`,
+        transform: `translate3d(calc(${index} * (100% + ${gap}px)), 0, 0)`,
       }}
     />
+  );
+}
+
+/** Dark rounded track that holds a segmented control. */
+const PICKER_TRACK_CLASS = "relative flex w-full rounded-[14px] p-[4px]";
+const PICKER_TRACK_STYLE = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.35)" } as const;
+const PICKER_OPTION_CLASS = "relative flex-1 min-w-0 flex items-center justify-center rounded-[10px] cursor-pointer transition-colors duration-200 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#60a5fa]";
+
+function PickerLabel({ id, n, children, aside }: { id: string; n: number; children: ReactNode; aside?: ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-[12px]">
+      <p id={id} className="flex items-center gap-[8px] font-['Inter:Medium',sans-serif] font-medium text-[13px] text-[#c9cfdd]">
+        <span aria-hidden="true" className="flex size-[20px] shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-[#93c5fd]" style={{ background: "rgba(59,130,246,0.14)", border: "1px solid rgba(96,165,250,0.3)" }}>
+          {n}
+        </span>
+        <span className="sr-only">{n}. </span>
+        {children}
+      </p>
+      {aside}
+    </div>
   );
 }
 
@@ -1696,6 +1651,44 @@ export function Pricing() {
   const spotlight = useCursorGlow<HTMLDivElement>();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [animsActive, setAnimsActive] = useState(true);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const checkoutLinkRef = useRef<HTMLAnchorElement>(null);
+  const [summaryVisible, setSummaryVisible] = useState(false);
+
+  // Phone-only summary bar: visible while the picker is on screen (or between
+  // it and the checkout button) and the real checkout button isn't, so
+  // "Start" is always one tap away.
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      const controls = controlsRef.current;
+      const cta = checkoutLinkRef.current;
+      if (!mq.matches || !controls || !cta) {
+        setSummaryVisible(false);
+        return;
+      }
+      const vh = window.innerHeight;
+      const c = controls.getBoundingClientRect();
+      const b = cta.getBoundingClientRect();
+      const pickerReached = c.top < vh * 0.9;
+      const ctaOnScreen = b.top < vh && b.bottom > 0;
+      const beforeCta = b.top > 0;
+      setSummaryVisible(pickerReached && beforeCta && !ctaOnScreen);
+    };
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(check);
+    };
+    check();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -1844,61 +1837,22 @@ export function Pricing() {
 
           {offerSlot}
 
-          <div className="flex gap-[6px] w-full" aria-hidden="true">
-            {[stepTouched, planTouched, platformTouched, sizeTouched].map((touched, i) => (
-              <div key={i} className="flex-1 h-[2px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
-                <motion.div
-                  className="h-full rounded-full origin-left"
-                  style={{ background: "#3b82f6" }}
-                  initial={{ scaleX: 0 }}
-                  animate={{
-                    scaleX: touched ? 1 : 0,
-                    boxShadow:
-                      celebrated && !reduceMotion
-                        ? ["0 0 4px rgba(59,130,246,0.4)", "0 0 16px rgba(59,130,246,0.9)", "0 0 4px rgba(59,130,246,0.4)"]
-                        : touched
-                        ? "0 0 4px rgba(59,130,246,0.4)"
-                        : "none",
-                  }}
-                  transition={
-                    celebrated && !reduceMotion
-                      ? { scaleX: PRICING_PROGRESS_SEGMENT_TRANSITION, boxShadow: { duration: PRICING_COMPLETION_LINE_GLOW_DURATION_S, delay: PRICING_COMPLETION_LINE_GLOW_DELAY_S, ease: "easeOut" } }
-                      : PRICING_PROGRESS_SEGMENT_TRANSITION
-                  }
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Controls — row 1: three segmented controls (model | type | platform); row 2: full-width size */}
-          <div className="flex flex-col gap-[24px] w-full">
-            <div className="flex flex-col lg:flex-row gap-[24px] w-full">
-              <div className="flex-1 flex flex-col gap-[12px]">
-                <p className="sr-only lg:not-sr-only lg:static font-['Inter:Regular',sans-serif] font-normal text-[#9da2b4] text-[13px]" id="model-group-label">1. Pick your model</p>
-                <div className="relative flex flex-1 rounded-[10px]" role="group" aria-labelledby="model-group-label" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+          {/* Controls: four clearly labelled steps. Row 1 (desktop): model | type | platform; row 2: account size. */}
+          <div ref={controlsRef} className="flex flex-col gap-[22px] lg:gap-[28px] w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-[22px] lg:gap-[24px] w-full">
+              <div className="flex flex-col gap-[10px]">
+                <PickerLabel id="model-group-label" n={1}>Pick your model</PickerLabel>
+                <div className={PICKER_TRACK_CLASS} role="group" aria-labelledby="model-group-label" style={PICKER_TRACK_STYLE}>
                   <SlidingPill index={(["1-Step", "2-Step", "Instant"] as StepId[]).indexOf(step)} count={3} />
-                  {(["1-Step", "2-Step", "Instant"] as StepId[]).map((id, i, arr) => {
+                  {(["1-Step", "2-Step", "Instant"] as StepId[]).map((id) => {
                     const active = id === step;
-                    const prevActive = i > 0 && arr[i - 1] === step;
                     return (
-                      <button
-                        key={id}
-                        onClick={() => handleStepChange(id)}
-                        aria-pressed={active}
-                        className="relative flex-1 flex flex-col items-center justify-center gap-[3px] py-[10px] cursor-pointer rounded-[10px] transition-[transform,translate] duration-200 hover:scale-[1.02] active:scale-[0.96]"
-                        style={{
-                          translate: active ? "0 -3px" : "0 0",
-                          ...(i > 0 && !active && !prevActive ? { borderLeft: "1px solid rgba(255,255,255,0.1)" } : {}),
-                        }}
-                      >
-                        <span className="relative z-[1] flex items-center gap-[8px]">
-                          <span style={{ color: active ? "#ffffff" : "#9da2b4" }}><SelectorIcon kind={STEP_ICONS[id]} /></span>
-                          <span className="font-['Inter:Medium',sans-serif] font-medium text-[14px]" style={{ color: active ? "#eef0f6" : "#9da2b4" }}>{STEP_DISPLAY_LABELS[id]}</span>
+                      <button key={id} type="button" onClick={() => handleStepChange(id)} aria-pressed={active} className={`${PICKER_OPTION_CLASS} flex-col gap-[3px] py-[10px]`}>
+                        <span className="relative z-[1] flex items-center gap-[6px]">
+                          <span style={{ color: active ? "#ffffff" : "#7f879b" }}><SelectorIcon kind={STEP_ICONS[id]} /></span>
+                          <span className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[14px] whitespace-nowrap" style={{ color: active ? "#ffffff" : "#c9cfdd" }}>{STEP_DISPLAY_LABELS[id]}</span>
                         </span>
-                        <span
-                          className="relative z-[1] font-['Inter:Regular',sans-serif] font-normal text-[11px] leading-[13px] whitespace-nowrap"
-                          style={{ color: active ? "rgba(255,255,255,0.78)" : "rgba(157,162,180,0.75)" }}
-                        >
+                        <span className="relative z-[1] font-['Inter:Regular',sans-serif] font-normal text-[10.5px] leading-[13px] whitespace-nowrap" style={{ color: active ? "rgba(255,255,255,0.82)" : "#7f879b" }}>
                           {STEP_BENEFIT_LABELS[id]}
                         </span>
                       </button>
@@ -1907,77 +1861,41 @@ export function Pricing() {
                 </div>
               </div>
 
-              <motion.div
-                className="hidden lg:block w-px"
-                style={{ background: "linear-gradient(180deg, transparent 0%, rgba(96,165,250,0.35) 50%, transparent 100%)" }}
-                aria-hidden
-              />
-
-              <div className="flex-1 flex flex-col gap-[12px]">
-                <p className="sr-only lg:not-sr-only lg:static font-['Inter:Regular',sans-serif] font-normal text-[#9da2b4] text-[13px]" id="type-group-label">2. Choose your type</p>
-                <div className="flex flex-1 items-stretch gap-[8px]">
-                  <div className="relative flex flex-1 rounded-[10px]" role="group" aria-labelledby="type-group-label" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-                    <SlidingPill index={STEP_PLANS[step].findIndex((p) => p.id === plan)} count={STEP_PLANS[step].length} />
-                    {STEP_PLANS[step].map((opt, i, arr) => {
-                      const active = opt.id === plan;
-                      const prevActive = i > 0 && arr[i - 1].id === plan;
-                      const flag = planFlag(opt.id);
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => setPlan(opt.id)}
-                          aria-pressed={active}
-                          className="relative flex-1 flex flex-col items-center justify-center gap-[2px] py-[10px] cursor-pointer rounded-[10px] transition-[transform,translate] duration-200 hover:scale-[1.02] active:scale-[0.96]"
-                          style={{
-                            color: active ? "#ffffff" : "#9da2b4",
-                            translate: active ? "0 -3px" : "0 0",
-                            ...(i > 0 && !active && !prevActive ? { borderLeft: "1px solid rgba(255,255,255,0.1)" } : {}),
-                          }}
-                        >
-                          <span className="relative z-[1] flex items-center gap-[8px]">
-                            <SelectorIcon kind={PLAN_ICONS[opt.id]} />
-                            <span className="font-['Inter:Medium',sans-serif] font-medium text-[14px]">{opt.label}</span>
+              <div className="flex flex-col gap-[10px]">
+                <PickerLabel id="type-group-label" n={2} aside={<PlanCompareShortcut step={step} />}>Choose your type</PickerLabel>
+                <div className={`${PICKER_TRACK_CLASS} mt-[4px]`} role="group" aria-labelledby="type-group-label" style={PICKER_TRACK_STYLE}>
+                  <SlidingPill index={STEP_PLANS[step].findIndex((p) => p.id === plan)} count={STEP_PLANS[step].length} />
+                  {STEP_PLANS[step].map((opt) => {
+                    const active = opt.id === plan;
+                    const flag = planFlag(opt.id);
+                    return (
+                      <button key={opt.id} type="button" onClick={() => setPlan(opt.id)} aria-pressed={active} className={`${PICKER_OPTION_CLASS} gap-[8px] py-[15px]`} style={{ color: active ? "#ffffff" : "#c9cfdd" }}>
+                        <span className="relative z-[1] flex items-center gap-[8px]">
+                          <span style={{ color: active ? "#ffffff" : "#7f879b" }}><SelectorIcon kind={PLAN_ICONS[opt.id]} /></span>
+                          <span className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[14px]">{opt.label}</span>
+                        </span>
+                        {flag && (
+                          <span
+                            className="absolute -top-[13px] left-1/2 z-[2] -translate-x-1/2 whitespace-nowrap rounded-full px-[8px] py-[3px] font-['Inter:Bold',sans-serif] text-[9.5px] font-bold uppercase leading-[11px] tracking-[0.06em]"
+                            style={{ color: "#4ade80", background: "#07140d", border: "1px solid rgba(74,222,128,0.45)", boxShadow: "0 4px 12px -4px rgba(34,197,94,0.45)" }}
+                          >
+                            {flag}
                           </span>
-                          {flag && (
-                            <span
-                              className="relative z-[1] font-['Inter:Bold',sans-serif] font-bold text-[10px] leading-[12px] tracking-[0.4px] uppercase whitespace-nowrap px-[6px] py-[2px] rounded-full"
-                              style={{ color: "#22c55e", background: "rgba(34,197,94,0.12)" }}
-                            >
-                              {flag}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <PlanCompareShortcut step={step} />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              <motion.div
-                className="hidden lg:block w-px"
-                style={{ background: "linear-gradient(180deg, transparent 0%, rgba(96,165,250,0.35) 50%, transparent 100%)" }}
-                aria-hidden
-              />
-
-              <div className="flex-1 flex flex-col gap-[12px]">
-                <p className="sr-only lg:not-sr-only lg:static font-['Inter:Regular',sans-serif] font-normal text-[#9da2b4] text-[13px]" id="platform-group-label">3. Choose your platform</p>
-                <div className="relative flex flex-1 rounded-[10px]" role="group" aria-labelledby="platform-group-label" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div className="flex flex-col gap-[10px]">
+                <PickerLabel id="platform-group-label" n={3}>Choose your platform</PickerLabel>
+                <div className={PICKER_TRACK_CLASS} role="group" aria-labelledby="platform-group-label" style={PICKER_TRACK_STYLE}>
                   <SlidingPill index={PLATFORM_OPTIONS.findIndex((p) => p.id === platform)} count={PLATFORM_OPTIONS.length} />
-                  {PLATFORM_OPTIONS.map((opt, i, arr) => {
+                  {PLATFORM_OPTIONS.map((opt) => {
                     const active = opt.id === platform;
-                    const prevActive = i > 0 && arr[i - 1].id === platform;
                     return (
-                      <button
-                        key={opt.id}
-                        onClick={() => setPlatform(opt.id)}
-                        aria-pressed={active}
-                        className="relative flex-1 flex items-center justify-center gap-[8px] py-[12px] cursor-pointer rounded-[10px] transition-[transform,translate] duration-200 hover:scale-[1.02] active:scale-[0.96]"
-                        style={{
-                          translate: active ? "0 -3px" : "0 0",
-                          ...(i > 0 && !active && !prevActive ? { borderLeft: "1px solid rgba(255,255,255,0.1)" } : {}),
-                        }}
-                      >
+                      <button key={opt.id} type="button" onClick={() => setPlatform(opt.id)} aria-pressed={active} className={`${PICKER_OPTION_CLASS} gap-[8px] py-[15px]`}>
                         <img
                           src={PLATFORM_LOGOS[opt.id]}
                           alt=""
@@ -1986,7 +1904,7 @@ export function Pricing() {
                           className="relative z-[1] w-auto object-contain"
                           style={{ height: PLATFORM_LOGO_HEIGHT[opt.id] }}
                         />
-                        <span className="relative z-[1] font-['Inter:Medium',sans-serif] font-medium text-[14px]" style={{ color: active ? "#eef0f6" : "#9da2b4" }}>{opt.label}</span>
+                        <span className="relative z-[1] font-['Inter:Semi_Bold',sans-serif] font-semibold text-[14px] whitespace-nowrap" style={{ color: active ? "#ffffff" : "#c9cfdd" }}>{opt.label}</span>
                       </button>
                     );
                   })}
@@ -1994,33 +1912,60 @@ export function Pricing() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-[12px] w-full">
-              <p className="sr-only lg:not-sr-only lg:static font-['Inter:Regular',sans-serif] font-normal text-[#9da2b4] text-[13px]" id="size-group-label">4. Pick your account size</p>
-              <div className="relative flex gap-[10px] w-full" role="group" aria-labelledby="size-group-label">
-                <SlidingPill index={STEP_SIZES[step].indexOf(size)} count={STEP_SIZES[step].length} gap={10} />
+            <div className="flex flex-col gap-[10px] w-full">
+              <PickerLabel id="size-group-label" n={4}>Pick your account size</PickerLabel>
+              <div className={PICKER_TRACK_CLASS} role="group" aria-labelledby="size-group-label" style={PICKER_TRACK_STYLE}>
+                <SlidingPill index={STEP_SIZES[step].indexOf(size)} count={STEP_SIZES[step].length} />
                 {STEP_SIZES[step].map((value) => {
                   const active = value === size;
                   return (
-                    <button
-                      key={value}
-                      onClick={() => setSize(value)}
-                      aria-pressed={active}
-                      className="relative flex-1 flex items-center justify-center py-[12px] rounded-[10px] cursor-pointer transition-[transform,translate] duration-200 hover:scale-[1.02] active:scale-[0.96]"
-                      style={{ translate: active ? "0 -3px" : "0 0" }}
-                    >
-                      {!active && <div aria-hidden className="absolute inset-0 rounded-[10px] pointer-events-none" style={{ border: "1px solid rgba(255,255,255,0.1)" }} />}
-                      <p
-                        className={`relative z-[1] font-['Inter:${active ? "Medium" : "Regular"}',sans-serif] font-${active ? "medium" : "normal"} text-[14px] whitespace-nowrap`}
-                        style={{ color: active ? "#ffffff" : "#9da2b4" }}
-                      >
+                    <button key={value} type="button" onClick={() => setSize(value)} aria-pressed={active} className={`${PICKER_OPTION_CLASS} py-[13px]`}>
+                      <span className="relative z-[1] font-['Inter:Semi_Bold',sans-serif] font-semibold text-[14px] lg:text-[15px] whitespace-nowrap" style={{ color: active ? "#ffffff" : "#c9cfdd" }}>
                         {fmtSize(value)}
-                      </p>
+                      </span>
                     </button>
                   );
                 })}
               </div>
             </div>
           </div>
+
+          {/* Phone summary bar (fixed; see summaryVisible above). */}
+          <a
+            href={checkoutUrl(entry.productId)}
+            onClick={() =>
+              pushViewItem({
+                itemId: entry.productId,
+                itemName: `${STEP_DISPLAY_LABELS[step]} ${planLabel} · ${platformLabel} · ${sizeLabel}`,
+                price: entry.priceNew,
+              })
+            }
+            aria-hidden={!summaryVisible}
+            tabIndex={summaryVisible ? 0 : -1}
+            aria-label={`Start ${STEP_DISPLAY_LABELS[step]} ${planLabel} ${sizeLabel} for $${entry.priceNew.toFixed(2)}`}
+            className="lg:hidden fixed left-1/2 z-[2147482980] flex max-w-[calc(100vw-140px)] items-center gap-[12px] rounded-full py-[6px] pl-[18px] pr-[6px] no-underline transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            style={{
+              bottom: "max(20px, env(safe-area-inset-bottom, 0px))",
+              transform: `translate3d(-50%, ${summaryVisible ? 0 : 28}px, 0)`,
+              opacity: summaryVisible ? 1 : 0,
+              pointerEvents: summaryVisible ? "auto" : "none",
+              background: "linear-gradient(180deg, #4f8cff 0%, #2563eb 100%)",
+              boxShadow: "0 18px 40px -12px rgba(37,99,235,0.8), 0 0 0 1px rgba(191,219,254,0.35), inset 0 1px 0 rgba(255,255,255,0.35)",
+            }}
+          >
+            <span className="flex min-w-0 flex-col gap-[3px] font-['DM_Sans',sans-serif] leading-none">
+              <span className="truncate text-[10.5px] font-medium text-white/80">{`${STEP_DISPLAY_LABELS[step]} · ${planLabel} · ${sizeLabel}`}</span>
+              <span className="flex items-baseline gap-[6px] whitespace-nowrap">
+                <span className="text-[16px] font-bold tracking-[-0.01em] text-white">${entry.priceNew.toFixed(2)}</span>
+                <span className="text-[11px] font-semibold text-white/85">Start</span>
+              </span>
+            </span>
+            <span aria-hidden="true" className="flex size-[36px] shrink-0 items-center justify-center rounded-full bg-white">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+                <path d="M3.333 8h9.334M8.667 4l4 4-4 4" stroke="#1d4ed8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </a>
 
           {/* Results panel — 3 columns */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-[16px] w-full">
@@ -2140,6 +2085,7 @@ export function Pricing() {
                   style={{ background: "radial-gradient(140px circle at 50% 0%, rgba(255,255,255,0.4), transparent 70%)" }}
                 />
                 <a
+                  ref={checkoutLinkRef}
                   href={checkoutUrl(entry.productId)}
                   onClick={() =>
                     pushViewItem({
