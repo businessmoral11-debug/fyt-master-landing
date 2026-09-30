@@ -127,10 +127,9 @@ function CertificateCard({
       onMouseLeave={onMouseLeave}
       onFocus={onInteract}
     >
-      <div
-        className={reduceMotion ? "" : "cert-card-float"}
-        style={reduceMotion ? undefined : { animationDelay: `${(index % 5) * 0.35}s` }}
-      >
+      {/* No idle float: dozens of cards (most off-screen) floating forever kept
+          the page busy on every frame, which phones feel as scroll lag. */}
+      <div data-index={index}>
         <div ref={tiltRef} data-tilt-layer style={{ transformStyle: "preserve-3d" }}>
           <a
             href={cert.certificateUrl}
@@ -155,7 +154,7 @@ function CertificateCard({
                 className="absolute inset-0 size-full object-cover transition-transform duration-500 ease-out group-hover/cert:scale-[1.04]"
               />
             ) : (
-              <div className="absolute inset-0 animate-pulse" style={{ background: "#131a2b" }} aria-hidden="true" />
+              <div className="absolute inset-0" style={{ background: "#131a2b" }} aria-hidden="true" />
             )}
           </a>
         </div>
@@ -166,7 +165,7 @@ function CertificateCard({
 
 function CardSkeleton() {
   return (
-    <div className="shrink-0 rounded-xl bg-[#1a2233] animate-pulse" style={{ width: CARD_WIDTH_PX, aspectRatio: "3 / 2" }} />
+    <div className="shrink-0 rounded-xl bg-[#1a2233]" style={{ width: CARD_WIDTH_PX, aspectRatio: "3 / 2" }} />
   );
 }
 

@@ -140,3 +140,7 @@
     background: rgba(10, 14, 24, 0.94) !important;
   }
 }
+
+/* Hero CTA shine keeps sweeping after the hero scrolls away — pause it with
+   the rest of the hero's animations. */
+.hero-anims-paused .cta-shine::after { animation-play-state: paused; }
