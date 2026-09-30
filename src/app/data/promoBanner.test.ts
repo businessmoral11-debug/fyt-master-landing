@@ -2,37 +2,33 @@ import { describe, it, expect } from "vitest";
 import { formatCountdown, formatHoursLeft, PROMO_ITEMS, PROMO_BENEFITS, PROMO_BANNER_ITEMS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEADLINE } from "./promoBanner";
 
 describe("PROMO_BENEFITS", () => {
-  it("lists the four top-banner benefit lines", () => {
+  it("lists the top-banner benefit lines", () => {
     expect(PROMO_BENEFITS).toEqual([
       "First Reward on Demand",
-      "200% Refund",
       "Free Drawdown Reset",
-      "Daily Reward Processing",
     ]);
   });
 });
 
 describe("PROMO_DEAL_LINE", () => {
   it("includes the Instantly deal copy shown on the banner", () => {
-    expect(PROMO_DEAL_LINE).toBe("35% off + Buy 1 Get 2 Instantly");
+    expect(PROMO_DEAL_LINE).toBe("Limited Time: 40% off + Buy 1 Get 3 Instantly");
   });
 });
 
 describe("PROMO_BANNER_ITEMS", () => {
-  it("joins benefits and deal for the desktop banner row", () => {
+  it("puts the deal first, then the benefits", () => {
     expect(PROMO_BANNER_ITEMS).toEqual([
+      "Limited Time: 40% off + Buy 1 Get 3 Instantly",
       "First Reward on Demand",
-      "200% Refund",
       "Free Drawdown Reset",
-      "Daily Reward Processing",
-      "35% off + Buy 1 Get 2 Instantly",
     ]);
   });
 });
 
 describe("PROMO_CODE", () => {
   it("exposes the banner/checkout coupon code", () => {
-    expect(PROMO_CODE).toBe("FYT35");
+    expect(PROMO_CODE).toBe("AWARD40");
   });
 });
 
@@ -60,9 +56,9 @@ describe("ALT_PROMO", () => {
 });
 
 describe("PROMO_ITEMS", () => {
-  it("keeps the current deal badge/coupon copy at 35% off + Buy 1 Get 2", () => {
+  it("keeps the current deal badge/coupon copy at 40% off + Buy 1 Get 3", () => {
     expect(PROMO_ITEMS).toHaveLength(1);
-    expect(PROMO_ITEMS[0]).toEqual({ kind: "code", label: "The NEW FYT Deal", text: "35% off + Buy 1 Get 2", code: "FYT35" });
+    expect(PROMO_ITEMS[0]).toEqual({ kind: "code", label: "The NEW FYT Deal", text: "40% off + Buy 1 Get 3", code: "AWARD40" });
   });
 });
 

@@ -19,7 +19,7 @@ import { HERO_ORBIT_LABELS, HERO_ORBIT_RINGS, MOBILE_ORBIT_LABELS, MOBILE_LABEL_
 import { HERO_STAGE_WIDTH, heroStageScale, heroLabelScale } from "@/app/motion/heroResponsive";
 import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
-import { PROMO_BANNER_ITEMS, PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
+import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
@@ -564,11 +564,17 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
 
   const left = formatHoursLeft(PROMO_DEADLINE, now);
   if (left.expired) return null;
+  const totalHours = Number(left.hh);
+  const days = Math.floor(totalHours / 24);
+  const hh = String(totalHours % 24).padStart(2, "0");
+  const label = compact
+    ? `${days > 0 ? `${days}D ` : ""}${hh}:${left.mm}:${left.ss} Left`
+    : `${days > 0 ? `${days}D ` : ""}${hh}H ${left.mm}M ${left.ss}S Left`;
 
   return (
     <span
       role="timer"
-      aria-label={`${Number(left.hh)} hours ${Number(left.mm)} minutes left`}
+      aria-label={`${days > 0 ? `${days} days ` : ""}${Number(hh)} hours ${Number(left.mm)} minutes left`}
       className={`inline-flex shrink-0 items-center rounded-full font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] tabular-nums text-white ${compact ? "h-[16px] px-[7px] text-[7.5px]" : "h-[24px] px-[12px] text-[11px] lg:h-[25px] lg:text-[12px]"}`}
       style={{
         background: "#DC2626",
@@ -577,7 +583,7 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
         animation: pulse ? "fyt-promo-urgency-pulse 2.4s ease-in-out infinite" : undefined,
       }}
     >
-      {compact ? `${left.hh}:${left.mm}:${left.ss} Left` : `${left.hh}H ${left.mm}M ${left.ss}S Left`}
+      {label}
     </span>
   );
 }
@@ -671,48 +677,47 @@ function PromoBanner() {
         />
       )}
 
-      {/* Mobile: 2 lines — benefits + "Daily Reward" up; "Processing" + deal + CODE + urgency below */}
-      <div className="relative mx-auto flex w-full flex-col items-center justify-center gap-[5px] px-[6px] py-[8px] md:hidden">
-        <div className="flex items-center justify-center gap-x-[4px] whitespace-nowrap">
-          {PROMO_BENEFITS.slice(0, 3).map((text, i) => (
+      {/* Mobile: 2 lines. Deal + CODE on top; benefits + countdown below */}
+      <div className="relative mx-auto flex w-full flex-col items-center justify-center gap-[5px] px-[6px] py-[7px] md:hidden">
+        <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
+          <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[10px] tracking-[0.01em] min-[380px]:text-[10.5px]">
+            {PROMO_DEAL_LINE}
+          </span>
+          <CodePill compact />
+        </div>
+        <div className="flex items-center justify-center gap-x-[5px] whitespace-nowrap">
+          {PROMO_BENEFITS.map((text, i) => (
             <Fragment key={text}>
               {i > 0 && <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />}
-              <span className="font-['DM_Sans',sans-serif] text-[8.5px] font-bold uppercase leading-none tracking-[0.01em] text-white">
+              <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[8.5px] tracking-[0.01em] text-white/85">
                 {text}
               </span>
             </Fragment>
           ))}
-          <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />
-          <span className="font-['DM_Sans',sans-serif] text-[8.5px] font-bold uppercase leading-none tracking-[0.01em] text-white">
-            Daily Reward
-          </span>
-        </div>
-        <div className="flex max-w-full items-center justify-center gap-x-[4px] overflow-hidden whitespace-nowrap">
-          <span className="font-['DM_Sans',sans-serif] text-[8.5px] font-bold uppercase leading-none tracking-[0.01em] text-white">
-            Processing
-          </span>
-          <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />
-          <span className="font-['DM_Sans',sans-serif] text-[8.5px] font-bold uppercase leading-none tracking-[0.01em] text-white">
-            {PROMO_DEAL_LINE}
-          </span>
-          <CodePill compact />
           <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} />
         </div>
       </div>
 
-      {/* Desktop / tablet: benefits + deal + CODE + urgency */}
-      <div className="relative mx-auto hidden min-h-[36px] w-full max-w-[1400px] flex-wrap items-center justify-center gap-x-[8px] gap-y-[4px] px-[12px] py-[8px] md:flex lg:gap-x-[12px] lg:px-[20px] xl:gap-x-[14px] xl:px-[24px]">
-        {PROMO_BANNER_ITEMS.map((text, i) => (
-          <Fragment key={text}>
-            {i > 0 && <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />}
-            <span className="font-['DM_Sans',sans-serif] text-[11px] font-bold uppercase leading-none tracking-[0.02em] text-white whitespace-nowrap lg:text-[12px] xl:text-[13px]">
-              {text}
-            </span>
-          </Fragment>
-        ))}
-        <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />
-        <CodePill />
-        <PromoCountdownPill pulse={!reduceMotion && nearViewport} />
+      {/* Desktop / tablet: deal first, then benefits, then CODE + countdown.
+          Each group stays on one line, so a narrow screen wraps between groups, never mid-offer. */}
+      <div className="relative mx-auto hidden min-h-[36px] w-full max-w-[1440px] flex-wrap items-center justify-center gap-x-[12px] gap-y-[6px] px-[12px] py-[8px] md:flex lg:gap-x-[14px] lg:px-[20px] xl:px-[24px]">
+        <div className="flex items-center gap-x-[10px] whitespace-nowrap lg:gap-x-[14px]">
+          <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[12px] tracking-[0.02em] lg:text-[13px] xl:text-[14px]">
+            {PROMO_DEAL_LINE}
+          </span>
+          {PROMO_BENEFITS.map((text) => (
+            <Fragment key={text}>
+              <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />
+              <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[11px] tracking-[0.02em] text-white/85 lg:text-[12px] xl:text-[13px]">
+                {text}
+              </span>
+            </Fragment>
+          ))}
+        </div>
+        <div className="flex items-center gap-x-[8px] whitespace-nowrap lg:gap-x-[10px]">
+          <CodePill />
+          <PromoCountdownPill pulse={!reduceMotion && nearViewport} />
+        </div>
       </div>
     </div>
   );
