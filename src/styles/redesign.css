@@ -104,3 +104,31 @@
 @media (prefers-reduced-motion: reduce) {
   .fyt-rd-marquee, .fyt-gradient-text, .fyt-rd-ping { animation: none; }
 }
+
+/* Soft expanding ring behind the main checkout button. Transform/opacity only. */
+.fyt-cta-pulse {
+  border: 2px solid rgba(96, 165, 250, 0.75);
+  animation: fyt-rd-cta-pulse 2.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes fyt-rd-cta-pulse {
+  0% { transform: scale(1); opacity: 0.85; }
+  70%, 100% { transform: scale(1.08, 1.45); opacity: 0; }
+}
+
+/* Slow gradient border sweep for the offer card. */
+.fyt-offer-border {
+  background:
+    linear-gradient(#0a1226, #0a1226) padding-box,
+    linear-gradient(110deg, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.9), rgba(191, 219, 254, 0.4), rgba(96, 165, 250, 0.15)) border-box;
+  background-size: 100% 100%, 240% 100%;
+  border: 1px solid transparent;
+  animation: fyt-rd-border-sweep 6s linear infinite;
+}
+@keyframes fyt-rd-border-sweep {
+  from { background-position: 0 0, 0% 0; }
+  to { background-position: 0 0, 240% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fyt-cta-pulse, .fyt-offer-border { animation: none; }
+}

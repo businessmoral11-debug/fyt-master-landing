@@ -1,6 +1,7 @@
 import { FeaturedIn, LivePayouts, PricingSection, ProofInNumbers, ProveYourSkill, Testimonials } from "./SectionsTop";
 import { ClosingCta, Comparison, Faq, Footer, HowItWorks, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
+import { FloatingCta } from "./Conversion";
 
 /**
  * Redesigned landing page below the hero. Same content, data, links and
@@ -23,6 +24,7 @@ export function BelowFold() {
       <ClosingCta />
       <Faq />
       <Footer />
+      <FloatingCta />
     </>
   );
 }

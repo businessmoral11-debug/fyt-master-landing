@@ -5,7 +5,8 @@ import { resolve } from "node:path";
 const read = (p: string) => readFileSync(resolve(__dirname, p), "utf8");
 const top = read("./SectionsTop.tsx");
 const bottom = read("./SectionsBottom.tsx");
-const all = top + bottom;
+const conversion = read("./Conversion.tsx");
+const all = top + bottom + conversion;
 
 describe("redesigned below-the-fold", () => {
   it("is the below-the-fold App actually renders", () => {
@@ -61,9 +62,20 @@ describe("redesigned below-the-fold", () => {
   });
 
   it("reuses the shared data and functional components instead of copies", () => {
-    for (const name of ["PROVE_SKILL_CARDS", "PROOF_STATS", "HOW_IT_WORKS_STEPS", "COMPARISON_ROWS", "FAQ_ITEMS", "FOOTER_COLUMNS", "<Pricing />", "<FooterLegalText />", "<TradingGlobeSlot />", "<TrustindexWidget />", "<FeaturedCertificates />", "<RecentVerifiedRewards />"]) {
+    for (const name of ["PROVE_SKILL_CARDS", "PROOF_STATS", "HOW_IT_WORKS_STEPS", "COMPARISON_ROWS", "FAQ_ITEMS", "FOOTER_COLUMNS", "<Pricing ", "<FooterLegalText />", "<TradingGlobeSlot />", "<TrustindexWidget />", "<FeaturedCertificates />", "<RecentVerifiedRewards />"]) {
       expect(all, name).toContain(name);
     }
+  });
+
+  it("drives conversion from the challenge section", () => {
+    expect(top).toContain("<Pricing offerSlot={<PricingOffer />} afterCheckoutSlot={<PricingTrustLine />} />");
+    expect(top).toContain("<PayoutTicker />");
+    expect(read("./RedesignBelowFold.tsx")).toContain("<FloatingCta />");
+    // Offer copy and countdown come from the shared promo data, never hard-coded.
+    for (const name of ["PROMO_DEAL_LINE", "PROMO_BENEFITS", "PROMO_CODE", "PROMO_DEADLINE", "formatHoursLeft"]) {
+      expect(conversion, name).toContain(name);
+    }
+    expect(conversion).toContain('href="#challenge"');
   });
 
   it("keeps the anchors other parts of the page jump to", () => {

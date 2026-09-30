@@ -22,6 +22,7 @@ import {
   VideoLightbox,
 } from "@/app/BelowFold";
 import { C, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent } from "./ui";
+import { PayoutTicker, PricingOffer, PricingTrustLine } from "./Conversion";
 
 const FeaturedCertificates = lazy(() => import("@/app/featuredCertificates").then((m) => ({ default: m.FeaturedCertificates })));
 const RecentVerifiedRewards = lazy(() => import("@/app/recentVerifiedRewards").then((m) => ({ default: m.RecentVerifiedRewards })));
@@ -214,16 +215,18 @@ function CountUp({ value, className }: { value: string; className?: string }) {
   );
 }
 
+const PROOF_CURVE = "M0 262 C 140 258, 220 236, 330 214 S 520 176, 640 150 S 860 96, 980 70 S 1130 34, 1200 24";
+
 function ProofChartLine() {
   const ref = useRef<SVGSVGElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
   const pathLength = useTransform(scrollYProgress, [0, 1], [0.05, 1]);
   return (
-    <svg ref={ref} viewBox="0 0 1200 300" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-[62%] w-full" fill="none" aria-hidden="true">
+    <svg ref={ref} viewBox="0 0 1200 300" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 hidden h-[62%] w-full lg:block" fill="none" aria-hidden="true">
       <defs>
         <linearGradient id="rd-proof-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2563eb" stopOpacity="0.22" />
+          <stop offset="0%" stopColor="#2563eb" stopOpacity="0.2" />
           <stop offset="100%" stopColor="#2563eb" stopOpacity="0" />
         </linearGradient>
         <linearGradient id="rd-proof-stroke" x1="0" y1="0" x2="1" y2="0">
@@ -232,14 +235,8 @@ function ProofChartLine() {
           <stop offset="100%" stopColor="#93c5fd" />
         </linearGradient>
       </defs>
-      <path d="M0 270 L90 250 L170 262 L260 214 L340 226 L430 176 L520 190 L610 138 L690 152 L780 96 L870 112 L960 62 L1050 74 L1200 20 L1200 300 L0 300 Z" fill="url(#rd-proof-fill)" />
-      <motion.path
-        d="M0 270 L90 250 L170 262 L260 214 L340 226 L430 176 L520 190 L610 138 L690 152 L780 96 L870 112 L960 62 L1050 74 L1200 20"
-        stroke="url(#rd-proof-stroke)"
-        strokeWidth="2"
-        vectorEffect="non-scaling-stroke"
-        style={{ pathLength: reduce ? 1 : pathLength }}
-      />
+      <path d={`${PROOF_CURVE} L1200 300 L0 300 Z`} fill="url(#rd-proof-fill)" />
+      <motion.path d={PROOF_CURVE} stroke="url(#rd-proof-stroke)" strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ pathLength: reduce ? 1 : pathLength }} />
     </svg>
   );
 }
@@ -249,6 +246,7 @@ export function ProofInNumbers() {
   return (
     <Section tone="dark" stars>
       <ProofChartLine />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] lg:hidden" style={{ background: "radial-gradient(90% 70% at 50% 100%, rgba(37,99,235,0.28), transparent 70%)" }} />
       <div className="relative grid grid-cols-1 items-center gap-[44px] lg:grid-cols-12 lg:gap-[56px]">
         <div className="flex flex-col gap-[22px] lg:col-span-6">
           <Eyebrow>Proof in Numbers</Eyebrow>
@@ -355,8 +353,11 @@ export function PricingSection() {
         />
         <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.4), transparent)" }} />
       </div>
+      <div className="relative">
+        <PayoutTicker />
+      </div>
       <div className="relative mx-auto w-full max-w-[1296px]">
-        <Pricing />
+        <Pricing offerSlot={<PricingOffer />} afterCheckoutSlot={<PricingTrustLine />} />
       </div>
     </div>
   );

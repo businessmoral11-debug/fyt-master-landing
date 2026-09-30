@@ -1706,7 +1706,7 @@ function PlanCompareShortcut({ step }: { step: StepId }) {
 
 const PRICING_ANIMATIONS_ACTIVE_MARGIN_PX = 600;
 
-export function Pricing() {
+export function Pricing({ offerSlot, afterCheckoutSlot }: { offerSlot?: ReactNode; afterCheckoutSlot?: ReactNode } = {}) {
   const [step, setStep] = useState<StepId>("2-Step");
   const [plan, setPlan] = useState<PlanId>("prime");
   const [platform, setPlatform] = useState<PlatformId>("match-trader");
@@ -1840,11 +1840,11 @@ export function Pricing() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="flex-1 flex flex-col gap-[12px] items-center lg:items-start"
             >
-              <p className="font-['DM_Sans',sans-serif] font-medium leading-[1.1] text-[#eef0f6] text-[32px] lg:text-[44px] tracking-[-0.792px] text-center lg:text-left">
+              <p className="font-['DM_Sans',sans-serif] font-semibold leading-[1.06] text-[#eef0f6] text-[34px] lg:text-[54px] tracking-[-0.035em] text-center lg:text-left">
                 Find the right challenge
                 <br />
                 <span className="text-[#eef0f6]">in </span>
-                <span className="text-[#3b82f6]" style={{ textShadow: "0 0 30px rgba(59,130,246,0.35)" }}>under a minute.</span>
+                <span className="fyt-gradient-text">under a minute.</span>
               </p>
               <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.6] text-[#9da2b4] text-[16px] lg:text-[18px] text-center lg:text-left">Pick a model, compare essentials, and start with clarity.</p>
             </motion.div>
@@ -1876,6 +1876,8 @@ export function Pricing() {
               </div>
             </button>
           </div>
+
+          {offerSlot}
 
           <div className="flex gap-[6px] w-full" aria-hidden="true">
             {[stepTouched, planTouched, platformTouched, sizeTouched].map((touched, i) => (
@@ -2217,6 +2219,7 @@ export function Pricing() {
                 transition={{ type: "spring", stiffness: 380, damping: 24 }}
                 className="group relative w-full rounded-[16px]"
               >
+                {!reduceMotion && animsActive && <span aria-hidden="true" className="fyt-cta-pulse absolute inset-0 rounded-[16px] pointer-events-none" />}
                 <div
                   aria-hidden="true"
                   className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -2256,7 +2259,7 @@ export function Pricing() {
                     />
                   )}
                   <div className="relative flex items-center justify-center gap-[8px] h-full">
-                    <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[14px] text-white">Start Challenge</p>
+                    <p className="font-['DM_Sans',sans-serif] font-semibold text-[16px] text-white">Start Challenge</p>
                     <svg
                       width="14"
                       height="14"
@@ -2272,6 +2275,7 @@ export function Pricing() {
               <p className="flex items-center justify-center gap-[6px] font-['Inter:Regular',sans-serif] font-normal text-[#6B7280] text-[12px]">
                 <PanelIcon kind="shield" /> Secure checkout · Instant access
               </p>
+              {afterCheckoutSlot}
               </div>
             </PanelCard>
             </PricingFlashContext.Provider>
