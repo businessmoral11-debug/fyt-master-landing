@@ -54,6 +54,17 @@ for (const vp of viewports) {
     await page.evaluate((yy) => window.scrollTo(0, yy), y);
     await sleep(1300);
     await page.screenshot({ path: `${OUT}/${vp.name}-${String(i).padStart(2, "0")}-y${y}.png` });
+    if (i === 3) {
+      const diag = await page.evaluate(() => ({
+        scrollY: window.scrollY,
+        docTop: document.documentElement.scrollTop,
+        bodyTop: document.body.scrollTop,
+        scrollH: document.documentElement.scrollHeight,
+        cta: !!document.querySelector('a[aria-label^="Start Challenge"]'),
+        challengeTop: document.getElementById("challenge")?.getBoundingClientRect().top,
+      }));
+      log.push(`[${vp.name}] diag ${JSON.stringify(diag)}`);
+    }
     i++;
   }
   await page.evaluate(() => window.scrollTo(0, 0));
