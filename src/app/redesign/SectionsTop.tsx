@@ -15,6 +15,7 @@ import {
   PROOF_STATS,
   ProofStatIcon,
   Pricing,
+  PricingSlotsContext,
   TestimonialsDesktopCarousel,
   TestimonialsMobileCarousel,
   TestimonialsRevealContext,
@@ -341,6 +342,8 @@ export function LivePayouts() {
 /* Pricing — existing configurator in a new stage                      */
 /* ------------------------------------------------------------------ */
 
+const PRICING_SLOTS = { offerSlot: <PricingOffer />, afterCheckoutSlot: <PricingTrustLine /> };
+
 export function PricingSection() {
   return (
     <div className="fyt-rd relative w-full shrink-0 overflow-hidden" style={{ background: `radial-gradient(120% 70% at 50% 0%, #0a1733 0%, ${C.ink} 55%)` }}>
@@ -357,7 +360,9 @@ export function PricingSection() {
         <PayoutTicker />
       </div>
       <div className="relative mx-auto w-full max-w-[1296px]">
-        <Pricing offerSlot={<PricingOffer />} afterCheckoutSlot={<PricingTrustLine />} />
+        <PricingSlotsContext.Provider value={PRICING_SLOTS}>
+          <Pricing />
+        </PricingSlotsContext.Provider>
       </div>
     </div>
   );

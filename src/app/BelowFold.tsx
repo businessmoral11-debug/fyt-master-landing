@@ -1706,7 +1706,11 @@ function PlanCompareShortcut({ step }: { step: StepId }) {
 
 const PRICING_ANIMATIONS_ACTIVE_MARGIN_PX = 600;
 
-export function Pricing({ offerSlot, afterCheckoutSlot }: { offerSlot?: ReactNode; afterCheckoutSlot?: ReactNode } = {}) {
+/** Optional extra content the redesign injects around the configurator (offer card, trust line). */
+export const PricingSlotsContext = createContext<{ offerSlot?: ReactNode; afterCheckoutSlot?: ReactNode }>({});
+
+export function Pricing() {
+  const { offerSlot, afterCheckoutSlot } = useContext(PricingSlotsContext);
   const [step, setStep] = useState<StepId>("2-Step");
   const [plan, setPlan] = useState<PlanId>("prime");
   const [platform, setPlatform] = useState<PlatformId>("match-trader");

@@ -62,13 +62,15 @@ describe("redesigned below-the-fold", () => {
   });
 
   it("reuses the shared data and functional components instead of copies", () => {
-    for (const name of ["PROVE_SKILL_CARDS", "PROOF_STATS", "HOW_IT_WORKS_STEPS", "COMPARISON_ROWS", "FAQ_ITEMS", "FOOTER_COLUMNS", "<Pricing ", "<FooterLegalText />", "<TradingGlobeSlot />", "<TrustindexWidget />", "<FeaturedCertificates />", "<RecentVerifiedRewards />"]) {
+    for (const name of ["PROVE_SKILL_CARDS", "PROOF_STATS", "HOW_IT_WORKS_STEPS", "COMPARISON_ROWS", "FAQ_ITEMS", "FOOTER_COLUMNS", "<Pricing />", "<FooterLegalText />", "<TradingGlobeSlot />", "<TrustindexWidget />", "<FeaturedCertificates />", "<RecentVerifiedRewards />"]) {
       expect(all, name).toContain(name);
     }
   });
 
   it("drives conversion from the challenge section", () => {
-    expect(top).toContain("<Pricing offerSlot={<PricingOffer />} afterCheckoutSlot={<PricingTrustLine />} />");
+    expect(top).toContain("offerSlot: <PricingOffer />");
+    expect(top).toContain("afterCheckoutSlot: <PricingTrustLine />");
+    expect(top).toContain("<PricingSlotsContext.Provider value={PRICING_SLOTS}>");
     expect(top).toContain("<PayoutTicker />");
     expect(read("./RedesignBelowFold.tsx")).toContain("<FloatingCta />");
     // Offer copy and countdown come from the shared promo data, never hard-coded.
