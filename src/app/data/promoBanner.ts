@@ -18,13 +18,13 @@ export const PROMO_BENEFITS = [
 ] as const;
 
 /** Deal line shown after benefits on the top banner. */
-export const PROMO_DEAL_LINE = "35% off + Buy 1 Get 2 Instantly";
+export const PROMO_DEAL_LINE = "Limited Time: 40% off + Buy 1 Get 3 Instantly";
 
 /** Full desktop banner copy order: benefits + deal. */
 export const PROMO_BANNER_ITEMS = [...PROMO_BENEFITS, PROMO_DEAL_LINE] as const;
 
 /** Promo code shown in the top-banner CODE pill (also used at checkout). */
-export const PROMO_CODE = "FYT35";
+export const PROMO_CODE = "AWARD40";
 
 /** Alternate welcome offer shown on the pricing card (manual code entry). */
 export const ALT_PROMO_LABEL = "For new traders";
@@ -33,11 +33,11 @@ export const ALT_PROMO_CODE = "WELCOME45";
 
 /** Kept for pricing-panel badge / coupon references. */
 export const PROMO_ITEMS: PromoItem[] = [
-  { kind: "code", label: "The NEW FYT Deal", text: "35% off + Buy 1 Get 2", code: PROMO_CODE },
+  { kind: "code", label: "The NEW FYT Deal", text: "40% off + Buy 1 Get 3", code: PROMO_CODE },
 ];
 
-/** Offer ends Wednesday 30 Sep 17:59:59 (UTC+6), extended 4h from 13:59:59 (UTC+6). */
-export const PROMO_DEADLINE = "2026-09-30T17:59:59+06:00";
+/** 7-day AWARD40 offer: ends Wednesday 7 Oct 17:59:59 IST (UTC+5:30). */
+export const PROMO_DEADLINE = "2026-10-07T17:59:59+05:30";
 
 export interface Countdown {
   days: number;

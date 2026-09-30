@@ -35,8 +35,8 @@ interface Row {
 
 type PlatformTable = Record<PlatformId, Record<number, PricingEntry>>;
 
-/** Display sale price: 35% off the list price (FYT35). */
-export const SALE_DISCOUNT_FRACTION = 0.35;
+/** Display sale price: 40% off the list price (AWARD40). */
+export const SALE_DISCOUNT_FRACTION = 0.4;
 
 export function salePrice(priceOld: number): number {
   return Math.round(priceOld * (1 - SALE_DISCOUNT_FRACTION) * 100) / 100;
@@ -91,7 +91,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
     ]),
   },
   "Instant": {
-    // List prices from live PRODUCTS_CONFIG; sale = 35% off (FYT35)
+    // List prices from live PRODUCTS_CONFIG; sale = 40% off (AWARD40)
     plus: build(RULES_INSTANT_PLUS, [
       { size: 5000, mt: [109, 59.95, 20619], p5: [119, 65.45, 20620] },
       { size: 10000, mt: [209, 114.95, 20613], p5: [219, 120.45, 20614] },
@@ -99,7 +99,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
       { size: 50000, mt: [469, 257.95, 20617], p5: [479, 263.45, 20618] },
       { size: 100000, mt: [939, 516.45, 20621], p5: [949, 521.95, 20622] },
     ]),
-    // fyt-pro INSTANT (Prime) — product IDs from live PRODUCTS_CONFIG; sale = 35% off
+    // fyt-pro INSTANT (Prime) — product IDs from live PRODUCTS_CONFIG; sale = 40% off
     prime: build(RULES_INSTANT_PRIME, [
       { size: 5000, mt: [129, 70.95, 22214], p5: [129, 70.95, 22209] },
       { size: 10000, mt: [239, 131.45, 22213], p5: [239, 131.45, 22206] },
@@ -156,7 +156,7 @@ export function getEntry(step: StepId, plan: PlanId, platform: PlatformId, size:
 // Instant Prime SKUs use plain add-to-cart (checkout-link is unreliable for those products).
 const CHECKOUT_LINK_BASE = "https://fundingyourtrades.com/checkout-link/?products=";
 const CHECKOUT_ADD_TO_CART_BASE = "https://fundingyourtrades.com/checkout/?add-to-cart=";
-export const CHECKOUT_COUPON_CODE = "FYT35";
+export const CHECKOUT_COUPON_CODE = "AWARD40";
 
 const INSTANT_PRIME_PRODUCT_IDS = new Set<number>([
   22214, 22213, 22212, 22211, 22210,

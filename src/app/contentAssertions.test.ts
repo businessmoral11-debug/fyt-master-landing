@@ -1166,8 +1166,8 @@ describe("Promo banner", () => {
     expect(promo).toContain("200% Refund");
     expect(promo).toContain("Free Drawdown Reset");
     expect(promo).toContain("Daily Reward Processing");
-    expect(promo).toContain('export const PROMO_DEAL_LINE = "35% off + Buy 1 Get 2 Instantly"');
-    expect(promo).toContain('export const PROMO_CODE = "FYT35"');
+    expect(promo).toContain('export const PROMO_DEAL_LINE = "Limited Time: 40% off + Buy 1 Get 3 Instantly"');
+    expect(promo).toContain('export const PROMO_CODE = "AWARD40"');
     expect(promo).not.toContain("PROMO_URGENCY");
   });
 });

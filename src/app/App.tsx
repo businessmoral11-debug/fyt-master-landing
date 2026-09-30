@@ -564,11 +564,17 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
 
   const left = formatHoursLeft(PROMO_DEADLINE, now);
   if (left.expired) return null;
+  const totalHours = Number(left.hh);
+  const days = Math.floor(totalHours / 24);
+  const hh = String(totalHours % 24).padStart(2, "0");
+  const label = compact
+    ? `${days > 0 ? `${days}D ` : ""}${hh}:${left.mm}:${left.ss} Left`
+    : `${days > 0 ? `${days}D ` : ""}${hh}H ${left.mm}M ${left.ss}S Left`;
 
   return (
     <span
       role="timer"
-      aria-label={`${Number(left.hh)} hours ${Number(left.mm)} minutes left`}
+      aria-label={`${days > 0 ? `${days} days ` : ""}${Number(hh)} hours ${Number(left.mm)} minutes left`}
       className={`inline-flex shrink-0 items-center rounded-full font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] tabular-nums text-white ${compact ? "h-[16px] px-[7px] text-[7.5px]" : "h-[24px] px-[12px] text-[11px] lg:h-[25px] lg:text-[12px]"}`}
       style={{
         background: "#DC2626",
@@ -577,7 +583,7 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
         animation: pulse ? "fyt-promo-urgency-pulse 2.4s ease-in-out infinite" : undefined,
       }}
     >
-      {compact ? `${left.hh}:${left.mm}:${left.ss} Left` : `${left.hh}H ${left.mm}M ${left.ss}S Left`}
+      {label}
     </span>
   );
 }

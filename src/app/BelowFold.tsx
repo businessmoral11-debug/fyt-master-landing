@@ -2166,7 +2166,7 @@ function Pricing() {
                   className="font-['DM_Sans',sans-serif] font-bold text-[#2563EB] text-[44px] leading-[1.1] tracking-[-0.8px]"
                 >${entry.priceNew.toFixed(2)}</motion.p>
                 <p className="m-0 font-['Inter:Medium',sans-serif] text-[11px] font-medium leading-[15px] text-[#7EB6FF]">
-                  {CHECKOUT_COUPON_CODE} Coupon Auto applied
+                  {CHECKOUT_COUPON_CODE} Applied
                 </p>
               </div>
 
