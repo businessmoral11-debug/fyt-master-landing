@@ -23,7 +23,7 @@ import {
   VideoLightbox,
 } from "@/app/BelowFold";
 import { C, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent, useShimmer } from "./ui";
-import { PayoutTicker, PricingOffer, PricingTrustLine } from "./Conversion";
+import { PricingOffer, PricingTrustLine } from "./Conversion";
 
 const FeaturedCertificates = lazy(() => import("@/app/featuredCertificates").then((m) => ({ default: m.FeaturedCertificates })));
 const RecentVerifiedRewards = lazy(() => import("@/app/recentVerifiedRewards").then((m) => ({ default: m.RecentVerifiedRewards })));
@@ -359,9 +359,6 @@ export function PricingSection() {
           style={{ border: "1px solid rgba(96,165,250,0.35)", boxShadow: "0 0 90px 10px rgba(37,99,235,0.35), inset 0 0 90px rgba(37,99,235,0.25)" }}
         />
         <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.4), transparent)" }} />
-      </div>
-      <div className="relative">
-        <PayoutTicker />
       </div>
       <div className="relative mx-auto w-full max-w-[1296px]">
         <PricingSlotsContext.Provider value={PRICING_SLOTS}>

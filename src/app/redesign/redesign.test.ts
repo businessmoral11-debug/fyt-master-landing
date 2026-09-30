@@ -71,7 +71,7 @@ describe("redesigned below-the-fold", () => {
     expect(top).toContain("offerSlot: <PricingOffer />");
     expect(top).toContain("afterCheckoutSlot: <PricingTrustLine />");
     expect(top).toContain("<PricingSlotsContext.Provider value={PRICING_SLOTS}>");
-    expect(top).toContain("<PayoutTicker />");
+    expect(top).not.toContain("<PayoutTicker />");
     expect(read("./RedesignBelowFold.tsx")).toContain("<FloatingCta />");
     // Offer copy and countdown come from the shared promo data, never hard-coded.
     for (const name of ["PROMO_DEAL_LINE", "PROMO_BENEFITS", "PROMO_CODE", "PROMO_DEADLINE", "formatHoursLeft"]) {
