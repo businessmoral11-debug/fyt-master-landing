@@ -24,6 +24,7 @@ for (const vp of viewports) {
   const page = await ctx.newPage();
   page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") log.push(`[${vp.name}] console.${m.type()}: ${m.text()}`); });
   page.on("pageerror", (e) => log.push(`[${vp.name}] PAGEERROR: ${e.message}`));
+  page.on("response", (r) => { if (r.status() >= 400) log.push(`[${vp.name}] HTTP ${r.status()} ${r.url()}`); });
   const t0 = Date.now();
   await page.goto(URL, { waitUntil: "load", timeout: 60000 });
   log.push(`[${vp.name}] load in ${Date.now() - t0}ms`);
