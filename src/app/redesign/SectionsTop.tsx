@@ -164,7 +164,7 @@ export function ProveYourSkill() {
               key={card.id}
               variants={staggerChild}
               onPointerMove={spotlightMove}
-              className={`fyt-spot fyt-spot-light group flex items-start gap-[16px] rounded-[20px] bg-white p-[22px] transition-[transform,box-shadow] duration-500 hover:-translate-y-[4px] hover:shadow-[0_28px_60px_-28px_rgba(37,99,235,0.45)] lg:p-[26px] ${i === PROVE_SKILL_CARDS.length - 1 ? "sm:col-span-2" : ""}`}
+              className={`fyt-spot fyt-spot-light group flex items-start gap-[16px] rounded-[22px] bg-white p-[22px] transition-[transform,box-shadow] duration-500 hover:-translate-y-[4px] hover:shadow-[0_28px_60px_-28px_rgba(37,99,235,0.45)] lg:min-h-[132px] lg:p-[30px] ${i === PROVE_SKILL_CARDS.length - 1 ? "sm:col-span-2" : ""}`}
               style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 18px 40px -30px rgba(15,23,42,0.35)" }}
             >
               <span
@@ -175,9 +175,12 @@ export function ProveYourSkill() {
                   {PROVE_ICONS[card.id]}
                 </svg>
               </span>
-              <p className="pt-[2px] text-[17px] font-medium leading-[1.45] tracking-[-0.01em] lg:text-[18px]" style={{ color: C.textLight }}>
+              <p className="flex-1 pt-[2px] text-[17px] font-medium leading-[1.45] tracking-[-0.01em] lg:text-[19px]" style={{ color: C.textLight }}>
                 {card.text}
               </p>
+              <span className="tabular pt-[4px] text-[12px] font-semibold tracking-[0.1em]" style={{ color: "#a3b3d4" }} aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
             </motion.li>
           ))}
         </motion.ul>
@@ -245,8 +248,8 @@ export function ProofInNumbers() {
   return (
     <Section tone="dark" stars>
       <ProofChartLine />
-      <div className="relative grid grid-cols-1 items-center gap-[44px] lg:grid-cols-12 lg:gap-[64px]">
-        <div className="flex flex-col gap-[22px] lg:col-span-5">
+      <div className="relative grid grid-cols-1 items-center gap-[44px] lg:grid-cols-12 lg:gap-[56px]">
+        <div className="flex flex-col gap-[22px] lg:col-span-6">
           <Eyebrow>Proof in Numbers</Eyebrow>
           <h2 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[42px] lg:text-[56px]" style={{ color: C.textDark }}>
             <WordsReveal text="Thousands traded." />
@@ -265,7 +268,7 @@ export function ProofInNumbers() {
           </Reveal>
         </div>
         <motion.div
-          className="grid grid-cols-2 gap-[12px] sm:gap-[16px] lg:col-span-7"
+          className="grid grid-cols-2 gap-[12px] sm:gap-[16px] lg:col-span-6"
           variants={staggerParent(0.1, 0.1)}
           initial={reduce ? false : "hidden"}
           whileInView="show"
@@ -351,7 +354,7 @@ export function PricingSection() {
         />
         <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.4), transparent)" }} />
       </div>
-      <div className="relative mx-auto w-full max-w-[1440px]">
+      <div className="relative mx-auto w-full max-w-[1296px]">
         <Pricing />
       </div>
     </div>
@@ -391,7 +394,7 @@ export function Testimonials() {
           </Reveal>
         </div>
       </div>
-      <div className="relative mx-auto w-full max-w-[1280px] px-[20px] pt-[40px] lg:px-[88px] lg:pt-[56px]">
+      <div className="relative mx-auto flex w-full max-w-[1280px] flex-col items-center px-[20px] pt-[40px] lg:px-[88px] lg:pt-[56px]">
         <TestimonialsRevealContext.Provider value={revealed}>
           <TestimonialsDesktopCarousel onPlayVideo={setActiveVideo} />
           <TestimonialsMobileCarousel onPlayVideo={setActiveVideo} />

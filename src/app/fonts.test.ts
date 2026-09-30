@@ -10,12 +10,11 @@ describe("DM Sans font wiring", () => {
     expect(pkg.dependencies["@fontsource/dm-sans"]).toBeTruthy();
   });
 
-  it("imports exactly the DM Sans weights actually used in the app (400/500/700 — not 600, which no element applies)", () => {
+  it("imports the DM Sans weights used in the app (400/500/600/700 — 600 is the redesign's semibold)", () => {
     const main = read("../main.tsx");
-    for (const w of [400, 500, 700]) {
+    for (const w of [400, 500, 600, 700]) {
       expect(main).toContain(`@fontsource/dm-sans/${w}.css`);
     }
-    expect(main).not.toContain("@fontsource/dm-sans/600.css");
   });
 });
 

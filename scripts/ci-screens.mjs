@@ -8,7 +8,7 @@ const log = [];
 
 const viewports = [
   { name: "desktop", width: 1440, height: 900, dpr: 1, mobile: false },
-  { name: "mobile", width: 390, height: 844, dpr: 2, mobile: true },
+  { name: "mobile", width: 390, height: 844, dpr: 1, mobile: true },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
