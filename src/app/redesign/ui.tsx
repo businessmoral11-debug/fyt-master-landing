@@ -1,4 +1,4 @@
-import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 
 /** Shared easing for every redesign reveal — fast start, long soft landing. */
@@ -23,6 +23,7 @@ export const PRIMARY_GRADIENT: CSSProperties = {
   background: "linear-gradient(180deg, #4f8cff 0%, #2563eb 100%)",
   boxShadow: "0 10px 30px -10px rgba(37,99,235,0.75), inset 0 1px 0 rgba(255,255,255,0.35)",
 };
+const PRIMARY_PILL_BG: CSSProperties = { background: PRIMARY_GRADIENT.background };
 
 /** Sets --mx/--my on the card for the `.fyt-spot` glowing border. */
 export function spotlightMove(e: PointerEvent<HTMLElement>) {
@@ -31,6 +32,20 @@ export function spotlightMove(e: PointerEvent<HTMLElement>) {
   const r = el.getBoundingClientRect();
   el.style.setProperty("--mx", `${e.clientX - r.left}px`);
   el.style.setProperty("--my", `${e.clientY - r.top}px`);
+}
+
+/** True on desktop-width, fine-pointer screens — used to keep parallax off phones. */
+export function useIsDesktop() {
+  const query = "(min-width: 1024px) and (pointer: fine)";
+  const [is, setIs] = useState(() => typeof window !== "undefined" && window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const update = () => setIs(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return is;
 }
 
 /** Thin blue reading-progress bar pinned to the very top of the viewport. */
@@ -42,7 +57,7 @@ export function ScrollProgressBar() {
   return (
     <motion.div
       aria-hidden="true"
-      className="fixed left-0 right-0 top-0 h-[2px] origin-left z-[2147483002] pointer-events-none"
+      className="fixed left-0 right-0 top-0 h-[2px] origin-left z-[100] pointer-events-none"
       style={{ scaleX, background: "linear-gradient(90deg, #2563eb, #60a5fa 60%, #bfdbfe)", boxShadow: "0 0 12px rgba(96,165,250,0.8)" }}
     />
   );
@@ -176,14 +191,14 @@ export function Pill({
   ariaLabel?: string;
 }) {
   const base =
-    "group relative inline-flex items-center justify-center gap-[10px] rounded-full px-[28px] py-[15px] text-[15px] font-semibold no-underline whitespace-nowrap transition-[transform,box-shadow,background-color,border-color] duration-300 hover:-translate-y-[2px] active:translate-y-0 active:scale-[0.98] cursor-pointer";
+    "group relative inline-flex items-center justify-center gap-[10px] rounded-full px-[28px] py-[15px] text-center text-[15px] font-semibold no-underline whitespace-nowrap max-[374px]:whitespace-normal transition-[translate,scale,box-shadow,background-color,border-color] duration-300 hover:-translate-y-[2px] active:translate-y-0 active:scale-[0.98] cursor-pointer";
   const style: CSSProperties =
     variant === "primary"
-      ? PRIMARY_GRADIENT
+      ? PRIMARY_PILL_BG
       : tone === "dark"
         ? { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.14)", color: "#e8ecf6" }
         : { background: "#fff", border: `1px solid ${C.borderLight}`, color: C.textLight, boxShadow: "0 8px 24px -14px rgba(15,23,42,0.25)" };
-  const cls = `${base} ${variant === "primary" ? "cta-shine text-white hover:shadow-[0_18px_44px_-12px_rgba(59,130,246,0.85)]" : ""} ${className}`;
+  const cls = `${base} ${variant === "primary" ? "cta-shine text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.75),inset_0_1px_0_rgba(255,255,255,0.35)] hover:shadow-[0_18px_44px_-12px_rgba(59,130,246,0.85),inset_0_1px_0_rgba(255,255,255,0.35)]" : ""} ${className}`;
   const inner = (
     <>
       {variant === "primary" && (
@@ -229,7 +244,7 @@ export function Section({
   stars?: boolean;
 }) {
   const ref = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotion() || !useIsDesktop();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const yA = useTransform(scrollYProgress, [0, 1], [-90, 90]);
   const yB = useTransform(scrollYProgress, [0, 1], [70, -70]);
@@ -238,7 +253,7 @@ export function Section({
     <section
       ref={ref}
       id={id}
-      className={`fyt-rd relative w-full shrink-0 overflow-hidden scroll-mt-[132px] lg:scroll-mt-[136px] ${className}`}
+      className={`fyt-rd relative w-full shrink-0 overflow-clip scroll-mt-[132px] lg:scroll-mt-[136px] ${className}`}
       style={{ background: dark ? `linear-gradient(180deg, ${C.ink} 0%, ${C.inkAlt} 100%)` : `linear-gradient(180deg, #ffffff 0%, ${C.light} 100%)` }}
     >
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">

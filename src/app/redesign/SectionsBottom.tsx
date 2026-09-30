@@ -32,7 +32,7 @@ function StepCard({ step, index, progress, vertical }: { step: (typeof HOW_IT_WO
   const reduce = useReducedMotion();
   const total = HOW_IT_WORKS_STEPS.length;
   const at = vertical ? index / total : index / (total - 1);
-  const lit = useTransform(progress, [Math.max(0, at - 0.12), at + 0.02], [0, 1]);
+  const lit = useTransform(progress, [Math.max(0, Math.min(at, 0.98) - 0.12), Math.min(at + 0.02, 1)], [0, 1]);
   const ringOpacity = reduce ? 1 : lit;
   const glow = useTransform(lit, (v) => `0 0 0 ${6 * v}px rgba(59,130,246,${0.14 * v}), 0 0 ${28 * v}px rgba(59,130,246,${0.55 * v})`);
   return (
@@ -224,7 +224,7 @@ export function Comparison() {
                 >
                   <th
                     scope="row"
-                    className="px-[10px] py-[13px] text-left align-middle text-[11px] font-medium leading-[1.35] sm:px-[20px] sm:text-[14px] lg:px-[32px] lg:py-[17px] lg:text-[15px]"
+                    className="break-words hyphens-auto px-[10px] py-[13px] text-left align-middle text-[11px] font-medium leading-[1.35] sm:px-[20px] sm:text-[14px] lg:px-[32px] lg:py-[17px] lg:text-[15px]"
                     style={{ color: C.textLight, borderTop: `1px solid ${C.borderLight}` }}
                   >
                     {row.criteria}
@@ -237,7 +237,7 @@ export function Comparison() {
                       <span className="hidden sm:flex">
                         <CheckDot on />
                       </span>
-                      <span className="text-[11px] font-semibold leading-[1.35] sm:text-[14px] lg:text-[15px]" style={{ color: "#0b1d4d" }}>
+                      <span className="break-words text-[11px] font-semibold leading-[1.35] sm:text-[14px] lg:text-[15px]" style={{ color: "#0b1d4d" }}>
                         {row.fyt}
                       </span>
                     </span>
@@ -247,7 +247,7 @@ export function Comparison() {
                       <span className="hidden sm:flex">
                         <CheckDot on={false} />
                       </span>
-                      <span className="text-[11px] leading-[1.35] sm:text-[14px] lg:text-[15px]" style={{ color: "#6b7280" }}>
+                      <span className="break-words text-[11px] leading-[1.35] sm:text-[14px] lg:text-[15px]" style={{ color: "#6b7280" }}>
                         {row.others}
                       </span>
                     </span>
@@ -293,7 +293,7 @@ function DashboardStage() {
   const glow = useTransform(p, [0, 1], [0.15, 0.7]);
   return (
     <div ref={ref} className="relative w-full" style={{ perspective: 1400 }}>
-      <motion.div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[70%] w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ opacity: reduce ? 0.6 : glow, background: "radial-gradient(ellipse, rgba(37,99,235,0.75), transparent 70%)", filter: "blur(50px)" }} />
+      <motion.div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[70%] w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ opacity: reduce ? 0.6 : glow, background: "radial-gradient(ellipse, rgba(37,99,235,0.6), transparent 68%)" }} />
       <motion.div className="relative" style={reduce ? undefined : { rotateX, scale, y, transformOrigin: "50% 100%" }}>
         <img src={imgDashboardMockup} alt="FYT trader dashboard overview" loading="lazy" decoding="async" width={1280} height={983} className="relative h-auto w-full object-contain" />
       </motion.div>
@@ -361,11 +361,11 @@ export function ProductShowcase() {
             ].map(({ name, logo, h }) => (
               <div
                 key={name}
-                className="flex items-center justify-center gap-[10px] rounded-[16px] px-[10px] py-[16px] transition-transform duration-300 hover:-translate-y-[3px] lg:py-[20px]"
+                className="flex min-w-0 items-center justify-center gap-[8px] rounded-[16px] px-[8px] py-[16px] transition-[translate] duration-300 hover:-translate-y-[3px] lg:gap-[10px] lg:py-[20px]"
                 style={{ background: "linear-gradient(180deg, #3b82f6, #1d4ed8)", boxShadow: "0 16px 36px -18px rgba(37,99,235,0.9), inset 0 1px 0 rgba(255,255,255,0.3)" }}
               >
                 <img src={logo} alt="" loading="lazy" decoding="async" className={`${h} w-auto object-contain`} />
-                <span className="text-[13px] font-semibold text-white lg:text-[16px]">{name}</span>
+                <span className="min-w-0 truncate text-[12px] font-semibold text-white min-[375px]:text-[13px] lg:text-[16px]">{name}</span>
               </div>
             ))}
           </div>
@@ -403,7 +403,7 @@ export function ProductShowcase() {
                   <span className="text-[11px] font-medium text-white sm:text-[12px]">{label}</span>
                 </>
               );
-              const cls = "flex flex-col items-center gap-[8px] text-center transition-transform duration-200 hover:scale-105";
+              const cls = "flex flex-col items-center gap-[8px] text-center transition-[scale] duration-200 hover:scale-105";
               if (action === "intercom")
                 return (
                   <button key={label} type="button" onClick={() => void openIntercomMessenger()} aria-label="Open live chat" className={`${cls} cursor-pointer border-0 bg-transparent p-0`}>
@@ -426,7 +426,7 @@ export function ProductShowcase() {
           <button
             type="button"
             onClick={() => void openIntercomMessenger()}
-            className="group relative inline-flex w-fit cursor-pointer items-center gap-[8px] self-start rounded-full border-0 bg-white px-[22px] py-[13px] text-[14px] font-semibold text-[#1d4ed8] transition-transform duration-300 hover:-translate-y-[2px]"
+            className="group relative inline-flex w-fit cursor-pointer items-center gap-[8px] self-start rounded-full border-0 bg-white px-[22px] py-[13px] text-[14px] font-semibold text-[#1d4ed8] transition-[translate] duration-300 hover:-translate-y-[2px]"
           >
             Chat with us
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="transition-transform duration-300 group-hover:translate-x-[4px]" aria-hidden="true">
@@ -504,7 +504,7 @@ export function Faq() {
                         <span className="text-[16px] font-semibold leading-[1.35] tracking-[-0.01em] lg:text-[18px]" style={{ color: C.textLight }}>
                           {q}
                         </span>
-                        <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full transition-[transform,background-color] duration-300 group-data-[state=open]:rotate-45 group-data-[state=open]:bg-[#2563eb]" style={{ background: "#eef4ff" }}>
+                        <span className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-[#eef4ff] transition-[rotate,background-color] duration-300 group-data-[state=open]:rotate-45 group-data-[state=open]:bg-[#2563eb]">
                           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="stroke-[#2563eb] group-data-[state=open]:stroke-white">
                             <path d="M7 1.5v11M1.5 7h11" strokeWidth="1.8" strokeLinecap="round" />
                           </svg>
@@ -584,8 +584,8 @@ export function Footer() {
                   aria-label={label}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex size-[40px] items-center justify-center rounded-full text-[#9fb8e8] transition-[color,background-color,transform] duration-300 hover:-translate-y-[2px] hover:bg-[#2563eb] hover:text-white"
-                  style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.borderDark}` }}
+                  className="flex size-[40px] items-center justify-center rounded-full bg-white/[0.04] text-[#9fb8e8] transition-[color,background-color,translate] duration-300 hover:-translate-y-[2px] hover:bg-[#2563eb] hover:text-white"
+                  style={{ border: `1px solid ${C.borderDark}` }}
                 >
                   <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                     {SOCIAL_ICONS[label]}
@@ -620,7 +620,7 @@ export function Footer() {
 
         <div className="mt-[28px] flex flex-col items-center justify-between gap-[12px] text-[13px] sm:flex-row" style={{ color: "#6c7690" }}>
           <p>© 2026 Funding Your Trades. All rights reserved.</p>
-          <a href="#" className="no-underline transition-colors hover:text-white" style={{ color: "#8e98b0" }} onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+          <a href="#" className="no-underline transition-colors hover:text-white" style={{ color: "#8e98b0" }} onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }}>
             Back to top ↑
           </a>
         </div>

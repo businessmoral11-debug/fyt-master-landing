@@ -48,7 +48,7 @@ export function FeaturedIn() {
       <div className="relative mx-auto flex w-full max-w-[1280px] flex-col items-center gap-[18px] px-[20px] py-[34px] lg:flex-row lg:gap-[40px] lg:px-[80px] lg:py-[30px]">
         <p className="shrink-0 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#6f7a94] lg:w-[150px]">As featured in</p>
         <div className="fyt-marquee-mask w-full min-w-0 overflow-hidden">
-          <div className={`flex items-center ${reduce ? "flex-wrap justify-center gap-x-[40px] gap-y-[16px]" : "fyt-rd-marquee w-max gap-[64px]"}`}>
+          <div className={`flex items-center ${reduce ? "flex-wrap justify-center gap-x-[40px] gap-y-[16px]" : "fyt-rd-marquee w-max"}`}>
             {track.map((logo, i) => (
               <img
                 key={`${logo.alt}-${i}`}
@@ -57,7 +57,7 @@ export function FeaturedIn() {
                 aria-hidden={i >= PRESS.length || undefined}
                 loading="lazy"
                 decoding="async"
-                className="shrink-0 object-contain brightness-0 invert opacity-55 transition-opacity duration-300 hover:opacity-100"
+                className={`shrink-0 object-contain brightness-0 invert opacity-55 transition-opacity duration-300 hover:opacity-100 ${reduce ? "" : "mr-[64px]"}`}
                 style={{ width: logo.w }}
               />
             ))}
@@ -164,13 +164,12 @@ export function ProveYourSkill() {
               key={card.id}
               variants={staggerChild}
               onPointerMove={spotlightMove}
-              className={`fyt-spot fyt-spot-light group flex flex-col gap-[18px] rounded-[22px] bg-white p-[22px] transition-[transform,box-shadow] duration-500 hover:-translate-y-[4px] hover:shadow-[0_28px_60px_-28px_rgba(37,99,235,0.45)] lg:p-[28px] ${i === PROVE_SKILL_CARDS.length - 1 ? "sm:col-span-2" : ""}`}
-              style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 18px 40px -30px rgba(15,23,42,0.35)" }}
+              className={`fyt-spot fyt-spot-light group flex flex-col gap-[18px] rounded-[22px] bg-white p-[22px] shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)] transition-[translate,box-shadow] duration-500 hover:-translate-y-[4px] hover:shadow-[0_28px_60px_-28px_rgba(37,99,235,0.45)] lg:p-[28px] ${i === PROVE_SKILL_CARDS.length - 1 ? "sm:col-span-2" : ""}`}
+              style={{ border: `1px solid ${C.borderLight}` }}
             >
               <span className="flex items-center justify-between">
                 <span
-                  className="relative flex size-[46px] shrink-0 items-center justify-center rounded-[14px] transition-colors duration-500 group-hover:bg-[#2563eb]"
-                  style={{ background: "#eef4ff" }}
+                  className="relative flex size-[46px] shrink-0 items-center justify-center rounded-[14px] bg-[#eef4ff] transition-colors duration-500 group-hover:bg-[#2563eb]"
                 >
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="stroke-[#2563eb] transition-colors duration-500 group-hover:stroke-white">
                     {PROVE_ICONS[card.id]}
@@ -281,7 +280,7 @@ export function ProofInNumbers() {
               key={s.label}
               variants={staggerChild}
               onPointerMove={spotlightMove}
-              className="fyt-spot group relative flex flex-col gap-[18px] overflow-hidden rounded-[22px] p-[20px] backdrop-blur-[6px] sm:p-[28px]"
+              className="fyt-spot group relative flex min-w-0 flex-col gap-[18px] overflow-hidden rounded-[22px] p-[18px] sm:p-[28px]"
               style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015))", border: `1px solid ${C.borderDark}` }}
             >
               <span
@@ -293,7 +292,7 @@ export function ProofInNumbers() {
                 <ProofStatIcon kind={s.icon} />
               </span>
               <div className="relative flex flex-col gap-[6px]">
-                <CountUp value={s.value} className="text-[28px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[40px] lg:text-[46px]" />
+                <CountUp value={s.value} className="text-[24px] font-semibold leading-none tracking-[-0.03em] text-white min-[375px]:text-[28px] sm:text-[40px] lg:text-[46px]" />
                 <span className="text-[12px] font-medium uppercase tracking-[0.16em] sm:text-[13px]" style={{ color: C.mutedDark }}>
                   {s.label}
                 </span>
