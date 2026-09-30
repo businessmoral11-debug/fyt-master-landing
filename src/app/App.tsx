@@ -721,7 +721,7 @@ function PromoBanner() {
             </Fragment>
           ))}
         </div>
-        <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />
+        <span aria-hidden="true" className="hidden h-[12px] w-px shrink-0 bg-white/25 min-[1400px]:block" />
         <div className="flex items-center gap-x-[8px] whitespace-nowrap lg:gap-x-[10px]">
           <span className="font-['DM_Sans',sans-serif] text-[11px] font-bold uppercase leading-none tracking-[0.02em] text-white whitespace-nowrap lg:text-[12px] xl:text-[13px]">
             {PROMO_DEAL_LINE}
