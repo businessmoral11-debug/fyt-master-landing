@@ -21,6 +21,8 @@ for (const vp of viewports) {
     isMobile: vp.mobile,
     hasTouch: vp.mobile,
   });
+  // Screenshot-only: block the Klaviyo marketing popup so it doesn't cover the page.
+  await ctx.route(/klaviyo\.com/, (r) => r.abort());
   const page = await ctx.newPage();
   page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") log.push(`[${vp.name}] console.${m.type()}: ${m.text()}`); });
   page.on("pageerror", (e) => log.push(`[${vp.name}] PAGEERROR: ${e.message}`));
