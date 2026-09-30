@@ -229,6 +229,8 @@ export function FloatingCta() {
           transition={{ duration: 0.45, ease: EASE }}
           className="fyt-rd cta-shine group fixed left-1/2 z-[2147482980] flex max-w-[calc(100vw-150px)] items-center gap-[10px] rounded-full py-[8px] pl-[18px] pr-[18px] min-[380px]:pl-[8px] no-underline sm:max-w-none sm:gap-[14px] sm:pr-[22px]"
           style={{
+            // Inline so the shared .cta-shine rule (position: relative) can't override it.
+            position: "fixed",
             bottom: "max(20px, env(safe-area-inset-bottom, 0px))",
             background: "linear-gradient(180deg, #4f8cff 0%, #2563eb 100%)",
             boxShadow: "0 18px 40px -12px rgba(37,99,235,0.8), 0 0 0 1px rgba(191,219,254,0.35), inset 0 1px 0 rgba(255,255,255,0.35)",
