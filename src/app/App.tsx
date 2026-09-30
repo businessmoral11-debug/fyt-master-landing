@@ -19,7 +19,7 @@ import { HERO_ORBIT_LABELS, HERO_ORBIT_RINGS, MOBILE_ORBIT_LABELS, MOBILE_LABEL_
 import { HERO_STAGE_WIDTH, heroStageScale, heroLabelScale } from "@/app/motion/heroResponsive";
 import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
-import { PROMO_BANNER_ITEMS, PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
+import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
@@ -701,24 +701,34 @@ function PromoBanner() {
           <span className="font-['DM_Sans',sans-serif] text-[8.5px] font-bold uppercase leading-none tracking-[0.01em] text-white">
             {PROMO_DEAL_LINE}
           </span>
+        </div>
+        <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
           <CodePill compact />
           <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} />
         </div>
       </div>
 
-      {/* Desktop / tablet: benefits + deal + CODE + urgency */}
-      <div className="relative mx-auto hidden min-h-[36px] w-full max-w-[1400px] flex-wrap items-center justify-center gap-x-[8px] gap-y-[4px] px-[12px] py-[8px] md:flex lg:gap-x-[12px] lg:px-[20px] xl:gap-x-[14px] xl:px-[24px]">
-        {PROMO_BANNER_ITEMS.map((text, i) => (
-          <Fragment key={text}>
-            {i > 0 && <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />}
-            <span className="font-['DM_Sans',sans-serif] text-[11px] font-bold uppercase leading-none tracking-[0.02em] text-white whitespace-nowrap lg:text-[12px] xl:text-[13px]">
-              {text}
-            </span>
-          </Fragment>
-        ))}
+      {/* Desktop / tablet: benefits group + offer group (deal, CODE, countdown).
+          Each group stays on one line, so a narrow screen wraps between groups, never mid-offer. */}
+      <div className="relative mx-auto hidden min-h-[36px] w-full max-w-[1440px] flex-wrap items-center justify-center gap-x-[12px] gap-y-[6px] px-[12px] py-[8px] md:flex lg:px-[20px] xl:gap-x-[14px] xl:px-[24px]">
+        <div className="flex items-center gap-x-[8px] whitespace-nowrap lg:gap-x-[12px] xl:gap-x-[14px]">
+          {PROMO_BENEFITS.map((text, i) => (
+            <Fragment key={text}>
+              {i > 0 && <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />}
+              <span className="font-['DM_Sans',sans-serif] text-[11px] font-bold uppercase leading-none tracking-[0.02em] text-white whitespace-nowrap lg:text-[12px] xl:text-[13px]">
+                {text}
+              </span>
+            </Fragment>
+          ))}
+        </div>
         <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />
-        <CodePill />
-        <PromoCountdownPill pulse={!reduceMotion && nearViewport} />
+        <div className="flex items-center gap-x-[8px] whitespace-nowrap lg:gap-x-[10px]">
+          <span className="font-['DM_Sans',sans-serif] text-[11px] font-bold uppercase leading-none tracking-[0.02em] text-white whitespace-nowrap lg:text-[12px] xl:text-[13px]">
+            {PROMO_DEAL_LINE}
+          </span>
+          <CodePill />
+          <PromoCountdownPill pulse={!reduceMotion && nearViewport} />
+        </div>
       </div>
     </div>
   );

@@ -1114,7 +1114,7 @@ describe("Site-wide cleanup: 'profit'/'payout' wording replaced with reward-base
 describe("Promo banner", () => {
   it("imports promoBanner benefits + deal + code + countdown deadline", () => {
     const app = read("./App.tsx");
-    expect(app).toMatch(/import\s*\{[^}]*\bPROMO_BANNER_ITEMS\b[^}]*\bPROMO_BENEFITS\b[^}]*\bPROMO_CODE\b[^}]*\bPROMO_DEAL_LINE\b[^}]*\bPROMO_DEADLINE\b[^}]*\bformatHoursLeft\b[^}]*\}\s*from\s*"@\/app\/data\/promoBanner"/);
+    expect(app).toMatch(/import\s*\{[^}]*\bPROMO_BENEFITS\b[^}]*\bPROMO_CODE\b[^}]*\bPROMO_DEAL_LINE\b[^}]*\bPROMO_DEADLINE\b[^}]*\bformatHoursLeft\b[^}]*\}\s*from\s*"@\/app\/data\/promoBanner"/);
   });
 
   it("defines PromoBanner and sticks it with Nav at the top of the page", () => {
@@ -1148,13 +1148,13 @@ describe("Promo banner", () => {
     expect(bannerBody).not.toContain("fyt-marquee");
     expect(bannerBody).toContain("fyt-promo-sheen");
     expect(bannerBody).toContain("PROMO_BANNER_GRADIENT");
-    expect(bannerBody).toContain("PROMO_BANNER_ITEMS.map");
+    expect(bannerBody).toContain("PROMO_BENEFITS.map");
   });
 
   it("keeps benefits, Instantly deal line, copyable CODE pill, and the hours-left countdown pill", () => {
     const app = read("./App.tsx");
     const bannerBody = sliceToNextFunction(app, "function PromoBanner()");
-    expect(bannerBody).toContain("PROMO_BANNER_ITEMS.map");
+    expect(bannerBody).toContain("PROMO_BENEFITS.map");
     expect(bannerBody).toContain("PROMO_DEAL_LINE");
     expect(bannerBody).toContain("<PromoCountdownPill compact");
     expect(bannerBody).toContain("<PromoCountdownPill pulse");
