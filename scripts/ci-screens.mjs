@@ -111,7 +111,28 @@ for (const vp of BENCH_ONLY ? [] : viewports) {
     const groups = [...document.querySelectorAll('#challenge [role="group"] button')];
     for (let round = 0; round < 3; round++) for (const b of groups) { b.click(); await new Promise(r => setTimeout(r, 120)); }
   `;
+  if (!BENCH_ONLY) {
+    await cdp.send("Profiler.enable");
+    await cdp.send("Profiler.setSamplingInterval", { interval: 200 });
+    await cdp.send("Profiler.start");
+  }
   log.push(`[bench ${BENCH_LABEL}] ${await frameStats("tap-challenge-picker", toggleBody)}`);
+  if (!BENCH_ONLY) {
+    const { profile } = await cdp.send("Profiler.stop");
+    const byId = new Map(profile.nodes.map((n) => [n.id, n]));
+    const self = new Map();
+    const dt = profile.timeDeltas;
+    profile.samples.forEach((id, i) => {
+      const n = byId.get(id);
+      const cf = n.callFrame;
+      const key = `${cf.functionName || "(anon)"} ${cf.url.split("/").pop()}:${cf.lineNumber}`;
+      self.set(key, (self.get(key) || 0) + (dt[i] || 0));
+    });
+    const total = [...self.values()].reduce((a, b) => a + b, 0);
+    const top = [...self.entries()].sort((a, b) => b[1] - a[1]).slice(0, 25);
+    log.push(`[profile] total ${(total / 1000).toFixed(0)}ms`);
+    for (const [k, v] of top) log.push(`[profile] ${(v / 1000).toFixed(1)}ms ${k}`);
+  }
   await ctx.close();
 }
 await browser.close();
