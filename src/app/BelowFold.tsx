@@ -1571,7 +1571,7 @@ function PlanCompareShortcut({ step }: { step: StepId }) {
       rel="noopener noreferrer"
       aria-label={ariaLabel}
       title={label}
-      className="group/compare inline-flex shrink-0 items-center gap-[6px] rounded-full px-[10px] py-[4px] text-[12px] font-['Inter:Medium',sans-serif] font-medium text-[#93c5fd] no-underline transition-colors duration-200 hover:bg-[rgba(59,130,246,0.12)] hover:text-white"
+      className="group/compare inline-flex shrink-0 items-center gap-[6px] rounded-full px-[10px] py-[3px] text-[12px] font-['Inter:Medium',sans-serif] font-medium text-[#93c5fd] no-underline transition-colors duration-200 hover:bg-[rgba(59,130,246,0.12)] hover:text-white"
       style={{ border: "1px solid rgba(96,165,250,0.28)" }}
     >
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="shrink-0">
@@ -1613,13 +1613,13 @@ function SlidingPill({ index, count, gap = 0, inset = 4 }: { index: number; coun
 }
 
 /** Dark rounded track that holds a segmented control. */
-const PICKER_TRACK_CLASS = "relative flex w-full rounded-[14px] p-[4px]";
+const PICKER_TRACK_CLASS = "relative flex w-full min-h-[60px] rounded-[14px] p-[4px]";
 const PICKER_TRACK_STYLE = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.35)" } as const;
 const PICKER_OPTION_CLASS = "relative flex-1 min-w-0 flex items-center justify-center rounded-[10px] cursor-pointer transition-colors duration-200 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#60a5fa]";
 
 function PickerLabel({ id, n, children, aside }: { id: string; n: number; children: ReactNode; aside?: ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-[12px]">
+    <div className="flex min-h-[28px] items-center justify-between gap-[12px]">
       <p id={id} className="flex items-center gap-[8px] font-['Inter:Medium',sans-serif] font-medium text-[13px] text-[#c9cfdd]">
         <span aria-hidden="true" className="flex size-[20px] shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-[#93c5fd]" style={{ background: "rgba(59,130,246,0.14)", border: "1px solid rgba(96,165,250,0.3)" }}>
           {n}
@@ -1840,7 +1840,7 @@ export function Pricing() {
           {/* Controls: four clearly labelled steps. Row 1 (desktop): model | type | platform; row 2: account size. */}
           <div ref={controlsRef} className="flex flex-col gap-[22px] lg:gap-[28px] w-full">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-[22px] lg:gap-[24px] w-full">
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-[14px]">
                 <PickerLabel id="model-group-label" n={1}>Pick your model</PickerLabel>
                 <div className={PICKER_TRACK_CLASS} role="group" aria-labelledby="model-group-label" style={PICKER_TRACK_STYLE}>
                   <SlidingPill index={(["1-Step", "2-Step", "Instant"] as StepId[]).indexOf(step)} count={3} />
@@ -1861,9 +1861,9 @@ export function Pricing() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-[14px]">
                 <PickerLabel id="type-group-label" n={2} aside={<PlanCompareShortcut step={step} />}>Choose your type</PickerLabel>
-                <div className={`${PICKER_TRACK_CLASS} mt-[4px]`} role="group" aria-labelledby="type-group-label" style={PICKER_TRACK_STYLE}>
+                <div className={PICKER_TRACK_CLASS} role="group" aria-labelledby="type-group-label" style={PICKER_TRACK_STYLE}>
                   <SlidingPill index={STEP_PLANS[step].findIndex((p) => p.id === plan)} count={STEP_PLANS[step].length} />
                   {STEP_PLANS[step].map((opt) => {
                     const active = opt.id === plan;
@@ -1888,7 +1888,7 @@ export function Pricing() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-[14px]">
                 <PickerLabel id="platform-group-label" n={3}>Choose your platform</PickerLabel>
                 <div className={PICKER_TRACK_CLASS} role="group" aria-labelledby="platform-group-label" style={PICKER_TRACK_STYLE}>
                   <SlidingPill index={PLATFORM_OPTIONS.findIndex((p) => p.id === platform)} count={PLATFORM_OPTIONS.length} />
@@ -1912,7 +1912,7 @@ export function Pricing() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-[10px] w-full">
+            <div className="flex flex-col gap-[14px] w-full">
               <PickerLabel id="size-group-label" n={4}>Pick your account size</PickerLabel>
               <div className={PICKER_TRACK_CLASS} role="group" aria-labelledby="size-group-label" style={PICKER_TRACK_STYLE}>
                 <SlidingPill index={STEP_SIZES[step].indexOf(size)} count={STEP_SIZES[step].length} />
