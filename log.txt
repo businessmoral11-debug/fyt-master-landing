@@ -1,0 +1,58 @@
+[header] {"headerH":85,"navBottom":85,"heroTop":242}
+[desktop] console.error: Failed to load resource: net::ERR_FAILED
+[desktop] load in 1066ms
+[desktop] console.warning: Deprecated API for given entry type.
+[desktop] perf {"dcl":67,"load":1064,"jsKB":1007,"totalKB":1332}
+[desktop] diag {"scrollY":2700,"docTop":2700,"bodyTop":0,"scrollH":13636,"cta":false,"challengeTop":1941.328125}
+[desktop] console.error: Access to fetch at 'https://rewards.fundingyourtrades.com/api/v1/public/globe-stats' from origin 'http://127.0.0.1:4173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[desktop] console.error: Failed to load resource: net::ERR_FAILED
+[desktop] console.warning: THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
+[desktop] console.warning: [GroupMarkerNotSet(crbug.com/242999)!:A0A02000FC1B0000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader (about:flags#enable-unsafe-swiftshader) flag to opt in to lower security guarantees for trusted content.
+[desktop] console.warning: [.WebGL-0x3b1406ebe300]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[desktop] console.warning: [.WebGL-0x3b1406ebe300]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[desktop] console.warning: [.WebGL-0x3b1406ebe300]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[desktop] console.warning: [.WebGL-0x3b1406ebe300]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+[desktop] scrollHeight 13636
+[mobile] console.error: Failed to load resource: net::ERR_FAILED
+[mobile] load in 793ms
+[mobile] console.warning: Deprecated API for given entry type.
+[mobile] perf {"dcl":87,"load":789,"jsKB":383,"totalKB":709}
+[mobile] diag {"scrollY":2532,"docTop":2532,"bodyTop":0,"scrollH":16289,"cta":false,"challengeTop":2489.96875}
+[mobile] console.error: Access to fetch at 'https://rewards.fundingyourtrades.com/api/v1/public/globe-stats' from origin 'http://127.0.0.1:4173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[mobile] console.error: Failed to load resource: net::ERR_FAILED
+[mobile] console.warning: THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
+[mobile] console.warning: [GroupMarkerNotSet(crbug.com/242999)!:A0D02000FC1B0000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader (about:flags#enable-unsafe-swiftshader) flag to opt in to lower security guarantees for trusted content.
+[mobile] scrollHeight 16289
+[bench this-branch] scroll-whole-page: frames=738 avgMs=16.7 over33ms=0 over50ms=0 worstMs=17
+[bench this-branch] idle-at-challenge-3s: frames=133 avgMs=22.3 over33ms=18 over50ms=7 worstMs=83
+[diag] canvases=
+[diag] running CSS animations=fyt-promo-sheen:pointer-events-none absolute inset-y-0 w | fyt-promo-urgency-pulse:inline-flex shrink-0 items-center rounde | fyt-rd-text-shimmer:inline-block fyt-gradient-text font-semi | fyt-rd-text-shimmer:inline-block fyt-gradient-text font-semi | cta-shine-sweep:group relative inline-flex items-center  | fyt-rd-text-shimmer:inline-block fyt-gradient-text | cta-shine-sweep:group relative inline-flex items-center  | fyt-rd-text-shimmer:fyt-gradient-text | fyt-rd-ping:fyt-rd-ping-gated absolute inset-0 round | fyt-rd-cta-pulse:fyt-cta-pulse absolute inset-0 rounded-[ | cta-shine-sweep:group relative inline-flex items-center  | cta-shine-sweep:group relative inline-flex items-center  | cta-shine-sweep:group relative inline-flex items-center  | cta-shine-sweep:group relative inline-flex items-center 
+[bench this-branch] idle-css-anims-paused: frames=172 avgMs=16.7 over33ms=0 over50ms=0 worstMs=17
+[bench this-branch] idle-css-paused-no-canvas: frames=180 avgMs=16.7 over33ms=0 over50ms=0 worstMs=17
+[bench this-branch] tap-challenge-picker: frames=348 avgMs=19.8 over33ms=20 over50ms=3 worstMs=67
+[profile] total 7771ms
+[profile] 5400.3ms (program) :-1
+[profile] 846.2ms querySelectorAll :-1
+[profile] 754.3ms (idle) :-1
+[profile] 45.7ms (garbage collector) :-1
+[profile] 38.5ms La RedesignBelowFold-SEGxQgzj.js:1
+[profile] 30.3ms (anon) RedesignBelowFold-SEGxQgzj.js:1
+[profile] 22.6ms Zm index-B9Ivtddf.js:47
+[profile] 19.9ms (anon) index-B9Ivtddf.js:55
+[profile] 16.9ms (anon) index-B9Ivtddf.js:47
+[profile] 15.0ms (anon) loader.js?789d2d278999828b52568075d8b:0
+[profile] 14.9ms p index-B9Ivtddf.js:47
+[profile] 12.9ms f index-B9Ivtddf.js:17
+[profile] 12.8ms yd index-B9Ivtddf.js:40
+[profile] 11.8ms yn index-B9Ivtddf.js:40
+[profile] 11.7ms r.getCookie uwt.js:0
+[profile] 11.3ms xy index-B9Ivtddf.js:40
+[profile] 10.7ms Ma index-B9Ivtddf.js:38
+[profile] 10.0ms Wu index-B9Ivtddf.js:47
+[profile] 10.0ms Fd index-B9Ivtddf.js:40
+[profile] 9.3ms animate :-1
+[profile] 9.3ms removeChild :-1
+[profile] 9.2ms requestAnimationFrame :-1
+[profile] 8.4ms D index-B9Ivtddf.js:47
+[profile] 8.2ms Hf index-B9Ivtddf.js:38
+[profile] 8.0ms updateFeatures index-B9Ivtddf.js:47

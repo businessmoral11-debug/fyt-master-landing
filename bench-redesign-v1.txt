@@ -1,0 +1,3 @@
+[bench redesign-v1] scroll-whole-page: frames=650 avgMs=19.0 over33ms=15 over50ms=0 worstMs=50
+[bench redesign-v1] idle-at-challenge-3s: frames=75 avgMs=39.3 over33ms=31 over50ms=12 worstMs=100
+[bench redesign-v1] tap-challenge-picker: frames=154 avgMs=51.8 over33ms=104 over50ms=62 worstMs=117
