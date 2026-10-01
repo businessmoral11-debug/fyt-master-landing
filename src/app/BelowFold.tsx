@@ -1612,6 +1612,18 @@ function SlidingPill({ index, count, gap = 0, inset = 4 }: { index: number; coun
   );
 }
 
+/** "$275" + ".40" so the price card can show whole dollars large and cents small. */
+function splitPrice(v: number): { dollars: string; cents: string } {
+  const whole = Math.floor(v + 1e-6);
+  const cents = Math.round((v - whole) * 100);
+  return { dollars: `$${whole.toLocaleString("en-US")}`, cents: cents > 0 ? `.${String(cents).padStart(2, "0")}` : "" };
+}
+
+/** "$459" (list prices are whole dollars; keeps cents only if there are any). */
+function formatWholePrice(v: number): string {
+  return Number.isInteger(v) ? `$${v.toLocaleString("en-US")}` : `$${v.toFixed(2)}`;
+}
+
 /** Dark rounded track that holds a segmented control. */
 const PICKER_TRACK_CLASS = "relative flex w-full min-h-[60px] rounded-[14px] p-[4px]";
 const PICKER_TRACK_STYLE = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.35)" } as const;
@@ -1720,15 +1732,30 @@ export function Pricing() {
   const platformLabel = PLATFORM_OPTIONS.find((p) => p.id === platform)?.label ?? "";
   const sizeLabel = fmtSize(size);
 
-  const priceRef = useRef<HTMLParagraphElement>(null);
+  const priceRef = useRef<HTMLSpanElement>(null);
   const priceMotionValue = useMotionValue(entry.priceNew);
   const priceSpring = useSpring(priceMotionValue, PRICING_PRICE_SPRING);
   useEffect(() => {
     priceMotionValue.set(entry.priceNew);
   }, [entry.priceNew, priceMotionValue]);
+  const priceCentsRef = useRef<HTMLSpanElement>(null);
   useMotionValueEvent(priceSpring, "change", (v) => {
-    if (priceRef.current) priceRef.current.textContent = `$${v.toFixed(2)}`;
+    const parts = splitPrice(v);
+    if (priceRef.current) priceRef.current.textContent = parts.dollars;
+    if (priceCentsRef.current) priceCentsRef.current.textContent = parts.cents;
   });
+  const [welcomeCopied, setWelcomeCopied] = useState(false);
+  const copyWelcomeCode = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(ALT_PROMO_CODE);
+      setWelcomeCopied(true);
+      window.setTimeout(() => setWelcomeCopied(false), 1600);
+    } catch {
+      // Clipboard blocked: the code is still visible to type in.
+    }
+  }, []);
+  const savePct = entry.priceOld > 0 ? Math.round((1 - entry.priceNew / entry.priceOld) * 100) : 0;
+  const priceParts = splitPrice(entry.priceNew);
 
   function handleStepChange(next: StepId) {
     setStep(next);
@@ -1956,7 +1983,7 @@ export function Pricing() {
             <span className="flex min-w-0 flex-col gap-[3px] font-['DM_Sans',sans-serif] leading-none">
               <span className="truncate text-[10.5px] font-medium text-white/80">{`${STEP_DISPLAY_LABELS[step]} · ${planLabel} · ${sizeLabel}`}</span>
               <span className="flex items-baseline gap-[6px] whitespace-nowrap">
-                <span className="text-[16px] font-bold tracking-[-0.01em] text-white">${entry.priceNew.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="text-[16px] font-bold tracking-[-0.01em] text-white">{priceParts.dollars}<span className="text-[11px] align-top">{priceParts.cents}</span></span>
                 <span className="text-[11px] font-semibold text-white/85">Start</span>
               </span>
             </span>
@@ -2021,52 +2048,61 @@ export function Pricing() {
                   <p className="font-['Inter:Regular',sans-serif] font-normal text-[#6B7280] text-[12px]">One-time fee</p>
                 )}
                 {entry.priceOld > entry.priceNew && (
-                  <motion.p
+                  <motion.div
                     key={entry.priceOld}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.25 }}
-                    className="font-['Inter:Regular',sans-serif] font-normal text-[#9CA3AF] text-[14px] line-through"
-                  >${entry.priceOld.toFixed(2)}</motion.p>
+                    className="mt-[2px] flex items-center gap-[8px]"
+                  >
+                    <span className="font-['Inter:Regular',sans-serif] font-normal text-[#9CA3AF] text-[14px] line-through">{formatWholePrice(entry.priceOld)}</span>
+                    <span className="rounded-full px-[8px] py-[2px] font-['Inter:Semi_Bold',sans-serif] text-[11px] font-semibold text-[#15803d]" style={{ background: "#dcfce7" }}>
+                      Save {savePct}%
+                    </span>
+                  </motion.div>
                 )}
                 <motion.p
-                  ref={priceRef}
                   initial={{ opacity: 0, y: -10, scale: 0.94 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ type: "spring", stiffness: 380, damping: 26 }}
-                  className="font-['DM_Sans',sans-serif] font-bold text-[#2563EB] text-[44px] leading-[1.1] tracking-[-0.8px]"
-                >${entry.priceNew.toFixed(2)}</motion.p>
-                <p className="m-0 font-['Inter:Medium',sans-serif] text-[11px] font-medium leading-[15px] text-[#7EB6FF]">
-                  {CHECKOUT_COUPON_CODE} Applied
+                  className="flex items-start font-['DM_Sans',sans-serif] font-bold text-[#2563EB] leading-none tracking-[-1.2px]"
+                  aria-label={`${priceParts.dollars}${priceParts.cents}`}
+                >
+                  <span ref={priceRef} className="text-[52px]">{priceParts.dollars}</span>
+                  <span ref={priceCentsRef} className="mt-[6px] ml-[2px] text-[20px] tracking-[-0.3px]">{priceParts.cents}</span>
+                </motion.p>
+                <p className="m-0 mt-[4px] inline-flex items-center gap-[6px] rounded-full px-[10px] py-[4px] font-['Inter:Medium',sans-serif] text-[11px] font-medium leading-none text-[#1d4ed8]" style={{ background: "rgba(37,99,235,0.08)" }}>
+                  <svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M11.6662 3.5L5.25017 9.9162L2.3338 6.99975" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  {CHECKOUT_COUPON_CODE} applied
                 </p>
               </div>
 
+              {/* New-trader alternative: one tidy coupon row, tap the code to copy. */}
               <div
-                className="relative self-center w-full max-w-[280px] overflow-hidden rounded-[16px]"
-                style={{
-                  border: "1px solid rgba(37,99,235,0.16)",
-                  background: "#F8FAFF",
-                  boxShadow: "0 1px 0 rgba(255,255,255,0.9) inset",
-                }}
+                className="flex w-full items-center justify-between gap-[10px] rounded-[14px] px-[14px] py-[11px]"
+                style={{ border: "1px dashed rgba(37,99,235,0.35)", background: "#F8FAFF" }}
               >
-
-                <div className="relative z-[1] flex flex-col items-center gap-[6px] px-[14px] py-[12px] text-center">
-                  <span
-                    className="inline-flex items-center rounded-full px-[8px] py-[2px] font-['Inter:Semi_Bold',sans-serif] text-[10px] font-semibold uppercase tracking-[0.06em] text-[#2563EB]"
-                    style={{ background: "rgba(37,99,235,0.10)" }}
-                  >
-                    {ALT_PROMO_LABEL}
-                  </span>
-                  <p className="m-0 font-['DM_Sans',sans-serif] text-[15px] font-bold leading-[20px] tracking-[-0.2px] text-[#111827]">
-                    {ALT_PROMO_DEAL}
-                  </p>
-                  <p className="m-0 flex items-center gap-[6px] font-['Inter:Medium',sans-serif] text-[12px] font-medium leading-none text-[#6B7280]">
-                    Use Code
-                    <span className="inline-flex items-center rounded-full bg-[#0B1220] px-[8px] py-[4px] font-['Inter:Bold',sans-serif] text-[11px] font-bold tracking-[0.05em] text-white">
-                      {ALT_PROMO_CODE}
-                    </span>
-                  </p>
+                <div className="flex min-w-0 flex-col gap-[3px] text-left">
+                  <span className="font-['Inter:Semi_Bold',sans-serif] text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6B7280]">{ALT_PROMO_LABEL}</span>
+                  <span className="font-['DM_Sans',sans-serif] text-[14px] font-bold leading-[18px] text-[#111827]">{ALT_PROMO_DEAL}</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={copyWelcomeCode}
+                  aria-label={welcomeCopied ? `Copied ${ALT_PROMO_CODE}` : `Copy code ${ALT_PROMO_CODE}`}
+                  className="inline-flex shrink-0 cursor-pointer items-center gap-[6px] rounded-full border-0 px-[10px] py-[6px] font-['Inter:Bold',sans-serif] text-[11px] font-bold tracking-[0.05em] text-white transition-transform duration-200 active:scale-[0.96]"
+                  style={{ background: welcomeCopied ? "#15803d" : "#0B1220" }}
+                >
+                  {welcomeCopied ? "Copied" : ALT_PROMO_CODE}
+                  {!welcomeCopied && (
+                    <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" strokeWidth="1.6" />
+                      <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5" stroke="currentColor" strokeWidth="1.6" />
+                    </svg>
+                  )}
+                </button>
               </div>
               <motion.div
                 ref={checkoutMagnet.ref}

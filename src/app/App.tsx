@@ -171,7 +171,6 @@ import {
   LIVE_PAYOUTS_VIGNETTE_OPACITY,
   LIVE_PAYOUTS_NOISE_OPACITY,
 } from "@/app/motion/livePayoutsMotion";
-import { HeroSceneGate } from "@/app/three/HeroSceneGate";
 import { PROVE_SKILL_CARD_REVEALS, PROVE_SKILL_SCROLL_HEIGHT_VH, PROVE_SKILL_MOBILE_CARD_REVEALS, PROVE_SKILL_MOBILE_SCROLL_HEIGHT_VH, type CardReveal } from "@/app/motion/proveSkillReveal";
 import { useMonotonicProgress } from "@/app/motion/scrollProgress";
 import {
@@ -1086,9 +1085,8 @@ function HeroBackground() {
     >
       {HERO_RADAR_ENABLED && <style>{HERO_SWEEP_CSS}</style>}
 
-      {/* Same backdrop as the "Proof in Numbers" section: navy base, faint
-          technical grid, two soft blue glows. All static (no animation), so it costs nothing per frame. */}
-      <div className="absolute inset-0 fyt-stars opacity-70" />
+      {/* Same backdrop as the dark redesign sections: navy base, faint
+          technical grid, two soft blue glows (no star field). All static (no animation), so it costs nothing per frame. */}
       <div className="absolute inset-0 fyt-grid-dark" />
       <div
         className="absolute rounded-full"
@@ -1099,7 +1097,6 @@ function HeroBackground() {
         style={{ right: "-10%", bottom: "-6%", width: 640, height: 640, background: "radial-gradient(circle, rgba(59,130,246,0.14), transparent 65%)" }}
       />
 
-      <HeroSceneGate />
 
       {/* Fixed 1440×1080 stage centered horizontally; scene coords are spec px */}
       <div className="absolute left-1/2 top-0 hidden lg:block" style={{ width: 1440, height: 1080, transform: "translateX(-50%)" }}>

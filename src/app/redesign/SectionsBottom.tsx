@@ -297,9 +297,21 @@ function DashboardStage() {
   const glow = useTransform(p, [0, 1], [0.15, 0.7]);
   return (
     <div ref={ref} className="relative w-full" style={{ perspective: 1400 }}>
-      <motion.div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[70%] w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ opacity: reduce ? 0.6 : glow, background: "radial-gradient(ellipse, rgba(37,99,235,0.6), transparent 68%)" }} />
+      {/* Lit "stage" so the dark screenshot reads on the dark section: a bright
+          blue core behind it, a soft wide halo, and a light floor reflection. */}
+      <motion.div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[88%] w-[96%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ opacity: reduce ? 0.9 : glow, background: "radial-gradient(ellipse at 50% 50%, rgba(96,165,250,0.55) 0%, rgba(37,99,235,0.4) 35%, transparent 70%)" }} />
+      <div aria-hidden="true" className="absolute inset-x-[8%] bottom-[-6%] h-[22%] rounded-[50%]" style={{ background: "radial-gradient(ellipse, rgba(147,197,253,0.35), transparent 70%)" }} />
       <motion.div className="relative" style={reduce ? undefined : { rotateX, scale, y, transformOrigin: "50% 100%" }}>
-        <img src={imgDashboardMockup} alt="FYT trader dashboard overview" loading="lazy" decoding="async" width={1280} height={983} className="relative h-auto w-full object-contain" />
+        <img
+          src={imgDashboardMockup}
+          alt="FYT trader dashboard overview"
+          loading="lazy"
+          decoding="async"
+          width={1280}
+          height={983}
+          className="relative h-auto w-full object-contain"
+          style={{ filter: "brightness(1.18) contrast(1.06) saturate(1.1) drop-shadow(0 0 1px rgba(191,219,254,0.85)) drop-shadow(0 0 18px rgba(96,165,250,0.35)) drop-shadow(0 40px 60px rgba(2,6,23,0.6))" }}
+        />
       </motion.div>
     </div>
   );
@@ -391,34 +403,42 @@ export function ProductShowcase() {
             <p className="text-[22px] font-semibold tracking-[-0.02em] text-white lg:text-[26px]">Trusted Support Team</p>
             <p className="mt-[8px] text-[15px] leading-[1.6] text-white/80">Fast, friendly support whenever traders need help.</p>
           </div>
-          <div className="relative grid grid-cols-4 gap-[8px]">
+          {/* 2x2 grid of equal tiles: icon + label, left aligned, live dot where it applies. */}
+          <div className="relative grid grid-cols-2 gap-[10px]">
             {SUPPORT_FEATURES.map(({ label, icon, action }) => {
+              const live = icon === "chat" || icon === "clock";
               const content: ReactNode = (
                 <>
-                  <span className="relative flex size-[42px] items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.16)", border: "1px solid rgba(255,255,255,0.22)" }}>
-                    {(icon === "chat" || icon === "clock") && (
-                      <span className="absolute right-0 top-0 size-[9px] rounded-full bg-[#4ade80] shadow-[0_0_6px_rgba(74,222,128,0.8)]" />
-                    )}
+                  <span className="relative flex size-[38px] shrink-0 items-center justify-center rounded-[12px]" style={{ background: "rgba(255,255,255,0.16)", border: "1px solid rgba(255,255,255,0.24)" }}>
                     <SupportFeatureIcon kind={icon} />
                   </span>
-                  <span className="text-[11px] font-medium text-white sm:text-[12px]">{label}</span>
+                  <span className="flex min-w-0 flex-col gap-[3px] text-left">
+                    <span className="truncate text-[13px] font-semibold leading-tight text-white sm:text-[14px]">{label}</span>
+                    {live && (
+                      <span className="flex items-center gap-[5px] text-[11px] font-medium leading-none text-[#bbf7d0]">
+                        <span className="size-[6px] rounded-full bg-[#4ade80] shadow-[0_0_6px_rgba(74,222,128,0.8)]" />
+                        Online
+                      </span>
+                    )}
+                  </span>
                 </>
               );
-              const cls = "flex flex-col items-center gap-[8px] text-center transition-[scale] duration-200 hover:scale-105";
+              const cls = "flex min-h-[64px] items-center gap-[12px] rounded-[16px] px-[12px] py-[12px] text-left transition-[background-color,translate] duration-200 hover:-translate-y-[2px] sm:px-[14px]";
+              const tileStyle = { background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.16)" } as const;
               if (action === "intercom")
                 return (
-                  <button key={label} type="button" onClick={() => void openIntercomMessenger()} aria-label="Open live chat" className={`${cls} cursor-pointer border-0 bg-transparent p-0`}>
+                  <button key={label} type="button" onClick={() => void openIntercomMessenger()} aria-label="Open live chat" className={`${cls} cursor-pointer`} style={tileStyle}>
                     {content}
                   </button>
                 );
               if (action === "email")
                 return (
-                  <a key={label} href={SUPPORT_EMAIL_HREF} aria-label="Email support" className={`${cls} no-underline`}>
+                  <a key={label} href={SUPPORT_EMAIL_HREF} aria-label="Email support" className={`${cls} no-underline`} style={tileStyle}>
                     {content}
                   </a>
                 );
               return (
-                <div key={label} className={cls}>
+                <div key={label} className={cls} style={tileStyle}>
                   {content}
                 </div>
               );
@@ -427,7 +447,7 @@ export function ProductShowcase() {
           <button
             type="button"
             onClick={() => void openIntercomMessenger()}
-            className="group relative inline-flex w-fit cursor-pointer items-center gap-[8px] self-start rounded-full border-0 bg-white px-[22px] py-[13px] text-[14px] font-semibold text-[#1d4ed8] transition-[translate] duration-300 hover:-translate-y-[2px]"
+            className="group relative mt-auto inline-flex w-full cursor-pointer items-center justify-center gap-[8px] rounded-full border-0 bg-white px-[22px] py-[13px] text-[14px] font-semibold text-[#1d4ed8] transition-[translate] duration-300 hover:-translate-y-[2px] sm:w-fit sm:self-start"
           >
             Chat with us
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="transition-transform duration-300 group-hover:translate-x-[4px]" aria-hidden="true">

@@ -6,7 +6,8 @@ import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import { EASE } from "./ui";
 
 /** "40% off" pulled from the deal line (e.g. "Limited Time: 40% off + Buy 1 Get 3 Instantly"), so it follows the promo data automatically. */
-const DEAL_SHORT = (PROMO_DEAL_LINE.match(/\d+%\s*off/i)?.[0] ?? PROMO_DEAL_LINE.split("+")[0]).trim();
+/** "40% off + Buy 1 Get 3" (drops "Limited Time:" and "Instantly") for the floating button. */
+const DEAL_COMPACT = PROMO_DEAL_LINE.replace(/^limited time:\s*/i, "").replace(/\s*instantly\s*$/i, "");
 
 function useNow(active = true) {
   const [now, setNow] = useState(() => Date.now());
@@ -240,7 +241,7 @@ export function FloatingCta() {
           animate={{ opacity: 1, y: 0, x: "-50%" }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: 40, x: "-50%" }}
           transition={{ duration: 0.45, ease: EASE }}
-          className="fyt-rd cta-shine group fixed left-1/2 z-[2147482980] flex max-w-[calc(100vw-150px)] items-center gap-[10px] rounded-full py-[8px] pl-[18px] pr-[18px] min-[380px]:pl-[8px] no-underline sm:max-w-none sm:gap-[14px] sm:pr-[22px]"
+          className="fyt-rd cta-shine group fixed left-1/2 z-[2147482980] flex max-w-[calc(100vw-140px)] items-center gap-[12px] rounded-full py-[6px] pl-[18px] pr-[6px] no-underline sm:max-w-none sm:gap-[14px] sm:py-[8px] sm:pl-[8px] sm:pr-[22px]"
           style={{
             // Inline so the shared .cta-shine rule (position: relative) can't override it.
             position: "fixed",
@@ -248,18 +249,25 @@ export function FloatingCta() {
             background: "linear-gradient(180deg, #4f8cff 0%, #2563eb 100%)",
             boxShadow: "0 18px 40px -12px rgba(37,99,235,0.8), 0 0 0 1px rgba(191,219,254,0.35), inset 0 1px 0 rgba(255,255,255,0.35)",
           }}
-          aria-label={`Start Challenge, ${PROMO_DEAL_LINE}`}
+          aria-label={`Claim offer: ${PROMO_DEAL_LINE}`}
         >
-          <span className="hidden shrink-0 whitespace-nowrap rounded-full bg-white px-[10px] py-[6px] min-[380px]:inline text-[11px] font-bold uppercase tracking-[0.04em] text-[#1d4ed8] sm:text-[12px]">{DEAL_SHORT}</span>
-          <span className="whitespace-nowrap text-[14px] font-semibold text-white sm:text-[15px]">Start Challenge</span>
+          {/* Phones: two compact lines. Desktop: offer chip + action + timer on one line. */}
+          <span className="flex min-w-0 flex-col leading-none sm:hidden">
+            <span className="whitespace-nowrap text-[14px] font-semibold text-white">Claim Offer</span>
+            <span className="mt-[3px] whitespace-nowrap text-[10.5px] font-semibold uppercase tracking-[0.03em] text-[#dbeafe]">{DEAL_COMPACT}</span>
+          </span>
+          <span className="hidden shrink-0 whitespace-nowrap rounded-full bg-white px-[11px] py-[6px] text-[12px] font-bold uppercase tracking-[0.04em] text-[#1d4ed8] sm:inline">{DEAL_COMPACT}</span>
+          <span className="hidden whitespace-nowrap text-[15px] font-semibold text-white sm:inline">Claim Offer</span>
           {!left.expired && (
             <span className="tabular hidden whitespace-nowrap rounded-full px-[10px] py-[5px] text-[12px] font-semibold text-white sm:inline-flex" style={{ background: "rgba(3,6,13,0.28)" }}>
-              {Number(left.hh) >= 24 ? `${Math.floor(Number(left.hh) / 24)}d ${String(Number(left.hh) % 24).padStart(2, "0")}` : left.hh}:{left.mm}:{left.ss} left
+              Ends in {Number(left.hh) >= 24 ? `${Math.floor(Number(left.hh) / 24)}d ${String(Number(left.hh) % 24).padStart(2, "0")}` : left.hh}:{left.mm}:{left.ss}
             </span>
           )}
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="hidden shrink-0 transition-transform duration-300 group-hover:translate-x-[4px] min-[400px]:block" aria-hidden="true">
-            <path d="M3.333 8h9.334M8.667 4l4 4-4 4" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <span aria-hidden="true" className="flex size-[30px] shrink-0 items-center justify-center rounded-full bg-white sm:size-auto sm:bg-transparent">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" className="shrink-0 transition-transform duration-300 group-hover:translate-x-[4px]">
+              <path d="M3.333 8h9.334M8.667 4l4 4-4 4" className="stroke-[#1d4ed8] sm:stroke-white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
         </motion.a>
       )}
     </AnimatePresence>

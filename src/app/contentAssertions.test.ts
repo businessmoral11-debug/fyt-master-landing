@@ -1035,10 +1035,10 @@ describe("Pricing panel: original price shown struck through", () => {
     const app = read("./BelowFold.tsx");
     const pricingBody = sliceToNextFunction(app, "function Pricing()");
     expect(pricingBody).toContain("entry.priceOld > entry.priceNew");
-    expect(pricingBody).toContain("${entry.priceOld.toFixed(2)}");
+    expect(pricingBody).toContain("{formatWholePrice(entry.priceOld)}");
     expect(pricingBody).toContain("line-through");
-    const oldIdx = pricingBody.indexOf("entry.priceOld.toFixed(2)");
-    const newIdx = pricingBody.indexOf("entry.priceNew.toFixed(2)");
+    const oldIdx = pricingBody.indexOf("{formatWholePrice(entry.priceOld)}");
+    const newIdx = pricingBody.indexOf("{priceParts.dollars}</span>");
     expect(oldIdx).toBeGreaterThan(-1);
     expect(newIdx).toBeGreaterThan(oldIdx);
   });
