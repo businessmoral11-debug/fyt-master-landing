@@ -2081,18 +2081,18 @@ export function Pricing() {
 
               {/* New-trader alternative: one tidy coupon row, tap the code to copy. */}
               <div
-                className="flex w-full items-center justify-between gap-[10px] rounded-[14px] px-[14px] py-[11px]"
+                className="flex w-full items-center justify-between gap-[8px] rounded-[14px] px-[12px] py-[11px]"
                 style={{ border: "1px dashed rgba(37,99,235,0.35)", background: "#F8FAFF" }}
               >
                 <div className="flex min-w-0 flex-col gap-[3px] text-left">
-                  <span className="font-['Inter:Semi_Bold',sans-serif] text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6B7280]">{ALT_PROMO_LABEL}</span>
-                  <span className="font-['DM_Sans',sans-serif] text-[14px] font-bold leading-[18px] text-[#111827]">{ALT_PROMO_DEAL}</span>
+                  <span className="whitespace-nowrap font-['Inter:Semi_Bold',sans-serif] text-[10px] font-semibold uppercase tracking-[0.06em] text-[#6B7280]">{ALT_PROMO_LABEL}</span>
+                  <span className="whitespace-nowrap font-['DM_Sans',sans-serif] text-[14px] font-bold leading-[18px] text-[#111827]">{ALT_PROMO_DEAL}</span>
                 </div>
                 <button
                   type="button"
                   onClick={copyWelcomeCode}
                   aria-label={welcomeCopied ? `Copied ${ALT_PROMO_CODE}` : `Copy code ${ALT_PROMO_CODE}`}
-                  className="inline-flex shrink-0 cursor-pointer items-center gap-[6px] rounded-full border-0 px-[10px] py-[6px] font-['Inter:Bold',sans-serif] text-[11px] font-bold tracking-[0.05em] text-white transition-transform duration-200 active:scale-[0.96]"
+                  className="inline-flex shrink-0 cursor-pointer items-center gap-[5px] rounded-full border-0 px-[9px] py-[6px] font-['Inter:Bold',sans-serif] text-[11px] font-bold tracking-[0.05em] text-white transition-transform duration-200 active:scale-[0.96]"
                   style={{ background: welcomeCopied ? "#15803d" : "#0B1220" }}
                 >
                   {welcomeCopied ? "Copied" : ALT_PROMO_CODE}

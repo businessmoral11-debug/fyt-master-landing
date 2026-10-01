@@ -385,7 +385,7 @@ export function ProductShowcase() {
               </div>
             ))}
           </div>
-          <p className="flex items-center gap-[8px] text-[13px] font-medium text-[#93c5fd]">
+          <p className="mt-auto flex items-center gap-[8px] text-[13px] font-medium text-[#93c5fd]">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M8 1.5l5.5 2v4c0 3.5-2.3 6.2-5.5 7-3.2-.8-5.5-3.5-5.5-7v-4l5.5-2Z" stroke="#93c5fd" strokeWidth="1.3" strokeLinejoin="round" />
             </svg>
