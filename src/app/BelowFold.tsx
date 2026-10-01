@@ -2143,7 +2143,7 @@ export function Pricing() {
                     />
                   )}
                   <div className="relative flex items-center justify-center gap-[8px] h-full">
-                    <p className="font-['DM_Sans',sans-serif] font-semibold text-[16px] text-white">Start Challenge</p>
+                    <p className="font-['DM_Sans',sans-serif] font-semibold text-[16px] text-white">{step === "Instant" ? "Get Funded" : "Start Challenge"}</p>
                     <svg
                       width="14"
                       height="14"
