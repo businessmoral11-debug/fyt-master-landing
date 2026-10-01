@@ -19,33 +19,20 @@ function useNow(active = true) {
   return now;
 }
 
-function Digit({ value, label }: { value: string; label: string }) {
-  const reduce = useReducedMotion();
+/** One countdown unit, e.g. "06" + "d". Plain text, no boxes, so the card stays calm. */
+function TimeUnit({ value, unit }: { value: string; unit: string }) {
   return (
-    <div className="flex flex-col items-center gap-[4px]">
-      <div
-        className="relative flex h-[46px] w-[50px] items-center justify-center overflow-hidden rounded-[12px] sm:h-[52px] sm:w-[58px]"
-        style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03))", border: "1px solid rgba(148,178,255,0.2)" }}
-      >
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span
-            key={value}
-            className="tabular absolute text-[22px] font-semibold tracking-[-0.02em] text-white sm:text-[26px]"
-            initial={reduce ? false : { y: "70%", opacity: 0 }}
-            animate={{ y: "0%", opacity: 1 }}
-            exit={reduce ? undefined : { y: "-70%", opacity: 0 }}
-            transition={{ duration: 0.35, ease: EASE }}
-          >
-            {value}
-          </motion.span>
-        </AnimatePresence>
-      </div>
-      <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#7f8aa6]">{label}</span>
-    </div>
+    <span className="inline-flex items-baseline">
+      <span className="tabular text-[22px] font-semibold tracking-[-0.02em] text-white sm:text-[26px]">{value}</span>
+      <span className="ml-[2px] text-[13px] font-medium text-[#7f8aa6]">{unit}</span>
+    </span>
   );
 }
 
-/** Offer + countdown + benefits, shown right above the challenge picker. */
+/** "40% off + Buy 1 Get 3 Instantly" (the "Limited time" part is the small label above it). */
+const DEAL_HEADLINE = PROMO_DEAL_LINE.replace(/^limited time:\s*/i, "");
+
+/** Offer + countdown, shown right above the challenge picker. Kept deliberately quiet. */
 export function PricingOffer() {
   const ref = useRef<HTMLDivElement>(null);
   const onScreen = useInView(ref, { margin: "100px" });
@@ -55,54 +42,53 @@ export function PricingOffer() {
   return (
     <motion.div
       ref={ref}
-      className={`fyt-rd fyt-ring relative w-full overflow-hidden rounded-[22px] p-[18px] sm:p-[22px] lg:p-[26px] ${onScreen ? "fyt-live" : ""}`}
+      className={`fyt-rd relative w-full overflow-hidden rounded-[20px] p-[20px] sm:p-[24px] lg:px-[32px] lg:py-[28px] ${onScreen ? "fyt-live" : ""}`}
+      style={{
+        background: "linear-gradient(180deg, rgba(37,99,235,0.16) 0%, rgba(255,255,255,0.02) 100%)",
+        border: "1px solid rgba(148,178,255,0.18)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.07), 0 30px 60px -40px rgba(37,99,235,0.6)",
+      }}
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
       transition={{ duration: 0.7, ease: EASE }}
     >
-      <div aria-hidden="true" className="pointer-events-none absolute -left-[60px] -top-[80px] size-[240px] rounded-full" style={{ background: "radial-gradient(circle, rgba(59,130,246,0.35), transparent 70%)" }} />
-      <div className="relative flex flex-col gap-[18px] lg:flex-row lg:items-center lg:justify-between">
+      <div className="relative flex flex-col gap-[18px] lg:flex-row lg:items-center lg:justify-between lg:gap-[32px]">
         <div className="flex flex-col gap-[10px]">
-          <span className="inline-flex w-fit items-center gap-[8px] rounded-full px-[10px] py-[5px] text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#fecaca", background: "rgba(220,38,38,0.16)", border: "1px solid rgba(248,113,113,0.35)" }}>
+          <span className="flex items-center gap-[8px] text-[11px] font-semibold uppercase tracking-[0.16em] text-[#fca5a5]">
             <span className="relative flex size-[6px]">
               <span className="fyt-rd-ping-gated absolute inset-0 rounded-full bg-[#f87171]" />
               <span className="relative size-[6px] rounded-full bg-[#f87171]" />
             </span>
-            {left.expired ? "Offer" : "Offer ends in"}
+            Limited time
           </span>
-          <p className="text-[22px] font-semibold leading-[1.15] tracking-[-0.02em] text-white sm:text-[26px]">{PROMO_DEAL_LINE}</p>
-          <p className="flex flex-wrap items-center gap-[8px] text-[13px] text-[#9aa6c2]">
-            <span className="inline-flex items-center gap-[6px] rounded-full bg-[#0b1220] px-[10px] py-[4px] text-[12px] font-semibold tracking-[0.06em] text-white" style={{ border: "1px solid rgba(148,178,255,0.25)" }}>
-              <span className="text-[#93c5fd]">CODE</span> {PROMO_CODE}
+          <p className="text-[24px] font-semibold leading-[1.15] tracking-[-0.025em] text-white sm:text-[28px]">{DEAL_HEADLINE}</p>
+          <p className="flex flex-wrap items-center gap-x-[8px] gap-y-[4px] text-[13px] text-[#9aa6c2]">
+            Code
+            <span className="rounded-full bg-[#0b1220] px-[10px] py-[3px] text-[12px] font-semibold tracking-[0.06em] text-white" style={{ border: "1px solid rgba(148,178,255,0.25)" }}>
+              {PROMO_CODE}
             </span>
-            Applied at checkout
+            applied at checkout
           </p>
         </div>
         {!left.expired && (
-          <div className="flex items-start gap-[6px] sm:gap-[8px]" role="timer" aria-label={`${days} days ${Number(hours)} hours ${Number(left.mm)} minutes left`}>
-            {days > 0 && (
-              <>
-                <Digit value={String(days).padStart(2, "0")} label="Days" />
-                <span className="pt-[10px] text-[22px] font-semibold text-[#5b6b8f]">:</span>
-              </>
-            )}
-            <Digit value={hours} label="Hours" />
-            <span className="pt-[10px] text-[22px] font-semibold text-[#5b6b8f]">:</span>
-            <Digit value={left.mm} label="Min" />
-            <span className="pt-[10px] text-[22px] font-semibold text-[#5b6b8f]">:</span>
-            <Digit value={left.ss} label="Sec" />
+          <div className="flex flex-col gap-[6px] border-t pt-[16px] lg:items-end lg:border-t-0 lg:border-l lg:pl-[32px] lg:pt-0" style={{ borderColor: "rgba(148,178,255,0.14)" }}>
+            <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#7f8aa6]">Ends in</span>
+            <div className="flex items-baseline gap-[12px]" role="timer" aria-label={`${days} days ${Number(hours)} hours ${Number(left.mm)} minutes left`}>
+              {days > 0 && <TimeUnit value={String(days).padStart(2, "0")} unit="d" />}
+              <TimeUnit value={hours} unit="h" />
+              <TimeUnit value={left.mm} unit="m" />
+              <TimeUnit value={left.ss} unit="s" />
+            </div>
           </div>
         )}
       </div>
-      <ul className="relative mt-[18px] grid grid-cols-2 gap-[8px] border-t pt-[16px] sm:flex sm:flex-wrap sm:gap-x-[22px]" style={{ borderColor: "rgba(148,178,255,0.14)" }}>
+      <ul className="relative mt-[20px] hidden flex-wrap gap-x-[22px] gap-y-[8px] border-t pt-[16px] lg:flex" style={{ borderColor: "rgba(148,178,255,0.12)" }}>
         {PROMO_BENEFITS.map((b) => (
-          <li key={b} className="flex items-center gap-[8px] text-[12px] font-medium text-[#dbe6ff] sm:text-[13px]">
-            <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full" style={{ background: "linear-gradient(180deg, #4f8cff, #2563eb)" }}>
-              <svg width="9" height="9" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M11.6662 3.5L5.25017 9.9162L2.3338 6.99975" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
+          <li key={b} className="flex items-center gap-[8px] text-[13px] font-medium text-[#c7d4f0]">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M11.6662 3.5L5.25017 9.9162L2.3338 6.99975" stroke="#60a5fa" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
             {b}
           </li>
         ))}

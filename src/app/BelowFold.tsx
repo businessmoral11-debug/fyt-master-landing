@@ -1840,16 +1840,15 @@ export function Pricing() {
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); setShowExplainerVideo(true); }}
-              className="flex items-center justify-center lg:justify-start gap-[14px] px-[16px] py-[14px] rounded-[12px] shrink-0 no-underline w-full lg:w-[300px] relative overflow-hidden transition-[border-color,transform] duration-300 hover:border-[rgba(59,130,246,0.4)] hover:-translate-y-[2px]"
-              style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)" }}
+              className="flex items-center justify-center lg:justify-start gap-[10px] lg:gap-[14px] p-0 lg:px-[16px] lg:py-[14px] rounded-full lg:rounded-[12px] shrink-0 no-underline w-auto lg:w-[300px] relative overflow-hidden border-0 bg-transparent cursor-pointer lg:border lg:border-solid lg:border-[rgba(255,255,255,0.1)] lg:bg-[rgba(255,255,255,0.02)] transition-[border-color,transform] duration-300 lg:hover:border-[rgba(59,130,246,0.4)] lg:hover:-translate-y-[2px]"
             >
               <motion.div
-                className="flex items-center justify-center rounded-full size-[44px] shrink-0"
-                style={{ border: "1.5px solid #3b82f6", background: "rgba(59,130,246,0.08)", boxShadow: "0 0 16px rgba(59,130,246,0.6)" }}
+                className="flex items-center justify-center rounded-full size-[34px] lg:size-[44px] shrink-0"
+                style={{ border: "1.5px solid #3b82f6", background: "rgba(59,130,246,0.08)", boxShadow: "0 0 12px rgba(59,130,246,0.45)" }}
               >
-                <svg width="14" height="16" viewBox="0 0 14 16" fill="none" className="ml-[2px]"><path d="M1 1L13 8L1 15V1Z" fill="white" /></svg>
+                <svg width="14" height="16" viewBox="0 0 14 16" fill="none" className="ml-[2px] h-[12px] w-[11px] lg:h-[16px] lg:w-[14px]"><path d="M1 1L13 8L1 15V1Z" fill="white" /></svg>
               </motion.div>
-              <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-white text-[14px]">See how it works</p>
+              <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#c9d6f2] lg:text-white text-[14px]">See how it works</p>
               <div className="hidden lg:flex items-end gap-[3px] absolute right-[16px] bottom-[14px] h-[28px]" aria-hidden="true">
                 {[6, 12, 18, 24, 14, 20, 10].map((h, i) => (
                   <motion.div

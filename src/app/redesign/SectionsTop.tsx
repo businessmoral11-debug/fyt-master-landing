@@ -350,15 +350,10 @@ const PRICING_SLOTS = { offerSlot: <PricingOffer />, afterCheckoutSlot: <Pricing
 
 export function PricingSection() {
   return (
-    <div className="fyt-rd relative w-full shrink-0 overflow-hidden" style={{ background: `radial-gradient(120% 70% at 50% 0%, #0a1733 0%, ${C.ink} 55%)` }}>
+    <div className="fyt-rd relative w-full shrink-0 overflow-hidden" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, ${C.ink} 70%)` }}>
+      {/* Calm backdrop: one soft glow at the top, nothing else. */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute inset-0 fyt-stars opacity-60" />
-        <div className="absolute inset-0 fyt-grid-dark" />
-        <div
-          className="absolute left-1/2 top-0 h-[520px] w-[1100px] -translate-x-1/2 -translate-y-[55%] rounded-[50%]"
-          style={{ border: "1px solid rgba(96,165,250,0.35)", boxShadow: "0 0 90px 10px rgba(37,99,235,0.35), inset 0 0 90px rgba(37,99,235,0.25)" }}
-        />
-        <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.4), transparent)" }} />
+        <div className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       </div>
       <div className="relative mx-auto w-full max-w-[1296px]">
         <PricingSlotsContext.Provider value={PRICING_SLOTS}>
