@@ -2080,7 +2080,7 @@ export function Pricing() {
 
               {/* New-trader alternative: one tidy coupon row, tap the code to copy. */}
               <div
-                className="flex w-full items-center justify-between gap-[8px] rounded-[14px] px-[12px] py-[11px]"
+                className="flex w-full flex-wrap items-center justify-between gap-x-[8px] gap-y-[8px] rounded-[14px] px-[12px] py-[11px]"
                 style={{ border: "1px dashed rgba(37,99,235,0.35)", background: "#F8FAFF" }}
               >
                 <div className="flex min-w-0 flex-col gap-[3px] text-left">
