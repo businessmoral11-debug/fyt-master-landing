@@ -62,7 +62,7 @@ describe("redesigned below-the-fold", () => {
   });
 
   it("reuses the shared data and functional components instead of copies", () => {
-    for (const name of ["PROVE_SKILL_CARDS", "PROOF_STATS", "HOW_IT_WORKS_STEPS", "COMPARISON_ROWS", "FAQ_ITEMS", "FOOTER_COLUMNS", "<Pricing />", "<FooterLegalText />", "<TradingGlobeSlot />", "<TrustindexWidget />", "<FeaturedCertificates />", "<RecentVerifiedRewards />"]) {
+    for (const name of ["PROVE_SKILL_CARDS", "PROOF_STATS", "HOW_IT_WORKS_STEPS", "COMPARISON_ROWS", "FAQ_ITEMS", "FOOTER_COLUMNS", "<Pricing />", "<FooterLegalText />", "<TradingGlobeSlot />", "<TrustindexWidget />", 'data-fyt-embed="certificates"', 'data-fyt-embed="payouts"', "rewards.fundingyourtrades.com/fyt-embed.js"]) {
       expect(all, name).toContain(name);
     }
   });

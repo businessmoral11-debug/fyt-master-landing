@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import imgPressBarchart from "@/assets/live-site/press-logos/barchart.webp";
 import imgPressBenzinga from "@/assets/live-site/press-logos/benzinga.webp";
@@ -25,8 +25,6 @@ import {
 import { C, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent, useShimmer } from "./ui";
 import { PricingOffer, PricingTrustLine } from "./Conversion";
 
-const FeaturedCertificates = lazy(() => import("@/app/featuredCertificates").then((m) => ({ default: m.FeaturedCertificates })));
-const RecentVerifiedRewards = lazy(() => import("@/app/recentVerifiedRewards").then((m) => ({ default: m.RecentVerifiedRewards })));
 
 /* ------------------------------------------------------------------ */
 /* As featured in — edge-faded logo marquee                            */
@@ -312,6 +310,35 @@ export function ProofInNumbers() {
 /* Live rewards / verified proofs                                      */
 /* ------------------------------------------------------------------ */
 
+const FYT_EMBED_SRC = "https://rewards.fundingyourtrades.com/fyt-embed.js";
+
+/**
+ * Official FYT rewards embed (certificates + payouts), served from
+ * rewards.fundingyourtrades.com. The embed script scans the page once when it
+ * runs, so it is added only after these placeholders are on the page (and
+ * re-added if the section mounts again).
+ */
+function FytRewardsEmbed() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const host = ref.current;
+    if (!host) return;
+    const script = document.createElement("script");
+    script.src = FYT_EMBED_SRC;
+    script.async = true;
+    host.appendChild(script);
+    return () => {
+      script.remove();
+    };
+  }, []);
+  return (
+    <div ref={ref} className="flex w-full flex-col gap-[28px]">
+      <div data-fyt-embed="certificates" />
+      <div data-fyt-embed="payouts" />
+    </div>
+  );
+}
+
 export function LivePayouts() {
   return (
     <Section tone="light" id="live-payouts">
@@ -321,18 +348,9 @@ export function LivePayouts() {
         </Eyebrow>
         <SectionTitle tone="light" center lead="Live Rewards." highlight="Verified" trail="Proofs." />
       </div>
-      <Reveal delay={0.1} className="mt-[40px] w-full lg:mt-[56px]">
-        <Suspense fallback={<div className="h-[320px]" />}>
-          <FeaturedCertificates />
-        </Suspense>
-      </Reveal>
-      <Reveal delay={0.1} className="mt-[28px] w-full">
-        <div className="rounded-[26px] bg-white p-[10px] sm:p-[18px] lg:p-[26px]" style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 40px 80px -48px rgba(30,64,175,0.45)" }}>
-          <Suspense fallback={<div className="h-[420px]" />}>
-            <RecentVerifiedRewards />
-          </Suspense>
-        </div>
-      </Reveal>
+      <div className="mt-[40px] w-full lg:mt-[56px]">
+        <FytRewardsEmbed />
+      </div>
       <Reveal delay={0.1} className="mt-[40px] flex justify-center">
         <Pill href="https://rewards.fundingyourtrades.com/" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
           Check More Rewards
