@@ -34,8 +34,8 @@ export const PROMO_ITEMS: PromoItem[] = [
   { kind: "code", label: "The NEW FYT Deal", text: "40% off + Buy 1 Get 3", code: PROMO_CODE },
 ];
 
-/** 7-day AWARD40 offer: ends Wednesday 7 Oct 17:59:59 IST (UTC+5:30). */
-export const PROMO_DEADLINE = "2026-10-07T17:59:59+05:30";
+/** AWARD40 offer: ends Thursday 8 Oct 17:59:59 IST (UTC+5:30), extended 1 day from 7 Oct. */
+export const PROMO_DEADLINE = "2026-10-08T17:59:59+05:30";
 
 export interface Countdown {
   days: number;
