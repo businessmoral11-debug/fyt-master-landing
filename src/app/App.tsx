@@ -1127,7 +1127,7 @@ const HERO_WORD_REVEAL_CSS = `
 `;
 let heroWordRevealStyleInjected = false;
 
-function RevealWords({ text }: { text: string }) {
+function RevealWords({ text, start = 0 }: { text: string; start?: number }) {
   const reduceMotion = useReducedMotion();
   // Moved off Framer Motion's JS-driven spring and onto a plain CSS
   // @keyframes animation. The headline reveal fires right at page load,
@@ -1150,7 +1150,7 @@ function RevealWords({ text }: { text: string }) {
     <>
       {words.map((word, i) => (
         <span key={i} className="inline-block overflow-hidden align-top pb-[0.1em] -mb-[0.1em]">
-          <span className="hero-word-in" style={{ animationDelay: `${0.1 + i * 0.055}s` }}>
+          <span className="hero-word-in" style={{ animationDelay: `${0.1 + (start + i) * 0.055}s` }}>
             {word}
             {i < words.length - 1 ? " " : ""}
           </span>
@@ -1324,6 +1324,29 @@ function HeroTrustindexGate() {
 
 const HERO_ANIMATIONS_ACTIVE_MARGIN_PX = 600;
 
+/**
+ * "Hidden" in the hero headline: it starts blacked out like a classified
+ * document, then a thin light scans across, pulls the redaction bar away and
+ * brings the blurred letters into focus. Every few seconds it is briefly
+ * redacted and revealed again. CSS-only (see .hero-hidden in redesign.css),
+ * paused with the other hero animations when the hero is off screen.
+ */
+function HiddenWord({ delayIndex = 0 }: { delayIndex?: number }) {
+  const reduceMotion = useReducedMotion();
+  if (reduceMotion) return <>Hidden</>;
+  return (
+    <span className="inline-block overflow-hidden align-top pb-[0.1em] -mb-[0.1em]">
+      <span className="hero-word-in" style={{ animationDelay: `${0.1 + delayIndex * 0.055}s` }}>
+        <span className="hero-hidden">
+          <span className="hero-hidden-text">Hidden</span>
+          <span aria-hidden="true" className="hero-hidden-bar" />
+          <span aria-hidden="true" className="hero-hidden-scan" />
+        </span>
+      </span>
+    </span>
+  );
+}
+
 function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [animationsActive, setAnimationsActive] = useState(true);
@@ -1363,7 +1386,7 @@ function Hero() {
           style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}
         >
           {/* Design spec capitalizes "Without" — HERO_CONTENT.headlineMain (live-site manifest, lowercase "without") is correct as a record of the live site but not used for this specific render */}
-          <span className="block text-white"><RevealWords text="Trade Without Hidden Rules." /></span>
+          <span className="block text-white"><RevealWords text="Trade Without" /> <HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
           <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
         </h1>
         <div className="h-[16px] lg:h-[32px] shrink-0" />

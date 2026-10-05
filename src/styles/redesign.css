@@ -205,3 +205,71 @@
   padding-top: 0;
   padding-bottom: 0;
 }
+
+/* ---- Hero: the word "Hidden" is redacted, then scanned and revealed ---- */
+.hero-hidden {
+  position: relative;
+  display: inline-block;
+}
+.hero-hidden-text {
+  display: inline-block;
+  animation: hero-hidden-text 8s cubic-bezier(0.65, 0, 0.35, 1) 0.55s infinite both;
+}
+.hero-hidden-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0.16em;
+  bottom: 0.06em;
+  border-radius: 0.12em;
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.07) 0 2px, transparent 2px 9px),
+    linear-gradient(180deg, #1c2945, #0c1428);
+  box-shadow: inset 0 0 0 1px rgba(148, 178, 255, 0.3), 0 0 24px rgba(37, 99, 235, 0.18);
+  transform-origin: right center;
+  animation: hero-hidden-bar 8s cubic-bezier(0.65, 0, 0.35, 1) 0.55s infinite both;
+  pointer-events: none;
+}
+.hero-hidden-scan {
+  position: absolute;
+  inset: 0.08em 0;
+  pointer-events: none;
+  animation: hero-hidden-scan 8s cubic-bezier(0.65, 0, 0.35, 1) 0.55s infinite both;
+}
+.hero-hidden-scan::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 3px;
+  background: #bfdbfe;
+  box-shadow: 0 0 12px 3px rgba(96, 165, 250, 0.85), 0 0 28px 8px rgba(59, 130, 246, 0.45);
+}
+/* Timeline (8s loop): 0-7% redacted, 7-17% scan reveals, 17-86% readable,
+   86-93% scan redacts again, 93-100% redacted, then it starts over. */
+@keyframes hero-hidden-text {
+  0%, 7% { filter: blur(0.12em); opacity: 0.35; }
+  17%, 86% { filter: blur(0); opacity: 1; }
+  93%, 100% { filter: blur(0.12em); opacity: 0.35; }
+}
+@keyframes hero-hidden-bar {
+  0%, 7% { transform: scaleX(1); transform-origin: right center; }
+  17% { transform: scaleX(0); transform-origin: right center; }
+  17.01%, 86% { transform: scaleX(0); transform-origin: left center; }
+  93%, 100% { transform: scaleX(1); transform-origin: left center; }
+}
+@keyframes hero-hidden-scan {
+  0%, 7% { transform: translate3d(0, 0, 0); opacity: 0; }
+  8% { opacity: 1; }
+  16% { transform: translate3d(100%, 0, 0); opacity: 1; }
+  17%, 85% { transform: translate3d(100%, 0, 0); opacity: 0; }
+  86% { transform: translate3d(0, 0, 0); opacity: 0; }
+  87% { opacity: 1; }
+  92% { transform: translate3d(100%, 0, 0); opacity: 1; }
+  93%, 100% { transform: translate3d(100%, 0, 0); opacity: 0; }
+}
+.hero-anims-paused .hero-hidden-text,
+.hero-anims-paused .hero-hidden-bar,
+.hero-anims-paused .hero-hidden-scan { animation-play-state: paused; }
