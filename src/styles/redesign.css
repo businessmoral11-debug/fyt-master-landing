@@ -205,3 +205,72 @@
   padding-top: 0;
   padding-bottom: 0;
 }
+
+/* ---- Hero: the word "Hidden" burns away, then comes back (7s loop) ---- */
+@property --hero-burn {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -10%;
+}
+.hero-burn {
+  position: relative;
+  display: inline-block;
+}
+.hero-burn-text {
+  display: inline-block;
+  -webkit-mask-image: linear-gradient(90deg, transparent calc(var(--hero-burn) - 6%), #000 calc(var(--hero-burn) + 6%));
+          mask-image: linear-gradient(90deg, transparent calc(var(--hero-burn) - 6%), #000 calc(var(--hero-burn) + 6%));
+  animation: hero-burn-mask 7s cubic-bezier(0.45, 0, 0.55, 1) 0.9s infinite both;
+}
+.hero-burn-ember {
+  position: absolute;
+  top: 0.12em;
+  bottom: 0.02em;
+  left: 0;
+  width: 0.12em;
+  margin-left: -0.06em;
+  border-radius: 0.1em;
+  background: linear-gradient(180deg, #fde68a, #f97316 40%, #ef4444);
+  filter: blur(3px);
+  box-shadow: 0 0 22px 8px rgba(249, 115, 22, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  animation: hero-burn-ember 7s cubic-bezier(0.45, 0, 0.55, 1) 0.9s infinite both;
+}
+.hero-burn-ash {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 52%;
+  height: 0.045em;
+  border-radius: 0.04em;
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.9), rgba(249, 115, 22, 0.7));
+  opacity: 0;
+  pointer-events: none;
+  animation: hero-burn-ash 7s ease-in-out 0.9s infinite both;
+}
+/* Timeline: 0-8% readable, 8-34% burns left to right, 34-82% gone (red trace),
+   83% word is back, 100% loop. */
+@keyframes hero-burn-mask {
+  0%, 8% { --hero-burn: -10%; }
+  34%, 82% { --hero-burn: 110%; }
+  83%, 100% { --hero-burn: -10%; }
+}
+@keyframes hero-burn-ember {
+  0%, 8% { left: 0; opacity: 0; }
+  10% { opacity: 1; }
+  32% { left: 100%; opacity: 1; }
+  36%, 100% { left: 100%; opacity: 0; }
+}
+@keyframes hero-burn-ash {
+  0%, 30% { opacity: 0; }
+  38%, 80% { opacity: 0.9; }
+  84%, 100% { opacity: 0; }
+}
+/* Older browsers that can't animate the mask just show the plain word. */
+@supports not selector(:has(*)) {
+  .hero-burn-ember, .hero-burn-ash { display: none; }
+}
+.hero-anims-paused .hero-burn-text,
+.hero-anims-paused .hero-burn-ember,
+.hero-anims-paused .hero-burn-ash { animation-play-state: paused; }
