@@ -2080,10 +2080,10 @@ export function Pricing() {
 
               {/* New-trader alternative: one tidy coupon row, tap the code to copy. */}
               <div
-                className="flex w-full flex-wrap items-center justify-between gap-x-[8px] gap-y-[8px] rounded-[14px] px-[12px] py-[11px]"
+                className="flex w-full flex-col items-center justify-center gap-[8px] rounded-[14px] px-[12px] py-[12px] text-center"
                 style={{ border: "1px dashed rgba(37,99,235,0.35)", background: "#F8FAFF" }}
               >
-                <div className="flex min-w-0 flex-col gap-[3px] text-left">
+                <div className="flex min-w-0 flex-col items-center gap-[3px] text-center">
                   <span className="whitespace-nowrap font-['Inter:Semi_Bold',sans-serif] text-[10px] font-semibold uppercase tracking-[0.06em] text-[#6B7280]">{ALT_PROMO_LABEL}</span>
                   <span className="whitespace-nowrap font-['DM_Sans',sans-serif] text-[14px] font-bold leading-[18px] text-[#111827]">{ALT_PROMO_DEAL}</span>
                 </div>

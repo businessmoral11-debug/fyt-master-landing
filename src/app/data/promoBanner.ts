@@ -16,26 +16,29 @@ export const PROMO_BENEFITS = [
 ] as const;
 
 /** Deal line shown after benefits on the top banner. */
-export const PROMO_DEAL_LINE = "Limited Time: 40% off + Buy 1 Get 3 Instantly";
+export const PROMO_DEAL_LINE = "BOGO Deal: 35% off + Instant BOGO";
 
 /** Full banner copy order: deal first, then benefits. */
 export const PROMO_BANNER_ITEMS = [PROMO_DEAL_LINE, ...PROMO_BENEFITS] as const;
 
 /** Promo code shown in the top-banner CODE pill (also used at checkout). */
-export const PROMO_CODE = "AWARD40";
+export const PROMO_CODE = "FYT35";
 
 /** Alternate welcome offer shown on the pricing card (manual code entry). */
 export const ALT_PROMO_LABEL = "For new traders";
-export const ALT_PROMO_DEAL = "45% off + BOGO";
+export const ALT_PROMO_DEAL = "45% off + Instant BOGO";
 export const ALT_PROMO_CODE = "WELCOME45";
 
 /** Kept for pricing-panel badge / coupon references. */
 export const PROMO_ITEMS: PromoItem[] = [
-  { kind: "code", label: "The NEW FYT Deal", text: "40% off + Buy 1 Get 3", code: PROMO_CODE },
+  { kind: "code", label: "The NEW FYT Deal", text: "35% off + Instant BOGO", code: PROMO_CODE },
 ];
 
-/** AWARD40 offer: ends Thursday 8 Oct 22:59:59 IST (UTC+5:30), extended 5h from 17:59:59. */
+/** Previous AWARD40 offer end (kept for the countdown helpers; no countdown is shown now). */
 export const PROMO_DEADLINE = "2026-10-08T22:59:59+05:30";
+
+/** Spots left for the current offer, shown instead of a countdown. Updated by hand from real sales. */
+export const PROMO_SPOTS_LEFT = 247;
 
 export interface Countdown {
   days: number;

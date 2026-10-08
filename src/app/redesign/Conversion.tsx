@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
-import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEADLINE, PROMO_DEAL_LINE, formatHoursLeft } from "@/app/data/promoBanner";
+import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_SPOTS_LEFT } from "@/app/data/promoBanner";
 import { countryFlagUrl, fetchFeaturedPayouts, formatPayoutAmount, type PublicPayout } from "@/app/api/rewardsApi";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import { EASE } from "./ui";
 
-/** "40% off" pulled from the deal line (e.g. "Limited Time: 40% off + Buy 1 Get 3 Instantly"), so it follows the promo data automatically. */
-/** "40% off + Buy 1 Get 3" (drops "Limited Time:" and "Instantly") for the floating button. */
-const DEAL_COMPACT = PROMO_DEAL_LINE.replace(/^limited time:\s*/i, "").replace(/\s*instantly\s*$/i, "");
+/** Short deal for the floating button (drops a leading "BOGO Deal:" / "Limited Time:" and a trailing "Instantly"). */
+const DEAL_COMPACT = PROMO_DEAL_LINE.replace(/^(limited time|bogo deal):\s*/i, "").replace(/\s*instantly\s*$/i, "");
 
 function useNow(active = true) {
   const [now, setNow] = useState(() => Date.now());
@@ -29,16 +28,13 @@ function TimeUnit({ value, unit }: { value: string; unit: string }) {
   );
 }
 
-/** "40% off + Buy 1 Get 3 Instantly" (the "Limited time" part is the small label above it). */
+/** Deal headline for the offer card (a leading "Limited time:" is dropped). */
 const DEAL_HEADLINE = PROMO_DEAL_LINE.replace(/^limited time:\s*/i, "");
 
-/** Offer + countdown, shown right above the challenge picker. Kept deliberately quiet. */
+/** Offer + spots left, shown right above the challenge picker. Kept deliberately quiet. */
 export function PricingOffer() {
   const ref = useRef<HTMLDivElement>(null);
   const onScreen = useInView(ref, { margin: "100px" });
-  const left = formatHoursLeft(PROMO_DEADLINE, useNow(onScreen));
-  const days = Math.floor(Number(left.hh) / 24);
-  const hours = String(Number(left.hh) % 24).padStart(2, "0");
   return (
     <motion.div
       ref={ref}
@@ -60,7 +56,7 @@ export function PricingOffer() {
               <span className="fyt-rd-ping-gated absolute inset-0 rounded-full bg-[#f87171]" />
               <span className="relative size-[6px] rounded-full bg-[#f87171]" />
             </span>
-            Limited time
+            Limited spots
           </span>
           <p className="text-[24px] font-semibold leading-[1.15] tracking-[-0.025em] text-white sm:text-[28px]">{DEAL_HEADLINE}</p>
           <p className="flex flex-wrap items-center gap-x-[8px] gap-y-[4px] text-[13px] text-[#9aa6c2]">
@@ -71,17 +67,13 @@ export function PricingOffer() {
             applied at checkout
           </p>
         </div>
-        {!left.expired && (
-          <div className="flex flex-col gap-[6px] border-t pt-[16px] lg:items-end lg:border-t-0 lg:border-l lg:pl-[32px] lg:pt-0" style={{ borderColor: "rgba(148,178,255,0.14)" }}>
-            <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#7f8aa6]">Ends in</span>
-            <div className="flex items-baseline gap-[12px]" role="timer" aria-label={`${days} days ${Number(hours)} hours ${Number(left.mm)} minutes left`}>
-              {days > 0 && <TimeUnit value={String(days).padStart(2, "0")} unit="d" />}
-              <TimeUnit value={hours} unit="h" />
-              <TimeUnit value={left.mm} unit="m" />
-              <TimeUnit value={left.ss} unit="s" />
-            </div>
-          </div>
-        )}
+        <div className="flex flex-col gap-[6px] border-t pt-[16px] lg:items-end lg:border-t-0 lg:border-l lg:pl-[32px] lg:pt-0" style={{ borderColor: "rgba(148,178,255,0.14)" }}>
+          <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#7f8aa6]">Spots left</span>
+          <span className="inline-flex items-baseline gap-[6px]">
+            <span className="tabular text-[30px] font-semibold tracking-[-0.02em] text-white sm:text-[34px]">{PROMO_SPOTS_LEFT}</span>
+            <span className="text-[13px] font-medium text-[#7f8aa6]">spots</span>
+          </span>
+        </div>
       </div>
       <ul className="relative mt-[20px] hidden flex-wrap gap-x-[22px] gap-y-[8px] border-t pt-[16px] lg:flex" style={{ borderColor: "rgba(148,178,255,0.12)" }}>
         {PROMO_BENEFITS.map((b) => (
@@ -189,7 +181,6 @@ export function PayoutTicker() {
 export function FloatingCta() {
   const [show, setShow] = useState(false);
   const reduce = useReducedMotion();
-  const left = formatHoursLeft(PROMO_DEADLINE, useNow(show));
   useEffect(() => {
     let raf = 0;
     const check = () => {
@@ -244,11 +235,9 @@ export function FloatingCta() {
           </span>
           <span className="hidden shrink-0 whitespace-nowrap rounded-full bg-white px-[11px] py-[6px] text-[12px] font-bold uppercase tracking-[0.04em] text-[#1d4ed8] sm:inline">{DEAL_COMPACT}</span>
           <span className="hidden whitespace-nowrap text-[15px] font-semibold text-white sm:inline">Claim Offer</span>
-          {!left.expired && (
-            <span className="tabular hidden whitespace-nowrap rounded-full px-[10px] py-[5px] text-[12px] font-semibold text-white sm:inline-flex" style={{ background: "rgba(3,6,13,0.28)" }}>
-              Ends in {Number(left.hh) >= 24 ? `${Math.floor(Number(left.hh) / 24)}d ${String(Number(left.hh) % 24).padStart(2, "0")}` : left.hh}:{left.mm}:{left.ss}
-            </span>
-          )}
+          <span className="tabular hidden whitespace-nowrap rounded-full px-[10px] py-[5px] text-[12px] font-semibold text-white sm:inline-flex" style={{ background: "rgba(3,6,13,0.28)" }}>
+            {PROMO_SPOTS_LEFT} spots left
+          </span>
           <span aria-hidden="true" className="flex size-[30px] shrink-0 items-center justify-center rounded-full bg-white sm:size-auto sm:bg-transparent">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" className="shrink-0 transition-transform duration-300 group-hover:translate-x-[4px]">
               <path d="M3.333 8h9.334M8.667 4l4 4-4 4" className="stroke-[#1d4ed8] sm:stroke-white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
