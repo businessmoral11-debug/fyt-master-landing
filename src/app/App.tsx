@@ -19,7 +19,7 @@ import { HERO_ORBIT_LABELS, HERO_ORBIT_RINGS, MOBILE_ORBIT_LABELS, MOBILE_LABEL_
 import { HERO_STAGE_WIDTH, heroStageScale, heroLabelScale } from "@/app/motion/heroResponsive";
 import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
-import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
+import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_SPOTS_LEFT } from "@/app/data/promoBanner";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
@@ -530,8 +530,8 @@ function Nav() {
 
 
 const PROMO_BANNER_ACTIVE_MARGIN_PX = 600;
-/** "40% off + Buy 1 Get 3" for the one-line phone banner (drops "Limited Time:" and "Instantly"). */
-const PROMO_DEAL_SHORT = PROMO_DEAL_LINE.replace(/^limited time:\s*/i, "").replace(/\s*instantly\s*$/i, "");
+/** Short deal for the one-line phone banner (drops a leading "BOGO Deal:" / "Limited Time:" and a trailing "Instantly"). */
+const PROMO_DEAL_SHORT = PROMO_DEAL_LINE.replace(/^(limited time|bogo deal):\s*/i, "").replace(/\s*instantly\s*$/i, "");
 const PROMO_BANNER_GRADIENT =
   "linear-gradient(90deg, #172554 0%, #1d4ed8 28%, #2563eb 50%, #1d4ed8 72%, #172554 100%)";
 
@@ -562,27 +562,10 @@ async function copyTextToClipboard(text: string): Promise<boolean> {
   }
 }
 
+/** Red urgency pill on the top banner: "250 SPOTS LEFT" (number from PROMO_SPOTS_LEFT). */
 function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pulse: boolean }) {
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  const left = formatHoursLeft(PROMO_DEADLINE, now);
-  if (left.expired) return null;
-  const totalHours = Number(left.hh);
-  const days = Math.floor(totalHours / 24);
-  const hh = String(totalHours % 24).padStart(2, "0");
-  const label = compact
-    ? `${days > 0 ? `${days}D ` : ""}${hh}:${left.mm}:${left.ss} Left`
-    : `${days > 0 ? `${days}D ` : ""}${hh}H ${left.mm}M ${left.ss}S Left`;
-
   return (
     <span
-      role="timer"
-      aria-label={`${days > 0 ? `${days} days ` : ""}${Number(hh)} hours ${Number(left.mm)} minutes left`}
       className={`inline-flex shrink-0 items-center rounded-full font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] tabular-nums text-white ${compact ? "h-[16px] px-[7px] text-[7.5px]" : "h-[24px] px-[12px] text-[11px] lg:h-[25px] lg:text-[12px]"}`}
       style={{
         background: "#DC2626",
@@ -591,7 +574,7 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
         animation: pulse ? "fyt-promo-urgency-pulse 2.4s ease-in-out infinite" : undefined,
       }}
     >
-      {label}
+      {PROMO_SPOTS_LEFT} Spots Left
     </span>
   );
 }

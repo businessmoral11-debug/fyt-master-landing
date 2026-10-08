@@ -12,14 +12,14 @@ describe("PROMO_BENEFITS", () => {
 
 describe("PROMO_DEAL_LINE", () => {
   it("includes the Instantly deal copy shown on the banner", () => {
-    expect(PROMO_DEAL_LINE).toBe("Limited Time: 40% off + Buy 1 Get 3 Instantly");
+    expect(PROMO_DEAL_LINE).toBe("BOGO Deal: 35% off + Double Instant BOGO");
   });
 });
 
 describe("PROMO_BANNER_ITEMS", () => {
   it("puts the deal first, then the benefits", () => {
     expect(PROMO_BANNER_ITEMS).toEqual([
-      "Limited Time: 40% off + Buy 1 Get 3 Instantly",
+      "BOGO Deal: 35% off + Double Instant BOGO",
       "First Reward on Demand",
       "Free Drawdown Reset",
     ]);
@@ -28,7 +28,7 @@ describe("PROMO_BANNER_ITEMS", () => {
 
 describe("PROMO_CODE", () => {
   it("exposes the banner/checkout coupon code", () => {
-    expect(PROMO_CODE).toBe("AWARD40");
+    expect(PROMO_CODE).toBe("FYT35");
   });
 });
 
@@ -56,9 +56,9 @@ describe("ALT_PROMO", () => {
 });
 
 describe("PROMO_ITEMS", () => {
-  it("keeps the current deal badge/coupon copy at 40% off + Buy 1 Get 3", () => {
+  it("keeps the current deal badge/coupon copy at 35% off + Double Instant BOGO", () => {
     expect(PROMO_ITEMS).toHaveLength(1);
-    expect(PROMO_ITEMS[0]).toEqual({ kind: "code", label: "The NEW FYT Deal", text: "40% off + Buy 1 Get 3", code: "AWARD40" });
+    expect(PROMO_ITEMS[0]).toEqual({ kind: "code", label: "The NEW FYT Deal", text: "35% off + Double Instant BOGO", code: "FYT35" });
   });
 });
 
