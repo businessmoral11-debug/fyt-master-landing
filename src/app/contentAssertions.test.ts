@@ -1105,7 +1105,7 @@ describe("Site-wide cleanup: 'profit'/'payout' wording replaced with reward-base
 describe("Promo banner", () => {
   it("imports promoBanner benefits + deal + code + countdown deadline", () => {
     const app = read("./App.tsx");
-    expect(app).toMatch(/import\s*\{[^}]*\bPROMO_BENEFITS\b[^}]*\bPROMO_CODE\b[^}]*\bPROMO_DEAL_LINE\b[^}]*\bPROMO_SPOTS_LEFT\b[^}]*\}\s*from\s*"@\/app\/data\/promoBanner"/);
+    expect(app).toMatch(/import\s*\{[^}]*\bPROMO_BENEFITS\b[^}]*\bPROMO_CODE\b[^}]*\bPROMO_DEAL_LINE\b[^}]*\bPROMO_DEADLINE\b[^}]*\bformatHoursLeft\b[^}]*\}\s*from\s*"@\/app\/data\/promoBanner"/);
   });
 
   it("defines PromoBanner and sticks it with Nav at the top of the page", () => {
@@ -1175,13 +1175,14 @@ describe("Promo banner sheen animation", () => {
 });
 
 describe("Promo banner countdown", () => {
-  it("shows the spots-left pill (no ticking timer) from PROMO_SPOTS_LEFT", () => {
+  it("ticks inside PromoCountdownPill (not PromoBanner) and hides once expired", () => {
     const app = read("./App.tsx");
     const bannerBody = sliceToNextFunction(app, "function PromoBanner()");
     expect(bannerBody).not.toContain("setInterval(() => setNow(Date.now()), 1000)");
     const pillBody = sliceToNextFunction(app, "function PromoCountdownPill(");
-    expect(pillBody).not.toContain("setInterval");
-    expect(pillBody).toContain("{PROMO_SPOTS_LEFT} Spots Left");
+    expect(pillBody).toContain("setInterval(() => setNow(Date.now()), 1000)");
+    expect(pillBody).toContain("formatHoursLeft(PROMO_DEADLINE, now)");
+    expect(pillBody).toContain("if (left.expired) return null;");
     expect(pillBody).toContain("#DC2626");
   });
 });

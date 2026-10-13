@@ -19,7 +19,7 @@ import { HERO_ORBIT_LABELS, HERO_ORBIT_RINGS, MOBILE_ORBIT_LABELS, MOBILE_LABEL_
 import { HERO_STAGE_WIDTH, heroStageScale, heroLabelScale } from "@/app/motion/heroResponsive";
 import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
-import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_SPOTS_LEFT } from "@/app/data/promoBanner";
+import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
@@ -560,10 +560,28 @@ async function copyTextToClipboard(text: string): Promise<boolean> {
   }
 }
 
-/** Red urgency pill on the top banner: "247 SPOTS LEFT" (number from PROMO_SPOTS_LEFT). */
+/** Red countdown pill on the top banner, ticking down to PROMO_DEADLINE; hidden once the offer ends. */
 function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pulse: boolean }) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const left = formatHoursLeft(PROMO_DEADLINE, now);
+  if (left.expired) return null;
+  const totalHours = Number(left.hh);
+  const days = Math.floor(totalHours / 24);
+  const hh = String(totalHours % 24).padStart(2, "0");
+  const label = compact
+    ? `${days > 0 ? `${days}D ` : ""}${hh}:${left.mm}:${left.ss} Left`
+    : `${days > 0 ? `${days}D ` : ""}${hh}H ${left.mm}M ${left.ss}S Left`;
+
   return (
     <span
+      role="timer"
+      aria-label={`${days > 0 ? `${days} days ` : ""}${Number(hh)} hours ${Number(left.mm)} minutes left`}
       className={`inline-flex shrink-0 items-center rounded-full font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] tabular-nums text-white ${compact ? "h-[16px] px-[7px] text-[7.5px]" : "h-[24px] px-[12px] text-[11px] lg:h-[25px] lg:text-[12px]"}`}
       style={{
         background: "#DC2626",
@@ -572,7 +590,7 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
         animation: pulse ? "fyt-promo-urgency-pulse 2.4s ease-in-out infinite" : undefined,
       }}
     >
-      {PROMO_SPOTS_LEFT} Spots Left
+      {label}
     </span>
   );
 }
