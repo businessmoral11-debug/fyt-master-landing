@@ -318,7 +318,7 @@ describe("NAV_LINKS", () => {
       { type: "link", label: "FAQ", href: "https://intercom.help/funding-your-trades/en/" },
       { type: "link", label: "Contact Us", href: "https://fundingyourtrades.com/contact/" },
     ]);
-    expect(NAV_LINKS.login).toEqual({ label: "Login/Sign up", href: "https://clients.fundingyourtrades.com/login" });
+    expect(NAV_LINKS.login).toEqual({ label: "Login/Sign up", href: "https://app.fundingyourtrades.com/" });
     expect(NAV_LINKS.buyHere).toEqual({ label: "Buy Here", href: "#challenge" });
   });
 });

@@ -201,7 +201,7 @@ export const NAV_LINKS = {
     { type: "link", label: "FAQ", href: "https://intercom.help/funding-your-trades/en/" },
     { type: "link", label: "Contact Us", href: "https://fundingyourtrades.com/contact/" },
   ],
-  login: { label: "Login/Sign up", href: "https://clients.fundingyourtrades.com/login" },
+  login: { label: "Login/Sign up", href: "https://app.fundingyourtrades.com/" },
   buyHere: { label: "Buy Here", href: "#challenge" },
 } as const;
 
