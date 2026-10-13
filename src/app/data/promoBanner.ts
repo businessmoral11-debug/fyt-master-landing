@@ -16,13 +16,16 @@ export const PROMO_BENEFITS = [
 ] as const;
 
 /** Deal line shown after benefits on the top banner. */
-export const PROMO_DEAL_LINE = "BOGO Deal: 35% off + Instant BOGO";
+export const PROMO_DEAL_LINE = "Dashboard Launch Offer: 40% off + Buy 1 Get 2 + 5% Instant Cashback";
+
+/** Short deal (no "Dashboard Launch Offer:" label) for the phone banner and floating button. */
+export const PROMO_DEAL_SHORT = "40% off + Buy 1 Get 2 + 5% Cashback";
 
 /** Full banner copy order: deal first, then benefits. */
 export const PROMO_BANNER_ITEMS = [PROMO_DEAL_LINE, ...PROMO_BENEFITS] as const;
 
 /** Promo code shown in the top-banner CODE pill (also used at checkout). */
-export const PROMO_CODE = "FYT35";
+export const PROMO_CODE = "NEWDASH";
 
 /** Alternate welcome offer shown on the pricing card (manual code entry). */
 export const ALT_PROMO_LABEL = "For new traders";
@@ -31,7 +34,7 @@ export const ALT_PROMO_CODE = "WELCOME45";
 
 /** Kept for pricing-panel badge / coupon references. */
 export const PROMO_ITEMS: PromoItem[] = [
-  { kind: "code", label: "The NEW FYT Deal", text: "35% off + Instant BOGO", code: PROMO_CODE },
+  { kind: "code", label: "Dashboard Launch Offer", text: "40% off + Buy 1 Get 2 + 5% Instant Cashback", code: PROMO_CODE },
 ];
 
 /** Previous AWARD40 offer end (kept for the countdown helpers; no countdown is shown now). */

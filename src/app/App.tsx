@@ -19,7 +19,7 @@ import { HERO_ORBIT_LABELS, HERO_ORBIT_RINGS, MOBILE_ORBIT_LABELS, MOBILE_LABEL_
 import { HERO_STAGE_WIDTH, heroStageScale, heroLabelScale } from "@/app/motion/heroResponsive";
 import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
-import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_SPOTS_LEFT } from "@/app/data/promoBanner";
+import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_SPOTS_LEFT } from "@/app/data/promoBanner";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
@@ -530,8 +530,6 @@ function Nav() {
 
 
 const PROMO_BANNER_ACTIVE_MARGIN_PX = 600;
-/** Short deal for the one-line phone banner (drops a leading "BOGO Deal:" / "Limited Time:" and a trailing "Instantly"). */
-const PROMO_DEAL_SHORT = PROMO_DEAL_LINE.replace(/^(limited time|bogo deal):\s*/i, "").replace(/\s*instantly\s*$/i, "");
 const PROMO_BANNER_GRADIENT =
   "linear-gradient(90deg, #172554 0%, #1d4ed8 28%, #2563eb 50%, #1d4ed8 72%, #172554 100%)";
 
@@ -674,7 +672,7 @@ function PromoBanner() {
       <div className={`relative mx-auto flex w-full flex-col items-center justify-center px-[6px] transition-[padding] duration-300 ease-out md:hidden ${compact ? "py-[6px]" : "py-[7px]"}`}>
         <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
           <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[10px] tracking-[0.01em] min-[380px]:text-[10.5px]">
-            {compact ? PROMO_DEAL_SHORT : PROMO_DEAL_LINE}
+            {PROMO_DEAL_SHORT}
           </span>
           <CodePill compact />
           {compact && <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} />}

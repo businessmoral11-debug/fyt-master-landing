@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
-import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_SPOTS_LEFT } from "@/app/data/promoBanner";
+import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_SPOTS_LEFT } from "@/app/data/promoBanner";
 import { countryFlagUrl, fetchFeaturedPayouts, formatPayoutAmount, type PublicPayout } from "@/app/api/rewardsApi";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import { EASE } from "./ui";
 
-/** Short deal for the floating button (drops a leading "BOGO Deal:" / "Limited Time:" and a trailing "Instantly"). */
-const DEAL_COMPACT = PROMO_DEAL_LINE.replace(/^(limited time|bogo deal):\s*/i, "").replace(/\s*instantly\s*$/i, "");
+/** Short deal for the floating button. */
+const DEAL_COMPACT = PROMO_DEAL_SHORT;
 
 function useNow(active = true) {
   const [now, setNow] = useState(() => Date.now());
