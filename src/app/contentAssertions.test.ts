@@ -1156,7 +1156,7 @@ describe("Promo banner", () => {
     const promo = read("./data/promoBanner.ts");
     expect(promo).toContain("First Reward on Demand");
     expect(promo).toContain("Free Drawdown Reset");
-    expect(promo).toContain('export const PROMO_DEAL_LINE = "Dashboard Launch Offer: 40% off + Buy 1 Get 2 + 5% Instant Cashback"');
+    expect(promo).toContain('export const PROMO_DEAL_LINE = "Dashboard Launch Offer: 40% off + Buy 1 Get 2 Instantly + 5% Instant Cashback"');
     expect(promo).toContain('export const PROMO_CODE = "NEWDASH"');
     expect(promo).not.toContain("PROMO_URGENCY");
   });

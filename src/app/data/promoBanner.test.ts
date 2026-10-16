@@ -12,14 +12,14 @@ describe("PROMO_BENEFITS", () => {
 
 describe("PROMO_DEAL_LINE", () => {
   it("includes the Instantly deal copy shown on the banner", () => {
-    expect(PROMO_DEAL_LINE).toBe("Dashboard Launch Offer: 40% off + Buy 1 Get 2 + 5% Instant Cashback");
+    expect(PROMO_DEAL_LINE).toBe("Dashboard Launch Offer: 40% off + Buy 1 Get 2 Instantly + 5% Instant Cashback");
   });
 });
 
 describe("PROMO_BANNER_ITEMS", () => {
   it("puts the deal first, then the benefits", () => {
     expect(PROMO_BANNER_ITEMS).toEqual([
-      "Dashboard Launch Offer: 40% off + Buy 1 Get 2 + 5% Instant Cashback",
+      "Dashboard Launch Offer: 40% off + Buy 1 Get 2 Instantly + 5% Instant Cashback",
       "First Reward on Demand",
       "Free Drawdown Reset",
     ]);
@@ -58,7 +58,7 @@ describe("ALT_PROMO", () => {
 describe("PROMO_ITEMS", () => {
   it("keeps the current deal badge/coupon copy (Dashboard Launch Offer)", () => {
     expect(PROMO_ITEMS).toHaveLength(1);
-    expect(PROMO_ITEMS[0]).toEqual({ kind: "code", label: "Dashboard Launch Offer", text: "40% off + Buy 1 Get 2 + 5% Instant Cashback", code: "NEWDASH" });
+    expect(PROMO_ITEMS[0]).toEqual({ kind: "code", label: "Dashboard Launch Offer", text: "40% off + Buy 1 Get 2 Instantly + 5% Instant Cashback", code: "NEWDASH" });
   });
 });
 

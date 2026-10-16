@@ -16,10 +16,10 @@ export const PROMO_BENEFITS = [
 ] as const;
 
 /** Deal line shown after benefits on the top banner. */
-export const PROMO_DEAL_LINE = "Dashboard Launch Offer: 40% off + Buy 1 Get 2 + 5% Instant Cashback";
+export const PROMO_DEAL_LINE = "Dashboard Launch Offer: 40% off + Buy 1 Get 2 Instantly + 5% Instant Cashback";
 
 /** Short deal (no "Dashboard Launch Offer:" label) for the phone banner and floating button. */
-export const PROMO_DEAL_SHORT = "40% off + Buy 1 Get 2 + 5% Cashback";
+export const PROMO_DEAL_SHORT = "40% off + Buy 1 Get 2 Instantly";
 
 /** Full banner copy order: deal first, then benefits. */
 export const PROMO_BANNER_ITEMS = [PROMO_DEAL_LINE, ...PROMO_BENEFITS] as const;
@@ -34,7 +34,7 @@ export const ALT_PROMO_CODE = "WELCOME45";
 
 /** Kept for pricing-panel badge / coupon references. */
 export const PROMO_ITEMS: PromoItem[] = [
-  { kind: "code", label: "Dashboard Launch Offer", text: "40% off + Buy 1 Get 2 + 5% Instant Cashback", code: PROMO_CODE },
+  { kind: "code", label: "Dashboard Launch Offer", text: "40% off + Buy 1 Get 2 Instantly + 5% Instant Cashback", code: PROMO_CODE },
 ];
 
 /** Dashboard Launch Offer (NEWDASH) ends Tuesday 20 Oct 2026, 23:59:59 IST (7 days from launch). */
