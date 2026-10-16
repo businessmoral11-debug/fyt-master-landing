@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
-import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEADLINE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, formatHoursLeft } from "@/app/data/promoBanner";
+import { PROMO_BENEFITS, PROMO_CARD_EXTRAS, PROMO_CARD_HEADLINE, PROMO_CODE, PROMO_DEADLINE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, formatHoursLeft } from "@/app/data/promoBanner";
 import { countryFlagUrl, fetchFeaturedPayouts, formatPayoutAmount, type PublicPayout } from "@/app/api/rewardsApi";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import { EASE } from "./ui";
@@ -61,7 +61,17 @@ export function PricingOffer() {
             </span>
             Limited time
           </span>
-          <p className="text-[24px] font-semibold leading-[1.15] tracking-[-0.025em] text-white sm:text-[28px]">{DEAL_HEADLINE}</p>
+          <div className="flex flex-wrap items-center gap-x-[12px] gap-y-[10px]" aria-label={DEAL_HEADLINE}>
+            <p className="text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">{PROMO_CARD_HEADLINE}</p>
+            {PROMO_CARD_EXTRAS.map((x) => (
+              <span key={x} className="inline-flex items-center gap-[7px] rounded-full px-[12px] py-[7px] text-[13px] font-semibold text-white" style={{ background: "rgba(37,99,235,0.18)", border: "1px solid rgba(148,178,255,0.28)" }}>
+                <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M7 1.5v11M1.5 7h11" stroke="#60a5fa" strokeWidth="2.2" strokeLinecap="round" />
+                </svg>
+                {x}
+              </span>
+            ))}
+          </div>
           <p className="flex flex-wrap items-center gap-x-[8px] gap-y-[4px] text-[13px] text-[#9aa6c2]">
             Code
             <span className="rounded-full bg-[#0b1220] px-[10px] py-[3px] text-[12px] font-semibold tracking-[0.06em] text-white" style={{ border: "1px solid rgba(148,178,255,0.25)" }}>

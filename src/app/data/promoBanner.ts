@@ -21,6 +21,10 @@ export const PROMO_DEAL_LINE = "Dashboard Launch Offer: 40% off + Buy 1 Get 2 In
 /** Short deal (no "Dashboard Launch Offer:" label) for the phone banner and floating button. */
 export const PROMO_DEAL_SHORT = "40% off + Buy 1 Get 2 Instantly";
 
+/** Offer card next to the pricing table: one big headline plus two short extras. */
+export const PROMO_CARD_HEADLINE = "40% off";
+export const PROMO_CARD_EXTRAS = ["1 Bonus Account Instantly", "5% Instant Cashback"] as const;
+
 /** Full banner copy order: deal first, then benefits. */
 export const PROMO_BANNER_ITEMS = [PROMO_DEAL_LINE, ...PROMO_BENEFITS] as const;
 
