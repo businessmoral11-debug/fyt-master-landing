@@ -33,6 +33,7 @@ import {
 } from "@/app/data/globeConfig";
 import { fetchGlobeStats } from "@/app/api/globeStatsApi";
 import { isLowPowerDevice } from "@/app/three/perf";
+import { usePinchZoomed } from "@/app/zoomGuard";
 
 const GLOBE_PERF_ENABLED =
   import.meta.env.DEV || (typeof location !== "undefined" && new URLSearchParams(location.search).has("globePerf"));
@@ -592,6 +593,7 @@ export function TradingGlobe({ onReady, active = true }: { onReady?: () => void;
   const fullyReady = globeReady && precompiled;
 
   const [lowPower] = useState(() => isLowPowerDevice());
+  const pinchZoomed = usePinchZoomed();
   const [liveStats, setLiveStats] = useState<ReadonlyMap<string, number>>(() => new Map());
   useEffect(() => {
     let cancelled = false;
@@ -636,8 +638,8 @@ export function TradingGlobe({ onReady, active = true }: { onReady?: () => void;
             style={{ overflow: "visible" }}
             camera={{ position: [0, 0, 300], fov: 42 }}
             dpr={[1, lowPower ? 1.15 : typeof window !== "undefined" && window.innerWidth < 768 ? 1.5 : 1.75]}
-            gl={{ antialias: !lowPower, alpha: true, powerPreference: "high-performance" }}
-            frameloop={active ? "always" : "demand"}
+            gl={{ antialias: !lowPower, alpha: true, powerPreference: lowPower ? "default" : "high-performance" }}
+            frameloop={pinchZoomed ? "never" : active ? "always" : "demand"}
             onCreated={({ gl }) => {
               if (GLOBE_PERF_ENABLED) performance.mark("globe:canvas-created");
               // Without this, a lost WebGL context (which a fast/heavy

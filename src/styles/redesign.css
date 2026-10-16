@@ -274,3 +274,14 @@
 .hero-anims-paused .hero-burn-text,
 .hero-anims-paused .hero-burn-ember,
 .hero-anims-paused .hero-burn-ash { animation-play-state: paused; }
+
+/* While the page is pinch-zoomed on a phone (see zoomGuard.ts), switch off the
+   effects that make iPhone Safari run out of memory. They return on zoom-out. */
+html.fyt-zoomed *,
+html.fyt-zoomed *::before,
+html.fyt-zoomed *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  animation-play-state: paused !important;
+  will-change: auto !important;
+}
