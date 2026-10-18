@@ -106,10 +106,15 @@ export function PricingOffer() {
   );
 }
 
-/** Rating + community line under the checkout button. */
+/** Trust strip under the checkout button: rating, payout speed, secure payment methods. */
 export function PricingTrustLine() {
+  const items: [string, string][] = [
+    ["shield", "Secure checkout"],
+    ["bolt", "Rewards in 24-48h"],
+    ["refund", "Fee back with reward"],
+  ];
   return (
-    <div className="flex flex-col items-center gap-[6px] border-t pt-[14px]" style={{ borderColor: "#E8EDF5" }}>
+    <div className="flex flex-col items-center gap-[10px] border-t pt-[14px]" style={{ borderColor: "#E8EDF5" }}>
       <span className="flex items-center gap-[6px]">
         <span className="flex gap-[2px]" aria-hidden="true">
           {[0, 1, 2, 3].map((i) => (
@@ -127,9 +132,27 @@ export function PricingTrustLine() {
             <path fill="url(#rd-pricing-halfstar)" d="M8 1.8l1.8 3.7 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4L2.2 6.1l4-.6L8 1.8Z" />
           </svg>
         </span>
-        <span className="font-['DM_Sans',sans-serif] text-[12px] font-semibold text-[#111827]">4.5/5 Trust Index Rating</span>
+        <span className="font-['DM_Sans',sans-serif] text-[12px] font-semibold text-[#111827]">4.5/5 from 4K+ reviews</span>
       </span>
-      <span className="font-['DM_Sans',sans-serif] text-[12px] text-[#6B7280]">Trusted by 21,500+ traders worldwide</span>
+      <ul className="flex flex-wrap items-center justify-center gap-x-[14px] gap-y-[6px]">
+        {items.map(([icon, label]) => (
+          <li key={label} className="flex items-center gap-[5px] font-['DM_Sans',sans-serif] text-[11.5px] font-medium text-[#4b5563]">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              {icon === "shield" && <path d="M8 1.5l5.5 2v4c0 3.5-2.3 6.2-5.5 7-3.2-.8-5.5-3.5-5.5-7v-4l5.5-2Z" stroke="#2563eb" strokeWidth="1.5" strokeLinejoin="round" />}
+              {icon === "bolt" && <path d="M9 1.5 3.5 9H8l-1 5.5L12.5 7H8l1-5.5Z" stroke="#2563eb" strokeWidth="1.5" strokeLinejoin="round" />}
+              {icon === "refund" && <path d="M3 8a5 5 0 1 0 1.5-3.5M3 2.5v2.5h2.5" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />}
+            </svg>
+            {label}
+          </li>
+        ))}
+      </ul>
+      <span className="flex items-center gap-[6px]" aria-label="Pay by card or crypto">
+        {["VISA", "Mastercard", "USDT", "BTC"].map((m) => (
+          <span key={m} className="rounded-[6px] px-[7px] py-[3px] font-['DM_Sans',sans-serif] text-[10px] font-bold tracking-[0.04em] text-[#374151]" style={{ background: "#F3F5FA", border: "1px solid #E5E9F2" }}>
+            {m}
+          </span>
+        ))}
+      </span>
     </div>
   );
 }

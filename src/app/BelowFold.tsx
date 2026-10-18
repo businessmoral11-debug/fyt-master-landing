@@ -15,6 +15,7 @@ import imgPressTrustedProp from "@/assets/live-site/press-logos/the-trusted-prop
 import imgMatchTraderLogo from "@/assets/live-site/platform-logos/match-trader.png";
 import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5.png";
 import { STEP_PLANS, STEP_SIZES, getEntry, checkoutUrl, fmtSize, planFlag, PLATFORM_OPTIONS, CHECKOUT_COUPON_CODE, type StepId, type PlanId, type PlatformId } from "@/app/data/pricing";
+import { SELECT_PLAN_EVENT, writeSavedPlan } from "@/app/data/savedPlan";
 import { ALT_PROMO_CODE, ALT_PROMO_DEAL, ALT_PROMO_LABEL } from "@/app/data/promoBanner";
 import { pushViewItem } from "@/app/tracking/gtm";
 import { HERO_CONTENT, KEY_METRICS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS, TRUSTINDEX_WIDGET } from "@/app/data/liveSiteContent";
@@ -1756,6 +1757,27 @@ export function Pricing() {
   }, []);
   const savePct = entry.priceOld > 0 ? Math.round((1 - entry.priceNew / entry.priceOld) * 100) : 0;
   const priceParts = splitPrice(entry.priceNew);
+
+  // Plan finder / welcome-back bar can switch the picker; every change is remembered for the next visit.
+  const skipFirstSave = useRef(true);
+  useEffect(() => {
+    if (skipFirstSave.current) {
+      skipFirstSave.current = false;
+      return;
+    }
+    writeSavedPlan({ step, plan, platform, size });
+  }, [step, plan, platform, size]);
+  useEffect(() => {
+    const onSelect = (e: Event) => {
+      const d = (e as CustomEvent<Partial<{ step: StepId; plan: PlanId; platform: PlatformId; size: number }>>).detail ?? {};
+      if (d.step) setStep(d.step);
+      if (d.plan) setPlan(d.plan);
+      if (d.platform) setPlatform(d.platform);
+      if (d.size) setSize(d.size);
+    };
+    window.addEventListener(SELECT_PLAN_EVENT, onSelect);
+    return () => window.removeEventListener(SELECT_PLAN_EVENT, onSelect);
+  }, []);
 
   function handleStepChange(next: StepId) {
     setStep(next);
