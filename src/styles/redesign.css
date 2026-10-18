@@ -285,3 +285,33 @@ html.fyt-zoomed *::after {
   animation-play-state: paused !important;
   will-change: auto !important;
 }
+
+/* ---- Conversion sections (Growth.tsx) ---- */
+/* Vertical live feed: list is duplicated, track moves up by half. Runs only on screen. */
+@keyframes fyt-rd-vscroll { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, -50%, 0); } }
+.fyt-vscroll { animation: fyt-rd-vscroll 42s linear infinite; animation-play-state: paused; }
+.fyt-live .fyt-vscroll { animation-play-state: running; }
+.fyt-vscroll:hover { animation-play-state: paused !important; }
+.fyt-vmask {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+}
+/* Premium range slider: filled track up to --p, glowing thumb. */
+.fyt-range { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 999px; outline: none; cursor: pointer;
+  background: linear-gradient(90deg, #2563eb 0%, #60a5fa var(--p, 50%), rgba(255,255,255,0.1) var(--p, 50%)); }
+.fyt-range::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 4px solid #3b82f6;
+  box-shadow: 0 0 0 6px rgba(59,130,246,0.18), 0 6px 18px rgba(37,99,235,0.7); }
+.fyt-range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 4px solid #3b82f6;
+  box-shadow: 0 0 0 6px rgba(59,130,246,0.18), 0 6px 18px rgba(37,99,235,0.7); }
+.fyt-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 8px rgba(96,165,250,0.4); }
+/* Slow orbit rings around the shield. */
+.fyt-orbit { animation: fyt-rd-spin 28s linear infinite; animation-play-state: paused; transform-origin: 50% 50%; }
+.fyt-orbit-rev { animation: fyt-rd-spin 40s linear infinite reverse; animation-play-state: paused; transform-origin: 50% 50%; }
+.fyt-live .fyt-orbit, .fyt-live .fyt-orbit-rev { animation-play-state: running; }
+/* Soft float for the free-trial dashboard visual. */
+@keyframes fyt-rd-float { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -8px, 0); } }
+.fyt-float { animation: fyt-rd-float 6s ease-in-out infinite; animation-play-state: paused; }
+.fyt-live .fyt-float { animation-play-state: running; }
+@media (prefers-reduced-motion: reduce) {
+  .fyt-vscroll, .fyt-orbit, .fyt-orbit-rev, .fyt-float { animation: none; }
+}
