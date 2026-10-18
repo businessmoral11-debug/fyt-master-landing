@@ -974,8 +974,8 @@ function GrowthChart({ fee, reward, on }: { fee: number; reward: number; on: boo
       <text x={W - 24} y={y(fee) - 6} textAnchor="end" fontSize="11" fill="#8e98b0">
         Account price
       </text>
-      <motion.path d={area} fill="url(#fyt-calc-fill)" initial={false} animate={{ d: area, opacity: on ? 1 : 0 }} transition={{ duration: 0.6, ease: EASE }} />
-      <motion.path d={line} fill="none" stroke="url(#fyt-calc-line)" strokeWidth="3" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ d: line, pathLength: on ? 1 : 0 }} transition={{ duration: 0.9, ease: EASE }} />
+      <motion.path d={area} fill="url(#fyt-calc-fill)" initial={{ opacity: 0 }} animate={{ opacity: on ? 1 : 0 }} transition={{ duration: 0.6, ease: EASE }} />
+      <motion.path d={line} fill="none" stroke="url(#fyt-calc-line)" strokeWidth="3" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: on ? 1 : 0 }} transition={{ duration: 0.9, ease: EASE }} />
       {pts.map((v, i) => (
         <motion.circle key={i} r={i === 3 ? 6 : 4} fill={i === 3 ? "#bbf7d0" : "#60a5fa"} stroke="#0a1226" strokeWidth="2" initial={false} animate={{ cx: x(i), cy: y(v), opacity: on ? 1 : 0 }} transition={{ duration: 0.6, delay: on ? 0.15 * i : 0, ease: EASE }} />
       ))}
