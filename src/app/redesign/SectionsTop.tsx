@@ -99,7 +99,7 @@ const PROVE_ICONS: Record<(typeof PROVE_SKILL_CARDS)[number]["id"], ReactNode> =
   ),
 };
 
-function OrbVisual({ size = 380 }: { size?: number }) {
+export function OrbVisual({ size = 380 }: { size?: number }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });

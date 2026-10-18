@@ -26,6 +26,7 @@ import {
   type SavedPlan,
 } from "@/app/data/savedPlan";
 import { C, EASE, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent, useLive, useShimmer } from "./ui";
+import { OrbVisual } from "./SectionsTop";
 
 /* ------------------------------------------------------------------ */
 /* Shared helpers                                                      */
@@ -1110,111 +1111,97 @@ export function RewardCalculator() {
 }
 
 /* ------------------------------------------------------------------ */
-/* 5. Versus board: what goes wrong at prop firms vs what FYT does     */
+/* 5. Prove your market expertise: the unfair rule vs what FYT does    */
 /* ------------------------------------------------------------------ */
 
-const VERSUS_ROWS: { icon: IconName; criteria: string; label: string }[] = [
-  { icon: "trend", criteria: "Drawdown Type", label: "Drawdown" },
-  { icon: "clock", criteria: "Time Limit", label: "Time limit" },
-  { icon: "scale", criteria: "Consistency Rule", label: "Consistency" },
-  { icon: "news", criteria: "News Trading", label: "News" },
-  { icon: "moon", criteria: "Weekend Holding", label: "Weekends" },
-  { icon: "split", criteria: "Reward Split", label: "Split" },
-  { icon: "calendar", criteria: "Rewards", label: "Rewards" },
-  { icon: "doc", criteria: "Conditions", label: "Conditions" },
+const EXPERTISE_CARDS: { icon: IconName; problem: string; fix: string; tag: string }[] = [
+  { icon: "scale", problem: "Consistency rules limit natural performance.", fix: "No consistency rule. Trade your natural style.", tag: "Consistency" },
+  { icon: "clock", problem: "Time limits create pressure.", fix: "No time limit. Pass at your own pace.", tag: "Time" },
+  { icon: "doc", problem: "Hidden rules cause breaches.", fix: "Every rule written down, nothing added at payout.", tag: "Rules" },
+  { icon: "trend", problem: "Relative drawdown punishes progress.", fix: "Static drawdown that never moves against you.", tag: "Drawdown" },
+  { icon: "calendar", problem: "Delayed rewards damage trust.", fix: "Weekly rewards. First one on demand, in 24-48h.", tag: "Rewards" },
+  { icon: "news", problem: "News and weekend bans block your strategy.", fix: "News trading and weekend holding allowed.", tag: "Freedom" },
 ];
 
-export function ProblemsVsFyt() {
+export function ProveYourExpertise() {
   const reduce = useReducedMotion();
-  const rows = VERSUS_ROWS.map((r) => ({ ...r, row: COMPARISON_ROWS.find((c) => c.criteria === r.criteria) })).filter((r) => r.row);
-  const [ref, live] = useLive<HTMLDivElement>();
-  const ROW_H = "min-h-[68px]";
+  const [titleRef, shimmer] = useShimmer<HTMLHeadingElement>();
   return (
     <Section tone="light">
-      <div className="flex flex-col items-center gap-[18px] text-center">
-        <Eyebrow tone="light" center>
-          Why traders switch
-        </Eyebrow>
-        <SectionTitle tone="light" center lead="What goes wrong at other firms." highlight="And what we do instead." />
-      </div>
+      <div className="grid grid-cols-1 items-center gap-[44px] lg:grid-cols-12 lg:gap-[56px]">
+        <div className="flex flex-col gap-[22px] lg:col-span-5">
+          <Eyebrow tone="light">Why FYT</Eyebrow>
+          <h2 ref={titleRef} className={`text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-[38px] lg:text-[50px] ${shimmer}`} style={{ color: C.textLight }}>
+            <WordsReveal text="Prove Your Market Expertise." />
+            <br />
+            <span className="font-normal" style={{ color: "#3c465c" }}>
+              <WordsReveal text="Not your ability to survive" delay={0.15} />
+            </span>{" "}
+            <WordsReveal text="unfair rules." wordClassName="fyt-gradient-text font-semibold" delay={0.3} />
+          </h2>
+          <Reveal delay={0.1}>
+            <p className="max-w-[420px] text-[16px] leading-[1.7]" style={{ color: C.mutedLight }}>
+              Most traders don't fail on skill. They fail on rules built to trip them up. We removed them.
+            </p>
+          </Reveal>
+          <Reveal delay={0.15} className="hidden lg:block">
+            <OrbVisual size={340} />
+          </Reveal>
+        </div>
 
-      <div ref={ref} className={`relative mx-auto mt-[48px] grid max-w-[1040px] grid-cols-1 gap-[18px] md:grid-cols-2 md:gap-[28px] lg:mt-[64px] ${live ? "fyt-live" : ""}`}>
-        {/* Others */}
-        <Reveal x={-24} y={0} className="hidden md:block">
-          <div className="h-full rounded-[28px] p-[22px] sm:p-[26px]" style={{ background: "linear-gradient(180deg,#ffffff,#f7f8fb)", border: `1px solid ${C.borderLight}` }}>
-            <div className="mb-[14px] flex items-center gap-[12px]">
-              <span className="flex size-[40px] items-center justify-center rounded-[12px]" style={{ background: "#fdecec", border: "1px solid #f8d4d4" }}>
-                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-                  <path d="M4 4l8 8M12 4l-8 8" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </span>
-              <span className="text-[17px] font-semibold" style={{ color: "#6b7280" }}>
-                Typical prop firm
-              </span>
-            </div>
-            <ul className="flex flex-col">
-              {rows.map(({ label, row }, i) => (
-                <li key={label} className={`flex ${ROW_H} items-center justify-between gap-[12px]`} style={{ borderTop: i ? "1px solid #eef0f5" : undefined }}>
-                  <span className="text-[12px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#9aa3b5" }}>
-                    {label}
+        <motion.ul
+          className="grid grid-cols-1 gap-[14px] sm:grid-cols-2 lg:col-span-7"
+          variants={staggerParent(0.09)}
+          initial={reduce ? false : "hidden"}
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          {EXPERTISE_CARDS.map((c, i) => (
+            <motion.li
+              key={c.tag}
+              variants={staggerChild}
+              onPointerMove={spotlightMove}
+              className="fyt-spot fyt-spot-light group relative flex flex-col overflow-hidden rounded-[22px] bg-white transition-[translate,box-shadow] duration-500 hover:-translate-y-[4px] hover:shadow-[0_32px_70px_-30px_rgba(37,99,235,0.5)]"
+              style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 18px 40px -30px rgba(15,23,42,0.35)" }}
+            >
+              <div className="flex flex-col gap-[14px] p-[20px] pb-[16px] lg:p-[24px] lg:pb-[18px]">
+                <span className="flex items-center justify-between">
+                  <span className="flex items-center gap-[8px] text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#b4bccd" }}>
+                    <span className="flex size-[18px] items-center justify-center rounded-full" style={{ background: "#fdecec" }}>
+                      <svg width="8" height="8" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M4 4l8 8M12 4l-8 8" stroke="#ef4444" strokeWidth="2.6" strokeLinecap="round" />
+                      </svg>
+                    </span>
+                    Other firms
                   </span>
-                  <span className="relative text-right text-[15px]" style={{ color: "#8b93a7" }}>
-                    {row!.others}
-                    <motion.span aria-hidden="true" className="absolute left-0 right-0 top-1/2 h-[1.5px] origin-left rounded-full bg-[#ef4444]" initial={{ scaleX: reduce ? 1 : 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true, amount: 0.8 }} transition={{ duration: 0.5, delay: 0.25 + i * 0.07, ease: EASE }} />
+                  <span className="tabular text-[12px] font-semibold tracking-[0.1em]" style={{ color: "#a3b3d4" }} aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
                   </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Reveal>
-
-        {/* FYT */}
-        <Reveal x={24} y={0}>
-          <div className="fyt-ring relative h-full rounded-[28px]" style={{ boxShadow: "0 60px 120px -50px rgba(37,99,235,0.75)" }}>
-            <div className="relative h-full p-[22px] sm:p-[26px]" style={{ background: "radial-gradient(80% 50% at 100% 0%, rgba(37,99,235,0.35), transparent 70%)" }}>
-              <div className="mb-[14px] flex items-center gap-[12px]">
-                <span className="flex size-[40px] items-center justify-center rounded-[12px]" style={{ background: "linear-gradient(180deg,#4f8cff,#2563eb)", boxShadow: "0 8px 22px -8px rgba(37,99,235,0.9)" }}>
-                  <img src={imgFytMark} alt="" className="h-[20px] w-auto" />
                 </span>
-                <span className="text-[17px] font-semibold text-white">Funding Your Trades</span>
+                <span className="relative w-fit text-[15.5px] leading-[1.45]" style={{ color: "#8b93a7" }}>
+                  {c.problem}
+                  <motion.span
+                    aria-hidden="true"
+                    className="absolute left-0 right-0 top-[55%] h-[1.5px] origin-left rounded-full bg-[#ef4444]/70"
+                    initial={{ scaleX: reduce ? 1 : 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true, amount: 1 }}
+                    transition={{ duration: 0.6, delay: 0.5 + i * 0.08, ease: EASE }}
+                  />
+                </span>
               </div>
-              <ul className="flex flex-col">
-                {rows.map(({ icon, label, row }, i) => (
-                  <motion.li
-                    key={label}
-                    className={`flex ${ROW_H} items-center gap-[14px] py-[8px]`}
-                    style={{ borderTop: i ? `1px solid ${C.borderDark}` : undefined }}
-                    initial={reduce ? false : { opacity: 0, x: 14 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.8 }}
-                    transition={{ duration: 0.5, delay: 0.3 + i * 0.07, ease: EASE }}
-                  >
-                    <IconTile name={icon} size={36} />
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="text-[16px] font-semibold text-white">{row!.fyt}</span>
-                      <span className="text-[12.5px] md:hidden" style={{ color: "#8e98b0" }}>
-                        <s>Others: {row!.others}</s>
-                      </span>
-                    </span>
-                    <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.4)" }}>
-                      <CheckIcon size={11} color="#4ade80" />
-                    </span>
-                  </motion.li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </Reveal>
-
-        <span aria-hidden="true" className="absolute left-1/2 top-[50%] z-[2] hidden size-[56px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[14px] font-bold tracking-[0.06em] text-white md:flex" style={{ background: "linear-gradient(180deg,#0f1b36,#0a1226)", border: "1px solid rgba(96,165,250,0.45)", boxShadow: "0 12px 30px -8px rgba(37,99,235,0.7), 0 0 0 6px #f5f8ff" }}>
-          VS
-        </span>
+              <div className="relative mt-auto flex items-center gap-[14px] px-[20px] py-[16px] transition-colors duration-500 group-hover:bg-[#2563eb] lg:px-[24px] lg:py-[18px]" style={{ background: "linear-gradient(180deg, #f3f7ff, #eaf1ff)", borderTop: "1px solid #e3eaf7" }}>
+                <span className="flex size-[42px] shrink-0 items-center justify-center rounded-[13px] bg-white text-[#2563eb] shadow-[0_8px_20px_-10px_rgba(37,99,235,0.6)] transition-colors duration-500 group-hover:bg-white/15 group-hover:text-white">
+                  <GIcon name={c.icon} size={20} color="currentColor" />
+                </span>
+                <span className="text-[16px] font-semibold leading-[1.4] tracking-[-0.01em] transition-colors duration-500 group-hover:text-white lg:text-[17px]" style={{ color: "#0b1d4d" }}>
+                  {c.fix}
+                </span>
+              </div>
+            </motion.li>
+          ))}
+        </motion.ul>
       </div>
-      <Reveal delay={0.1} className="mt-[40px] flex justify-center">
-        <Pill href="#plan-finder" onClick={() => pauseHeavyScenesForNav()}>
-          Find my plan
-        </Pill>
-      </Reveal>
     </Section>
   );
 }

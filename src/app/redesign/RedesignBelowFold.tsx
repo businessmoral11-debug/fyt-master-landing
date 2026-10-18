@@ -1,8 +1,8 @@
-import { FeaturedIn, PricingSection, ProofInNumbers, ProveYourSkill, Testimonials } from "./SectionsTop";
-import { ClosingCta, Faq, Footer, HowItWorks, ProductShowcase } from "./SectionsBottom";
+import { FeaturedIn, PricingSection, ProofInNumbers, Testimonials } from "./SectionsTop";
+import { ClosingCta, Comparison, Faq, Footer, HowItWorks, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
 import { FloatingCta } from "./Conversion";
-import { CountryProof, ExitSavePlan, FreeDemo, PayoutBoard, PlanFinder, ProblemsVsFyt, RewardCalculator, WelcomeBack, ZeroRisk } from "./Growth";
+import { CountryProof, ExitSavePlan, FreeDemo, PayoutBoard, PlanFinder, ProveYourExpertise, RewardCalculator, WelcomeBack, ZeroRisk } from "./Growth";
 
 /**
  * Redesigned landing page below the hero. Same content, data, links and
@@ -16,7 +16,7 @@ export function BelowFold() {
       <WelcomeBack />
       <FeaturedIn />
       <CountryProof />
-      <ProveYourSkill />
+      <ProveYourExpertise />
       <ProofInNumbers />
       <PlanFinder />
       <PricingSection />
@@ -24,7 +24,7 @@ export function BelowFold() {
       <RewardCalculator />
       <Testimonials />
       <HowItWorks />
-      <ProblemsVsFyt />
+      <Comparison />
       <ZeroRisk />
       <FreeDemo />
       <ProductShowcase />
