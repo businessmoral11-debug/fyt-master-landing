@@ -109,7 +109,7 @@ export function PricingOffer() {
 /** Trust strip under the checkout button: rating, payout speed, secure payment methods. */
 export function PricingTrustLine() {
   const items: [string, string][] = [
-    ["shield", "Secure checkout"],
+    ["shield", "Card or crypto"],
     ["bolt", "Rewards in 24-48h"],
     ["refund", "Fee back with reward"],
   ];

@@ -238,13 +238,13 @@ export function CountryProof() {
           </h2>
           <div className="grid grid-cols-3 gap-[10px]">
             {[
-              [String(pool.length || "-"), showLocal ? `Paid in ${name}` : "Recent rewards"],
+              [String(pool.length || "-"), "Rewards"],
               [total ? money(Math.round(total)) : "-", "Total paid"],
-              [showLocal ? "24-48h" : String(countries || "-"), showLocal ? "Payout time" : "Countries"],
+              [showLocal ? "24-48h" : String(countries || "-"), showLocal ? "Paid in" : "Countries"],
             ].map(([v, l]) => (
               <div key={l} className="flex min-w-0 flex-col gap-[4px] rounded-[16px] p-[14px]" style={DARK_CARD}>
                 <span className="tabular truncate text-[20px] font-semibold tracking-[-0.03em] text-white sm:text-[24px]">{v}</span>
-                <span className="truncate text-[11px] font-medium uppercase tracking-[0.12em]" style={{ color: C.mutedDark }}>
+                <span className="text-[10.5px] font-medium uppercase tracking-[0.1em] sm:text-[11px]" style={{ color: C.mutedDark }}>
                   {l}
                 </span>
               </div>
@@ -713,7 +713,7 @@ export function PayoutBoard() {
                                 {c.traderName ?? "FYT trader"}
                               </span>
                               <span className="truncate text-[12.5px]" style={{ color: C.mutedLight }}>
-                                {c.country ?? ""} · {relTime(c.createdAt)}
+                                {[c.country, relTime(c.createdAt)].filter(Boolean).join(" · ")}
                               </span>
                             </span>
                           </span>
