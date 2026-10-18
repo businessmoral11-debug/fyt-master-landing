@@ -1123,6 +1123,29 @@ const EXPERTISE_CARDS: { icon: IconName; problem: string; fix: string; tag: stri
   { icon: "news", problem: "News and weekend bans block your strategy.", fix: "News trading and weekend holding allowed.", tag: "Freedom" },
 ];
 
+/** Text that gets a red strike-through (on every wrapped line) once it scrolls into view. */
+function StrikeText({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const seen = useInView(ref, { once: true, amount: 1 });
+  const reduce = useReducedMotion();
+  const on = seen || !!reduce;
+  return (
+    <span
+      ref={ref}
+      className="text-[15.5px] leading-[1.45]"
+      style={{
+        color: "#8b93a7",
+        textDecorationLine: "line-through",
+        textDecorationThickness: "1.5px",
+        textDecorationColor: on ? "rgba(239,68,68,0.75)" : "rgba(239,68,68,0)",
+        transition: `text-decoration-color 0.6s ease ${delay}s`,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
 export function ProveYourExpertise() {
   const reduce = useReducedMotion();
   const [titleRef, shimmer] = useShimmer<HTMLHeadingElement>();
@@ -1178,17 +1201,7 @@ export function ProveYourExpertise() {
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </span>
-                <span className="relative w-fit text-[15.5px] leading-[1.45]" style={{ color: "#8b93a7" }}>
-                  {c.problem}
-                  <motion.span
-                    aria-hidden="true"
-                    className="absolute left-0 right-0 top-[55%] h-[1.5px] origin-left rounded-full bg-[#ef4444]/70"
-                    initial={{ scaleX: reduce ? 1 : 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true, amount: 1 }}
-                    transition={{ duration: 0.6, delay: 0.5 + i * 0.08, ease: EASE }}
-                  />
-                </span>
+                <StrikeText delay={0.5 + i * 0.08}>{c.problem}</StrikeText>
               </div>
               <div className="relative mt-auto flex items-center gap-[14px] px-[20px] py-[16px] transition-colors duration-500 group-hover:bg-[#2563eb] lg:px-[24px] lg:py-[18px]" style={{ background: "linear-gradient(180deg, #f3f7ff, #eaf1ff)", borderTop: "1px solid #e3eaf7" }}>
                 <span className="flex size-[42px] shrink-0 items-center justify-center rounded-[13px] bg-white text-[#2563eb] shadow-[0_8px_20px_-10px_rgba(37,99,235,0.6)] transition-colors duration-500 group-hover:bg-white/15 group-hover:text-white">
