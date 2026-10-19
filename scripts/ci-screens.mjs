@@ -45,26 +45,34 @@ for (const vp of viewports) {
     i++;
   }
   log.push(`[${vp.name}] scrollHeight ${h}, shots ${i}`);
-  // Plan finder: answer the 4 questions and capture the result.
-  const finder = page.locator("#plan-finder");
-  if (await finder.count()) {
-    await finder.scrollIntoViewIfNeeded();
-    await sleep(800);
+  // Plan finder pop-up: open from pricing, answer, capture the result.
+  const opener = page.getByRole("button", { name: /Find your plan/ }).first();
+  if (await opener.count()) {
+    await opener.scrollIntoViewIfNeeded();
+    await sleep(600);
+    await opener.click().catch((e) => log.push("finder open fail " + e.message.split("\n")[0]));
+    await sleep(900);
+    const dlg = page.getByRole("dialog", { name: "Plan finder" });
+    await page.screenshot({ path: `${OUT}/${vp.name}-finder-q1.png` });
     for (const label of ["1-3 years", "Scalping", "Sometimes"]) {
-      await page.getByRole("button", { name: new RegExp(label) }).first().click().catch((e) => log.push("finder click fail " + label + " " + e.message.split("\n")[0]));
+      await dlg.getByRole("button", { name: new RegExp(label) }).first().click().catch((e) => log.push("finder click fail " + label + " " + e.message.split("\n")[0]));
       await sleep(600);
     }
-    await finder.getByRole("button", { name: "$100K" }).first().click().catch((e) => log.push("finder size fail " + e.message.split("\n")[0]));
+    await dlg.getByRole("button", { name: /\$100K/ }).first().click().catch((e) => log.push("finder size fail " + e.message.split("\n")[0]));
     await sleep(1200);
-    await finder.screenshot({ path: `${OUT}/${vp.name}-finder-result.png` }).catch((e) => log.push("finder shot " + e.message));
+    await page.screenshot({ path: `${OUT}/${vp.name}-finder-result.png` });
+    await page.keyboard.press("Escape");
+    await sleep(500);
   }
-  // Payout board "Paid on camera" tab.
-  const cam = page.getByRole("tab", { name: "Paid on camera" });
-  if (await cam.count()) {
-    await cam.scrollIntoViewIfNeeded();
-    await cam.click();
-    await sleep(1500);
-    await page.locator("#live-payouts").screenshot({ path: `${OUT}/${vp.name}-board-camera.png` }).catch((e) => log.push("cam shot " + e.message));
+  // Proof board tabs.
+  for (const [tabName, file] of [["Biggest", "board-biggest"], ["On camera", "board-camera"], ["Live payouts", "board-live"]]) {
+    const t = page.getByRole("tab", { name: tabName });
+    if (await t.count()) {
+      await t.scrollIntoViewIfNeeded();
+      await t.click();
+      await sleep(tabName === "Biggest" ? 6000 : 2500);
+      await page.locator("#live-payouts").screenshot({ path: `${OUT}/${vp.name}-${file}.png` }).catch((e) => log.push(tabName + " shot " + e.message));
+    }
   }
   await ctx.close();
 }

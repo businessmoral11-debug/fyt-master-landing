@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { AnimatePresence, motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useSpring } from "motion/react";
 import imgFytMark from "@/imports/FytLandingPage/c3e1b41ac1a944e4221b3b1465d4e68b855d759f.png";
 import imgDashboard from "@/assets/images/trader-dashboard.png";
@@ -27,7 +27,9 @@ import {
   type SavedPlan,
 } from "@/app/data/savedPlan";
 import { C, EASE, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent, useLive, useShimmer } from "./ui";
-import { OrbVisual } from "./SectionsTop";
+import { createPortal } from "react-dom";
+
+const RecentVerifiedRewards = lazy(() => import("@/app/recentVerifiedRewards").then((m) => ({ default: m.RecentVerifiedRewards })));
 
 /* ------------------------------------------------------------------ */
 /* Shared helpers                                                      */
@@ -438,16 +440,16 @@ export function CountryProof() {
   if (loaded && payouts.length === 0) return null;
 
   return (
-    <Section tone="dark" stars>
+    <Section tone="light">
       <div className="relative grid grid-cols-1 items-center gap-[44px] lg:grid-cols-12 lg:gap-[56px]">
         <div className="flex flex-col gap-[24px] lg:col-span-4">
-          <Eyebrow>People like you</Eyebrow>
-          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] sm:text-[42px] lg:text-[52px]" style={{ color: C.textDark }}>
+          <Eyebrow tone="light">Live rewards</Eyebrow>
+          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] sm:text-[42px] lg:text-[52px]" style={{ color: C.textLight }}>
             {showLocal ? (
               <>
                 <span className="inline-flex flex-wrap items-center gap-x-[14px]">
                   Traders from
-                  {flag && <img src={flag} alt="" width={56} height={40} className="inline-block h-[0.66em] w-auto rounded-[6px] shadow-[0_8px_24px_rgba(0,0,0,0.5)] ring-1 ring-white/20" />}
+                  {flag && <img src={flag} alt="" width={56} height={40} className="inline-block h-[0.66em] w-auto rounded-[6px] shadow-[0_8px_24px_rgba(15,23,42,0.25)] ring-1 ring-black/10" />}
                 </span>
                 <br />
                 <span className="fyt-gradient-text">{name} get paid.</span>
@@ -466,16 +468,16 @@ export function CountryProof() {
               [String(pool.length || "-"), "Rewards"],
               [showLocal ? "24-48h" : String(countries || "-"), showLocal ? "Paid in" : "Countries"],
             ].map(([v, l]) => (
-              <div key={l} className="flex min-w-0 flex-col gap-[4px] rounded-[16px] p-[12px]" style={DARK_CARD}>
-                <span className="tabular truncate text-[18px] font-semibold tracking-[-0.03em] text-white sm:text-[20px]">{v}</span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.mutedDark }}>
+              <div key={l} className="flex min-w-0 flex-col gap-[4px] rounded-[16px] p-[12px]" style={LIGHT_CARD}>
+                <span className="tabular truncate text-[18px] font-semibold tracking-[-0.03em] sm:text-[20px]" style={{ color: C.textLight }}>{v}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.mutedLight }}>
                   {l}
                 </span>
               </div>
             ))}
           </div>
           {hasLocal && (
-            <div className="inline-flex w-fit rounded-full p-[4px]" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.borderDark}` }} role="tablist">
+            <div className="inline-flex w-fit rounded-full p-[4px]" style={{ background: "#fff", border: `1px solid ${C.borderLight}` }} role="tablist">
               {([false, true] as const).map((w) => {
                 const on = worldwide === w;
                 return (
@@ -486,16 +488,16 @@ export function CountryProof() {
                     aria-selected={on}
                     onClick={() => setWorldwide(w)}
                     className="flex cursor-pointer items-center gap-[8px] rounded-full border-0 px-[16px] py-[9px] text-[13px] font-semibold transition-colors"
-                    style={on ? { background: "linear-gradient(180deg,#4f8cff,#2563eb)", color: "#fff", boxShadow: "0 8px 20px -10px rgba(37,99,235,0.9)" } : { background: "transparent", color: C.mutedDark }}
+                    style={on ? { background: "linear-gradient(180deg,#4f8cff,#2563eb)", color: "#fff", boxShadow: "0 8px 20px -10px rgba(37,99,235,0.9)" } : { background: "transparent", color: C.mutedLight }}
                   >
-                    {!w && flag ? <img src={flag} alt="" width={18} height={13} className="h-[13px] w-[18px] rounded-[2px] object-cover" /> : <GIcon name="globe" size={14} color={on ? "#fff" : "#8e98b0"} />}
+                    {!w && flag ? <img src={flag} alt="" width={18} height={13} className="h-[13px] w-[18px] rounded-[2px] object-cover" /> : <GIcon name="globe" size={14} color={on ? "#fff" : "#5b6478"} />}
                     {w ? "Worldwide" : name}
                   </button>
                 );
               })}
             </div>
           )}
-          <DiscordLive />
+          <DiscordLive tone="light" />
         </div>
 
         <Reveal delay={0.1} className="lg:col-span-8">
@@ -518,7 +520,7 @@ export function CountryProof() {
                 <CertificateStage item={ordered[pick] ?? ordered[0]} />
                 <ul className="flex max-h-[420px] flex-col gap-[8px] overflow-y-auto pr-[2px] md:max-h-none">
                   {ordered.length
-                    ? ordered.slice(0, 6).map((p, i) => (
+                    ? ordered.slice(0, 5).map((p, i) => (
                         <FeedRow
                           key={`${p.id ?? "x"}-${i}`}
                           p={p}
@@ -536,8 +538,8 @@ export function CountryProof() {
                 <a href="https://rewards.fundingyourtrades.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-[6px] text-[13px] font-semibold text-[#93c5fd] no-underline hover:underline">
                   <GIcon name="shield" size={15} /> Every reward verified on-chain
                 </a>
-                <Pill href="#plan-finder" onClick={() => pauseHeavyScenesForNav()} className="px-[22px]! py-[12px]! text-[14px]!">
-                  Find my plan
+                <Pill href="#challenge" onClick={() => pauseHeavyScenesForNav()} className="px-[22px]! py-[12px]! text-[14px]!">
+                  Start my challenge
                 </Pill>
               </div>
             </div>
@@ -593,7 +595,7 @@ function recommend(ans: Answer[]): { step: StepId; plan: PlanId; why: string[] }
   return { step, plan, why };
 }
 
-function FinderOption({ label, sub, icon, onClick }: { label: string; sub?: string; icon: IconName; onClick: () => void }) {
+function FinderOption({ label, icon, onClick }: { label: string; icon: IconName; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -605,7 +607,6 @@ function FinderOption({ label, sub, icon, onClick }: { label: string; sub?: stri
       <IconTile name={icon} />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="text-[16px] font-semibold">{label}</span>
-        {sub && <span className="text-[13px]" style={{ color: C.mutedDark }}>{sub}</span>}
       </span>
       <span className="flex size-[32px] shrink-0 items-center justify-center rounded-full transition-colors group-hover:bg-[#2563eb]" style={{ border: `1px solid ${C.borderDark}` }}>
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -653,13 +654,13 @@ function SavePlanForm({ plan, compact = false }: { plan: Omit<SavedPlan, "savedA
   );
 }
 
-export function PlanFinder() {
+/** The 4-tap finder card. Lives in a pop-up opened from the pricing section. */
+function FinderCard({ onDone }: { onDone: () => void }) {
   const reduce = useReducedMotion();
   const [ans, setAns] = useState<Answer[]>([]);
   const step = ans.length;
   const total = FINDER_QUESTIONS.length;
   const done = step >= total;
-  const [ringRef, live] = useLive<HTMLDivElement>();
 
   const rec = done ? recommend(ans) : null;
   const sizes = STEP_SIZES[ans[0] === 0 ? "2-Step" : "1-Step"];
@@ -676,167 +677,194 @@ export function PlanFinder() {
   const back = () => setAns((a) => a.slice(0, -1));
 
   return (
-    <Section tone="light" id="plan-finder">
-      <div className="relative grid grid-cols-1 items-center gap-[40px] lg:grid-cols-12 lg:gap-[64px]">
-        <div className="flex flex-col gap-[22px] lg:col-span-5">
-          <Eyebrow tone="light">Plan finder</Eyebrow>
-          <SectionTitle tone="light" lead="Find the challenge built for" highlight="how you trade." />
-          <Reveal delay={0.1}>
-            <p className="max-w-[440px] text-[16px] leading-[1.7] lg:text-[17px]" style={{ color: C.mutedLight }}>
-              Four quick questions. We match your model and size, and show your price with 40% off.
-            </p>
-          </Reveal>
-          <Reveal delay={0.15}>
-            <div className="grid max-w-[460px] grid-cols-3 gap-[10px]">
-              {(
-                [
-                  ["clock", "30 sec"],
-                  ["users", "No sign-up"],
-                  ["doc", "Saved for later"],
-                ] as const
-              ).map(([icon, t]) => (
-                <div key={t} className="flex flex-col items-start gap-[10px] rounded-[16px] bg-white p-[14px]" style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 18px 40px -30px rgba(30,64,175,0.5)" }}>
-                  <IconTile name={icon} tone="light" size={36} />
-                  <span className="text-[13.5px] font-semibold" style={{ color: C.textLight }}>
-                    {t}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-
-        <Reveal delay={0.1} className="lg:col-span-7">
-          <div className="relative">
-            <div aria-hidden="true" className="pointer-events-none absolute -inset-[40px] rounded-[48px] opacity-80" style={{ background: "radial-gradient(60% 60% at 60% 40%, rgba(59,130,246,0.25), transparent 70%)" }} />
-            <div ref={ringRef} className={`fyt-ring relative rounded-[30px] ${live ? "fyt-live" : ""}`} style={{ boxShadow: "0 70px 140px -60px rgba(30,64,175,0.75)" }}>
-              <div className="flex min-h-[520px] flex-col p-[22px] sm:p-[34px]" aria-live="polite">
-                <div className="flex items-center justify-between gap-[12px]">
-                  <div className="flex items-center gap-[8px]">
-                    {FINDER_QUESTIONS.map((_, i) => (
-                      <span key={i} className="h-[6px] rounded-full transition-all duration-500" style={{ width: i === step ? 28 : 6, background: i < step || done ? "#60a5fa" : i === step ? "linear-gradient(90deg,#2563eb,#93c5fd)" : "rgba(255,255,255,0.14)" }} />
-                    ))}
-                  </div>
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]">{done ? "Your match" : `Step ${step + 1} of ${total}`}</span>
-                </div>
-
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    key={step}
-                    className="mt-[26px] flex flex-1 flex-col"
-                    initial={reduce ? { opacity: 0 } : { opacity: 0, x: 28, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                    exit={reduce ? { opacity: 0 } : { opacity: 0, x: -28, filter: "blur(4px)" }}
-                    transition={{ duration: 0.4, ease: EASE }}
-                  >
-                    {!done && (
-                      <>
-                        <h3 className="mb-[20px] text-[26px] font-semibold leading-[1.12] tracking-[-0.03em] text-white sm:text-[32px]">{FINDER_QUESTIONS[step].q}</h3>
-                        {step < 3 ? (
-                          <div className="flex flex-col gap-[10px]">
-                            {FINDER_QUESTIONS[step].options.map((o, i) => (
-                              <FinderOption key={o.label} {...o} onClick={() => pick(i)} />
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-2 gap-[10px] sm:grid-cols-3">
-                            {sizes.map((s, i) => (
-                              <button
-                                key={s}
-                                type="button"
-                                onClick={() => pick(i)}
-                                onPointerMove={spotlightMove}
-                                className="fyt-spot group flex cursor-pointer flex-col items-start gap-[6px] rounded-[18px] p-[16px] text-left transition-[translate] duration-200 hover:-translate-y-[2px]"
-                                style={DARK_CARD}
-                              >
-                                <span className="text-[24px] font-semibold tracking-[-0.03em] text-white">{fmtSize(s)}</span>
-                                <span className="tabular text-[12.5px]" style={{ color: C.mutedDark }}>
-                                  from {money(getEntry(ans[0] === 0 ? "2-Step" : "1-Step", "prime", "match-trader", s)?.priceNew ?? 0)}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    {done && rec && entry && chosen && (
-                      <div className="flex flex-col gap-[18px]">
-                        <div className="flex flex-wrap items-start justify-between gap-[14px]">
-                          <div className="flex flex-col gap-[8px]">
-                            <span className="inline-flex w-fit items-center gap-[7px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#86efac]" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.28)" }}>
-                              <CheckIcon color="#86efac" size={11} /> Best match for you
-                            </span>
-                            <h3 className="text-[32px] font-semibold leading-none tracking-[-0.035em] text-white sm:text-[40px]">
-                              {fmtSize(size)} {STEP_LABELS[rec.step]}
-                            </h3>
-                            <span className="text-[15px] font-semibold text-[#93c5fd]">{rec.plan === "prime" ? "Prime · No consistency rule" : "Classic · News trading allowed"}</span>
-                          </div>
-                          <div className="flex flex-col items-start gap-[2px] sm:items-end">
-                            <span className="tabular fyt-gradient-text text-[44px] font-semibold leading-none tracking-[-0.04em]">{money(entry.priceNew)}</span>
-                            <span className="flex items-center gap-[8px]">
-                              <s className="tabular text-[15px]" style={{ color: C.mutedDark }}>
-                                {money(entry.priceOld)}
-                              </s>
-                              <span className="rounded-full bg-[#bfdbfe] px-[8px] py-[3px] text-[11px] font-bold text-[#0a1226]">-40%</span>
-                            </span>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 overflow-hidden rounded-[16px] sm:grid-cols-4" style={{ border: `1px solid ${C.borderDark}` }}>
-                          {[
-                            [rec.step === "2-Step" ? `${entry.p1} / ${entry.p2}` : entry.p1 ?? "", "Target"],
-                            [entry.maxDaily, "Daily loss"],
-                            [entry.maxOverall, "Max loss"],
-                            [entry.split.replace("Up to ", ""), "Split"],
-                          ].map(([v, l], i) => (
-                            <div key={l} className="flex flex-col gap-[2px] px-[14px] py-[12px]" style={{ background: "rgba(255,255,255,0.03)", borderLeft: i % 2 || i === 2 ? `1px solid ${C.borderDark}` : undefined, borderTop: i >= 2 ? `1px solid ${C.borderDark}` : undefined }}>
-                              <span className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.mutedDark }}>
-                                {l}
-                              </span>
-                              <span className="tabular text-[18px] font-semibold text-white">{v}</span>
-                            </div>
-                          ))}
-                        </div>
-                        <ul className="flex flex-col gap-[8px]">
-                          {rec.why.map((w) => (
-                            <li key={w} className="flex gap-[10px] text-[14px] leading-[1.5]" style={{ color: "#c7d2e6" }}>
-                              <span className="mt-[2px] flex size-[18px] shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(59,130,246,0.18)" }}>
-                                <CheckIcon size={10} color="#93c5fd" />
-                              </span>
-                              {w}
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="flex flex-wrap gap-[8px]">
-                          {PROMO_CARD_EXTRAS.map((x) => (
-                            <PlusChip key={x}>{x}</PlusChip>
-                          ))}
-                        </div>
-                        <div className="flex flex-col gap-[10px] sm:flex-row">
-                          <Pill href={checkoutUrl(entry.productId)} className="w-full sm:flex-1">
-                            Start challenge
-                          </Pill>
-                          <Pill variant="secondary" onClick={() => selectPlanInPricing(chosen)} arrow={false} className="w-full sm:w-auto">
-                            Compare all plans
-                          </Pill>
-                        </div>
-                        <SavePlanForm plan={chosen} />
-                      </div>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-
-                {step > 0 && (
-                  <button type="button" onClick={done ? () => setAns([]) : back} className="mt-[18px] w-fit cursor-pointer border-0 bg-transparent p-0 text-[13px] font-medium transition-colors hover:text-white" style={{ color: C.mutedDark }}>
-                    {done ? "↺ Start over" : "← Back"}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </Reveal>
+    <div className="flex flex-col p-[20px] sm:p-[30px]" aria-live="polite">
+      <div className="flex items-center gap-[8px] pr-[44px]">
+        {FINDER_QUESTIONS.map((_, i) => (
+          <span key={i} className="h-[5px] flex-1 rounded-full transition-colors duration-500" style={{ background: i < step || done ? "#3b82f6" : i === step ? "rgba(96,165,250,0.55)" : "rgba(255,255,255,0.1)" }} />
+        ))}
       </div>
-    </Section>
+
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={step}
+          className="mt-[22px] flex flex-col"
+          initial={reduce ? { opacity: 0 } : { opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, x: -24 }}
+          transition={{ duration: 0.32, ease: EASE }}
+        >
+          {!done && (
+            <>
+              <h3 className="mb-[18px] text-[24px] font-semibold leading-[1.15] tracking-[-0.03em] text-white sm:text-[28px]">{FINDER_QUESTIONS[step].q}</h3>
+              {step < 3 ? (
+                <div className="flex flex-col gap-[10px]">
+                  {FINDER_QUESTIONS[step].options.map((o, i) => (
+                    <FinderOption key={o.label} label={o.label} icon={o.icon} onClick={() => pick(i)} />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-[10px] sm:grid-cols-3">
+                  {sizes.map((s, i) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => pick(i)}
+                      className="flex cursor-pointer flex-col items-start gap-[4px] rounded-[16px] p-[14px] text-left transition-[translate,background-color] duration-200 hover:-translate-y-[2px] hover:bg-white/[0.06]"
+                      style={DARK_CARD}
+                    >
+                      <span className="text-[22px] font-semibold tracking-[-0.03em] text-white">{fmtSize(s)}</span>
+                      <span className="tabular text-[12.5px]" style={{ color: C.mutedDark }}>
+                        {money(getEntry(ans[0] === 0 ? "2-Step" : "1-Step", "prime", "match-trader", s)?.priceNew ?? 0)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {done && rec && entry && chosen && (
+            <div className="flex flex-col gap-[16px]">
+              <span className="inline-flex w-fit items-center gap-[7px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#86efac]" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.28)" }}>
+                <CheckIcon color="#86efac" size={11} /> Your match
+              </span>
+              <div className="flex flex-wrap items-end justify-between gap-[12px]">
+                <div className="flex flex-col gap-[6px]">
+                  <h3 className="text-[30px] font-semibold leading-none tracking-[-0.035em] text-white sm:text-[36px]">
+                    {fmtSize(size)} {STEP_LABELS[rec.step]}
+                  </h3>
+                  <span className="text-[14px] font-semibold text-[#93c5fd]">{rec.plan === "prime" ? "Prime · No consistency rule" : "Classic · News trading allowed"}</span>
+                </div>
+                <div className="flex items-baseline gap-[8px]">
+                  <span className="tabular fyt-gradient-text text-[38px] font-semibold leading-none tracking-[-0.04em]">{money(entry.priceNew)}</span>
+                  <s className="tabular text-[14px]" style={{ color: C.mutedDark }}>
+                    {money(entry.priceOld)}
+                  </s>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 overflow-hidden rounded-[14px]" style={{ border: `1px solid ${C.borderDark}` }}>
+                {[
+                  [rec.step === "2-Step" ? `${entry.p1}/${entry.p2}` : entry.p1 ?? "", "Target"],
+                  [entry.maxDaily, "Daily"],
+                  [entry.maxOverall, "Max"],
+                  [entry.split.replace("Up to ", ""), "Split"],
+                ].map(([v, l], i) => (
+                  <div key={l} className="flex min-w-0 flex-col gap-[2px] px-[10px] py-[10px] sm:px-[14px]" style={{ background: "rgba(255,255,255,0.03)", borderLeft: i ? `1px solid ${C.borderDark}` : undefined }}>
+                    <span className="text-[9.5px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.mutedDark }}>
+                      {l}
+                    </span>
+                    <span className="tabular truncate text-[14px] font-semibold text-white sm:text-[16px]">{v}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="flex gap-[10px] text-[14px] leading-[1.5]" style={{ color: "#c7d2e6" }}>
+                <CheckIcon size={14} color="#93c5fd" />
+                {rec.why[1]}
+              </p>
+              <div className="flex flex-col gap-[10px] sm:flex-row">
+                <Pill href={checkoutUrl(entry.productId)} className="w-full sm:flex-1">
+                  Start challenge
+                </Pill>
+                <Pill
+                  variant="secondary"
+                  onClick={() => {
+                    onDone();
+                    selectPlanInPricing(chosen);
+                  }}
+                  arrow={false}
+                  className="w-full sm:w-auto"
+                >
+                  See in pricing
+                </Pill>
+              </div>
+              <SavePlanForm plan={chosen} compact />
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      {step > 0 && (
+        <button type="button" onClick={done ? () => setAns([]) : back} className="mt-[16px] w-fit cursor-pointer border-0 bg-transparent p-0 text-[13px] font-medium transition-colors hover:text-white" style={{ color: C.mutedDark }}>
+          {done ? "↺ Start over" : "← Back"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function PlanFinderModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open, onClose]);
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fyt-rd fixed inset-0 z-[1000] flex items-end justify-center p-0 sm:items-center sm:p-[24px]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Plan finder"
+        >
+          <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.72)", backdropFilter: "blur(6px)" }} />
+          <motion.div
+            className="relative max-h-[92vh] w-full max-w-[560px] overflow-y-auto rounded-t-[26px] sm:rounded-[26px]"
+            style={{ background: "linear-gradient(180deg,#0d1834,#070d1d)", border: `1px solid ${C.borderDark}`, boxShadow: "0 60px 120px -40px rgba(37,99,235,0.6)" }}
+            initial={reduce ? false : { y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { y: 40, opacity: 0 }}
+            transition={{ duration: 0.35, ease: EASE }}
+          >
+            <button type="button" onClick={onClose} aria-label="Close plan finder" className="absolute right-[14px] top-[14px] z-[1] flex size-[34px] cursor-pointer items-center justify-center rounded-full border-0 text-white" style={{ background: "rgba(255,255,255,0.08)" }}>
+              <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
+            <FinderCard onDone={onClose} />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body,
+  );
+}
+
+/** Compact heading for the pricing section, with the plan finder behind one button. */
+export function PricingHeading() {
+  const [open, setOpen] = useState(false);
+  const close = useCallback(() => setOpen(false), []);
+  return (
+    <div className="flex flex-col items-center gap-[16px] lg:items-start">
+      <h2 className="text-center text-[34px] font-semibold leading-[1.06] tracking-[-0.035em] text-[#eef0f6] lg:text-left lg:text-[54px]">
+        Choose your <span className="fyt-gradient-text">challenge.</span>
+      </h2>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="group flex cursor-pointer items-center gap-[10px] rounded-full py-[7px] pl-[7px] pr-[16px] text-[14px] font-semibold text-white transition-[translate,border-color] duration-200 hover:-translate-y-[1px]"
+        style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(96,165,250,0.35)" }}
+      >
+        <span className="flex size-[30px] items-center justify-center rounded-full" style={{ background: "linear-gradient(180deg,#4f8cff,#2563eb)" }}>
+          <GIcon name="bolt" size={15} color="#fff" />
+        </span>
+        Not sure? Find your plan in 4 taps
+        <span className="text-[#93c5fd] transition-transform group-hover:translate-x-[3px]">→</span>
+      </button>
+      <PlanFinderModal open={open} onClose={close} />
+    </div>
   );
 }
 
@@ -859,8 +887,8 @@ function PodiumCard({ c, rank }: { c: PublicCertificate; rank: number }) {
       target="_blank"
       rel="noopener noreferrer"
       onPointerMove={spotlightMove}
-      className={`fyt-spot fyt-spot-light group relative flex flex-col overflow-hidden rounded-[24px] bg-white no-underline transition-[translate,box-shadow] duration-300 hover:-translate-y-[4px] ${rank === 0 ? "lg:-translate-y-[22px] lg:hover:-translate-y-[26px]" : ""}`}
-      style={{ border: `1px solid ${C.borderLight}`, boxShadow: `0 40px 80px -46px ${m.glow}, 0 30px 60px -40px rgba(30,64,175,0.45)` }}
+      className={`fyt-spot group relative flex flex-col overflow-hidden rounded-[24px] no-underline transition-[translate,box-shadow] duration-300 hover:-translate-y-[4px] ${rank === 0 ? "lg:-translate-y-[22px] lg:hover:-translate-y-[26px]" : ""}`}
+      style={{ ...DARK_CARD, boxShadow: `0 40px 80px -46px ${m.glow}` }}
     >
       <span className="relative block overflow-hidden" style={{ background: "#0a1226" }}>
         <img src={c.imageUrl} alt={`Payout certificate for ${c.traderName ?? "FYT trader"}`} loading="lazy" decoding="async" className="aspect-[1.41] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
@@ -872,51 +900,57 @@ function PodiumCard({ c, rank }: { c: PublicCertificate; rank: number }) {
         <span className="flex min-w-0 items-center gap-[10px]">
           {f && <img src={f} alt="" width={24} height={17} loading="lazy" className="h-[17px] w-[24px] shrink-0 rounded-[3px] object-cover" />}
           <span className="flex min-w-0 flex-col">
-            <span className="truncate text-[16px] font-semibold" style={{ color: C.textLight }}>
-              {c.traderName ?? "FYT trader"}
-            </span>
-            <span className="text-[12px]" style={{ color: C.mutedLight }}>
-              {relTime(c.createdAt)} · View certificate ↗
+            <span className="truncate text-[16px] font-semibold text-white">{c.traderName ?? "FYT trader"}</span>
+            <span className="text-[12px]" style={{ color: C.mutedDark }}>
+              View certificate ↗
             </span>
           </span>
         </span>
-        <span className="tabular shrink-0 text-[22px] font-semibold tracking-[-0.03em] text-[#16a34a]">{formatPayoutAmount(c.amount)}</span>
+        <span className="tabular shrink-0 text-[22px] font-semibold tracking-[-0.03em] text-[#4ade80]">{formatPayoutAmount(c.amount)}</span>
       </span>
     </a>
   );
 }
 
+/** Every certificate ever issued, biggest first. Countries borrowed from the payout feed. */
+async function fetchBiggestCertificates(n: number): Promise<PublicCertificate[]> {
+  const first = await fetchFeaturedCertificates(1, 100);
+  const pages = Math.min(first.meta?.pagination?.totalPages ?? 1, 20);
+  const restC = await Promise.all(Array.from({ length: Math.max(0, pages - 1) }, (_, i) => fetchFeaturedCertificates(i + 2, 100).catch(() => null)));
+  const all = [...first.data, ...restC.flatMap((r) => r?.data ?? [])];
+  const top = all
+    .filter((c) => Number(c.amount) > 0)
+    .sort((a, b) => Number(b.amount) - Number(a.amount))
+    .slice(0, n);
+  // Fill countries from payouts (certificates carry none).
+  const p1 = await fetchFeaturedPayouts(1, 100).catch(() => null);
+  const pPages = Math.min(p1?.meta?.pagination?.totalPages ?? 1, 20);
+  const restP = await Promise.all(Array.from({ length: Math.max(0, pPages - 1) }, (_, i) => fetchFeaturedPayouts(i + 2, 100).catch(() => null)));
+  const byCert = new Map<string, PublicPayout>();
+  for (const p of [...(p1?.data ?? []), ...restP.flatMap((r) => r?.data ?? [])]) if (p.certificateUrl) byCert.set(p.certificateUrl, p);
+  return top.map((c) => {
+    const p = byCert.get(c.certificateUrl);
+    return p ? { ...c, country: c.country ?? p.country, countryCode: c.countryCode ?? p.countryCode } : c;
+  });
+}
+
+type BoardTab = "live" | "biggest" | "camera";
+
 export function PayoutBoard() {
-  const [tab, setTab] = useState<"biggest" | "camera">("biggest");
+  const [tab, setTab] = useState<BoardTab>("live");
   const [certs, setCerts] = useState<PublicCertificate[]>([]);
   const [video, setVideo] = useState<TestimonialVideo | null>(null);
   const closeVideo = useCallback(() => setVideo(null), []);
   const reduce = useReducedMotion();
+  const asked = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
-    Promise.all([fetchFeaturedCertificates(1, 48), fetchFeaturedPayouts(1, 100).catch(() => null), fetchFeaturedPayouts(2, 100).catch(() => null)])
-      .then(([r, p1, p2]) => {
-        if (cancelled) return;
-        // Certificates carry no country; borrow it from the matching payout.
-        const country = new Map<string, PublicPayout>();
-        for (const p of [...(p1?.data ?? []), ...(p2?.data ?? [])]) if (p.certificateUrl) country.set(p.certificateUrl, p);
-        setCerts(
-          [...r.data]
-            .filter((c) => Number(c.amount) > 0)
-            .sort((a, b) => Number(b.amount) - Number(a.amount))
-            .slice(0, 8)
-            .map((c) => {
-              const p = country.get(c.certificateUrl);
-              return p ? { ...c, country: c.country ?? p.country, countryCode: c.countryCode ?? p.countryCode } : c;
-            }),
-        );
-      })
+    if (tab !== "biggest" || asked.current) return;
+    asked.current = true;
+    fetchBiggestCertificates(8)
+      .then(setCerts)
       .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  }, [tab]);
 
   const top = certs.slice(0, 3);
   const rest = certs.slice(3, 8);
@@ -924,18 +958,17 @@ export function PayoutBoard() {
   const videos = TESTIMONIAL_VIDEOS.slice(0, 7);
 
   return (
-    <Section tone="light" id="live-payouts">
+    <Section tone="dark" stars id="live-payouts">
       <div className="flex flex-col items-center gap-[18px] text-center">
-        <Eyebrow tone="light" center>
-          On the record
-        </Eyebrow>
-        <SectionTitle tone="light" center lead="Real traders." highlight="Real rewards." />
+        <Eyebrow center>Proof</Eyebrow>
+        <SectionTitle center lead="Every reward," highlight="on the record." />
         <Reveal y={12}>
-          <div className="mt-[6px] inline-flex rounded-full bg-white p-[5px]" style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 16px 40px -24px rgba(30,64,175,0.55)" }} role="tablist">
+          <div className="mt-[6px] inline-flex max-w-full overflow-x-auto rounded-full p-[5px]" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.borderDark}` }} role="tablist">
             {(
               [
-                ["biggest", "Biggest rewards", "trophy"],
-                ["camera", "Paid on camera", "monitor"],
+                ["live", "Live payouts", "pulse"],
+                ["biggest", "Biggest", "trophy"],
+                ["camera", "On camera", "monitor"],
               ] as const
             ).map(([id, label, icon]) => (
               <button
@@ -944,10 +977,10 @@ export function PayoutBoard() {
                 role="tab"
                 aria-selected={tab === id}
                 onClick={() => setTab(id)}
-                className="flex cursor-pointer items-center gap-[8px] rounded-full border-0 px-[20px] py-[11px] text-[14px] font-semibold transition-colors"
-                style={tab === id ? { background: "linear-gradient(180deg,#4f8cff,#2563eb)", color: "#fff", boxShadow: "0 10px 24px -12px rgba(37,99,235,0.9)" } : { background: "transparent", color: C.mutedLight }}
+                className="flex shrink-0 cursor-pointer items-center gap-[7px] rounded-full border-0 px-[14px] py-[10px] text-[13.5px] font-semibold transition-colors sm:px-[20px] sm:text-[14px]"
+                style={tab === id ? { background: "linear-gradient(180deg,#4f8cff,#2563eb)", color: "#fff", boxShadow: "0 10px 24px -12px rgba(37,99,235,0.9)" } : { background: "transparent", color: C.mutedDark }}
               >
-                <GIcon name={icon} size={16} color={tab === id ? "#fff" : "#5b6478"} />
+                <GIcon name={icon} size={15} color={tab === id ? "#fff" : "#8e98b0"} />
                 {label}
               </button>
             ))}
@@ -957,17 +990,25 @@ export function PayoutBoard() {
 
       <div className="mt-[44px] lg:mt-[64px]">
         <AnimatePresence mode="wait" initial={false}>
-          {tab === "biggest" ? (
+          {tab === "live" ? (
+            <motion.div key="live" initial={reduce ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.45, ease: EASE }}>
+              <div className="rounded-[24px] bg-white p-[10px] sm:p-[18px] lg:p-[24px]" style={{ boxShadow: "0 60px 120px -60px rgba(37,99,235,0.7)" }}>
+                <Suspense fallback={<div className="h-[420px]" />}>
+                  <RecentVerifiedRewards />
+                </Suspense>
+              </div>
+            </motion.div>
+          ) : tab === "biggest" ? (
             <motion.div key="biggest" initial={reduce ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.45, ease: EASE }}>
               <motion.div className="grid grid-cols-1 items-end gap-[18px] sm:grid-cols-3" variants={staggerParent(0.1)} initial={reduce ? false : "hidden"} whileInView="show" viewport={{ once: true, amount: 0.2 }}>
                 {(top.length ? podiumOrder : [1, 0, 2]).map((rank) => (
                   <motion.div key={rank} variants={staggerChild} className={rank === 0 ? "order-first sm:order-none" : ""}>
-                    {top[rank] ? <PodiumCard c={top[rank]} rank={rank} /> : <div className="aspect-[1.1] animate-pulse rounded-[24px] bg-white" style={{ border: `1px solid ${C.borderLight}` }} />}
+                    {top[rank] ? <PodiumCard c={top[rank]} rank={rank} /> : <div className="aspect-[1.1] animate-pulse rounded-[24px]" style={DARK_CARD} />}
                   </motion.div>
                 ))}
               </motion.div>
               {rest.length > 0 && (
-                <div className="mt-[22px] overflow-hidden rounded-[22px] bg-white" style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 30px 60px -46px rgba(30,64,175,0.45)" }}>
+                <div className="mt-[22px] overflow-hidden rounded-[22px]" style={DARK_CARD}>
                   {rest.map((c, i) => {
                     const f = countryFlagUrl(c.countryCode);
                     return (
@@ -976,25 +1017,20 @@ export function PayoutBoard() {
                         href={c.certificateUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="grid grid-cols-[36px_1fr_auto] items-center gap-[14px] px-[18px] py-[14px] no-underline transition-colors hover:bg-[#f5f8ff] sm:px-[24px]"
-                        style={{ borderTop: i ? `1px solid ${C.borderLight}` : undefined }}
+                        className="grid grid-cols-[36px_1fr_auto] items-center gap-[14px] px-[18px] py-[14px] no-underline transition-colors hover:bg-white/[0.04] sm:px-[24px]"
+                        style={{ borderTop: i ? `1px solid ${C.borderDark}` : undefined }}
                       >
-                        <span className="tabular flex size-[30px] items-center justify-center rounded-full text-[12px] font-bold" style={{ background: "#eef3ff", color: "#2563eb" }}>
+                        <span className="tabular flex size-[30px] items-center justify-center rounded-full text-[12px] font-bold" style={{ background: "rgba(59,130,246,0.14)", color: "#93c5fd" }}>
                           {i + 4}
                         </span>
                         <span className="flex min-w-0 items-center gap-[10px]">
                           {f && <img src={f} alt="" width={22} height={16} loading="lazy" className="h-[16px] w-[22px] shrink-0 rounded-[2px] object-cover" />}
-                          <span className="truncate text-[15px] font-semibold" style={{ color: C.textLight }}>
-                            {c.traderName ?? "FYT trader"}
-                          </span>
-                          <span className="hidden text-[12.5px] sm:inline" style={{ color: C.mutedLight }}>
-                            {relTime(c.createdAt)}
-                          </span>
+                          <span className="truncate text-[15px] font-semibold text-white">{c.traderName ?? "FYT trader"}</span>
                         </span>
                         <span className="flex items-center gap-[10px]">
-                          <span className="tabular text-[16px] font-semibold text-[#16a34a]">{formatPayoutAmount(c.amount)}</span>
-                          <span className="hidden items-center gap-[4px] text-[12px] font-semibold text-[#2563eb] sm:flex">
-                            <CheckIcon size={11} color="#2563eb" /> Certificate
+                          <span className="tabular text-[16px] font-semibold text-[#4ade80]">{formatPayoutAmount(c.amount)}</span>
+                          <span className="hidden items-center gap-[4px] text-[12px] font-semibold text-[#93c5fd] sm:flex">
+                            <CheckIcon size={11} color="#93c5fd" /> Certificate
                           </span>
                         </span>
                       </a>
@@ -1011,7 +1047,7 @@ export function PayoutBoard() {
                   type="button"
                   onClick={() => setVideo(v)}
                   className={`group relative cursor-pointer overflow-hidden rounded-[22px] border-0 p-0 text-left ${i === 0 ? "col-span-2 row-span-2" : ""}`}
-                  style={{ boxShadow: "0 40px 80px -46px rgba(30,64,175,0.6)" }}
+                  style={{ boxShadow: "0 40px 80px -46px rgba(37,99,235,0.8)", border: `1px solid ${C.borderDark}` }}
                   aria-label={`Play ${v.name}'s payout video`}
                 >
                   <span className="relative block h-full overflow-hidden" style={{ aspectRatio: i === 0 ? undefined : "16/10" }}>
@@ -1041,11 +1077,11 @@ export function PayoutBoard() {
       </div>
 
       <Reveal delay={0.1} className="mt-[40px] flex flex-col items-center justify-center gap-[14px] sm:flex-row">
-        <Pill href="#plan-finder" onClick={() => pauseHeavyScenesForNav()}>
-          Get on the board
+        <Pill href="#challenge" onClick={() => pauseHeavyScenesForNav()}>
+          Start my challenge
         </Pill>
-        <Pill href="https://rewards.fundingyourtrades.com/" target="_blank" rel="noopener noreferrer" variant="secondary" tone="light">
-          Check more rewards
+        <Pill href="https://rewards.fundingyourtrades.com/" target="_blank" rel="noopener noreferrer" variant="secondary">
+          See all rewards
         </Pill>
       </Reveal>
       <VideoLightbox source={video ? testimonialVideoSource(video) : null} onClose={closeVideo} />
@@ -1225,13 +1261,13 @@ export function RewardCalculator() {
 /* ------------------------------------------------------------------ */
 
 const EXPERTISE_CARDS: { icon: IconName; problem: string; fix: string; tag: string }[] = [
-  { icon: "scale", problem: "Consistency rules limit natural performance.", fix: "No consistency rule. Trade your natural style.", tag: "Consistency" },
-  { icon: "clock", problem: "Time limits create pressure.", fix: "No time limit. Pass at your own pace.", tag: "Time" },
-  { icon: "doc", problem: "Hidden rules cause breaches.", fix: "Every rule written down, nothing added at payout.", tag: "Rules" },
-  { icon: "trend", problem: "Relative drawdown punishes progress.", fix: "Static drawdown that never moves against you.", tag: "Drawdown" },
-  { icon: "calendar", problem: "Delayed rewards damage trust.", fix: "Weekly rewards. First one on demand, in 24-48h.", tag: "Rewards" },
-  { icon: "news", problem: "News and weekend bans block your strategy.", fix: "News trading and weekend holding allowed.", tag: "Freedom" },
-];
+  { icon: "scale", problem: "Other firms: consistency rules", fix: "No consistency rule", tag: "Consistency" },
+  { icon: "clock", problem: "Other firms: 30-day time limits", fix: "No time limit", tag: "Time" },
+  { icon: "doc", problem: "Other firms: hidden rules at payout", fix: "Every rule written down", tag: "Rules" },
+  { icon: "trend", problem: "Other firms: trailing drawdown", fix: "Static drawdown", tag: "Drawdown" },
+  { icon: "calendar", problem: "Other firms: slow, delayed payouts", fix: "Rewards in 24-48h", tag: "Rewards" },
+  { icon: "news", problem: "Other firms: news and weekend bans", fix: "News and weekends allowed", tag: "Freedom" },
+]
 
 /** Text that gets a red strike-through (on every wrapped line) once it scrolls into view. */
 function StrikeText({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
@@ -1242,9 +1278,9 @@ function StrikeText({ children, delay = 0 }: { children: ReactNode; delay?: numb
   return (
     <span
       ref={ref}
-      className="text-[15.5px] leading-[1.45]"
+      className="text-[13px] leading-[1.4]"
       style={{
-        color: "#8b93a7",
+        color: "#98a0b3",
         textDecorationLine: "line-through",
         textDecorationThickness: "1.5px",
         textDecorationColor: on ? "rgba(239,68,68,0.75)" : "rgba(239,68,68,0)",
@@ -1260,71 +1296,41 @@ export function ProveYourExpertise() {
   const reduce = useReducedMotion();
   const [titleRef, shimmer] = useShimmer<HTMLHeadingElement>();
   return (
-    <Section tone="light">
-      <div className="grid grid-cols-1 items-center gap-[44px] lg:grid-cols-12 lg:gap-[56px]">
-        <div className="flex flex-col gap-[22px] lg:col-span-5">
-          <Eyebrow tone="light">Why FYT</Eyebrow>
-          <h2 ref={titleRef} className={`text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-[38px] lg:text-[50px] ${shimmer}`} style={{ color: C.textLight }}>
-            <WordsReveal text="Prove Your Market Expertise." />
-            <br />
-            <span className="font-normal" style={{ color: "#3c465c" }}>
-              <WordsReveal text="Not your ability to survive" delay={0.15} />
-            </span>{" "}
-            <WordsReveal text="unfair rules." wordClassName="fyt-gradient-text font-semibold" delay={0.3} />
-          </h2>
-          <Reveal delay={0.1}>
-            <p className="max-w-[420px] text-[16px] leading-[1.7]" style={{ color: C.mutedLight }}>
-              Most traders don't fail on skill. They fail on rules built to trip them up. We removed them.
-            </p>
-          </Reveal>
-          <Reveal delay={0.15} className="hidden lg:block">
-            <OrbVisual size={340} />
-          </Reveal>
-        </div>
-
-        <motion.ul
-          className="grid grid-cols-1 gap-[14px] sm:grid-cols-2 lg:col-span-7"
-          variants={staggerParent(0.09)}
-          initial={reduce ? false : "hidden"}
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          {EXPERTISE_CARDS.map((c, i) => (
-            <motion.li
-              key={c.tag}
-              variants={staggerChild}
-              onPointerMove={spotlightMove}
-              className="fyt-spot fyt-spot-light group relative flex flex-col overflow-hidden rounded-[22px] bg-white transition-[translate,box-shadow] duration-500 hover:-translate-y-[4px] hover:shadow-[0_32px_70px_-30px_rgba(37,99,235,0.5)]"
-              style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 18px 40px -30px rgba(15,23,42,0.35)" }}
-            >
-              <div className="flex flex-col gap-[14px] p-[20px] pb-[16px] lg:p-[24px] lg:pb-[18px]">
-                <span className="flex items-center justify-between">
-                  <span className="flex items-center gap-[8px] text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: "#b4bccd" }}>
-                    <span className="flex size-[18px] items-center justify-center rounded-full" style={{ background: "#fdecec" }}>
-                      <svg width="8" height="8" viewBox="0 0 16 16" aria-hidden="true">
-                        <path d="M4 4l8 8M12 4l-8 8" stroke="#ef4444" strokeWidth="2.6" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                    Other firms
-                  </span>
-                  <span className="tabular text-[12px] font-semibold tracking-[0.1em]" style={{ color: "#a3b3d4" }} aria-hidden="true">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </span>
-                <StrikeText delay={0.5 + i * 0.08}>{c.problem}</StrikeText>
-              </div>
-              <div className="relative mt-auto flex items-center gap-[14px] px-[20px] py-[16px] transition-colors duration-500 group-hover:bg-[#2563eb] lg:px-[24px] lg:py-[18px]" style={{ background: "linear-gradient(180deg, #f3f7ff, #eaf1ff)", borderTop: "1px solid #e3eaf7" }}>
-                <span className="flex size-[42px] shrink-0 items-center justify-center rounded-[13px] bg-white text-[#2563eb] shadow-[0_8px_20px_-10px_rgba(37,99,235,0.6)] transition-colors duration-500 group-hover:bg-white/15 group-hover:text-white">
-                  <GIcon name={c.icon} size={20} color="currentColor" />
-                </span>
-                <span className="text-[16px] font-semibold leading-[1.4] tracking-[-0.01em] transition-colors duration-500 group-hover:text-white lg:text-[17px]" style={{ color: "#0b1d4d" }}>
-                  {c.fix}
-                </span>
-              </div>
-            </motion.li>
-          ))}
-        </motion.ul>
+    <Section tone="light" id="how-it-works">
+      <div className="flex flex-col items-center gap-[16px] text-center">
+        <Eyebrow tone="light" center>
+          Why FYT
+        </Eyebrow>
+        <h2 ref={titleRef} className={`text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-[40px] lg:text-[52px] ${shimmer}`} style={{ color: C.textLight }}>
+          <WordsReveal text="Prove your" /> <WordsReveal text="market expertise." wordClassName="fyt-gradient-text" delay={0.12} />
+        </h2>
       </div>
+      <motion.ul
+        className="mx-auto mt-[36px] grid max-w-[1040px] grid-cols-1 gap-[12px] md:grid-cols-2 lg:mt-[52px] lg:gap-[14px]"
+        variants={staggerParent(0.07)}
+        initial={reduce ? false : "hidden"}
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        {EXPERTISE_CARDS.map((c, i) => (
+          <motion.li
+            key={c.tag}
+            variants={staggerChild}
+            className="group flex items-center gap-[14px] rounded-[18px] bg-white p-[14px] transition-[translate,box-shadow] duration-300 hover:-translate-y-[2px] hover:shadow-[0_28px_60px_-30px_rgba(37,99,235,0.5)] sm:p-[18px]"
+            style={{ border: `1px solid ${C.borderLight}`, boxShadow: "0 16px 36px -30px rgba(15,23,42,0.35)" }}
+          >
+            <span className="flex size-[44px] shrink-0 items-center justify-center rounded-[13px] text-[#2563eb] transition-colors duration-300 group-hover:bg-[#2563eb] group-hover:text-white" style={{ background: "#eef3ff" }}>
+              <GIcon name={c.icon} size={21} color="currentColor" />
+            </span>
+            <span className="flex min-w-0 flex-col gap-[3px] text-left">
+              <span className="text-[15.5px] font-semibold leading-[1.35] tracking-[-0.01em] sm:text-[16.5px]" style={{ color: "#0b1d4d" }}>
+                {c.fix}
+              </span>
+              <StrikeText delay={0.4 + i * 0.08}>{c.problem}</StrikeText>
+            </span>
+          </motion.li>
+        ))}
+      </motion.ul>
     </Section>
   );
 }

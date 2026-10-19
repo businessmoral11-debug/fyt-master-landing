@@ -24,6 +24,7 @@ import {
 } from "@/app/BelowFold";
 import { C, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent, useShimmer } from "./ui";
 import { PricingOffer, PricingTrustLine } from "./Conversion";
+import { PricingHeading } from "./Growth";
 
 const FeaturedCertificates = lazy(() => import("@/app/featuredCertificates").then((m) => ({ default: m.FeaturedCertificates })));
 const RecentVerifiedRewards = lazy(() => import("@/app/recentVerifiedRewards").then((m) => ({ default: m.RecentVerifiedRewards })));
@@ -346,7 +347,7 @@ export function LivePayouts() {
 /* Pricing — existing configurator in a new stage                      */
 /* ------------------------------------------------------------------ */
 
-const PRICING_SLOTS = { offerSlot: <PricingOffer />, afterCheckoutSlot: <PricingTrustLine /> };
+const PRICING_SLOTS = { offerSlot: <PricingOffer />, afterCheckoutSlot: <PricingTrustLine />, headingSlot: <PricingHeading /> };
 
 export function PricingSection() {
   return (
@@ -385,17 +386,11 @@ export function Testimonials() {
       <div ref={ref} className="relative mx-auto flex w-full max-w-[1280px] flex-col items-center gap-[40px] px-[20px] pt-[72px] lg:gap-[56px] lg:px-[80px] lg:pt-[120px]">
         <div className="flex flex-col items-center gap-[18px] text-center">
           <Eyebrow tone="light" center>
-            Trust
+            Reviews
           </Eyebrow>
           <h2 ref={trustRef} className={`max-w-[760px] text-[32px] font-semibold leading-[1.06] tracking-[-0.035em] sm:text-[40px] lg:text-[54px] ${trustShimmer}`} style={{ color: C.textLight }}>
-            <WordsReveal text="Trusted by" /> <WordsReveal text="21,500+" wordClassName="fyt-gradient-text" delay={0.1} />{" "}
-            <WordsReveal text="satisfied clients worldwide." delay={0.2} />
+            <WordsReveal text="In our traders'" /> <WordsReveal text="own words." wordClassName="fyt-gradient-text" delay={0.1} />
           </h2>
-          <Reveal delay={0.2}>
-            <p className="max-w-[560px] text-[16px] leading-[1.7] lg:text-[18px]" style={{ color: C.mutedLight }}>
-              Real experiences, verified rewards and transparent feedback from our traders.
-            </p>
-          </Reveal>
         </div>
       </div>
       <div className="relative mx-auto flex w-full max-w-[1280px] flex-col items-center px-[20px] pt-[40px] lg:px-[88px] lg:pt-[56px]">

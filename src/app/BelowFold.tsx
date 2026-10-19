@@ -1646,10 +1646,10 @@ function PickerLabel({ id, n, children, aside }: { id: string; n: number; childr
 }
 
 /** Optional extra content the redesign injects around the configurator (offer card, trust line). */
-export const PricingSlotsContext = createContext<{ offerSlot?: ReactNode; afterCheckoutSlot?: ReactNode }>({});
+export const PricingSlotsContext = createContext<{ offerSlot?: ReactNode; afterCheckoutSlot?: ReactNode; headingSlot?: ReactNode }>({});
 
 export function Pricing() {
-  const { offerSlot, afterCheckoutSlot } = useContext(PricingSlotsContext);
+  const { offerSlot, afterCheckoutSlot, headingSlot } = useContext(PricingSlotsContext);
   const headingRef = useRef<HTMLParagraphElement>(null);
   const headingSeen = useInView(headingRef, { once: true, amount: 0.6 });
   const [step, setStep] = useState<StepId>("2-Step");
@@ -1851,6 +1851,7 @@ export function Pricing() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="flex-1 flex flex-col gap-[12px] items-center lg:items-start"
             >
+              {headingSlot ?? (<>
               <p ref={headingRef} className={`font-['DM_Sans',sans-serif] font-semibold leading-[1.06] text-[#eef0f6] text-[34px] lg:text-[54px] tracking-[-0.035em] text-center lg:text-left ${headingSeen ? "fyt-shimmer-on" : ""}`}>
                 Find the right challenge
                 <br />
@@ -1858,6 +1859,7 @@ export function Pricing() {
                 <span className="fyt-gradient-text">under a minute.</span>
               </p>
               <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.6] text-[#9da2b4] text-[16px] lg:text-[18px] text-center lg:text-left">Pick a model, compare essentials, and start with clarity.</p>
+              </>)}
             </motion.div>
             <button
               type="button"

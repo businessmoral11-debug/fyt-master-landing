@@ -1,13 +1,13 @@
-import { FeaturedIn, PricingSection, ProofInNumbers, Testimonials } from "./SectionsTop";
-import { ClosingCta, Comparison, Faq, Footer, HowItWorks, ProductShowcase } from "./SectionsBottom";
+import { FeaturedIn, PricingSection, Testimonials } from "./SectionsTop";
+import { ClosingCta, Faq, Footer, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
-import { FloatingCta } from "./Conversion";
-import { CountryProof, ExitSavePlan, FreeDemo, PayoutBoard, PlanFinder, ProveYourExpertise, RewardCalculator, WelcomeBack, ZeroRisk } from "./Growth";
+import { CountryProof, ExitSavePlan, FreeDemo, PayoutBoard, ProveYourExpertise, WelcomeBack, ZeroRisk } from "./Growth";
 
 /**
- * Redesigned landing page below the hero. Same content, data, links and
- * checkout flow as the original BelowFold — new visual system, lighter
- * scroll-driven motion (no pinned scroll-jacking sections).
+ * Redesigned landing page below the hero. Sections alternate dark / white:
+ * hero (dark) > country rewards (white) > pricing (dark) > why FYT (white) >
+ * proof board (dark) > reviews (white) > zero risk (dark) > free demo (white) >
+ * platform (dark) > FAQ (white) > closing CTA + footer (dark).
  */
 export function BelowFold() {
   return (
@@ -16,22 +16,16 @@ export function BelowFold() {
       <WelcomeBack />
       <FeaturedIn />
       <CountryProof />
-      <ProveYourExpertise />
-      <ProofInNumbers />
-      <PlanFinder />
       <PricingSection />
+      <ProveYourExpertise />
       <PayoutBoard />
-      <RewardCalculator />
       <Testimonials />
-      <HowItWorks />
-      <Comparison />
       <ZeroRisk />
       <FreeDemo />
       <ProductShowcase />
-      <ClosingCta />
       <Faq />
+      <ClosingCta />
       <Footer />
-      <FloatingCta />
       <ExitSavePlan />
     </>
   );
