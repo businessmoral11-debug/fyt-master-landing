@@ -303,11 +303,11 @@ function certFromPayout(p: PublicPayout): PublicCertificate | undefined {
   };
 }
 
-function FeedRow({ p, active, onPick }: { p: ProofItem; active: boolean; onPick: () => void }) {
+function FeedRow({ p, active, onPick, className = "" }: { p: ProofItem; active: boolean; onPick: () => void; className?: string }) {
   const f = countryFlagUrl(p.countryCode);
   const link = p.cert?.certificateUrl || p.certificateUrl || p.explorerUrl;
   return (
-    <li>
+    <li className={className}>
       <button
         type="button"
         onClick={onPick}
@@ -399,6 +399,7 @@ export function CountryProof() {
   const [worldwide, setWorldwide] = useState(false);
   const [pick, setPick] = useState(0);
   const [auto, setAuto] = useState(true);
+  const [more, setMore] = useState(false);
   const [panelRef, panelLive] = useLive<HTMLDivElement>();
 
   useEffect(() => {
@@ -506,7 +507,7 @@ export function CountryProof() {
               <div className="flex items-center justify-between gap-[12px]">
                 <span className="flex items-center gap-[10px] text-[13px] font-semibold text-white">
                   {showLocal && flag ? <img src={flag} alt="" width={22} height={16} className="h-[16px] w-[22px] rounded-[3px] object-cover" /> : <GIcon name="globe" size={16} />}
-                  Latest rewards {showLocal ? `in ${name}` : "worldwide"}
+                  Recent rewards {showLocal ? `from ${name}` : "worldwide"}
                 </span>
                 <span className="flex items-center gap-[7px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#86efac]" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.28)" }}>
                   <span className="relative flex size-[7px]">
@@ -518,10 +519,11 @@ export function CountryProof() {
               </div>
               <div className="grid grid-cols-1 gap-[16px] md:grid-cols-[1.15fr_1fr]">
                 <CertificateStage item={ordered[pick] ?? ordered[0]} />
-                <ul className="flex max-h-[420px] flex-col gap-[8px] overflow-y-auto pr-[2px] md:max-h-none">
+                <ul className="flex flex-col gap-[8px]">
                   {ordered.length
                     ? ordered.slice(0, 5).map((p, i) => (
                         <FeedRow
+                          className={i >= 3 && !more ? "hidden md:block" : ""}
                           key={`${p.id ?? "x"}-${i}`}
                           p={p}
                           active={i === pick}
@@ -532,6 +534,13 @@ export function CountryProof() {
                         />
                       ))
                     : Array.from({ length: 5 }, (_, i) => <li key={i} className="h-[62px] animate-pulse rounded-[16px]" style={DARK_CARD} />)}
+                  {ordered.length > 3 && !more && (
+                    <li className="md:hidden">
+                      <button type="button" onClick={() => setMore(true)} className="w-full cursor-pointer rounded-[14px] border-0 py-[12px] text-[13.5px] font-semibold text-[#93c5fd]" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(96,165,250,0.22)" }}>
+                        View more
+                      </button>
+                    </li>
+                  )}
                 </ul>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-[12px] border-t pt-[14px]" style={{ borderColor: C.borderDark }}>
@@ -810,7 +819,7 @@ export function PlanFinderModal({ open, onClose }: { open: boolean; onClose: () 
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fyt-rd fixed inset-0 z-[1000] flex items-end justify-center p-0 sm:items-center sm:p-[24px]"
+          className="fyt-rd fixed inset-0 z-[2147483100] flex items-end justify-center p-0 sm:items-center sm:p-[24px]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -821,7 +830,7 @@ export function PlanFinderModal({ open, onClose }: { open: boolean; onClose: () 
         >
           <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.72)", backdropFilter: "blur(6px)" }} />
           <motion.div
-            className="relative max-h-[92vh] w-full max-w-[560px] overflow-y-auto rounded-t-[26px] sm:rounded-[26px]"
+            className="relative max-h-[92dvh] w-full max-w-[560px] overflow-y-auto rounded-t-[26px] pb-[env(safe-area-inset-bottom)] sm:rounded-[26px]"
             style={{ background: "linear-gradient(180deg,#0d1834,#070d1d)", border: `1px solid ${C.borderDark}`, boxShadow: "0 60px 120px -40px rgba(37,99,235,0.6)" }}
             initial={reduce ? false : { y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -938,6 +947,7 @@ type BoardTab = "live" | "biggest" | "camera";
 
 export function PayoutBoard() {
   const [tab, setTab] = useState<BoardTab>("live");
+  const [liveMore, setLiveMore] = useState(false);
   const [certs, setCerts] = useState<PublicCertificate[]>([]);
   const [video, setVideo] = useState<TestimonialVideo | null>(null);
   const closeVideo = useCallback(() => setVideo(null), []);
@@ -961,7 +971,7 @@ export function PayoutBoard() {
     <Section tone="dark" stars id="live-payouts">
       <div className="flex flex-col items-center gap-[18px] text-center">
         <Eyebrow center>Proof</Eyebrow>
-        <SectionTitle center lead="Every reward," highlight="on the record." />
+        <SectionTitle tone="dark" center lead="Every reward," highlight="on the record." />
         <Reveal y={12}>
           <div className="mt-[6px] inline-flex max-w-full overflow-x-auto rounded-full p-[5px]" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.borderDark}` }} role="tablist">
             {(
@@ -992,10 +1002,17 @@ export function PayoutBoard() {
         <AnimatePresence mode="wait" initial={false}>
           {tab === "live" ? (
             <motion.div key="live" initial={reduce ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.45, ease: EASE }}>
-              <div className="rounded-[24px] bg-white p-[10px] sm:p-[18px] lg:p-[24px]" style={{ boxShadow: "0 60px 120px -60px rgba(37,99,235,0.7)" }}>
+              <div className={`relative overflow-hidden rounded-[24px] bg-white p-[10px] sm:max-h-none sm:p-[18px] lg:p-[24px] ${liveMore ? "" : "max-h-[560px]"}`} style={{ boxShadow: "0 60px 120px -60px rgba(37,99,235,0.7)" }}>
                 <Suspense fallback={<div className="h-[420px]" />}>
                   <RecentVerifiedRewards />
                 </Suspense>
+                {!liveMore && (
+                  <div className="absolute inset-x-0 bottom-0 flex h-[150px] items-end justify-center pb-[16px] sm:hidden" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0), #fff 70%)" }}>
+                    <button type="button" onClick={() => setLiveMore(true)} className="cursor-pointer rounded-full border-0 px-[22px] py-[11px] text-[14px] font-semibold text-white" style={{ background: "linear-gradient(180deg,#4f8cff,#2563eb)", boxShadow: "0 10px 24px -12px rgba(37,99,235,0.9)" }}>
+                      View more payouts
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           ) : tab === "biggest" ? (
@@ -1304,6 +1321,11 @@ export function ProveYourExpertise() {
         <h2 ref={titleRef} className={`text-[32px] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-[40px] lg:text-[52px] ${shimmer}`} style={{ color: C.textLight }}>
           <WordsReveal text="Prove your" /> <WordsReveal text="market expertise." wordClassName="fyt-gradient-text" delay={0.12} />
         </h2>
+        <Reveal delay={0.15}>
+          <p className="max-w-[460px] text-[16px] leading-[1.6] lg:text-[18px]" style={{ color: C.mutedLight }}>
+            Most traders don't fail on skill. They fail on rules. <span className="font-semibold" style={{ color: C.textLight }}>We removed them.</span>
+          </p>
+        </Reveal>
       </div>
       <motion.ul
         className="mx-auto mt-[36px] grid max-w-[1040px] grid-cols-1 gap-[12px] md:grid-cols-2 lg:mt-[52px] lg:gap-[14px]"
