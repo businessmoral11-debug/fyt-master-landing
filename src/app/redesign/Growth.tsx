@@ -14,6 +14,7 @@ import {
   type PublicPayout,
 } from "@/app/api/rewardsApi";
 import { COMPARISON_ROWS, VideoLightbox } from "@/app/BelowFold";
+import { API_BASE_URL } from "@/app/api/apiBaseUrl";
 import { testimonialVideoSource } from "@/app/motion/videoLightbox";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import {
@@ -281,7 +282,23 @@ function attachCertificates(payouts: PublicPayout[], certs: PublicCertificate[])
     if (c.certificateUrl) byUrl.set(c.certificateUrl, c);
     byKey.set(certKey(c.traderName, c.amount), c);
   }
-  return payouts.map((p) => ({ ...p, cert: (p.certificateUrl && byUrl.get(p.certificateUrl)) || byKey.get(certKey(p.traderName, p.amount)) }));
+  return payouts.map((p) => ({ ...p, cert: (p.certificateUrl && byUrl.get(p.certificateUrl)) || byKey.get(certKey(p.traderName, p.amount)) || certFromPayout(p) }));
+}
+
+/** Every payout links to /certificate/{id}; the image lives at /public/certificates/{id}/image. */
+function certFromPayout(p: PublicPayout): PublicCertificate | undefined {
+  const id = /\/certificate\/([0-9a-f-]{16,})/i.exec(p.certificateUrl ?? "")?.[1];
+  if (!id || !p.certificateUrl) return undefined;
+  return {
+    certificateId: id,
+    traderName: p.traderName,
+    country: p.country,
+    countryCode: p.countryCode,
+    amount: p.amount,
+    createdAt: p.createdAt ?? "",
+    imageUrl: `${API_BASE_URL}/public/certificates/${id}/image`,
+    certificateUrl: p.certificateUrl,
+  };
 }
 
 function FeedRow({ p, active, onPick }: { p: ProofItem; active: boolean; onPick: () => void }) {
@@ -376,7 +393,6 @@ function CertificateStage({ item }: { item: ProofItem | undefined }) {
 export function CountryProof() {
   const [code, setCode] = useState<string | null>(null);
   const [payouts, setPayouts] = useState<PublicPayout[]>([]);
-  const [certs, setCerts] = useState<PublicCertificate[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [worldwide, setWorldwide] = useState(false);
   const [pick, setPick] = useState(0);
@@ -386,16 +402,10 @@ export function CountryProof() {
   useEffect(() => {
     setCode(detectVisitorCountry());
     let cancelled = false;
-    Promise.all([
-      fetchFeaturedPayouts(1, 100).catch(() => null),
-      fetchFeaturedPayouts(2, 100).catch(() => null),
-      fetchFeaturedCertificates(1, 100).catch(() => null),
-      fetchFeaturedCertificates(2, 100).catch(() => null),
-    ])
-      .then(([p1, p2, c1, c2]) => {
+    Promise.all([fetchFeaturedPayouts(1, 100).catch(() => null), fetchFeaturedPayouts(2, 100).catch(() => null), fetchFeaturedPayouts(3, 100).catch(() => null)])
+      .then((rs) => {
         if (cancelled) return;
-        setPayouts([...(p1?.data ?? []), ...(p2?.data ?? [])].filter((p) => Number(p.amount) > 0));
-        setCerts([...(c1?.data ?? []), ...(c2?.data ?? [])]);
+        setPayouts(rs.flatMap((r) => r?.data ?? []).filter((p) => Number(p.amount) > 0));
       })
       .finally(() => {
         if (!cancelled) setLoaded(true);
@@ -405,7 +415,7 @@ export function CountryProof() {
     };
   }, []);
 
-  const items = useMemo(() => attachCertificates(payouts, certs), [payouts, certs]);
+  const items = useMemo(() => attachCertificates(payouts, []), [payouts]);
   const local = useMemo(() => (code ? items.filter((p) => (p.countryCode ?? "").toUpperCase() === code) : []), [code, items]);
   const hasLocal = local.length >= 3;
   const showLocal = hasLocal && !worldwide;
@@ -885,10 +895,22 @@ export function PayoutBoard() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchFeaturedCertificates(1, 48)
-      .then((r) => {
+    Promise.all([fetchFeaturedCertificates(1, 48), fetchFeaturedPayouts(1, 100).catch(() => null), fetchFeaturedPayouts(2, 100).catch(() => null)])
+      .then(([r, p1, p2]) => {
         if (cancelled) return;
-        setCerts([...r.data].filter((c) => Number(c.amount) > 0).sort((a, b) => Number(b.amount) - Number(a.amount)).slice(0, 8));
+        // Certificates carry no country; borrow it from the matching payout.
+        const country = new Map<string, PublicPayout>();
+        for (const p of [...(p1?.data ?? []), ...(p2?.data ?? [])]) if (p.certificateUrl) country.set(p.certificateUrl, p);
+        setCerts(
+          [...r.data]
+            .filter((c) => Number(c.amount) > 0)
+            .sort((a, b) => Number(b.amount) - Number(a.amount))
+            .slice(0, 8)
+            .map((c) => {
+              const p = country.get(c.certificateUrl);
+              return p ? { ...c, country: c.country ?? p.country, countryCode: c.countryCode ?? p.countryCode } : c;
+            }),
+        );
       })
       .catch(() => {});
     return () => {
