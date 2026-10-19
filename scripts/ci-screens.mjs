@@ -19,6 +19,16 @@ async function open(vp, query = "") {
   return { ctx, page };
 }
 
+// Log the shape of the rewards feeds (helps match payouts to certificate images).
+try {
+  const api = "https://rewards.fundingyourtrades.com/api/v1/public";
+  const p = await (await fetch(`${api}/featured-payouts?limit=3&page=1&sort=latest`)).json();
+  const c = await (await fetch(`${api}/featured-certificates?limit=3&page=1&sort=latest`)).json();
+  log.push("[api] payouts " + JSON.stringify(p.data?.slice(0, 3)));
+  log.push("[api] certificates " + JSON.stringify(c.data?.slice(0, 3)));
+  log.push("[api] payouts total " + JSON.stringify(p.meta) + " certs total " + JSON.stringify(c.meta));
+} catch (e) { log.push("[api] fail " + e.message); }
+
 const viewports = [
   { name: "desktop", width: 1440, height: 900, mobile: false },
   { name: "mobile", width: 390, height: 844, mobile: true },

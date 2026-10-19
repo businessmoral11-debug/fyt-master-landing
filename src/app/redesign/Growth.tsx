@@ -267,50 +267,135 @@ function SpringNumber({ value, format, className }: { value: number; format: (n:
 /* 1. Country-matched proof: "People like me get paid"                 */
 /* ------------------------------------------------------------------ */
 
-function FeedRow({ p }: { p: PublicPayout }) {
+type ProofItem = PublicPayout & { cert?: PublicCertificate };
+
+function certKey(name: string | null, amount: string): string {
+  return `${(name ?? "").trim().toLowerCase()}|${Number(amount).toFixed(2)}`;
+}
+
+/** Joins each payout to its certificate image (same feeds the rewards widgets use). */
+function attachCertificates(payouts: PublicPayout[], certs: PublicCertificate[]): ProofItem[] {
+  const byUrl = new Map<string, PublicCertificate>();
+  const byKey = new Map<string, PublicCertificate>();
+  for (const c of certs) {
+    if (c.certificateUrl) byUrl.set(c.certificateUrl, c);
+    byKey.set(certKey(c.traderName, c.amount), c);
+  }
+  return payouts.map((p) => ({ ...p, cert: (p.certificateUrl && byUrl.get(p.certificateUrl)) || byKey.get(certKey(p.traderName, p.amount)) }));
+}
+
+function FeedRow({ p, active, onPick }: { p: ProofItem; active: boolean; onPick: () => void }) {
   const f = countryFlagUrl(p.countryCode);
-  const proof = p.certificateUrl || p.explorerUrl;
+  const link = p.cert?.certificateUrl || p.certificateUrl || p.explorerUrl;
   return (
-    <li className="flex items-center gap-[14px] rounded-[16px] px-[14px] py-[12px]" style={{ background: "linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015))", border: `1px solid ${C.borderDark}` }}>
-      <span className="relative flex size-[42px] shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-white" style={{ background: "linear-gradient(135deg, #2563eb, #60a5fa)", boxShadow: "0 6px 16px -6px rgba(37,99,235,0.9)" }}>
-        {initials(p.traderName)}
-        {f && <img src={f} alt="" width={18} height={13} loading="lazy" className="absolute -bottom-[2px] -right-[4px] h-[13px] w-[18px] rounded-[3px] object-cover ring-2 ring-[#0a1226]" />}
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-[15px] font-semibold text-white">{p.traderName ?? "FYT trader"}</span>
-        <span className="truncate text-[12.5px]" style={{ color: C.mutedDark }}>
-          {[p.country, relTime(p.createdAt)].filter(Boolean).join(" · ")}
-        </span>
-      </span>
-      <span className="flex shrink-0 flex-col items-end gap-[3px]">
-        <span className="tabular text-[17px] font-semibold text-[#4ade80]">+{formatPayoutAmount(p.amount)}</span>
-        {proof ? (
-          <a href={proof} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-[4px] text-[11px] font-semibold text-[#93c5fd] no-underline hover:underline">
-            <CheckIcon size={10} color="#86efac" /> Verified
-          </a>
+    <li>
+      <button
+        type="button"
+        onClick={onPick}
+        className="flex w-full cursor-pointer items-center gap-[12px] rounded-[16px] border-0 px-[10px] py-[10px] text-left transition-colors"
+        style={{
+          background: active ? "linear-gradient(90deg, rgba(59,130,246,0.22), rgba(59,130,246,0.06))" : "linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015))",
+          border: `1px solid ${active ? "rgba(96,165,250,0.55)" : C.borderDark}`,
+        }}
+      >
+        {p.cert ? (
+          <span className="relative h-[40px] w-[56px] shrink-0 overflow-hidden rounded-[8px]" style={{ border: "1px solid rgba(148,178,255,0.25)" }}>
+            <img src={p.cert.imageUrl} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
+          </span>
         ) : (
-          <span className="inline-flex items-center gap-[4px] text-[11px] font-semibold text-[#86efac]">
-            <CheckIcon size={10} color="#86efac" /> Paid
+          <span className="flex h-[40px] w-[56px] shrink-0 items-center justify-center rounded-[8px] text-[13px] font-semibold text-white" style={{ background: "linear-gradient(135deg, #2563eb, #60a5fa)" }}>
+            {initials(p.traderName)}
           </span>
         )}
-      </span>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="flex items-center gap-[6px] truncate text-[14.5px] font-semibold text-white">
+            {f && <img src={f} alt="" width={16} height={12} loading="lazy" className="h-[12px] w-[16px] shrink-0 rounded-[2px] object-cover" />}
+            <span className="truncate">{p.traderName ?? "FYT trader"}</span>
+          </span>
+          <span className="truncate text-[12px]" style={{ color: C.mutedDark }}>
+            {relTime(p.createdAt)}
+            {link ? " · Certificate" : ""}
+          </span>
+        </span>
+        <span className="tabular shrink-0 text-[16px] font-semibold text-[#4ade80]">+{formatPayoutAmount(p.amount)}</span>
+      </button>
     </li>
+  );
+}
+
+function CertificateStage({ item }: { item: ProofItem | undefined }) {
+  const reduce = useReducedMotion();
+  const cert = item?.cert;
+  const link = cert?.certificateUrl || item?.certificateUrl || item?.explorerUrl || undefined;
+  const f = item ? countryFlagUrl(item.countryCode) : null;
+  return (
+    <div className="flex flex-col gap-[12px]">
+      <a href={link} target="_blank" rel="noopener noreferrer" className="group relative block overflow-hidden rounded-[18px] no-underline" style={{ background: "#060b16", border: "1px solid rgba(148,178,255,0.22)", boxShadow: "0 30px 60px -30px rgba(37,99,235,0.8)" }}>
+        <div className="relative aspect-[1.41] w-full">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {cert ? (
+              <motion.img
+                key={cert.certificateId}
+                src={cert.imageUrl}
+                alt={`Payout certificate for ${cert.traderName ?? "FYT trader"}`}
+                className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6, ease: EASE }}
+              />
+            ) : (
+              <motion.div key="empty" className="absolute inset-0 flex items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <span className="size-full animate-pulse" style={{ background: "linear-gradient(135deg,#0b1430,#0a1226)" }} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <span className="absolute left-[12px] top-[12px] flex items-center gap-[6px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.12em] text-[#86efac]" style={{ background: "rgba(3,6,13,0.75)", border: "1px solid rgba(34,197,94,0.35)", backdropFilter: "blur(6px)" }}>
+            <CheckIcon size={10} color="#86efac" /> Verified certificate
+          </span>
+        </div>
+      </a>
+      {item && (
+        <div className="flex items-center justify-between gap-[12px] px-[4px]">
+          <span className="flex min-w-0 items-center gap-[10px]">
+            {f && <img src={f} alt="" width={24} height={17} className="h-[17px] w-[24px] shrink-0 rounded-[3px] object-cover" />}
+            <span className="flex min-w-0 flex-col">
+              <span className="truncate text-[15px] font-semibold text-white">{item.traderName ?? "FYT trader"}</span>
+              <span className="truncate text-[12px]" style={{ color: C.mutedDark }}>
+                {[item.country, relTime(item.createdAt)].filter(Boolean).join(" · ")}
+              </span>
+            </span>
+          </span>
+          <span className="tabular fyt-gradient-text shrink-0 text-[26px] font-semibold tracking-[-0.03em]">{formatPayoutAmount(item.amount)}</span>
+        </div>
+      )}
+    </div>
   );
 }
 
 export function CountryProof() {
   const [code, setCode] = useState<string | null>(null);
   const [payouts, setPayouts] = useState<PublicPayout[]>([]);
+  const [certs, setCerts] = useState<PublicCertificate[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [worldwide, setWorldwide] = useState(false);
-  const [feedRef, feedLive] = useLive<HTMLDivElement>();
+  const [pick, setPick] = useState(0);
+  const [auto, setAuto] = useState(true);
+  const [panelRef, panelLive] = useLive<HTMLDivElement>();
 
   useEffect(() => {
     setCode(detectVisitorCountry());
     let cancelled = false;
-    Promise.all([fetchFeaturedPayouts(1, 100).catch(() => null), fetchFeaturedPayouts(2, 100).catch(() => null)])
-      .then((rs) => {
-        if (!cancelled) setPayouts(rs.flatMap((r) => r?.data ?? []).filter((p) => Number(p.amount) > 0));
+    Promise.all([
+      fetchFeaturedPayouts(1, 100).catch(() => null),
+      fetchFeaturedPayouts(2, 100).catch(() => null),
+      fetchFeaturedCertificates(1, 100).catch(() => null),
+      fetchFeaturedCertificates(2, 100).catch(() => null),
+    ])
+      .then(([p1, p2, c1, c2]) => {
+        if (cancelled) return;
+        setPayouts([...(p1?.data ?? []), ...(p2?.data ?? [])].filter((p) => Number(p.amount) > 0));
+        setCerts([...(c1?.data ?? []), ...(c2?.data ?? [])]);
       })
       .finally(() => {
         if (!cancelled) setLoaded(true);
@@ -320,24 +405,34 @@ export function CountryProof() {
     };
   }, []);
 
-  const local = useMemo(() => (code ? payouts.filter((p) => (p.countryCode ?? "").toUpperCase() === code) : []), [code, payouts]);
+  const items = useMemo(() => attachCertificates(payouts, certs), [payouts, certs]);
+  const local = useMemo(() => (code ? items.filter((p) => (p.countryCode ?? "").toUpperCase() === code) : []), [code, items]);
   const hasLocal = local.length >= 3;
   const showLocal = hasLocal && !worldwide;
-  const pool = showLocal ? local : payouts;
+  const pool = showLocal ? local : items;
+  // Certificates first so the stage always has something to show.
+  const ordered = useMemo(() => [...pool.filter((p) => p.cert), ...pool.filter((p) => !p.cert)].slice(0, 8), [pool]);
   const total = pool.reduce((s, p) => s + (Number(p.amount) || 0), 0);
-  const countries = useMemo(() => new Set(payouts.map((p) => p.countryCode).filter(Boolean)).size, [payouts]);
+  const countries = useMemo(() => new Set(items.map((p) => p.countryCode).filter(Boolean)).size, [items]);
   const name = code ? countryName(code) : "";
   const flag = code ? countryFlagUrl(code) : null;
-  const feed = pool.slice(0, 14);
+  const withCert = ordered.filter((p) => p.cert).length;
+
+  useEffect(() => setPick(0), [showLocal]);
+  useEffect(() => {
+    if (!auto || !panelLive || withCert < 2) return;
+    const t = window.setInterval(() => setPick((i) => (i + 1) % withCert), 4500);
+    return () => window.clearInterval(t);
+  }, [auto, panelLive, withCert]);
 
   if (loaded && payouts.length === 0) return null;
 
   return (
     <Section tone="dark" stars>
-      <div className="relative grid grid-cols-1 items-center gap-[44px] lg:grid-cols-12 lg:gap-[64px]">
-        <div className="flex flex-col gap-[24px] lg:col-span-5">
+      <div className="relative grid grid-cols-1 items-center gap-[44px] lg:grid-cols-12 lg:gap-[56px]">
+        <div className="flex flex-col gap-[24px] lg:col-span-4">
           <Eyebrow>People like you</Eyebrow>
-          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] sm:text-[42px] lg:text-[56px]" style={{ color: C.textDark }}>
+          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] sm:text-[42px] lg:text-[52px]" style={{ color: C.textDark }}>
             {showLocal ? (
               <>
                 <span className="inline-flex flex-wrap items-center gap-x-[14px]">
@@ -355,9 +450,20 @@ export function CountryProof() {
               </>
             )}
           </h2>
-          <p className="max-w-[440px] text-[16px] leading-[1.7] lg:text-[17px]" style={{ color: C.mutedDark }}>
-            Real rewards, verified on-chain and updated live. No stock photos, no made-up names.
-          </p>
+          <div className="grid grid-cols-3 gap-[10px]">
+            {[
+              [money(Math.round(total)), "Total paid"],
+              [String(pool.length || "-"), "Rewards"],
+              [showLocal ? "24-48h" : String(countries || "-"), showLocal ? "Paid in" : "Countries"],
+            ].map(([v, l]) => (
+              <div key={l} className="flex min-w-0 flex-col gap-[4px] rounded-[16px] p-[12px]" style={DARK_CARD}>
+                <span className="tabular truncate text-[18px] font-semibold tracking-[-0.03em] text-white sm:text-[20px]">{v}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: C.mutedDark }}>
+                  {l}
+                </span>
+              </div>
+            ))}
+          </div>
           {hasLocal && (
             <div className="inline-flex w-fit rounded-full p-[4px]" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.borderDark}` }} role="tablist">
               {([false, true] as const).map((w) => {
@@ -382,13 +488,13 @@ export function CountryProof() {
           <DiscordLive />
         </div>
 
-        <Reveal delay={0.1} className="lg:col-span-7">
-          <div ref={feedRef} className={`fyt-ring relative rounded-[28px] ${feedLive ? "fyt-live" : ""}`} style={{ boxShadow: "0 60px 120px -60px rgba(37,99,235,0.8)" }}>
-            <div className="relative flex flex-col p-[18px] sm:p-[26px]">
+        <Reveal delay={0.1} className="lg:col-span-8">
+          <div ref={panelRef} className={`fyt-ring relative rounded-[28px] ${panelLive ? "fyt-live" : ""}`} style={{ boxShadow: "0 60px 120px -60px rgba(37,99,235,0.8)" }}>
+            <div className="relative flex flex-col gap-[18px] p-[16px] sm:p-[22px]">
               <div className="flex items-center justify-between gap-[12px]">
                 <span className="flex items-center gap-[10px] text-[13px] font-semibold text-white">
                   {showLocal && flag ? <img src={flag} alt="" width={22} height={16} className="h-[16px] w-[22px] rounded-[3px] object-cover" /> : <GIcon name="globe" size={16} />}
-                  Live rewards {showLocal ? `· ${name}` : "· Worldwide"}
+                  Latest rewards {showLocal ? `in ${name}` : "worldwide"}
                 </span>
                 <span className="flex items-center gap-[7px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#86efac]" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.28)" }}>
                   <span className="relative flex size-[7px]">
@@ -398,43 +504,25 @@ export function CountryProof() {
                   Live
                 </span>
               </div>
-
-              <div className="mt-[20px] grid grid-cols-3 gap-[10px] border-b pb-[20px]" style={{ borderColor: C.borderDark }}>
-                <div className="col-span-3 flex flex-col gap-[4px] sm:col-span-1">
-                  <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.mutedDark }}>
-                    Total paid
-                  </span>
-                  <SpringNumber value={Math.round(total)} format={(n) => money(Math.round(n))} className="tabular fyt-gradient-text text-[32px] font-semibold leading-none tracking-[-0.035em] sm:text-[30px]" />
-                </div>
-                {[
-                  [String(pool.length || "-"), "Rewards"],
-                  [showLocal ? "24-48h" : String(countries || "-"), showLocal ? "Paid in" : "Countries"],
-                ].map(([v, l]) => (
-                  <div key={l} className="flex flex-col gap-[4px] sm:items-end sm:text-right">
-                    <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em]" style={{ color: C.mutedDark }}>
-                      {l}
-                    </span>
-                    <span className="tabular text-[24px] font-semibold leading-none tracking-[-0.03em] text-white">{v}</span>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 gap-[16px] md:grid-cols-[1.15fr_1fr]">
+                <CertificateStage item={ordered[pick] ?? ordered[0]} />
+                <ul className="flex max-h-[420px] flex-col gap-[8px] overflow-y-auto pr-[2px] md:max-h-none">
+                  {ordered.length
+                    ? ordered.slice(0, 6).map((p, i) => (
+                        <FeedRow
+                          key={`${p.id ?? "x"}-${i}`}
+                          p={p}
+                          active={i === pick}
+                          onPick={() => {
+                            setAuto(false);
+                            setPick(i);
+                          }}
+                        />
+                      ))
+                    : Array.from({ length: 5 }, (_, i) => <li key={i} className="h-[62px] animate-pulse rounded-[16px]" style={DARK_CARD} />)}
+                </ul>
               </div>
-
-              <div className="fyt-vmask relative mt-[14px] h-[340px] overflow-hidden sm:h-[380px]">
-                {feed.length ? (
-                  <ul key={showLocal ? "l" : "w"} className="fyt-vscroll flex flex-col gap-[10px]">
-                    {[...feed, ...feed].map((p, i) => (
-                      <FeedRow key={`${p.id ?? "x"}-${i}`} p={p} />
-                    ))}
-                  </ul>
-                ) : (
-                  <ul className="flex flex-col gap-[10px]">
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <li key={i} className="h-[68px] animate-pulse rounded-[16px]" style={DARK_CARD} />
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <div className="mt-[10px] flex flex-wrap items-center justify-between gap-[12px]">
+              <div className="flex flex-wrap items-center justify-between gap-[12px] border-t pt-[14px]" style={{ borderColor: C.borderDark }}>
                 <a href="https://rewards.fundingyourtrades.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-[6px] text-[13px] font-semibold text-[#93c5fd] no-underline hover:underline">
                   <GIcon name="shield" size={15} /> Every reward verified on-chain
                 </a>
