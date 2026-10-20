@@ -28,7 +28,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 type OfferId = "launch" | "welcome";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
   launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+1 bonus account", "+5% cashback"], who: "+1 bonus · 5% cashback" },
-  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ instant BOGO"], who: "New traders · BOGO" },
+  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ instant BOGO"], who: "+ BOGO instantly · New traders" },
 };
 
 function offerPrice(old: number, o: OfferId): number {
@@ -401,7 +401,7 @@ const MODEL_COPY: Record<StepId, { mark: string; line: string; short: string }> 
 /** The three models, always at the top so nobody has to scroll to compare. */
 function ModelTabs({ p }: { p: Pick }) {
   return (
-    <div className="grid grid-cols-3 gap-[8px] lg:grid-cols-1 lg:gap-[10px]" role="tablist" aria-label="Challenge model">
+    <div className="grid grid-cols-3 gap-[8px] pt-[6px] lg:grid-cols-1 lg:gap-[12px]" role="tablist" aria-label="Challenge model">
       {STEPS.map((m) => {
         const on = m === p.step;
         const fromOld = getEntry(m, "prime", "match-trader", STEP_SIZES[m][0])?.priceOld ?? 0;
@@ -412,13 +412,18 @@ function ModelTabs({ p }: { p: Pick }) {
             role="tab"
             aria-selected={on}
             onClick={() => p.setStep(m)}
-            className="relative flex cursor-pointer flex-col items-center gap-[4px] overflow-hidden rounded-[18px] px-[6px] py-[12px] text-white transition-[background,border-color,box-shadow] duration-300 lg:flex-row lg:items-center lg:gap-[14px] lg:px-[16px] lg:py-[14px] lg:text-left"
+            className="relative flex cursor-pointer flex-col items-center gap-[4px] rounded-[18px] px-[6px] py-[12px] text-white transition-[background,border-color,box-shadow] duration-300 lg:flex-row lg:items-center lg:gap-[14px] lg:px-[16px] lg:py-[14px] lg:text-left"
             style={{
               border: `1.5px solid ${on ? "rgba(96,165,250,0.85)" : LINE}`,
               background: on ? "linear-gradient(180deg, rgba(59,130,246,0.32), rgba(37,99,235,0.08))" : "rgba(255,255,255,0.03)",
               boxShadow: on ? "0 24px 50px -28px rgba(37,99,235,0.95)" : "none",
             }}
           >
+            {m === "Instant" && (
+              <span className="absolute -top-[9px] left-1/2 z-[1] -translate-x-1/2 whitespace-nowrap rounded-full px-[8px] py-[2px] text-[9.5px] font-bold uppercase tracking-[0.1em] text-[#1f1300] lg:left-auto lg:right-[14px] lg:translate-x-0" style={{ background: "linear-gradient(135deg,#fde68a,#f59e0b)", boxShadow: "0 6px 16px -6px rgba(245,158,11,0.8)" }}>
+                Popular
+              </span>
+            )}
             <span className="hidden size-[44px] shrink-0 items-center justify-center rounded-[14px] text-[17px] font-bold lg:flex" style={{ background: on ? BLUE : "rgba(255,255,255,0.07)" }}>{MODEL_COPY[m].mark}</span>
             <span className="flex flex-col items-center lg:flex-1 lg:items-start">
               <span className="text-[15px] font-bold lg:text-[17px]">{m}</span>
@@ -566,7 +571,23 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                 <PerkGrid p={p} cols={2} />
               </div>
 
-              <a href={p.co.href} className="flex h-[62px] items-center justify-between rounded-[18px] pl-[20px] pr-[8px] text-white no-underline transition-transform hover:-translate-y-[1px]" style={{ background: BLUE, boxShadow: "0 22px 44px -18px rgba(37,99,235,0.95)" }}>
+              <motion.a
+                href={p.co.href}
+                className="relative flex h-[64px] items-center justify-between overflow-hidden rounded-[18px] pl-[20px] pr-[8px] text-white no-underline transition-transform hover:-translate-y-[1px] active:scale-[0.99]"
+                style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 22px 44px -18px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)" }}
+                animate={reduce ? undefined : { boxShadow: ["0 22px 44px -18px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)", "0 22px 60px -10px rgba(59,130,246,1), inset 0 1px 0 rgba(255,255,255,0.3)", "0 22px 44px -18px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)"] }}
+                transition={reduce ? undefined : { duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+              >
+                {!reduce && (
+                  <motion.span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-y-0 w-[45%]"
+                    style={{ background: "linear-gradient(100deg, transparent, rgba(255,255,255,0.28), transparent)" }}
+                    initial={{ left: "-50%" }}
+                    animate={{ left: ["-50%", "120%"] }}
+                    transition={{ duration: 1.4, repeat: Infinity, repeatDelay: 2.2, ease: "easeInOut" }}
+                  />
+                )}
                 <span className="flex flex-col">
                   <span className="flex items-baseline gap-[8px]">
                     <Roll value={money(p.price)} className="text-[24px] font-bold leading-none" />
@@ -574,11 +595,13 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                   </span>
                   <span className="mt-[3px] text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}</span>
                 </span>
-                <span className="flex items-center gap-[6px] rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb]">
-                  Start {fmtSize(p.size)}
-                  <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#2563eb" w={2.6} />
+                <span className="relative flex items-center gap-[6px] rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
+                  Get funded
+                  <motion.span className="flex" animate={reduce ? undefined : { x: [0, 4, 0] }} transition={reduce ? undefined : { duration: 1.2, repeat: Infinity, ease: "easeInOut" }}>
+                    <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#2563eb" w={2.6} />
+                  </motion.span>
                 </span>
-              </a>
+              </motion.a>
               <CodeLine p={p} />
               <TrustRow />
             </div>
