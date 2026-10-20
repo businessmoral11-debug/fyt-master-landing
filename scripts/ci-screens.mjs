@@ -64,6 +64,15 @@ for (const vp of viewports) {
     await page.keyboard.press("Escape");
     await sleep(500);
   }
+  // Test pricing options A-F.
+  for (const id of ["a", "b", "c", "d", "e", "f"]) {
+    const el = page.locator(`#pricing-option-${id}`);
+    if (await el.count()) {
+      await el.scrollIntoViewIfNeeded();
+      await sleep(900);
+      await el.screenshot({ path: `${OUT}/${vp.name}-option-${id}.png` }).catch((e) => log.push("option " + id + " " + e.message));
+    }
+  }
   // Proof board tabs.
   for (const [tabName, file] of [["Biggest", "board-biggest"], ["On camera", "board-camera"], ["Live payouts", "board-live"]]) {
     const t = page.getByRole("tab", { name: tabName });
