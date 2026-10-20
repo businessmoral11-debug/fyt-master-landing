@@ -319,28 +319,53 @@ function PerkGrid({ p, cols = 3 }: { p: Pick; cols?: 2 | 3 }) {
   );
 }
 
-/* ================================ A v2 =================================== */
+/* ================================ A v3 =================================== */
+
+/** One-row offer switch with a single detail line under it. */
+function OfferSwitch({ p }: { p: Pick }) {
+  const clock = useClock();
+  const o = OFFERS[p.offer];
+  return (
+    <div className="flex flex-col gap-[8px]">
+      <div className="relative grid grid-cols-2 rounded-[18px] p-[4px]" role="radiogroup" aria-label="Choose your offer" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${LINE}` }}>
+        <span aria-hidden="true" className="absolute bottom-[4px] top-[4px] rounded-[14px] transition-[left,background] duration-300" style={{ left: p.offer === "launch" ? 4 : "calc(50%)", width: "calc(50% - 4px)", background: p.offer === "launch" ? "linear-gradient(160deg,#ef4444,#b91c1c)" : "linear-gradient(160deg,#10b981,#047857)", boxShadow: "0 12px 26px -14px rgba(0,0,0,0.9)" }} />
+        {(["launch", "welcome"] as OfferId[]).map((id) => {
+          const on = p.offer === id;
+          return (
+            <button key={id} type="button" role="radio" aria-checked={on} onClick={() => p.setOffer(id)} className="relative z-[1] flex h-[52px] cursor-pointer flex-col items-center justify-center rounded-[14px] border-0 bg-transparent text-white">
+              <span className="text-[17px] font-bold leading-none tracking-[-0.02em]">{OFFERS[id].title}</span>
+              <span className="mt-[3px] text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: on ? "rgba(255,255,255,0.85)" : MUTED }}>{OFFERS[id].who}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="flex items-center justify-center gap-[8px] text-[12px]" style={{ color: SOFT }}>
+        <span>{o.extras.join(" ")}</span>
+        <span className="size-[3px] rounded-full bg-[#5b6478]" />
+        <span className="font-semibold text-white" style={{ fontFamily: MONO }}>{o.code}</span>
+        <span className="size-[3px] rounded-full bg-[#5b6478]" />
+        {p.offer === "launch" ? <span style={{ color: "#fca5a5", fontFamily: MONO }}>{clock.slice(0, -3)}</span> : <span className="text-[#6ee7b7]">no expiry</span>}
+      </div>
+    </div>
+  );
+}
 
 function IdeaA() {
   const p = usePick();
   const r = rules(p);
   const touch = useRef<number | null>(null);
   const go = (d: number) => p.setI(Math.max(0, Math.min(p.sizes.length - 1, p.i + d)));
-  const typeLabel = p.plans.find((x) => x.id === p.plan)?.label ?? "Prime";
-  const typeBadge = (p.step === "Instant" && p.plan === "prime" ? INSTANT_PRIME : TYPE_INFO[p.plan]).badge;
   return (
-    <div className="flex flex-col gap-[20px]">
-      <h2 className="m-0 text-center text-[32px] font-semibold leading-[1.05] tracking-[-0.035em]">
+    <div className="flex flex-col gap-[16px]">
+      <h2 className="m-0 text-center text-[30px] font-semibold leading-[1.05] tracking-[-0.035em]">
         Choose your <span className="fyt-gradient-text">challenge.</span>
       </h2>
 
-      <OfferPicker p={p} />
-
+      <OfferSwitch p={p} />
       <Seg items={STEPS} value={p.step} onPick={p.setStep} />
 
-      {/* The account card */}
       <div
-        className="group relative flex select-none flex-col gap-[20px] overflow-hidden rounded-[28px] px-[22px] pb-[20px] pt-[20px]"
+        className="relative flex select-none flex-col gap-[16px] overflow-hidden rounded-[28px] px-[18px] pb-[18px] pt-[16px]"
         style={{ background: "linear-gradient(150deg,#2347b5 0%,#13286b 40%,#0a1433 75%,#070d1f 100%)", border: "1px solid rgba(147,197,253,0.4)", boxShadow: "0 50px 90px -36px rgba(37,99,235,0.85), inset 0 1px 0 rgba(255,255,255,0.22)" }}
         onTouchStart={(e) => (touch.current = e.touches[0].clientX)}
         onTouchEnd={(e) => {
@@ -352,31 +377,40 @@ function IdeaA() {
       >
         <span aria-hidden="true" className="pointer-events-none absolute -right-[70px] -top-[90px] size-[260px] rounded-full" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.5), transparent 65%)" }} />
         <span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-60" style={{ background: "linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.12) 45%, transparent 60%)" }} />
-        <div className="relative flex items-center justify-between">
-          <span className="flex items-center gap-[10px]">
-            <span aria-hidden="true" className="h-[26px] w-[36px] rounded-[6px]" style={{ background: "linear-gradient(135deg,#fde68a,#d4a72c 55%,#a37a13)", boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.25)" }} />
-            <span className="text-[12px] font-semibold tracking-[0.16em] text-[#dbeafe]">{p.step.toUpperCase()} · {typeLabel.toUpperCase()}</span>
-          </span>
-          <span className="rounded-full px-[9px] py-[4px] text-[10px] font-bold uppercase tracking-[0.08em] text-[#86efac]" style={{ background: "rgba(34,197,94,0.15)" }}>{typeBadge}</span>
+
+        {/* Type, inside the card */}
+        <div className="relative grid grid-cols-2 gap-[6px] rounded-[16px] p-[4px]" style={{ background: "rgba(3,6,13,0.35)" }}>
+          {p.plans.map((x) => {
+            const on = x.id === p.plan;
+            const info = p.step === "Instant" && x.id === "prime" ? INSTANT_PRIME : TYPE_INFO[x.id];
+            return (
+              <button key={x.id} type="button" aria-pressed={on} onClick={() => p.setPlan(x.id)} className="flex h-[48px] cursor-pointer flex-col items-center justify-center rounded-[12px] border-0 text-white transition-colors" style={{ background: on ? "rgba(255,255,255,0.16)" : "transparent", boxShadow: on ? "inset 0 0 0 1px rgba(255,255,255,0.25)" : "none" }}>
+                <span className="text-[14px] font-bold">{x.label}</span>
+                <span className="text-[9.5px] font-bold uppercase tracking-[0.1em]" style={{ color: on ? "#86efac" : "#9fb0d6" }}>{info.badge}</span>
+              </button>
+            );
+          })}
         </div>
+
         <div className="relative flex items-center justify-between">
-          <button type="button" aria-label="Smaller account" disabled={p.i === 0} onClick={() => go(-1)} className="flex size-[44px] cursor-pointer items-center justify-center rounded-full text-white disabled:opacity-30" style={{ border: "1px solid rgba(255,255,255,0.22)", background: "rgba(255,255,255,0.07)" }}>
+          <button type="button" aria-label="Smaller account" disabled={p.i === 0} onClick={() => go(-1)} className="flex size-[44px] cursor-pointer items-center justify-center rounded-full disabled:opacity-30" style={{ border: "1px solid rgba(255,255,255,0.22)", background: "rgba(255,255,255,0.07)" }}>
             <Svg d="M15 6l-6 6 6 6" size={18} color="#fff" w={2.2} />
           </button>
           <span className="flex flex-col items-center gap-[2px]">
             <span className="text-[10px] font-semibold tracking-[0.22em] text-[#93c5fd]">ACCOUNT SIZE</span>
-            <Roll value={money(p.size)} className="text-[46px] font-bold leading-[1.05] tracking-[-0.04em]" />
+            <Roll value={money(p.size)} className="text-[44px] font-bold leading-[1.05] tracking-[-0.04em]" />
+            <span className="flex gap-[5px] pt-[4px]">
+              {p.sizes.map((z, k) => (
+                <button key={z} type="button" aria-label={fmtSize(z)} onClick={() => p.setI(k)} className="h-[5px] cursor-pointer rounded-full border-0 p-0 transition-all duration-300" style={{ width: k === p.i ? 20 : 5, background: k === p.i ? "#bfdbfe" : "rgba(255,255,255,0.25)" }} />
+              ))}
+            </span>
           </span>
-          <button type="button" aria-label="Bigger account" disabled={p.i === p.sizes.length - 1} onClick={() => go(1)} className="flex size-[44px] cursor-pointer items-center justify-center rounded-full text-white disabled:opacity-30" style={{ border: "1px solid rgba(255,255,255,0.22)", background: "rgba(255,255,255,0.07)" }}>
+          <button type="button" aria-label="Bigger account" disabled={p.i === p.sizes.length - 1} onClick={() => go(1)} className="flex size-[44px] cursor-pointer items-center justify-center rounded-full disabled:opacity-30" style={{ border: "1px solid rgba(255,255,255,0.22)", background: "rgba(255,255,255,0.07)" }}>
             <Svg d="M9 6l6 6-6 6" size={18} color="#fff" w={2.2} />
           </button>
         </div>
-        <div className="relative flex justify-center gap-[6px]">
-          {p.sizes.map((z, k) => (
-            <button key={z} type="button" aria-label={fmtSize(z)} onClick={() => p.setI(k)} className="h-[6px] cursor-pointer rounded-full border-0 p-0 transition-all duration-300" style={{ width: k === p.i ? 24 : 6, background: k === p.i ? "#bfdbfe" : "rgba(255,255,255,0.25)" }} />
-          ))}
-        </div>
-        <div className="relative grid grid-cols-4 gap-[6px] rounded-[16px] p-[10px]" style={{ background: "rgba(3,6,13,0.35)" }}>
+
+        <div className="relative grid grid-cols-4 gap-[6px]">
           {r.map(([v, l]) => (
             <span key={l} className="flex flex-col items-center gap-[2px]">
               <span className="text-[15px] font-bold">{v}</span>
@@ -384,34 +418,176 @@ function IdeaA() {
             </span>
           ))}
         </div>
-        <div className="relative flex items-end justify-between pt-[14px]" style={{ borderTop: "1px dashed rgba(255,255,255,0.2)" }}>
-          <span className="flex flex-col">
-            <span className="text-[11px] font-semibold text-[#93c5fd]">You pay today</span>
-            <span className="flex items-baseline gap-[8px]">
-              <Roll value={money(p.price)} className="text-[34px] font-bold tracking-[-0.03em]" />
-              <s className="text-[14px]" style={{ color: "#9fb0d6" }}>{money(p.entry.priceOld)}</s>
+
+        {/* Platform + price */}
+        <div className="relative flex flex-col gap-[12px] pt-[14px]" style={{ borderTop: "1px dashed rgba(255,255,255,0.2)" }}>
+          <div className="flex gap-[6px]">
+            {PLATFORMS.map((pl) => {
+              const on = pl.id === p.platform;
+              return (
+                <button key={pl.id} type="button" aria-pressed={on} onClick={() => p.setPlatform(pl.id)} className="flex h-[36px] flex-1 cursor-pointer items-center justify-center gap-[6px] rounded-full text-[12.5px] font-semibold text-white" style={{ border: `1px solid ${on ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.14)"}`, background: on ? "rgba(255,255,255,0.14)" : "transparent", opacity: on ? 1 : 0.7 }}>
+                  <img src={pl.logo} alt="" className="h-[13px] w-auto" style={{ filter: "brightness(0) invert(1)" }} />
+                  {pl.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex items-end justify-between">
+            <span className="flex flex-col">
+              <span className="text-[11px] font-semibold text-[#93c5fd]">You pay today</span>
+              <span className="flex items-baseline gap-[8px]">
+                <Roll value={money(p.price)} className="text-[34px] font-bold tracking-[-0.03em]" />
+                <s className="text-[14px]" style={{ color: "#9fb0d6" }}>{money(p.entry.priceOld)}</s>
+              </span>
             </span>
-          </span>
-          <span className="rounded-full bg-[#4ade80] px-[10px] py-[6px] text-[12px] font-bold text-[#052e16]">Save {money(p.save)}</span>
+            <span className="rounded-full bg-[#4ade80] px-[10px] py-[6px] text-[12px] font-bold text-[#052e16]">Save {money(p.save)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Perks: one swipeable row */}
+      <div className="flex flex-col gap-[8px]">
+        <Label>Why traders choose this</Label>
+        <div className="-mx-[16px] flex gap-[8px] overflow-x-auto px-[16px] pb-[2px]" style={{ scrollbarWidth: "none", maskImage: "linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 28px), transparent)", WebkitMaskImage: "linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 28px), transparent)" }}>
+          {perks(p).map((k) => (
+            <span key={k.label} className="flex shrink-0 items-center gap-[8px] rounded-full py-[8px] pl-[8px] pr-[12px] text-[12.5px] font-semibold" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(148,178,255,0.14)" }}>
+              <span className="flex size-[24px] items-center justify-center rounded-full" style={{ background: "rgba(34,197,94,0.16)" }}><Svg d={k.d} size={13} color="#4ade80" w={2} /></span>
+              {k.label}
+              {k.challengeOnly && <span className="text-[10px] font-medium" style={{ color: MUTED }}>challenge</span>}
+            </span>
+          ))}
         </div>
       </div>
 
       <div className="flex flex-col gap-[10px]">
-        <Label>Type</Label>
-        <TypeCards p={p} />
-      </div>
-      <div className="flex flex-col gap-[10px]">
-        <Label>Platform</Label>
-        <PlatformSeg p={p} />
-      </div>
-      <div className="flex flex-col gap-[10px]">
-        <Label>Why traders choose this</Label>
-        <PerkGrid p={p} />
-      </div>
-
-      <div className="flex flex-col gap-[12px]">
         <a href={p.co.href} className="flex h-[60px] items-center justify-between rounded-full pl-[24px] pr-[8px] text-white no-underline transition-transform hover:-translate-y-[1px]" style={{ background: BLUE, boxShadow: "0 22px 44px -16px rgba(37,99,235,0.95)" }}>
           <span className="text-[16px] font-semibold">Start challenge · {money(p.price)}</span>
+          <span className="flex size-[44px] items-center justify-center rounded-full bg-white"><Svg d="M5 12h14M13 6l6 6-6 6" size={18} color="#2563eb" w={2.4} /></span>
+        </a>
+        <CodeLine p={p} />
+      </div>
+    </div>
+  );
+}
+
+/* ================================ E v2 =================================== */
+
+const STAMP_ROT = [-8, 5, -3, 7, -6, 4];
+
+/** A boarding-pass field you can tap to change. */
+function PassField({ k, v, onTap, hint }: { k: string; v: string; onTap?: () => void; hint?: string }) {
+  const inner = (
+    <>
+      <span className="flex items-center gap-[4px] text-[9.5px] tracking-[0.16em] text-[#93c5fd]">
+        {k}
+        {onTap && <Svg d="M7 7h11l-3-3M17 17H6l3 3" size={10} color="#93c5fd" w={2.2} />}
+      </span>
+      <span className="text-[15px] font-bold leading-[1.15] text-white">{v}</span>
+      {hint && <span className="text-[9.5px] font-bold uppercase tracking-[0.08em] text-[#86efac]">{hint}</span>}
+    </>
+  );
+  return onTap ? (
+    <button type="button" onClick={onTap} className="flex cursor-pointer flex-col items-start gap-[2px] rounded-[12px] border-0 px-[8px] py-[7px] text-left" style={{ background: "rgba(255,255,255,0.08)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.16)" }}>
+      {inner}
+    </button>
+  ) : (
+    <span className="flex flex-col gap-[2px] px-[8px] py-[7px]">{inner}</span>
+  );
+}
+
+function IdeaE() {
+  const p = usePick();
+  const clock = useClock();
+  const e = p.entry;
+  const cyclePlan = () => {
+    const ids = p.plans.map((x) => x.id);
+    p.setPlan(ids[(ids.indexOf(p.plan) + 1) % ids.length]);
+  };
+  const cyclePlatform = () => p.setPlatform(p.platform === "match-trader" ? "platform-5" : "match-trader");
+  const planLabel = p.plans.find((x) => x.id === p.plan)?.label ?? "Prime";
+  const badge = (p.step === "Instant" && p.plan === "prime" ? INSTANT_PRIME : TYPE_INFO[p.plan]).badge;
+  const targets = p.step === "Instant" ? e.profit ?? "N/A" : p.step === "2-Step" ? `${e.p1}/${e.p2}` : e.p1 ?? "";
+  return (
+    <div className="flex flex-col gap-[16px]">
+      <h2 className="m-0 text-center text-[30px] font-semibold leading-[1.05] tracking-[-0.035em]">
+        Your pass to <span className="fyt-gradient-text">funded.</span>
+      </h2>
+      <OfferSwitch p={p} />
+      <Seg items={STEPS} value={p.step} onPick={p.setStep} />
+      <div className="grid grid-cols-5 gap-[6px]">
+        {p.sizes.map((z, j) => {
+          const on = j === p.i;
+          return (
+            <button key={z} type="button" aria-pressed={on} onClick={() => p.setI(j)} className="h-[42px] cursor-pointer rounded-[13px] text-[13px] font-bold" style={{ border: `1px solid ${on ? "#60a5fa" : "rgba(148,178,255,0.16)"}`, background: on ? "rgba(59,130,246,0.28)" : "transparent", color: on ? "#fff" : SOFT }}>
+              {fmtSize(z)}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="relative overflow-hidden rounded-[26px]" style={{ background: "linear-gradient(160deg,#1d4ed8 0%,#1e3a8a 38%,#0b1638 100%)", boxShadow: "0 50px 90px -40px rgba(37,99,235,0.9)", border: "1px solid rgba(147,197,253,0.4)" }}>
+        <div className="flex flex-col gap-[14px] px-[18px] pb-[16px] pt-[18px]">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold tracking-[0.22em] text-[#bfdbfe]">FYT TRADER PASS</span>
+            <span className="rounded-full px-[8px] py-[4px] text-[10.5px] font-semibold" style={{ fontFamily: MONO, background: p.offer === "launch" ? "rgba(239,68,68,0.28)" : "rgba(16,185,129,0.28)", color: p.offer === "launch" ? "#fecaca" : "#a7f3d0" }}>
+              {OFFERS[p.offer].code}
+              {p.offer === "launch" ? ` · ${clock.slice(0, -3)}` : ""}
+            </span>
+          </div>
+          <div className="flex items-center justify-between px-[8px]">
+            <span className="flex flex-col">
+              <span className="text-[10px] tracking-[0.18em] text-[#93c5fd]">FROM</span>
+              <span className="text-[28px] font-bold tracking-[-0.03em]">You</span>
+            </span>
+            <svg width="64" height="20" viewBox="0 0 64 20" fill="none" stroke="#93c5fd" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="3 4" aria-hidden="true"><path d="M2 10h54M50 4l8 6-8 6" /></svg>
+            <span className="flex flex-col items-end">
+              <span className="text-[10px] tracking-[0.18em] text-[#93c5fd]">TO</span>
+              <Roll value={fmtSize(p.size)} className="text-[28px] font-bold tracking-[-0.03em]" />
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-[6px]">
+            <PassField k="CLASS" v={planLabel} hint={badge} onTap={cyclePlan} />
+            <PassField k="GATE" v={p.platform === "match-trader" ? "MatchTrader" : "Platform 5"} onTap={cyclePlatform} />
+            <PassField k="MODEL" v={p.step} />
+            <PassField k={p.step === "2-Step" ? "TARGETS" : "TARGET"} v={targets} />
+            <PassField k="DAILY / MAX" v={`${e.maxDaily} / ${e.maxOverall}`} />
+            <PassField k="SPLIT" v={e.split.replace("Up to ", "")} />
+          </div>
+          <span className="text-center text-[10.5px]" style={{ color: "#9fb0d6" }}>Tap CLASS or GATE to switch</span>
+        </div>
+
+        <div className="relative mx-[18px] h-0" style={{ borderTop: "2px dashed rgba(191,219,254,0.35)" }} />
+
+        <div className="flex flex-col gap-[12px] px-[18px] pb-[18px] pt-[14px]" style={{ background: "rgba(3,6,13,0.35)" }}>
+          <span className="text-[10.5px] font-bold tracking-[0.18em] text-[#bfdbfe]">STAMPED · WHY TRADERS CHOOSE THIS</span>
+          <div className="grid grid-cols-3 justify-items-center gap-x-[6px] gap-y-[10px]">
+            {perks(p).map((k, j) => {
+              const c = k.challengeOnly ? "#fcd34d" : j % 2 ? "#86efac" : "#bfdbfe";
+              return (
+                <span key={k.label} className="flex size-[80px] flex-col items-center justify-center gap-[3px] rounded-full text-center" style={{ border: `2px dashed ${c}`, transform: `rotate(${STAMP_ROT[j]}deg)` }}>
+                  <Svg d={k.d} size={18} color={c} />
+                  <span className="px-[6px] text-[9.5px] font-bold uppercase leading-[1.1] tracking-[0.04em]" style={{ color: c }}>{k.label}</span>
+                  {k.challengeOnly && <span className="text-[8px] font-bold uppercase tracking-[0.06em]" style={{ color: c }}>challenge</span>}
+                </span>
+              );
+            })}
+          </div>
+          <div className="flex items-end justify-between pt-[4px]">
+            <span className="flex flex-col">
+              <span className="text-[10px] tracking-[0.18em] text-[#93c5fd]">FARE TODAY</span>
+              <span className="flex items-baseline gap-[8px]">
+                <Roll value={money(p.price)} className="text-[34px] font-bold tracking-[-0.04em]" />
+                <s className="text-[13px]" style={{ color: "#9fb0d6" }}>{money(e.priceOld)}</s>
+              </span>
+            </span>
+            <svg width="88" height="34" viewBox="0 0 96 36" aria-hidden="true"><path d="M2 2v32M6 2v32M9 2v32M14 2v32M16 2v32M21 2v32M26 2v32M28 2v32M33 2v32M37 2v32M40 2v32M45 2v32M47 2v32M52 2v32M57 2v32M59 2v32M64 2v32M68 2v32M71 2v32M76 2v32M78 2v32M83 2v32M88 2v32M90 2v32M94 2v32" stroke="rgba(219,234,254,0.8)" strokeWidth="1.6" /></svg>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-[10px]">
+        <a href={p.co.href} className="flex h-[60px] items-center justify-between rounded-full pl-[24px] pr-[8px] text-white no-underline transition-transform hover:-translate-y-[1px]" style={{ background: BLUE, boxShadow: "0 22px 44px -16px rgba(37,99,235,0.95)" }}>
+          <span className="text-[16px] font-semibold">Board now · {money(p.price)}</span>
           <span className="flex size-[44px] items-center justify-center rounded-full bg-white"><Svg d="M5 12h14M13 6l6 6-6 6" size={18} color="#2563eb" w={2.4} /></span>
         </a>
         <CodeLine p={p} />
@@ -510,8 +686,9 @@ function IdeaC() {
 /* ------------------------------- wrapper --------------------------------- */
 
 const IDEAS: { id: string; name: string; C: () => ReactNode }[] = [
-  { id: "A", name: "Account Card v2", C: IdeaA },
+  { id: "A", name: "Account Card v3 (shorter)", C: IdeaA },
   { id: "C", name: "Model Stack v2", C: IdeaC },
+  { id: "E", name: "Trader Pass v2", C: IdeaE },
 ];
 
 export function PricingIdeas() {
