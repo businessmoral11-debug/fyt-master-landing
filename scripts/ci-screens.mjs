@@ -101,6 +101,7 @@ for (const vp of viewports) {
     await page.screenshot({ path: `${OUT}/${vp.name}-gift-3.png` });
     await page.getByRole("button", { name: /Use my gift/ }).click().catch((e) => log.push("gift use " + e.message.split("\n")[0]));
     await sleep(1000);
+    log.push(`[${vp.name}] after Use my gift: scrollY=${await page.evaluate(() => Math.round(window.scrollY))} pricingTop=${await page.evaluate(() => Math.round(document.getElementById("challenge")?.getBoundingClientRect().top ?? -1))}`);
     await pr.screenshot({ path: `${OUT}/${vp.name}-pricing-instant.png` }).catch(() => {});
   }
   // Proof board tabs.
