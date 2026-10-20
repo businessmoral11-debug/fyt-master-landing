@@ -2,7 +2,7 @@ import { FeaturedIn, Testimonials } from "./SectionsTop";
 import { ClosingCta, Faq, Footer, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
 import { ChallengePricing } from "./PricingC";
-import { CountryProof, ExitSavePlan, FreeDemo, PayoutBoard, ProveYourExpertise, WelcomeBack, ZeroRisk } from "./Growth";
+import { CountryProof, ExitSavePlan, FreeDemo, PayoutBoard, PricingHeading, ProveYourExpertise, WelcomeBack, ZeroRisk } from "./Growth";
 
 /**
  * Redesigned landing page below the hero. Sections alternate dark / white:
@@ -17,7 +17,7 @@ export function BelowFold() {
       <WelcomeBack />
       <FeaturedIn />
       <CountryProof />
-      <ChallengePricing />
+      <ChallengePricing heading={<PricingHeading />} />
       <ProveYourExpertise />
       <PayoutBoard />
       <Testimonials />

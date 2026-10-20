@@ -10,7 +10,6 @@ import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5.png";
 import { STEP_PLANS, STEP_SIZES, checkoutUrl, fmtSize, getEntry, type PlanId, type PlatformId, type StepId } from "@/app/data/pricing";
 import { ALT_PROMO_CODE, PROMO_CODE, PROMO_DEADLINE } from "@/app/data/promoBanner";
 import { SELECT_PLAN_EVENT, writeSavedPlan, type SavedPlan } from "@/app/data/savedPlan";
-import { PricingHeading } from "./Growth";
 
 const STEPS: StepId[] = ["1-Step", "2-Step", "Instant"];
 const PLATFORMS: { id: PlatformId; label: string; logo: string }[] = [
@@ -72,7 +71,7 @@ function money(n: number): string {
   return "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
 }
 
-function useClock(): string {
+function useCountdown(): [string, string][] {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = window.setInterval(() => setNow(Date.now()), 1000);
@@ -80,7 +79,12 @@ function useClock(): string {
   }, []);
   const left = Math.max(0, new Date(PROMO_DEADLINE).getTime() - now);
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${Math.floor(left / 864e5)}d ${pad(Math.floor(left / 36e5) % 24)}h ${pad(Math.floor(left / 6e4) % 60)}m ${pad(Math.floor(left / 1e3) % 60)}s`;
+  return [
+    [pad(Math.floor(left / 864e5)), "d"],
+    [pad(Math.floor(left / 36e5) % 24), "h"],
+    [pad(Math.floor(left / 6e4) % 60), "m"],
+    [pad(Math.floor(left / 1e3) % 60), "s"],
+  ];
 }
 
 /* ------------------------------ content ---------------------------------- */
@@ -309,8 +313,6 @@ function PerkGrid({ p, cols = 3 }: { p: Pick; cols?: 2 | 3 }) {
 
 /** One-row offer switch with a single detail line under it. */
 function OfferSwitch({ p }: { p: Pick }) {
-  const clock = useClock();
-  const o = OFFERS[p.offer];
   return (
     <div className="flex flex-col gap-[10px]">
       <div
@@ -334,18 +336,48 @@ function OfferSwitch({ p }: { p: Pick }) {
           );
         })}
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-[6px] text-[12px] font-medium">
+      <OfferDetails p={p} />
+    </div>
+  );
+}
+
+/** One glass panel: what you get, the code, and the countdown. */
+function OfferDetails({ p }: { p: Pick }) {
+  const parts = useCountdown();
+  const o = OFFERS[p.offer];
+  return (
+    <div className="flex flex-col gap-[12px] rounded-[18px] px-[14px] py-[12px]" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015))", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}>
+      <div className="flex flex-wrap items-center justify-center gap-x-[16px] gap-y-[6px]">
         {o.extras.map((x) => (
-          <span key={x} className="rounded-full px-[10px] py-[5px] text-[#dbeafe]" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>{x.replace(/^\+\s?/, "+ ")}</span>
+          <span key={x} className="flex items-center gap-[7px] text-[13px] font-medium text-[#e5edff]">
+            <span className="flex size-[18px] items-center justify-center rounded-full" style={{ background: "rgba(74,222,128,0.16)" }}>
+              <Svg d={IC.check} size={11} color="#4ade80" w={3} />
+            </span>
+            {x.replace(/^\+\s?/, "")}
+          </span>
         ))}
-        <span className="flex items-center gap-[5px] rounded-full px-[10px] py-[5px] text-white" style={{ background: "rgba(255,255,255,0.05)", border: "1px dashed rgba(255,255,255,0.22)" }}>
-          <Svg d={IC.tag} size={12} color="#93c5fd" w={2} />
-          {o.code}
+      </div>
+      <div className="flex items-center justify-between gap-[10px] pt-[12px]" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <span className="flex min-w-0 items-center gap-[8px]">
+          <span className="flex size-[30px] shrink-0 items-center justify-center rounded-[10px]" style={{ background: "rgba(96,165,250,0.12)" }}>
+            <Svg d={IC.tag} size={15} color="#93c5fd" w={2} />
+          </span>
+          <span className="flex min-w-0 flex-col leading-tight">
+            <span className="text-[13px] font-semibold tracking-[0.04em] text-white">{o.code}</span>
+            <span className="text-[10.5px]" style={{ color: MUTED }}>{p.co.auto ? "Auto-applied" : "Enter at checkout"}</span>
+          </span>
         </span>
         {p.offer === "launch" ? (
-          <span className="tabular rounded-full px-[10px] py-[5px] text-[#fecaca]" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(248,113,113,0.25)" }}>Ends in {clock}</span>
+          <span className="flex items-center gap-[4px]" aria-label={`Offer ends in ${parts.map(([v, u]) => v + u).join(" ")}`}>
+            {parts.map(([v, u]) => (
+              <span key={u} className="flex h-[34px] min-w-[38px] items-baseline justify-center gap-[1px] rounded-[9px] px-[5px] pt-[7px]" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                <span className="tabular text-[14px] font-semibold text-white">{v}</span>
+                <span className="text-[9.5px] font-medium" style={{ color: MUTED }}>{u}</span>
+              </span>
+            ))}
+          </span>
         ) : (
-          <span className="rounded-full px-[10px] py-[5px] text-[#a7f3d0]" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.25)" }}>No expiry</span>
+          <span className="rounded-full px-[10px] py-[6px] text-[11.5px] font-semibold text-[#a7f3d0]" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.25)" }}>No expiry</span>
         )}
       </div>
     </div>
@@ -410,7 +442,15 @@ function TrustRow() {
   );
 }
 
-export function ChallengePricing() {
+function DefaultHeading() {
+  return (
+    <h2 className="m-0 text-center text-[34px] font-semibold leading-[1.06] tracking-[-0.035em] text-[#eef0f6] lg:text-left lg:text-[54px]">
+      Choose your <span className="fyt-gradient-text">challenge.</span>
+    </h2>
+  );
+}
+
+export function ChallengePricing({ heading }: { heading?: ReactNode }) {
   const p = usePick();
   const reduce = useReducedMotion();
   const first = useRef(true);
@@ -448,7 +488,7 @@ export function ChallengePricing() {
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-[18px] px-[16px] pb-[64px] pt-[56px] lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-[48px] lg:px-[40px] lg:pb-[110px] lg:pt-[110px]">
         <div className="flex flex-col gap-[18px] lg:sticky lg:top-[140px] lg:self-start">
-          <PricingHeading />
+          {heading ?? <DefaultHeading />}
           <OfferSwitch p={p} />
           <ModelTabs p={p} />
         </div>
