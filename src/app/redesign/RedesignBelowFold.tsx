@@ -1,7 +1,7 @@
-import { FeaturedIn, PricingSection, Testimonials } from "./SectionsTop";
+import { FeaturedIn, Testimonials } from "./SectionsTop";
 import { ClosingCta, Faq, Footer, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
-import { PricingIdeas } from "./PricingIdeas";
+import { ChallengePricing } from "./PricingC";
 import { CountryProof, ExitSavePlan, FreeDemo, PayoutBoard, ProveYourExpertise, WelcomeBack, ZeroRisk } from "./Growth";
 
 /**
@@ -17,9 +17,7 @@ export function BelowFold() {
       <WelcomeBack />
       <FeaturedIn />
       <CountryProof />
-      <PricingSection />
-      {/* TEST ONLY: six pricing layouts to compare on the preview. */}
-      <PricingIdeas />
+      <ChallengePricing />
       <ProveYourExpertise />
       <PayoutBoard />
       <Testimonials />

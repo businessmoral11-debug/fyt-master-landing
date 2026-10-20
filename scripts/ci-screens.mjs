@@ -81,6 +81,17 @@ for (const vp of viewports) {
     await sleep(900);
     await optA.screenshot({ path: `${OUT}/${vp.name}-option-a-welcome.png` }).catch(() => {});
   }
+  // New pricing: default, then Instant + new-trader offer.
+  const pr = page.locator("#challenge");
+  if (await pr.count()) {
+    await pr.scrollIntoViewIfNeeded();
+    await sleep(1000);
+    await pr.screenshot({ path: `${OUT}/${vp.name}-pricing.png` }).catch((e) => log.push("pricing shot " + e.message));
+    await pr.getByRole("tab", { name: /Instant/ }).click().catch((e) => log.push("instant tab " + e.message.split("\n")[0]));
+    await pr.getByRole("radio", { name: /New traders/ }).click().catch((e) => log.push("welcome radio " + e.message.split("\n")[0]));
+    await sleep(1000);
+    await pr.screenshot({ path: `${OUT}/${vp.name}-pricing-instant.png` }).catch(() => {});
+  }
   // Proof board tabs.
   for (const [tabName, file] of [["Biggest", "board-biggest"], ["On camera", "board-camera"], ["Live payouts", "board-live"]]) {
     const t = page.getByRole("tab", { name: tabName });
