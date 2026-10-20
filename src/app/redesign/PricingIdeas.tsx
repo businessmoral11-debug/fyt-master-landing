@@ -482,16 +482,16 @@ function PassField({ k, v, onTap, hint }: { k: string; v: string; onTap?: () => 
         {k}
         {onTap && <Svg d="M7 7h11l-3-3M17 17H6l3 3" size={10} color="#93c5fd" w={2.2} />}
       </span>
-      <span className="text-[15px] font-bold leading-[1.15] text-white">{v}</span>
+      <span className="max-w-full truncate text-[13.5px] font-bold leading-[1.15] text-white">{v}</span>
       {hint && <span className="text-[9.5px] font-bold uppercase tracking-[0.08em] text-[#86efac]">{hint}</span>}
     </>
   );
   return onTap ? (
-    <button type="button" onClick={onTap} className="flex cursor-pointer flex-col items-start gap-[2px] rounded-[12px] border-0 px-[8px] py-[7px] text-left" style={{ background: "rgba(255,255,255,0.08)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.16)" }}>
+    <button type="button" onClick={onTap} className="flex min-w-0 cursor-pointer flex-col items-start gap-[2px] rounded-[12px] border-0 px-[8px] py-[7px] text-left" style={{ background: "rgba(255,255,255,0.08)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.16)" }}>
       {inner}
     </button>
   ) : (
-    <span className="flex flex-col gap-[2px] px-[8px] py-[7px]">{inner}</span>
+    <span className="flex min-w-0 flex-col gap-[2px] px-[8px] py-[7px]">{inner}</span>
   );
 }
 
