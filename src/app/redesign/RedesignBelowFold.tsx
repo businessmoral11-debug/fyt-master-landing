@@ -1,4 +1,5 @@
-import { FeaturedIn, LivePayouts, PricingSection, ProofInNumbers, ProveYourSkill, Testimonials } from "./SectionsTop";
+import { FeaturedIn, LivePayouts, ProofInNumbers, ProveYourSkill, Testimonials } from "./SectionsTop";
+import { ChallengePricing } from "./PricingC";
 import { ClosingCta, Comparison, Faq, Footer, HowItWorks, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
 import { FloatingCta } from "./Conversion";
@@ -16,7 +17,7 @@ export function BelowFold() {
       <ProveYourSkill />
       <ProofInNumbers />
       <LivePayouts />
-      <PricingSection />
+      <ChallengePricing />
       <Testimonials />
       <HowItWorks />
       <Comparison />
