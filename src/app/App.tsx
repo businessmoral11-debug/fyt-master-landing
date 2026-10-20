@@ -571,18 +571,15 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
 
   const left = formatHoursLeft(PROMO_DEADLINE, now);
   if (left.expired) return null;
-  const totalHours = Number(left.hh);
-  const days = Math.floor(totalHours / 24);
-  const hh = String(totalHours % 24).padStart(2, "0");
-  const label = compact
-    ? `${days > 0 ? `${days}D ` : ""}${hh}:${left.mm}:${left.ss} Left`
-    : `${days > 0 ? `${days}D ` : ""}${hh}H ${left.mm}M ${left.ss}S Left`;
+  // Hours only (e.g. 29H 47M 12S) - reads more urgent than "1D 05H".
+  const hh = left.hh;
+  const label = compact ? `${hh}:${left.mm}:${left.ss} Left` : `${hh}H ${left.mm}M ${left.ss}S Left`;
 
   return (
     <span
       role="timer"
-      aria-label={`${days > 0 ? `${days} days ` : ""}${Number(hh)} hours ${Number(left.mm)} minutes left`}
-      className={`inline-flex shrink-0 items-center rounded-full font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] tabular-nums text-white ${compact ? "h-[16px] px-[7px] text-[7.5px]" : "h-[24px] px-[12px] text-[11px] lg:h-[25px] lg:text-[12px]"}`}
+      aria-label={`${Number(hh)} hours ${Number(left.mm)} minutes left`}
+      className={`inline-flex shrink-0 items-center rounded-full font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] tabular-nums text-white ${compact ? "h-[19px] px-[8px] text-[9px]" : "h-[28px] px-[13px] text-[13px] lg:h-[30px] lg:px-[14px] lg:text-[14px]"}`}
       style={{
         background: "#DC2626",
         border: "1px solid rgba(255,255,255,0.28)",
