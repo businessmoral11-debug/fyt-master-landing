@@ -91,7 +91,15 @@ for (const vp of viewports) {
     await sleep(700);
     await pr.screenshot({ path: `${OUT}/${vp.name}-pricing-compare.png` }).catch(() => {});
     await pr.getByRole("tab", { name: /Instant/ }).click().catch((e) => log.push("instant tab " + e.message.split("\n")[0]));
-    await pr.getByRole("radio", { name: /New traders/ }).click().catch((e) => log.push("welcome radio " + e.message.split("\n")[0]));
+    await pr.getByRole("button", { name: /New to FYT/ }).click().catch((e) => log.push("gift open " + e.message.split("\n")[0]));
+    await sleep(900);
+    await page.screenshot({ path: `${OUT}/${vp.name}-gift-1.png` });
+    await page.getByRole("button", { name: /Open my gift/ }).click().catch((e) => log.push("gift unlock " + e.message.split("\n")[0]));
+    await sleep(700);
+    await page.screenshot({ path: `${OUT}/${vp.name}-gift-2.png` });
+    await sleep(1800);
+    await page.screenshot({ path: `${OUT}/${vp.name}-gift-3.png` });
+    await page.getByRole("button", { name: /Use my gift/ }).click().catch((e) => log.push("gift use " + e.message.split("\n")[0]));
     await sleep(1000);
     await pr.screenshot({ path: `${OUT}/${vp.name}-pricing-instant.png` }).catch(() => {});
   }
