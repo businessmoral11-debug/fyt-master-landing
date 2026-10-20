@@ -106,6 +106,8 @@ for (const vp of viewports) {
     await page.getByRole("button", { name: /Use my gift/ }).click().catch((e) => log.push("gift use " + e.message.split("\n")[0]));
     await sleep(150);
     await sy("150ms after use");
+    await sleep(1200);
+    await sy("1.3s after use");
     await sleep(1000);
     log.push(`[${vp.name}] after Use my gift: scrollY=${await page.evaluate(() => Math.round(window.scrollY))} pricingTop=${await page.evaluate(() => Math.round(document.getElementById("challenge")?.getBoundingClientRect().top ?? -1))}`);
     await pr.screenshot({ path: `${OUT}/${vp.name}-pricing-instant.png` }).catch(() => {});
