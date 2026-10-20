@@ -28,8 +28,8 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 type OfferId = "launch" | "welcome";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
-  launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+1 bonus account", "+5% cashback"], who: "+1 bonus · 5% cashback" },
-  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+1 bonus account instantly", "+5% instant cashback"], who: "Welcome gift" },
+  launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+ BOGO instantly", "+ 5% cashback"], who: "Instant BOGO · 5% cashback" },
+  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ BOGO instantly", "+ 5% instant cashback"], who: "Welcome gift" },
 };
 
 function offerPrice(old: number, o: OfferId): number {
@@ -402,22 +402,21 @@ function GiftModal({ p, onClose }: { p: Pick; onClose: () => void }) {
   const { parts } = useLeft(p.giftAt ? p.giftAt + GIFT_MS : null);
   const [burst, setBurst] = useState(0);
   const [copied, setCopied] = useState(false);
+  // No body scroll-lock: on this page locking the body collapses the document
+  // and throws the visitor back to the top. The overlay covers the screen anyway.
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeRef.current();
     window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
   const unlock = () => {
     p.unlockGift();
     setBurst((b) => b + 1);
   };
   return createPortal(
-    <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-center justify-center p-[16px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Welcome gift">
+    <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-center justify-center overscroll-contain p-[16px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Welcome gift">
       <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.78)", backdropFilter: "blur(8px)" }} />
       {burst > 0 && !reduce && <Confetti key={burst} />}
       <motion.div
@@ -497,7 +496,11 @@ function OfferSwitch({ p }: { p: Pick }) {
   const [open, setOpen] = useState(false);
   const close = () => {
     setOpen(false);
-    if (p.giftAt) p.setOffer("welcome");
+    if (p.giftAt) {
+      p.setOffer("welcome");
+      // Land back on the pricing card, not the top of the page.
+      window.setTimeout(() => document.getElementById("challenge")?.scrollIntoView({ behavior: "smooth", block: "start" }), 350);
+    }
   };
   const gift = useLeft(p.giftAt ? p.giftAt + GIFT_MS : null);
   const giftLive = p.giftAt !== null && gift.ms > 0;
@@ -522,7 +525,7 @@ function OfferSwitch({ p }: { p: Pick }) {
                 <Svg d={GiftIcon} size={15} color="#fde68a" w={2} />
                 45% OFF
               </span>
-              <span className="mt-[4px] text-[11px] font-medium" style={{ color: welcomeOn ? "#fde68a" : MUTED }}>+1 bonus · 5% cashback</span>
+              <span className="mt-[4px] text-[11px] font-medium" style={{ color: welcomeOn ? "#fde68a" : MUTED }}>Instant BOGO · 5% cashback</span>
             </button>
           ) : (
             <motion.button
