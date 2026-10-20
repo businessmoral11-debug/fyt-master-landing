@@ -80,7 +80,7 @@ function useClock(): string {
   }, []);
   const left = Math.max(0, new Date(PROMO_DEADLINE).getTime() - now);
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${Math.floor(left / 864e5)}d ${pad(Math.floor(left / 36e5) % 24)}:${pad(Math.floor(left / 6e4) % 60)}:${pad(Math.floor(left / 1e3) % 60)}`;
+  return `${Math.floor(left / 864e5)}d ${pad(Math.floor(left / 36e5) % 24)}h ${pad(Math.floor(left / 6e4) % 60)}m ${pad(Math.floor(left / 1e3) % 60)}s`;
 }
 
 /* ------------------------------ content ---------------------------------- */
@@ -188,18 +188,48 @@ function TypeCards({ p }: { p: Pick }) {
     <div className="grid grid-cols-2 gap-[8px]">
       {p.plans.map((x) => {
         const on = x.id === p.plan;
-        const info = p.step === "Instant" && x.id === "prime" ? INSTANT_PRIME : TYPE_INFO[x.id];
+        const note = x.id === "prime" && p.step !== "Instant" ? "No consistency" : "";
         return (
-          <button key={x.id} type="button" aria-pressed={on} onClick={() => p.setPlan(x.id)} className="relative flex cursor-pointer flex-col items-start gap-[6px] rounded-[18px] p-[12px] text-left text-white transition-colors" style={{ border: `1.5px solid ${on ? "#60a5fa" : LINE}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.26), rgba(37,99,235,0.06))" : "rgba(255,255,255,0.03)" }}>
-            <span className="flex w-full items-center justify-between">
-              <span className="text-[16px] font-bold">{x.label}</span>
-              <span className="size-[16px] rounded-full" style={{ border: `2px solid ${on ? "#60a5fa" : "#5b6478"}`, background: on ? "#60a5fa" : "transparent", boxShadow: on ? "inset 0 0 0 2px #0b1430" : "none" }} />
+          <button key={x.id} type="button" aria-pressed={on} onClick={() => p.setPlan(x.id)} className="flex h-[58px] cursor-pointer items-center justify-between gap-[8px] rounded-[16px] px-[14px] text-left text-white transition-colors" style={{ border: `1.5px solid ${on ? "#60a5fa" : LINE}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.26), rgba(37,99,235,0.06))" : "rgba(255,255,255,0.03)" }}>
+            <span className="flex flex-col">
+              <span className="text-[16px] font-bold leading-tight">{x.label}</span>
+              {note && <span className="text-[11px] font-semibold text-[#86efac]">{note}</span>}
             </span>
-            <span className="rounded-full px-[8px] py-[3px] text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: on ? "rgba(34,197,94,0.16)" : "rgba(255,255,255,0.06)", color: on ? "#86efac" : SOFT }}>{info.badge}</span>
-            <span className="text-[11.5px] leading-[1.35]" style={{ color: MUTED }}>{info.line}</span>
+            <span className="size-[16px] shrink-0 rounded-full" style={{ border: `2px solid ${on ? "#60a5fa" : "#5b6478"}`, background: on ? "#60a5fa" : "transparent", boxShadow: on ? "inset 0 0 0 2px #0b1430" : "none" }} />
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/** Differences only, opened from the "Compare" link next to Type. */
+function CompareTable({ p }: { p: Pick }) {
+  const instant = p.step === "Instant";
+  const ids = p.plans.map((x) => x.id);
+  const names = p.plans.map((x) => x.label);
+  const e = ids.map((id) => getEntry(p.step, id, p.platform, p.size)!);
+  const rows: [string, string, string][] = instant
+    ? [["Profit target", e[0].profit ?? "-", e[1].profit ?? "-"], ["Daily loss", e[0].maxDaily, e[1].maxDaily], ["Max loss", e[0].maxOverall, e[1].maxOverall], ["Min trading days", e[0].minDays, e[1].minDays]]
+    : [["Consistency rule", "Applies", "None"], ["News trading", "Always", "Challenge"], ["Hedging", "Always", "Challenge"], ["Fee refund", "2nd reward", "1st reward"]];
+  const href = instant ? "https://intercom.help/funding-your-trades/en/articles/14890800-instant-funding-models-compared" : "https://intercom.help/funding-your-trades/en/articles/13374417-fyt-classic-vs-fyt-prime";
+  return (
+    <div className="overflow-hidden rounded-[16px]" style={{ background: "rgba(0,0,0,0.25)", border: `1px solid ${LINE}` }}>
+      <div className="grid grid-cols-[1.3fr_1fr_1fr] px-[12px] py-[9px] text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#93c5fd]">
+        <span />
+        <span className="text-center">{names[0]}</span>
+        <span className="text-center">{names[1]}</span>
+      </div>
+      {rows.map(([k, a, b]) => (
+        <div key={k} className="grid grid-cols-[1.3fr_1fr_1fr] items-center px-[12px] py-[9px] text-[12.5px]" style={{ borderTop: "1px solid rgba(148,178,255,0.08)" }}>
+          <span style={{ color: SOFT }}>{k}</span>
+          <span className="text-center font-semibold" style={{ color: ids[0] === p.plan ? "#fff" : MUTED }}>{a}</span>
+          <span className="text-center font-semibold" style={{ color: ids[1] === p.plan ? "#fff" : MUTED }}>{b}</span>
+        </div>
+      ))}
+      <a href={href} target="_blank" rel="noopener noreferrer" className="block px-[12px] py-[9px] text-center text-[12px] font-semibold text-[#93c5fd] no-underline hover:underline" style={{ borderTop: "1px solid rgba(148,178,255,0.08)" }}>
+        Full comparison ↗
+      </a>
     </div>
   );
 }
@@ -282,25 +312,41 @@ function OfferSwitch({ p }: { p: Pick }) {
   const clock = useClock();
   const o = OFFERS[p.offer];
   return (
-    <div className="flex flex-col gap-[8px]">
-      <div className="relative grid grid-cols-2 rounded-[18px] p-[4px]" role="radiogroup" aria-label="Choose your offer" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${LINE}` }}>
-        <span aria-hidden="true" className="absolute bottom-[4px] top-[4px] rounded-[14px] transition-[left,background] duration-300" style={{ left: p.offer === "launch" ? 4 : "calc(50%)", width: "calc(50% - 4px)", background: p.offer === "launch" ? "linear-gradient(160deg,#ef4444,#b91c1c)" : "linear-gradient(160deg,#10b981,#047857)", boxShadow: "0 12px 26px -14px rgba(0,0,0,0.9)" }} />
+    <div className="flex flex-col gap-[10px]">
+      <div
+        className="relative grid grid-cols-2 rounded-[20px] p-[5px]"
+        role="radiogroup"
+        aria-label="Choose your offer"
+        style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}
+      >
+        <span
+          aria-hidden="true"
+          className="absolute bottom-[5px] top-[5px] rounded-[15px] transition-[left] duration-300"
+          style={{ left: p.offer === "launch" ? 5 : "50%", width: "calc(50% - 5px)", background: "linear-gradient(180deg, rgba(255,255,255,0.2), rgba(147,197,253,0.08))", border: "1px solid rgba(255,255,255,0.32)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35), 0 14px 30px -14px rgba(59,130,246,0.75)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
+        />
         {(["launch", "welcome"] as OfferId[]).map((id) => {
           const on = p.offer === id;
           return (
-            <button key={id} type="button" role="radio" aria-checked={on} onClick={() => p.setOffer(id)} className="relative z-[1] flex h-[52px] cursor-pointer flex-col items-center justify-center rounded-[14px] border-0 bg-transparent text-white">
-              <span className="text-[17px] font-bold leading-none tracking-[-0.02em]">{OFFERS[id].title}</span>
-              <span className="mt-[3px] text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: on ? "rgba(255,255,255,0.85)" : MUTED }}>{OFFERS[id].who}</span>
+            <button key={id} type="button" role="radio" aria-checked={on} onClick={() => p.setOffer(id)} className="relative z-[1] flex h-[54px] cursor-pointer flex-col items-center justify-center rounded-[15px] border-0 bg-transparent transition-colors" style={{ color: on ? "#fff" : MUTED }}>
+              <span className="text-[18px] font-semibold leading-none tracking-[-0.02em]">{OFFERS[id].title}</span>
+              <span className="mt-[4px] text-[11px] font-medium" style={{ color: on ? "#bfdbfe" : MUTED }}>{OFFERS[id].who}</span>
             </button>
           );
         })}
       </div>
-      <div className="flex items-center justify-center gap-[8px] text-[12px]" style={{ color: SOFT }}>
-        <span>{o.extras.join(" ")}</span>
-        <span className="size-[3px] rounded-full bg-[#5b6478]" />
-        <span className="font-semibold text-white" style={{ fontFamily: MONO }}>{o.code}</span>
-        <span className="size-[3px] rounded-full bg-[#5b6478]" />
-        {p.offer === "launch" ? <span style={{ color: "#fca5a5", fontFamily: MONO }}>{clock.slice(0, -3)}</span> : <span className="text-[#6ee7b7]">no expiry</span>}
+      <div className="flex flex-wrap items-center justify-center gap-[6px] text-[12px] font-medium">
+        {o.extras.map((x) => (
+          <span key={x} className="rounded-full px-[10px] py-[5px] text-[#dbeafe]" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>{x.replace(/^\+\s?/, "+ ")}</span>
+        ))}
+        <span className="flex items-center gap-[5px] rounded-full px-[10px] py-[5px] text-white" style={{ background: "rgba(255,255,255,0.05)", border: "1px dashed rgba(255,255,255,0.22)" }}>
+          <Svg d={IC.tag} size={12} color="#93c5fd" w={2} />
+          {o.code}
+        </span>
+        {p.offer === "launch" ? (
+          <span className="tabular rounded-full px-[10px] py-[5px] text-[#fecaca]" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(248,113,113,0.25)" }}>Ends in {clock}</span>
+        ) : (
+          <span className="rounded-full px-[10px] py-[5px] text-[#a7f3d0]" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.25)" }}>No expiry</span>
+        )}
       </div>
     </div>
   );
@@ -338,8 +384,6 @@ function ModelTabs({ p }: { p: Pick }) {
             <span className="hidden size-[44px] shrink-0 items-center justify-center rounded-[14px] text-[17px] font-bold lg:flex" style={{ background: on ? BLUE : "rgba(255,255,255,0.07)" }}>{MODEL_COPY[m].mark}</span>
             <span className="flex flex-col items-center lg:flex-1 lg:items-start">
               <span className="text-[15px] font-bold lg:text-[17px]">{m}</span>
-              <span className="text-[10.5px] lg:hidden" style={{ color: on ? "#bfdbfe" : MUTED }}>{MODEL_COPY[m].short}</span>
-              <span className="hidden text-[12.5px] lg:block" style={{ color: MUTED }}>{MODEL_COPY[m].line}</span>
             </span>
             <span className="flex items-baseline gap-[3px] lg:flex-col lg:items-end lg:gap-0">
               <span className="text-[10px]" style={{ color: MUTED }}>from</span>
@@ -370,6 +414,7 @@ export function ChallengePricing() {
   const p = usePick();
   const reduce = useReducedMotion();
   const first = useRef(true);
+  const [compare, setCompare] = useState(false);
 
   // Remember the visitor's plan (welcome-back card) - skip the default on load.
   useEffect(() => {
@@ -420,13 +465,6 @@ export function ChallengePricing() {
           >
             <span aria-hidden="true" className="pointer-events-none absolute -right-[70px] -top-[80px] size-[240px] rounded-full" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.35), transparent 65%)" }} />
             <div className="relative flex flex-col gap-[16px] p-[16px] sm:p-[22px] lg:gap-[18px] lg:p-[28px]">
-              <div className="flex items-center justify-between gap-[12px]">
-                <span className="flex flex-col">
-                  <span className="text-[20px] font-bold tracking-[-0.02em] lg:text-[24px]">{p.step}</span>
-                  <span className="text-[12.5px]" style={{ color: MUTED }}>{MODEL_COPY[p.step].line}</span>
-                </span>
-                <span className="rounded-full bg-[#4ade80] px-[10px] py-[6px] text-[12px] font-bold text-[#052e16]">Save {money(p.save)}</span>
-              </div>
 
               <div className="flex flex-col gap-[8px]">
                 <Label>Account size</Label>
@@ -444,8 +482,24 @@ export function ChallengePricing() {
 
               <div className="grid grid-cols-1 gap-[16px]">
                 <div className="flex flex-col gap-[8px]">
-                  <Label>Type</Label>
+                  <Label
+                    right={
+                      <button type="button" aria-expanded={compare} onClick={() => setCompare((v) => !v)} className="flex cursor-pointer items-center gap-[6px] rounded-full border-0 px-[10px] py-[5px] text-[12px] font-semibold text-[#bfdbfe]" style={{ background: compare ? "rgba(59,130,246,0.25)" : "rgba(255,255,255,0.06)" }}>
+                        <Svg d="M7 7h11l-3-3M17 17H6l3 3" size={12} color="#bfdbfe" w={2.2} />
+                        {compare ? "Hide" : "Compare"}
+                      </button>
+                    }
+                  >
+                    Type
+                  </Label>
                   <TypeCards p={p} />
+                  <AnimatePresence initial={false}>
+                    {compare && (
+                      <motion.div key="cmp" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }} className="overflow-hidden">
+                        <CompareTable p={p} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
                 <div className="flex flex-col gap-[8px]">
                   <Label>Platform</Label>
@@ -467,9 +521,12 @@ export function ChallengePricing() {
               </div>
 
               <a href={p.co.href} className="flex h-[62px] items-center justify-between rounded-[18px] pl-[20px] pr-[8px] text-white no-underline transition-transform hover:-translate-y-[1px]" style={{ background: BLUE, boxShadow: "0 22px 44px -18px rgba(37,99,235,0.95)" }}>
-                <span className="flex items-baseline gap-[8px]">
-                  <Roll value={money(p.price)} className="text-[24px] font-bold" />
-                  <s className="text-[13px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
+                <span className="flex flex-col">
+                  <span className="flex items-baseline gap-[8px]">
+                    <Roll value={money(p.price)} className="text-[24px] font-bold leading-none" />
+                    <s className="text-[13px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
+                  </span>
+                  <span className="mt-[3px] text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}</span>
                 </span>
                 <span className="flex items-center gap-[6px] rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb]">
                   Start {fmtSize(p.size)}

@@ -87,6 +87,9 @@ for (const vp of viewports) {
     await pr.scrollIntoViewIfNeeded();
     await sleep(1000);
     await pr.screenshot({ path: `${OUT}/${vp.name}-pricing.png` }).catch((e) => log.push("pricing shot " + e.message));
+    await pr.getByRole("button", { name: /Compare/ }).first().click().catch((e) => log.push("compare " + e.message.split("\n")[0]));
+    await sleep(700);
+    await pr.screenshot({ path: `${OUT}/${vp.name}-pricing-compare.png` }).catch(() => {});
     await pr.getByRole("tab", { name: /Instant/ }).click().catch((e) => log.push("instant tab " + e.message.split("\n")[0]));
     await pr.getByRole("radio", { name: /New traders/ }).click().catch((e) => log.push("welcome radio " + e.message.split("\n")[0]));
     await sleep(1000);
