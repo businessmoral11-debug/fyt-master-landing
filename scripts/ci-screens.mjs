@@ -73,6 +73,14 @@ for (const vp of viewports) {
       await el.screenshot({ path: `${OUT}/${vp.name}-option-${id}.png` }).catch((e) => log.push("option " + id + " " + e.message));
     }
   }
+  // Option A with the new-trader offer and Classic picked.
+  const optA = page.locator("#pricing-option-a");
+  if (await optA.count()) {
+    await optA.getByRole("radio", { name: /New traders/ }).click().catch((e) => log.push("welcome click " + e.message.split("\n")[0]));
+    await optA.getByRole("button", { name: /^Classic/ }).first().click().catch((e) => log.push("classic click " + e.message.split("\n")[0]));
+    await sleep(900);
+    await optA.screenshot({ path: `${OUT}/${vp.name}-option-a-welcome.png` }).catch(() => {});
+  }
   // Proof board tabs.
   for (const [tabName, file] of [["Biggest", "board-biggest"], ["On camera", "board-camera"], ["Live payouts", "board-live"]]) {
     const t = page.getByRole("tab", { name: tabName });
