@@ -28,8 +28,8 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 type OfferId = "launch" | "welcome";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
-  launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+1 bonus account", "+5% cashback"], who: "+1 bonus · 5% cashback" },
-  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+1 bonus account instantly", "+5% instant cashback"], who: "Welcome gift" },
+  launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+ BOGO instantly", "+ 5% cashback"], who: "Instant BOGO · 5% cashback" },
+  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ BOGO instantly", "+ 5% instant cashback"], who: "Welcome gift" },
 };
 
 function offerPrice(old: number, o: OfferId): number {
@@ -405,10 +405,12 @@ function GiftModal({ p, onClose }: { p: Pick; onClose: () => void }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     const prev = document.body.style.overflow;
+    const y = window.scrollY;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
+      if (Math.abs(window.scrollY - y) > 4) window.scrollTo(0, y);
       window.removeEventListener("keydown", onKey);
     };
   }, [onClose]);
@@ -497,7 +499,11 @@ function OfferSwitch({ p }: { p: Pick }) {
   const [open, setOpen] = useState(false);
   const close = () => {
     setOpen(false);
-    if (p.giftAt) p.setOffer("welcome");
+    if (p.giftAt) {
+      p.setOffer("welcome");
+      // Land back on the pricing card, not the top of the page.
+      window.setTimeout(() => document.getElementById("challenge")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+    }
   };
   const gift = useLeft(p.giftAt ? p.giftAt + GIFT_MS : null);
   const giftLive = p.giftAt !== null && gift.ms > 0;
@@ -522,7 +528,7 @@ function OfferSwitch({ p }: { p: Pick }) {
                 <Svg d={GiftIcon} size={15} color="#fde68a" w={2} />
                 45% OFF
               </span>
-              <span className="mt-[4px] text-[11px] font-medium" style={{ color: welcomeOn ? "#fde68a" : MUTED }}>+1 bonus · 5% cashback</span>
+              <span className="mt-[4px] text-[11px] font-medium" style={{ color: welcomeOn ? "#fde68a" : MUTED }}>Instant BOGO · 5% cashback</span>
             </button>
           ) : (
             <motion.button
