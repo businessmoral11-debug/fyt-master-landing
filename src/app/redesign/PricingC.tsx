@@ -27,8 +27,8 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 type OfferId = "launch" | "welcome";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
-  launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+1 bonus account", "+5% cashback"], who: "Launch offer" },
-  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ instant BOGO"], who: "New traders" },
+  launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+1 bonus account", "+5% cashback"], who: "+1 bonus · 5% cashback" },
+  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ instant BOGO"], who: "New traders · BOGO" },
 };
 
 function offerPrice(old: number, o: OfferId): number {
@@ -38,9 +38,11 @@ function offerPrice(old: number, o: OfferId): number {
 /** Checkout with the chosen code applied. Instant Prime SKUs cannot carry a coupon in the link. */
 function offerCheckout(productId: number, o: OfferId): { href: string; auto: boolean } {
   const base = checkoutUrl(productId);
-  if (base.includes("add-to-cart")) return { href: base, auto: false };
+  const code = OFFERS[o].code;
+  // The checkout reads ?coupon= (needs the Oct-20 checkout snippet) for both link kinds.
+  if (base.includes("add-to-cart")) return { href: `${base}&coupon=${code}`, auto: true };
   if (o === "launch") return { href: base, auto: true };
-  return { href: `https://fundingyourtrades.com/checkout-link/?products=${productId}:1&coupon=${ALT_PROMO_CODE}`, auto: true };
+  return { href: `https://fundingyourtrades.com/checkout-link/?products=${productId}:1&coupon=${code}`, auto: true };
 }
 
 /* ------------------------------ shared state ----------------------------- */
@@ -71,6 +73,7 @@ function money(n: number): string {
   return "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
 }
 
+/** Hours-based countdown (29h 47m 12s reads more urgent than 1d 5h). */
 function useCountdown(): [string, string][] {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -80,8 +83,7 @@ function useCountdown(): [string, string][] {
   const left = Math.max(0, new Date(PROMO_DEADLINE).getTime() - now);
   const pad = (n: number) => String(n).padStart(2, "0");
   return [
-    [pad(Math.floor(left / 864e5)), "d"],
-    [pad(Math.floor(left / 36e5) % 24), "h"],
+    [pad(Math.floor(left / 36e5)), "h"],
     [pad(Math.floor(left / 6e4) % 60), "m"],
     [pad(Math.floor(left / 1e3) % 60), "s"],
   ];
@@ -341,46 +343,50 @@ function OfferSwitch({ p }: { p: Pick }) {
   );
 }
 
-/** One glass panel: what you get, the code, and the countdown. */
+/** One slim bar under the switch: countdown (red alert) or no-expiry, plus the auto-applied code. */
 function OfferDetails({ p }: { p: Pick }) {
   const parts = useCountdown();
+  const reduce = useReducedMotion();
   const o = OFFERS[p.offer];
+  const launch = p.offer === "launch";
   return (
-    <div className="flex flex-col gap-[12px] rounded-[18px] px-[14px] py-[12px]" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015))", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}>
-      <div className="flex flex-wrap items-center justify-center gap-x-[16px] gap-y-[6px]">
-        {o.extras.map((x) => (
-          <span key={x} className="flex items-center gap-[7px] text-[13px] font-medium text-[#e5edff]">
-            <span className="flex size-[18px] items-center justify-center rounded-full" style={{ background: "rgba(74,222,128,0.16)" }}>
-              <Svg d={IC.check} size={11} color="#4ade80" w={3} />
-            </span>
-            {x.replace(/^\+\s?/, "")}
+    <motion.div
+      className="flex h-[44px] items-center justify-between gap-[10px] rounded-[14px] pl-[12px] pr-[6px]"
+      style={{
+        background: launch ? "linear-gradient(90deg, rgba(239,68,68,0.16), rgba(239,68,68,0.04))" : "linear-gradient(90deg, rgba(16,185,129,0.14), rgba(16,185,129,0.03))",
+        border: `1px solid ${launch ? "rgba(248,113,113,0.38)" : "rgba(52,211,153,0.3)"}`,
+      }}
+      animate={launch && !reduce ? { boxShadow: ["0 0 0 0 rgba(239,68,68,0)", "0 0 22px -4px rgba(239,68,68,0.45)", "0 0 0 0 rgba(239,68,68,0)"] } : undefined}
+      transition={launch && !reduce ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" } : undefined}
+    >
+      {launch ? (
+        <span className="flex items-center gap-[8px]" aria-label={`Offer ends in ${parts.map(([v, u]) => v + u).join(" ")}`}>
+          <span className="relative flex size-[8px]">
+            <span className="absolute inset-0 animate-ping rounded-full bg-[#ef4444] opacity-60" />
+            <span className="relative size-[8px] rounded-full bg-[#ef4444]" />
           </span>
-        ))}
-      </div>
-      <div className="flex items-center justify-between gap-[10px] pt-[12px]" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-        <span className="flex min-w-0 items-center gap-[8px]">
-          <span className="flex size-[30px] shrink-0 items-center justify-center rounded-[10px]" style={{ background: "rgba(96,165,250,0.12)" }}>
-            <Svg d={IC.tag} size={15} color="#93c5fd" w={2} />
-          </span>
-          <span className="flex min-w-0 flex-col leading-tight">
-            <span className="text-[13px] font-semibold tracking-[0.04em] text-white">{o.code}</span>
-            <span className="text-[10.5px]" style={{ color: MUTED }}>{p.co.auto ? "Auto-applied" : "Enter at checkout"}</span>
-          </span>
-        </span>
-        {p.offer === "launch" ? (
-          <span className="flex items-center gap-[4px]" aria-label={`Offer ends in ${parts.map(([v, u]) => v + u).join(" ")}`}>
+          <span className="text-[12px] font-medium text-[#fecaca]">Ends in</span>
+          <span className="tabular text-[15px] font-semibold tracking-[0.01em] text-white">
             {parts.map(([v, u]) => (
-              <span key={u} className="flex h-[34px] min-w-[38px] items-baseline justify-center gap-[1px] rounded-[9px] px-[5px] pt-[7px]" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <span className="tabular text-[14px] font-semibold text-white">{v}</span>
-                <span className="text-[9.5px] font-medium" style={{ color: MUTED }}>{u}</span>
+              <span key={u} className="mr-[4px] last:mr-0">
+                {v}
+                <span className="text-[11px] font-medium text-[#fca5a5]">{u}</span>
               </span>
             ))}
           </span>
-        ) : (
-          <span className="rounded-full px-[10px] py-[6px] text-[11.5px] font-semibold text-[#a7f3d0]" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(52,211,153,0.25)" }}>No expiry</span>
-        )}
-      </div>
-    </div>
+        </span>
+      ) : (
+        <span className="flex items-center gap-[8px] text-[12.5px] font-medium text-[#a7f3d0]">
+          <Svg d={IC.check} size={14} color="#4ade80" w={2.6} />
+          No expiry
+        </span>
+      )}
+      <span className="flex items-center gap-[6px] rounded-[10px] px-[10px] py-[6px] text-[12px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.07)", border: "1px dashed rgba(255,255,255,0.22)" }}>
+        <Svg d={IC.tag} size={12} color="#93c5fd" w={2} />
+        {o.code}
+        <Svg d={IC.check} size={12} color="#4ade80" w={3} />
+      </span>
+    </motion.div>
   );
 }
 
