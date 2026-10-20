@@ -29,7 +29,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 type OfferId = "launch" | "welcome";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
   launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+1 bonus account", "+5% cashback"], who: "+1 bonus · 5% cashback" },
-  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+1 bonus account instantly", "+5% cashback"], who: "Welcome gift" },
+  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+1 bonus account instantly", "+5% instant cashback"], who: "Welcome gift" },
 };
 
 function offerPrice(old: number, o: OfferId): number {
@@ -349,7 +349,7 @@ function useLeft(until: number | null): { ms: number; parts: [string, string][] 
     const t = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(t);
   }, [until]);
-  const ms = until ? Math.max(0, until - now) : 0;
+  const ms = until ? Math.min(GIFT_MS, Math.max(0, until - now)) : 0;
   const pad = (n: number) => String(n).padStart(2, "0");
   return {
     ms,
@@ -522,7 +522,7 @@ function OfferSwitch({ p }: { p: Pick }) {
                 <Svg d={GiftIcon} size={15} color="#fde68a" w={2} />
                 45% OFF
               </span>
-              <span className="mt-[4px] text-[11px] font-medium" style={{ color: welcomeOn ? "#fde68a" : MUTED }}>Your gift · {gift.parts[0][0]}h {gift.parts[1][0]}m left</span>
+              <span className="mt-[4px] text-[11px] font-medium" style={{ color: welcomeOn ? "#fde68a" : MUTED }}>+1 bonus · 5% cashback</span>
             </button>
           ) : (
             <motion.button
