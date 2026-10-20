@@ -4,6 +4,7 @@
  * (WELCOME45) offer, applied automatically through the checkout link.
  */
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import imgMatchTraderLogo from "@/assets/live-site/platform-logos/match-trader.png";
 import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5.png";
@@ -28,7 +29,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 type OfferId = "launch" | "welcome";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
   launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+1 bonus account", "+5% cashback"], who: "+1 bonus · 5% cashback" },
-  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ instant BOGO"], who: "+ BOGO instantly · New traders" },
+  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+1 bonus account instantly", "+5% instant cashback"], who: "Welcome gift" },
 };
 
 function offerPrice(old: number, o: OfferId): number {
@@ -52,7 +53,19 @@ function usePick() {
   const [planRaw, setPlan] = useState<PlanId>("prime");
   const [platform, setPlatform] = useState<PlatformId>("match-trader");
   const [i, setI] = useState(3);
-  const [offer, setOffer] = useState<OfferId>("launch");
+  const [giftAt, setGiftAt] = useState<number | null>(() => (typeof window === "undefined" ? null : readGift()));
+  const giftValid = giftAt !== null && Date.now() < giftAt + GIFT_MS;
+  const [offerRaw, setOffer] = useState<OfferId>(() => (giftValid ? "welcome" : "launch"));
+  const offer: OfferId = offerRaw === "welcome" && giftValid ? "welcome" : "launch";
+  const unlockGift = () => {
+    const now = Date.now();
+    try {
+      window.localStorage.setItem(GIFT_KEY, String(now));
+    } catch {
+      // Storage blocked: the gift still works for this visit.
+    }
+    setGiftAt(now);
+  };
   const plans = STEP_PLANS[step];
   const plan: PlanId = plans.some((p) => p.id === planRaw) ? planRaw : "prime";
   const sizes = STEP_SIZES[step];
@@ -64,7 +77,7 @@ function usePick() {
     step, plan, platform, i, plans, sizes, size, entry, offer, price, co,
     save: Math.round((entry.priceOld - price) * 100) / 100,
     setStep: (s: StepId) => { setStepRaw(s); setPlan("prime"); },
-    setPlan, setPlatform, setI, setOffer,
+    setPlan, setPlatform, setI, setOffer, giftAt, unlockGift,
   };
 }
 type Pick = ReturnType<typeof usePick>;
@@ -314,75 +327,259 @@ function PerkGrid({ p, cols = 3 }: { p: Pick; cols?: 2 | 3 }) {
 
 
 /** One-row offer switch with a single detail line under it. */
-function OfferSwitch({ p }: { p: Pick }) {
+/* ------------------------------ welcome gift ------------------------------ */
+
+const GIFT_KEY = "fyt_welcome_gift_v1";
+const GIFT_MS = 24 * 60 * 60 * 1000;
+
+function readGift(): number | null {
+  try {
+    const v = Number(window.localStorage.getItem(GIFT_KEY) || 0);
+    return v > 0 ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Ticking "hh mm ss" until an absolute time. */
+function useLeft(until: number | null): { ms: number; parts: [string, string][] } {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!until) return;
+    const t = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, [until]);
+  const ms = until ? Math.min(GIFT_MS, Math.max(0, until - now)) : 0;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return {
+    ms,
+    parts: [
+      [pad(Math.floor(ms / 36e5)), "h"],
+      [pad(Math.floor(ms / 6e4) % 60), "m"],
+      [pad(Math.floor(ms / 1e3) % 60), "s"],
+    ],
+  };
+}
+
+const GiftIcon = "M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7Zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7Z";
+
+/** Confetti burst from the middle of the screen. */
+function Confetti() {
+  const pieces = useRef(
+    Array.from({ length: 70 }, (_, i) => {
+      const a = (Math.PI * 2 * i) / 70 + Math.random() * 0.4;
+      const d = 140 + Math.random() * 260;
+      return {
+        x: Math.cos(a) * d,
+        y: Math.sin(a) * d - 120,
+        r: Math.random() * 720 - 360,
+        c: ["#fde68a", "#f59e0b", "#60a5fa", "#93c5fd", "#4ade80", "#f472b6", "#ffffff"][i % 7],
+        w: 6 + Math.random() * 6,
+        h: 8 + Math.random() * 10,
+        delay: Math.random() * 0.15,
+      };
+    }),
+  ).current;
   return (
-    <div className="flex flex-col gap-[10px]">
-      <div
-        className="relative grid grid-cols-2 rounded-[20px] p-[5px]"
-        role="radiogroup"
-        aria-label="Choose your offer"
-        style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" }}
-      >
-        <span
-          aria-hidden="true"
-          className="absolute bottom-[5px] top-[5px] rounded-[15px] transition-[left] duration-300"
-          style={{ left: p.offer === "launch" ? 5 : "50%", width: "calc(50% - 5px)", background: "linear-gradient(180deg, rgba(255,255,255,0.2), rgba(147,197,253,0.08))", border: "1px solid rgba(255,255,255,0.32)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35), 0 14px 30px -14px rgba(59,130,246,0.75)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
+    <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[40%] z-[2]">
+      {pieces.map((pc, i) => (
+        <motion.span
+          key={i}
+          className="absolute block rounded-[2px]"
+          style={{ width: pc.w, height: pc.h, background: pc.c }}
+          initial={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
+          animate={{ x: pc.x, y: [0, pc.y, pc.y + 260], rotate: pc.r, opacity: [1, 1, 0] }}
+          transition={{ duration: 2.2, delay: pc.delay, ease: [0.12, 0.8, 0.3, 1], times: [0, 0.45, 1] }}
         />
-        {(["launch", "welcome"] as OfferId[]).map((id) => {
-          const on = p.offer === id;
-          return (
-            <button key={id} type="button" role="radio" aria-checked={on} onClick={() => p.setOffer(id)} className="relative z-[1] flex h-[54px] cursor-pointer flex-col items-center justify-center rounded-[15px] border-0 bg-transparent transition-colors" style={{ color: on ? "#fff" : MUTED }}>
-              <span className="text-[18px] font-semibold leading-none tracking-[-0.02em]">{OFFERS[id].title}</span>
-              <span className="mt-[4px] text-[11px] font-medium" style={{ color: on ? "#bfdbfe" : MUTED }}>{OFFERS[id].who}</span>
-            </button>
-          );
-        })}
-      </div>
-      <OfferDetails p={p} />
+      ))}
     </div>
   );
 }
 
-/** One slim bar under the switch: countdown (red alert) or no-expiry, plus the auto-applied code. */
-function OfferDetails({ p }: { p: Pick }) {
-  const parts = useCountdown();
+function GiftModal({ p, onClose }: { p: Pick; onClose: () => void }) {
+  const reduce = useReducedMotion();
+  const opened = p.giftAt !== null;
+  const { parts } = useLeft(p.giftAt ? p.giftAt + GIFT_MS : null);
+  const [burst, setBurst] = useState(0);
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+  const unlock = () => {
+    p.unlockGift();
+    setBurst((b) => b + 1);
+  };
+  return createPortal(
+    <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-center justify-center p-[16px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Welcome gift">
+      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.78)", backdropFilter: "blur(8px)" }} />
+      {burst > 0 && !reduce && <Confetti key={burst} />}
+      <motion.div
+        className="relative w-full max-w-[400px] overflow-hidden rounded-[28px] px-[22px] pb-[22px] pt-[30px] text-center text-white"
+        style={{ background: "radial-gradient(120% 70% at 50% 0%, #1e3a8a 0%, #0a1433 55%, #060c1d 100%)", border: "1px solid rgba(253,230,138,0.35)", boxShadow: "0 60px 120px -40px rgba(245,158,11,0.45), inset 0 1px 0 rgba(255,255,255,0.15)" }}
+        initial={reduce ? false : { scale: 0.92, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: EASE }}
+      >
+        <button type="button" onClick={onClose} aria-label="Close gift" className="absolute right-[12px] top-[12px] flex size-[34px] cursor-pointer items-center justify-center rounded-full border-0 text-white" style={{ background: "rgba(255,255,255,0.08)" }}>
+          <Svg d="M6 6l12 12M18 6L6 18" size={14} color="#fff" w={2.2} />
+        </button>
+        <motion.span
+          className="mx-auto mb-[16px] flex size-[76px] items-center justify-center rounded-[24px]"
+          style={{ background: "linear-gradient(135deg,#fde68a,#f59e0b)", boxShadow: "0 20px 40px -12px rgba(245,158,11,0.8)" }}
+          animate={reduce || opened ? undefined : { rotate: [0, -8, 8, -6, 6, 0], scale: [1, 1.04, 1] }}
+          transition={reduce || opened ? undefined : { duration: 1.2, repeat: Infinity, repeatDelay: 0.8 }}
+        >
+          <Svg d={GiftIcon} size={38} color="#1f1300" w={1.8} />
+        </motion.span>
+        <AnimatePresence mode="wait" initial={false}>
+          {!opened ? (
+            <motion.div key="closed" exit={{ opacity: 0, y: -10 }} className="flex flex-col items-center gap-[10px]">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#fde68a]">New to FYT?</span>
+              <h3 className="m-0 text-[26px] font-semibold leading-[1.15] tracking-[-0.03em]">There's a welcome gift with your name on it.</h3>
+              <p className="m-0 text-[14px]" style={{ color: SOFT }}>One tap to reveal it. Once opened, it's yours for 24 hours.</p>
+              <button type="button" onClick={unlock} className="mt-[8px] flex h-[58px] w-full cursor-pointer items-center justify-center gap-[10px] rounded-[18px] border-0 text-[17px] font-bold text-[#1f1300]" style={{ background: "linear-gradient(180deg,#fde68a,#f59e0b)", boxShadow: "0 18px 36px -14px rgba(245,158,11,0.9)" }}>
+                <Svg d={GiftIcon} size={20} color="#1f1300" w={2} />
+                Open my gift
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div key="open" initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE, delay: 0.1 }} className="flex flex-col items-center gap-[12px]">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#86efac]">Gift unlocked</span>
+              <span className="text-[54px] font-bold leading-none tracking-[-0.04em]" style={{ background: "linear-gradient(180deg,#fff,#fde68a)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>45% OFF</span>
+              <div className="flex flex-col gap-[6px] text-[14px] font-medium">
+                {OFFERS.welcome.extras.map((x) => (
+                  <span key={x} className="flex items-center justify-center gap-[8px]">
+                    <Svg d={IC.check} size={14} color="#4ade80" w={3} />
+                    {x}
+                  </span>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => void navigator.clipboard?.writeText(OFFERS.welcome.code).then(() => setCopied(true)).catch(() => {})}
+                className="flex cursor-pointer items-center gap-[8px] rounded-[12px] px-[14px] py-[9px] text-[15px] font-bold tracking-[0.06em] text-white"
+                style={{ background: "rgba(255,255,255,0.07)", border: "1.5px dashed rgba(253,230,138,0.6)" }}
+              >
+                <Svg d={IC.tag} size={14} color="#fde68a" w={2} />
+                {OFFERS.welcome.code}
+                <span className="text-[11px] font-semibold tracking-normal text-[#fde68a]">{copied ? "Copied" : "Auto-applied"}</span>
+              </button>
+              <span className="flex items-center gap-[8px] text-[13px] text-[#fecaca]">
+                <span className="relative flex size-[7px]">
+                  <span className="absolute inset-0 animate-ping rounded-full bg-[#ef4444] opacity-60" />
+                  <span className="relative size-[7px] rounded-full bg-[#ef4444]" />
+                </span>
+                Yours for
+                <b className="tabular text-white">{parts.map(([v, u]) => `${v}${u}`).join(" ")}</b>
+              </span>
+              <button type="button" onClick={onClose} className="mt-[6px] flex h-[56px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[18px] border-0 text-[16px] font-bold text-white" style={{ background: BLUE, boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95)" }}>
+                Use my gift
+                <Svg d="M5 12h14M13 6l6 6-6 6" size={16} color="#fff" w={2.6} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </motion.div>,
+    document.body,
+  );
+}
+
+function OfferSwitch({ p }: { p: Pick }) {
+  const reduce = useReducedMotion();
+  const [open, setOpen] = useState(false);
+  const close = () => {
+    setOpen(false);
+    if (p.giftAt) p.setOffer("welcome");
+  };
+  const gift = useLeft(p.giftAt ? p.giftAt + GIFT_MS : null);
+  const giftLive = p.giftAt !== null && gift.ms > 0;
+  const giftGone = p.giftAt !== null && gift.ms <= 0;
+  const glass = { background: "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" };
+  const pill = { background: "linear-gradient(180deg, rgba(255,255,255,0.2), rgba(147,197,253,0.08))", border: "1px solid rgba(255,255,255,0.32)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35), 0 14px 30px -14px rgba(59,130,246,0.75)" };
+  const welcomeOn = p.offer === "welcome" && giftLive;
+  return (
+    <div className="flex flex-col gap-[10px]">
+      <div className={`relative grid ${giftGone ? "grid-cols-1" : "grid-cols-2"} rounded-[20px] p-[5px]`} role="radiogroup" aria-label="Choose your offer" style={glass}>
+        {!giftGone && (
+          <span aria-hidden="true" className="absolute bottom-[5px] top-[5px] rounded-[15px] transition-[left] duration-300" style={{ left: welcomeOn ? "50%" : 5, width: "calc(50% - 5px)", ...pill }} />
+        )}
+        <button type="button" role="radio" aria-checked={!welcomeOn} onClick={() => p.setOffer("launch")} className={`relative z-[1] flex h-[56px] cursor-pointer flex-col items-center justify-center rounded-[15px] border-0 transition-colors ${giftGone ? "" : "bg-transparent"}`} style={{ color: !welcomeOn ? "#fff" : MUTED, ...(giftGone ? pill : {}) }}>
+          <span className="text-[18px] font-semibold leading-none tracking-[-0.02em]">{OFFERS.launch.title}</span>
+          <span className="mt-[4px] text-[11px] font-medium" style={{ color: !welcomeOn ? "#bfdbfe" : MUTED }}>{OFFERS.launch.who}</span>
+        </button>
+        {!giftGone &&
+          (giftLive ? (
+            <button type="button" role="radio" aria-checked={welcomeOn} onClick={() => p.setOffer("welcome")} className="relative z-[1] flex h-[56px] cursor-pointer flex-col items-center justify-center rounded-[15px] border-0 bg-transparent" style={{ color: welcomeOn ? "#fff" : MUTED }}>
+              <span className="flex items-center gap-[6px] text-[18px] font-semibold leading-none tracking-[-0.02em]">
+                <Svg d={GiftIcon} size={15} color="#fde68a" w={2} />
+                45% OFF
+              </span>
+              <span className="mt-[4px] text-[11px] font-medium" style={{ color: welcomeOn ? "#fde68a" : MUTED }}>+1 bonus · 5% cashback</span>
+            </button>
+          ) : (
+            <motion.button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="relative z-[1] flex h-[56px] cursor-pointer items-center justify-center gap-[9px] overflow-hidden rounded-[15px] border-0 px-[8px] text-left"
+              style={{ background: "linear-gradient(135deg, rgba(253,230,138,0.18), rgba(245,158,11,0.08))", boxShadow: "inset 0 0 0 1px rgba(253,230,138,0.4)" }}
+              animate={reduce ? undefined : { boxShadow: ["inset 0 0 0 1px rgba(253,230,138,0.4), 0 0 0 0 rgba(245,158,11,0)", "inset 0 0 0 1px rgba(253,230,138,0.7), 0 0 26px -4px rgba(245,158,11,0.55)", "inset 0 0 0 1px rgba(253,230,138,0.4), 0 0 0 0 rgba(245,158,11,0)"] }}
+              transition={reduce ? undefined : { duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <motion.span className="flex size-[32px] shrink-0 items-center justify-center rounded-[10px]" style={{ background: "linear-gradient(135deg,#fde68a,#f59e0b)" }} animate={reduce ? undefined : { rotate: [0, -10, 10, -6, 0] }} transition={reduce ? undefined : { duration: 0.9, repeat: Infinity, repeatDelay: 2 }}>
+                <Svg d={GiftIcon} size={17} color="#1f1300" w={2} />
+              </motion.span>
+              <span className="flex flex-col leading-tight">
+                <span className="text-[14px] font-bold text-white">New to FYT?</span>
+                <span className="text-[11px] font-semibold text-[#fde68a]">Tap to open your gift</span>
+              </span>
+            </motion.button>
+          ))}
+      </div>
+      <OfferDetails p={p} giftParts={welcomeOn ? gift.parts : null} />
+      <AnimatePresence>{open && <GiftModal p={p} onClose={close} />}</AnimatePresence>
+    </div>
+  );
+}
+
+/** One slim bar under the switch: countdown (red alert) plus the auto-applied code. */
+function OfferDetails({ p, giftParts }: { p: Pick; giftParts: [string, string][] | null }) {
+  const launchParts = useCountdown();
   const reduce = useReducedMotion();
   const o = OFFERS[p.offer];
-  const launch = p.offer === "launch";
+  const parts = giftParts ?? launchParts;
+  const gift = !!giftParts;
   return (
     <motion.div
       className="flex h-[44px] items-center justify-between gap-[10px] rounded-[14px] pl-[12px] pr-[6px]"
-      style={{
-        background: launch ? "linear-gradient(90deg, rgba(239,68,68,0.16), rgba(239,68,68,0.04))" : "linear-gradient(90deg, rgba(16,185,129,0.14), rgba(16,185,129,0.03))",
-        border: `1px solid ${launch ? "rgba(248,113,113,0.38)" : "rgba(52,211,153,0.3)"}`,
-      }}
-      animate={launch && !reduce ? { boxShadow: ["0 0 0 0 rgba(239,68,68,0)", "0 0 22px -4px rgba(239,68,68,0.45)", "0 0 0 0 rgba(239,68,68,0)"] } : undefined}
-      transition={launch && !reduce ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" } : undefined}
+      style={{ background: gift ? "linear-gradient(90deg, rgba(245,158,11,0.16), rgba(245,158,11,0.04))" : "linear-gradient(90deg, rgba(239,68,68,0.16), rgba(239,68,68,0.04))", border: `1px solid ${gift ? "rgba(253,230,138,0.38)" : "rgba(248,113,113,0.38)"}` }}
+      animate={reduce ? undefined : { boxShadow: ["0 0 0 0 rgba(239,68,68,0)", `0 0 22px -4px ${gift ? "rgba(245,158,11,0.45)" : "rgba(239,68,68,0.45)"}`, "0 0 0 0 rgba(239,68,68,0)"] }}
+      transition={reduce ? undefined : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
     >
-      {launch ? (
-        <span className="flex items-center gap-[8px]" aria-label={`Offer ends in ${parts.map(([v, u]) => v + u).join(" ")}`}>
-          <span className="relative flex size-[8px]">
-            <span className="absolute inset-0 animate-ping rounded-full bg-[#ef4444] opacity-60" />
-            <span className="relative size-[8px] rounded-full bg-[#ef4444]" />
-          </span>
-          <span className="text-[12px] font-medium text-[#fecaca]">Ends in</span>
-          <span className="tabular text-[15px] font-semibold tracking-[0.01em] text-white">
-            {parts.map(([v, u]) => (
-              <span key={u} className="mr-[4px] last:mr-0">
-                {v}
-                <span className="text-[11px] font-medium text-[#fca5a5]">{u}</span>
-              </span>
-            ))}
-          </span>
+      <span className="flex items-center gap-[8px]" aria-label={`${gift ? "Gift" : "Offer"} ends in ${parts.map(([v, u]) => v + u).join(" ")}`}>
+        <span className="relative flex size-[8px]">
+          <span className="absolute inset-0 animate-ping rounded-full bg-[#ef4444] opacity-60" />
+          <span className="relative size-[8px] rounded-full bg-[#ef4444]" />
         </span>
-      ) : (
-        <span className="flex items-center gap-[8px] text-[12.5px] font-medium text-[#a7f3d0]">
-          <Svg d={IC.check} size={14} color="#4ade80" w={2.6} />
-          No expiry
+        <span className="text-[12px] font-medium text-[#fecaca]">{gift ? "Gift ends in" : "Ends in"}</span>
+        <span className="tabular text-[15px] font-semibold tracking-[0.01em] text-white">
+          {parts.map(([v, u]) => (
+            <span key={u} className="mr-[4px] last:mr-0">
+              {v}
+              <span className="text-[11px] font-medium text-[#fca5a5]">{u}</span>
+            </span>
+          ))}
         </span>
-      )}
+      </span>
       <span className="flex items-center gap-[6px] rounded-[10px] px-[10px] py-[6px] text-[12px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.07)", border: "1px dashed rgba(255,255,255,0.22)" }}>
-        <Svg d={IC.tag} size={12} color="#93c5fd" w={2} />
+        <Svg d={IC.tag} size={12} color={gift ? "#fde68a" : "#93c5fd"} w={2} />
         {o.code}
         <Svg d={IC.check} size={12} color="#4ade80" w={3} />
       </span>
