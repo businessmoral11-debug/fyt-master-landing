@@ -120,6 +120,13 @@ function useCountdown(deadline: string = PROMO_DEADLINE): [string, string][] {
   }, []);
   const left = Math.max(0, new Date(deadline).getTime() - now);
   const pad = (n: number) => String(n).padStart(2, "0");
+  // Long offers (Halloween) read better in days: 9d 21h 49m.
+  if (left >= 48 * 36e5)
+    return [
+      [String(Math.floor(left / 864e5)), "d"],
+      [pad(Math.floor(left / 36e5) % 24), "h"],
+      [pad(Math.floor(left / 6e4) % 60), "m"],
+    ];
   return [
     [pad(Math.floor(left / 36e5)), "h"],
     [pad(Math.floor(left / 6e4) % 60), "m"],
@@ -671,7 +678,7 @@ function VaultCard({ p }: { p: Pick }) {
         <span aria-hidden="true" className="pointer-events-none absolute -right-[40px] -top-[50px] size-[150px] rounded-full" style={{ background: `radial-gradient(circle, rgba(255,138,61,0.22), transparent 65%)` }} />
         <VaultDial open={open} />
         <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
-          <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}>Halloween · The Haunted Vault</span>
+          <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}><span className="hidden sm:inline">Halloween · </span>The Haunted Vault</span>
           <span className="text-[21px] font-semibold leading-[1.05] tracking-[-0.025em]">
             45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO</span>
           </span>
@@ -703,15 +710,15 @@ function VaultCard({ p }: { p: Pick }) {
                       type="button"
                       aria-pressed={on}
                       onClick={() => p.toggleTreat(t.id)}
-                      className="flex h-[54px] cursor-pointer items-center gap-[10px] rounded-[14px] px-[10px] text-left text-white transition-[background,border-color,opacity] duration-200"
+                      className="flex min-h-[52px] cursor-pointer items-center gap-[10px] rounded-[14px] px-[10px] py-[7px] text-left text-white transition-[background,border-color,opacity] duration-200"
                       style={{ border: `1px solid ${on ? "rgba(255,138,61,0.75)" : "rgba(148,178,255,0.12)"}`, background: on ? "linear-gradient(135deg, rgba(255,138,61,0.18), rgba(37,99,235,0.1))" : "rgba(255,255,255,0.025)", opacity: count >= TREAT_PICKS && !on ? 0.62 : 1 }}
                     >
                       <span className="flex size-[30px] shrink-0 items-center justify-center rounded-[10px]" style={{ background: on ? "rgba(255,138,61,0.2)" : "rgba(59,130,246,0.14)" }}>
                         <Svg d={t.d} size={15} color={on ? EMBER_SOFT : "#93c5fd"} w={1.9} />
                       </span>
                       <span className="flex min-w-0 flex-1 flex-col leading-tight">
-                        <span className="truncate text-[13px] font-semibold">{t.name}</span>
-                        <span className="truncate text-[11px]" style={{ color: on ? "#fed7aa" : MUTED }}>{t.line}</span>
+                        <span className="text-[13px] font-semibold">{t.name}</span>
+                        <span className="text-[11px] leading-[1.25]" style={{ color: on ? "#fed7aa" : MUTED }}>{t.line}</span>
                       </span>
                       <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full" style={{ border: `1.5px solid ${on ? EMBER : "#4b5568"}`, background: on ? EMBER : "transparent" }}>
                         {on && <Svg d={IC.check} size={10} color="#1a0a00" w={3.4} />}

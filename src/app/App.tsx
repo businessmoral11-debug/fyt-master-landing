@@ -577,7 +577,12 @@ function PromoCountdownPill({ compact = false, pulse, deadline = PROMO_DEADLINE,
   if (left.expired) return null;
   // Hours only (e.g. 29H 47M 12S) - reads more urgent than "1D 05H".
   const hh = left.hh;
-  const label = compact ? `${hh}:${left.mm}:${left.ss} Left` : `${hh}H ${left.mm}M ${left.ss}S Left`;
+  const days = Math.floor(Number(hh) / 24);
+  const dh = String(Number(hh) % 24).padStart(2, "0");
+  // Halloween runs ~10 days: show days once there are 48h+ left.
+  const label = ember && days >= 2
+    ? (compact ? `${days}D ${dh}H ${left.mm}M Left` : `${days}D ${dh}H ${left.mm}M ${left.ss}S Left`)
+    : compact ? `${hh}:${left.mm}:${left.ss} Left` : `${hh}H ${left.mm}M ${left.ss}S Left`;
 
   return (
     <span
