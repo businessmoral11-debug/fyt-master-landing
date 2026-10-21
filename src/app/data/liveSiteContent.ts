@@ -4,7 +4,7 @@ export const HERO_CONTENT = {
   headlineBlue: "Get Rewards in 24 Hours.",
   checklist: ["No Consistency Rule", "Up to 100% Reward Split", "1st Reward on Demand", "Static Drawdown"],
   ctaPrimary: { label: "Get Started Now", href: "#challenge" },
-  ctaSecondary: { label: "Chat with us", href: "https://discord.gg/6NYNSAwxeZ" },
+  ctaSecondary: { label: "Chat with us", href: "https://discord.gg/fundingyourtrades" },
 } as const;
 
 export const PROMO_BANNER = {
@@ -178,7 +178,7 @@ export const FOOTER_LINKS = {
     { label: "Refund Policy", href: "https://fundingyourtrades.com/refund_returns/" },
   ],
   social: [
-    { label: "Discord", href: "https://discord.gg/6NYNSAwxeZ" },
+    { label: "Discord", href: "https://discord.gg/fundingyourtrades" },
     { label: "Instagram", href: "https://www.instagram.com/fundingyourtrades" },
     { label: "Telegram", href: "https://t.me/fundingyourtrades" },
     { label: "X", href: "https://x.com/fundingurtrades" },

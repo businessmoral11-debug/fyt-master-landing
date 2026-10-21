@@ -808,7 +808,7 @@ describe("ProductShowcase Trusted Support Team card (spec v4 blue container)", (
   it("renders a floating Discord invite button at the bottom-left", () => {
     const app = read("./App.tsx");
     expect(app).toContain("<DiscordLauncher />");
-    expect(app).toContain('const DISCORD_INVITE_URL = "https://discord.com/invite/6NYNSAwxeZ"');
+    expect(app).toContain('const DISCORD_INVITE_URL = "https://discord.gg/fundingyourtrades"');
     expect(app).toContain('aria-label="Join FYT on Discord"');
     expect(app).toContain('left: "max(20px, env(safe-area-inset-left, 0px))"');
   });

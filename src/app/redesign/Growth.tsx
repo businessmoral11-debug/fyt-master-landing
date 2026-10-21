@@ -35,7 +35,7 @@ const RecentVerifiedRewards = lazy(() => import("@/app/recentVerifiedRewards").t
 /* Shared helpers                                                      */
 /* ------------------------------------------------------------------ */
 
-const DISCORD_INVITE_CODE = "6NYNSAwxeZ";
+const DISCORD_INVITE_CODE = "fundingyourtrades";
 const DISCORD_URL = `https://discord.gg/${DISCORD_INVITE_CODE}`;
 
 function money(n: number): string {
