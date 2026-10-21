@@ -86,6 +86,23 @@ for (const vp of vps) {
   }
   await ctx.close();
 }
+// Giveaway pop-up (not submitted: no test sign-ups in Klaviyo).
+for (const vp of vps) {
+  const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: vp.mobile, hasTouch: vp.mobile });
+  await ctx.route(/klaviyo\.com/, (r) => r.abort());
+  const page = await ctx.newPage();
+  page.on("pageerror", (e) => log.push(`[giveaway ${vp.name}] PAGEERROR: ${e.message}`));
+  await page.goto(BASE + "?giveaway=1&halloween=1", { waitUntil: "load", timeout: 60000 });
+  await sleep(3000);
+  await page.screenshot({ path: `${OUT}/${vp.name}-07-giveaway.png` });
+  const dlg = page.getByRole("dialog", { name: "FYT Private Giveaway" });
+  await dlg.getByLabel("Email address").fill("name@example.com").catch((e) => log.push("fill " + e.message.split("\n")[0]));
+  await dlg.getByLabel("Your name").fill("Rahul").catch(() => {});
+  await sleep(500);
+  await page.screenshot({ path: `${OUT}/${vp.name}-07b-giveaway-filled.png` });
+  log.push(`[giveaway ${vp.name}] dialog=${await dlg.count()}`);
+  await ctx.close();
+}
 // Live dates: without the flag the launch offer should still show on a non-vercel host.
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });

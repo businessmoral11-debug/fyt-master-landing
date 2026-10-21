@@ -4,6 +4,7 @@ import { ChallengePricing } from "./PricingC";
 import { ClosingCta, Comparison, Faq, Footer, HowItWorks, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
 import { FloatingCta } from "./Conversion";
+import { GiveawayPopup } from "./GiveawayPopup";
 
 /**
  * Redesigned landing page below the hero. Same content, data, links and
@@ -27,6 +28,7 @@ export function BelowFold() {
       <Faq />
       <Footer />
       <FloatingCta />
+      <GiveawayPopup />
     </>
   );
 }
