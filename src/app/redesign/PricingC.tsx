@@ -207,7 +207,7 @@ function TypeCards({ p }: { p: Pick }) {
     <div className="grid grid-cols-2 gap-[8px]">
       {p.plans.map((x) => {
         const on = x.id === p.plan;
-        const note = x.id === "prime" && p.step !== "Instant" ? "No consistency" : "";
+        const note = x.id === "prime" ? "No consistency" : "";
         return (
           <button key={x.id} type="button" aria-pressed={on} onClick={() => p.setPlan(x.id)} className="flex h-[58px] cursor-pointer items-center justify-between gap-[8px] rounded-[16px] px-[14px] text-left text-white transition-colors" style={{ border: `1.5px solid ${on ? "#60a5fa" : LINE}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.26), rgba(37,99,235,0.06))" : "rgba(255,255,255,0.03)" }}>
             <span className="flex flex-col">
@@ -656,7 +656,7 @@ function TrustRow() {
 function DefaultHeading() {
   return (
     <h2 className="m-0 text-center text-[34px] font-semibold leading-[1.06] tracking-[-0.035em] text-[#eef0f6] lg:text-left lg:text-[54px]">
-      Choose your <span className="fyt-gradient-text">challenge.</span>
+      Get funded <span className="fyt-gradient-text">your way.</span>
     </h2>
   );
 }
