@@ -3,8 +3,9 @@
  * Sign-ups go straight to Klaviyo (public client API, site key only) into the
  * "news letter subscribers" list, which starts the live Welcome Series flow.
  *
- * Shows once: after 20s or half-way down the page, never over another dialog
+ * Shows once the visitor has scrolled 30% of the page, never over another dialog
  * or the pricing table, at most once every 7 days, never again after sign-up.
+ * Never shown to existing Klaviyo contacts or buyers (see knownVisitor).
  * Preview: ?giveaway=1 opens it straight away.
  */
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -136,7 +137,7 @@ function Check({ size = 12 }: { size?: number }) {
   return <Icon d="M5 12.5l4.5 4.5L19 7.5" size={size} color="#4ade80" w={3} />;
 }
 
-function GiveawayDialog({ onClose }: { onClose: () => void }) {
+function GiveawayDialog({ onClose, onPricing }: { onClose: () => void; onPricing: () => void }) {
   const reduce = useReducedMotion();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -258,7 +259,7 @@ function GiveawayDialog({ onClose }: { onClose: () => void }) {
                 </span>
                 <h3 className="m-0 text-[28px] font-semibold leading-[1.1] tracking-[-0.03em]">You're in.</h3>
                 <p className="m-0 text-[14.5px] leading-[1.55] text-[#c7d2e6]">Your entry is secured. Your 45% off code, bonus account and 5% wallet cashback details are on their way to your inbox.</p>
-                <a href="#challenge" onClick={onClose} className="mt-[6px] flex h-[56px] w-full items-center justify-center gap-[8px] rounded-[16px] text-[16px] font-bold text-white no-underline" style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95)" }}>
+                <a href="#challenge" onClick={onPricing} className="mt-[6px] flex h-[56px] w-full items-center justify-center gap-[8px] rounded-[16px] text-[16px] font-bold text-white no-underline" style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95)" }}>
                   See accounts
                   <Icon d="M5 12h14M13 6l6 6-6 6" size={16} color="#fff" w={2.6} />
                 </a>
@@ -320,56 +321,130 @@ function GiveawayTeaser({ onOpen }: { onOpen: () => void }) {
   );
 }
 
+const KNOWN_KEY = "fyt_known_visitor_v1";
+const SCROLL_SHARE = 0.3;
+
+function readCookie(name: string): string {
+  const m = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/[$()*+.?[\\\]^{|}]/g, "\\$&") + "=([^;]*)"));
+  return m ? decodeURIComponent(m[1]) : "";
+}
+
+/** Klaviyo's own cookie: holds an email or exchange id once a visitor is a known profile in this browser. */
+function klaviyoCookieKnown(): boolean {
+  const raw = readCookie("__kla_id");
+  if (!raw) return false;
+  try {
+    const j = JSON.parse(atob(raw)) as Record<string, unknown>;
+    return !!(j.$email || j.$exchange_id || j.$kx || j.$phone_number);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Existing contacts and buyers never see the pop-up: anyone Klaviyo already knows in
+ * this browser, anyone who arrived from a Klaviyo email, anyone with a WooCommerce cart
+ * or login cookie, and anyone who has clicked through to checkout on this site.
+ */
+function knownVisitor(): boolean {
+  if (store(KNOWN_KEY) || store(DONE_KEY)) return true;
+  const q = new URLSearchParams(window.location.search);
+  const fromEmail = q.has("_kx") || /email|klaviyo/i.test(q.get("utm_medium") || "") || /klaviyo/i.test(q.get("utm_source") || "");
+  const wpCookie = /(?:^|; )(wordpress_logged_in_|woocommerce_items_in_cart|wp_woocommerce_session_)/.test(document.cookie);
+  if (fromEmail || wpCookie || klaviyoCookieKnown()) {
+    store(KNOWN_KEY, "1");
+    return true;
+  }
+  return false;
+}
+
+/** Klaviyo's onsite script can also confirm a known profile (it loads a little later). */
+async function klaviyoSaysKnown(): Promise<boolean> {
+  try {
+    const k = (window as unknown as { klaviyo?: { isIdentified?: () => Promise<boolean> | boolean } }).klaviyo;
+    if (k?.isIdentified) return !!(await k.isIdentified());
+  } catch {
+    // ignore
+  }
+  return klaviyoCookieKnown();
+}
+
 export function GiveawayPopup() {
   const [open, setOpen] = useState(false);
-  const [teaser, setTeaser] = useState(() => !!store(SEEN_KEY) && !store(DONE_KEY));
+  const [teaser, setTeaser] = useState(() => !!store(SEEN_KEY) && !store(DONE_KEY) && !knownVisitor());
+  const openedAt = useRef(0);
+
+  // Anyone who clicks through to checkout is treated as a customer from then on.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement | null)?.closest?.("a");
+      if (a && /fundingyourtrades\.com\/(checkout|checkout-link)/.test(a.href)) store(KNOWN_KEY, "1");
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, []);
+
   useEffect(() => {
     const forced = new URLSearchParams(window.location.search).get("giveaway") === "1";
     if (forced) {
-      const t = window.setTimeout(() => setOpen(true), 800);
+      const t = window.setTimeout(() => show(), 800);
       return () => window.clearTimeout(t);
     }
-    if (store(DONE_KEY)) return;
+    if (knownVisitor()) return;
     const seen = Number(store(SEEN_KEY) || 0);
     if (seen && Date.now() - seen < REPEAT_MS) return;
 
     let fired = false;
     let retry = 0;
-    let timer = 0;
     const cleanup = () => {
-      window.clearTimeout(timer);
       window.clearTimeout(retry);
       window.removeEventListener("scroll", onScroll);
     };
-    const tryOpen = () => {
+    const tryOpen = async () => {
       if (fired) return;
       if (otherDialogOpen() || pricingInView()) {
-        // Busy: try again shortly instead of interrupting.
+        // Busy (pricing on screen or another pop-up): try again shortly, never interrupt.
         window.clearTimeout(retry);
-        retry = window.setTimeout(tryOpen, 6000);
+        retry = window.setTimeout(() => void tryOpen(), 6000);
         return;
       }
       fired = true;
-      store(SEEN_KEY, String(Date.now()));
-      setOpen(true);
       cleanup();
+      if (knownVisitor() || (await klaviyoSaysKnown())) {
+        store(KNOWN_KEY, "1");
+        return;
+      }
+      store(SEEN_KEY, String(Date.now()));
+      show();
     };
+    // Only after the visitor has scrolled at least 30% of the page.
     function onScroll() {
       const h = document.documentElement.scrollHeight - window.innerHeight;
-      if (h > 0 && window.scrollY / h > 0.5) tryOpen();
+      if (h > 0 && window.scrollY / h >= SCROLL_SHARE) void tryOpen();
     }
-    timer = window.setTimeout(tryOpen, 20000);
     window.addEventListener("scroll", onScroll, { passive: true });
     return cleanup;
   }, []);
-  const close = () => {
+
+  function show() {
+    openedAt.current = window.scrollY;
+    setOpen(true);
+  }
+  // Closing never moves the page: if anything shifted it (phone keyboard), put it back.
+  const close = (toPricing = false) => {
+    const y = openedAt.current;
     setOpen(false);
-    setTeaser(!store(DONE_KEY));
+    setTeaser(!store(DONE_KEY) && !store(KNOWN_KEY));
+    if (!toPricing) {
+      window.requestAnimationFrame(() => {
+        if (Math.abs(window.scrollY - y) > 40) window.scrollTo({ top: y, behavior: "auto" });
+      });
+    }
   };
   return (
     <>
-      <AnimatePresence>{open && <GiveawayDialog onClose={close} />}</AnimatePresence>
-      {teaser && !open && <GiveawayTeaser onOpen={() => setOpen(true)} />}
+      <AnimatePresence>{open && <GiveawayDialog onClose={() => close()} onPricing={() => close(true)} />}</AnimatePresence>
+      {teaser && !open && <GiveawayTeaser onOpen={show} />}
     </>
   );
 }
