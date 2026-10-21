@@ -1,0 +1,47 @@
+[desktop] console.error: Failed to load resource: net::ERR_FAILED
+[desktop] tab 1-Step: [y h top focus] 4443 12339 55 BODY:
+    
+    
+      <if  ->  4443 12751 55 BUTTON:11-Stepfrom$63
+[desktop] tab Instant: [y h top focus] 4443 12751 55 BUTTON:11-Stepfrom$63  ->  4443 12751 55 BUTTON:Popular0Instantfrom$
+[desktop] tab 2-Step: [y h top focus] 4443 12751 55 BUTTON:Popular0Instantfrom$  ->  4443 12751 55 BUTTON:22-Stepfrom$52
+[desktop] control no click: [y h top focus] 4443 12751 55 BUTTON:22-Stepfrom$52  ->  4443 12751 55 BUTTON:22-Stepfrom$52
+[desktop] size $50K: [y h top focus] 4443 12751 55 BUTTON:22-Stepfrom$52  ->  4443 12751 55 BUTTON:$50K
+[desktop] size $10K: [y h top focus] 4443 12751 55 BUTTON:$50K  ->  4443 12751 55 BUTTON:$10K
+[desktop] size $200K: [y h top focus] 4443 12751 55 BUTTON:$10K  ->  4443 12751 55 BUTTON:$200K
+[desktop] size $100K: [y h top focus] 4443 12751 55 BUTTON:$200K  ->  4443 12751 55 BUTTON:$100K
+[desktop] type Classic: [y h top focus] 4443 12751 55 BUTTON:$100K  ->  4443 12751 55 BUTTON:Classic
+[desktop] platform 5: [y h top focus] 4443 12751 55 BUTTON:Classic  ->  4443 12751 55 BUTTON:Platform 5
+[desktop] open vault: [y h top focus] 4443 12751 55 BUTTON:Platform 5  ->  4443 13147 55 BUTTON:Halloween · The Haun
+[desktop] treat Midnight: [y h top focus] 4443 13147 55 BUTTON:Halloween · The Haun  ->  4443 13147 55 BUTTON:Midnight RushFirst p
+[desktop] treat Midnight off: [y h top focus] 4443 13147 55 BUTTON:Midnight RushFirst p  ->  4443 13147 55 BUTTON:Midnight RushFirst p
+[desktop] close vault: [y h top focus] 4443 13147 55 BUTTON:Midnight RushFirst p  ->  4443 12751 55 BUTTON:Halloween · The Haun
+[desktop] CTA w/o treats: sheet=1 scroll 4443->4443
+[desktop] sheet CTA href: https://fundingyourtrades.com/checkout-link/?products=12366:1&coupon=FYTWEEN&treats=vampire,nightmare
+[desktop] CTA href: https://fundingyourtrades.com/checkout-link/?products=12366:1&coupon=FYTWEEN&treats=vampire,nightmare
+[desktop] after Keep my treats: #challenge top = 120
+[mobile] console.error: Failed to load resource: net::ERR_FAILED
+[mobile] tab 1-Step: [y h top focus] 4721 14733 77 BODY:
+    
+    
+      <if  ->  4735 14747 77 BUTTON:11-Stepfrom$63
+[mobile] tab Instant: [y h top focus] 4735 14747 77 BUTTON:11-Stepfrom$63  ->  4735 15169 77 BUTTON:Popular0Instantfrom$
+[mobile] tab 2-Step: [y h top focus] 4735 15169 77 BUTTON:Popular0Instantfrom$  ->  4735 15233 77 BUTTON:22-Stepfrom$52
+[mobile] control no click: [y h top focus] 4735 15233 77 BUTTON:22-Stepfrom$52  ->  4735 15233 77 BUTTON:22-Stepfrom$52
+[mobile] size $50K: [y h top focus] 4735 15233 77 BUTTON:22-Stepfrom$52  ->  4735 15233 77 BUTTON:$50K
+[mobile] size $10K: [y h top focus] 4735 15233 77 BUTTON:$50K  ->  4735 15233 77 BUTTON:$10K
+[mobile] size $200K: [y h top focus] 4735 15233 77 BUTTON:$10K  ->  4735 15233 77 BUTTON:$200K
+[mobile] size $100K: [y h top focus] 4735 15233 77 BUTTON:$200K  ->  4735 15233 77 BUTTON:$100K
+[mobile] type Classic: [y h top focus] 4735 15233 77 BUTTON:$100K  ->  4735 15214 77 BUTTON:Classic
+[mobile] platform 5: [y h top focus] 4735 15214 77 BUTTON:Classic  ->  4735 15214 77 BUTTON:Platform 5
+[mobile] open vault: [y h top focus] 4735 15214 77 BUTTON:Platform 5  ->  4735 15661 77 BUTTON:Halloween · The Haun
+[mobile] treat Midnight: [y h top focus] 4735 15661 77 BUTTON:Halloween · The Haun  ->  4735 15661 77 BUTTON:Midnight RushFirst p
+[mobile] treat Midnight off: [y h top focus] 4735 15661 77 BUTTON:Midnight RushFirst p  ->  4735 15661 77 BUTTON:Midnight RushFirst p
+[mobile] close vault: [y h top focus] 4735 15661 77 BUTTON:Midnight RushFirst p  ->  4735 15214 77 BUTTON:Halloween · The Haun
+[mobile] CTA w/o treats: sheet=1 scroll 5438->5438
+[mobile] sheet CTA href: https://fundingyourtrades.com/checkout-link/?products=12366:1&coupon=FYTWEEN&treats=vampire,nightmare
+[mobile] CTA href: https://fundingyourtrades.com/checkout-link/?products=12366:1&coupon=FYTWEEN&treats=vampire,nightmare
+[giveaway desktop] input font=16px panel overflowX=0 pageOverflowX=0
+[giveaway desktop] dialog=1
+[giveaway mobile] input font=16px panel overflowX=0 pageOverflowX=0
+[giveaway mobile] dialog=1
