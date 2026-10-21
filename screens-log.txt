@@ -1,0 +1,29 @@
+[api] payouts [{"id":"0x410e0968b743398fe1b7e8c2502f556f79d9a1d654ef92c4a91173f93e17423e","traderName":"Mihir Bhalerao","country":"India","countryCode":"IN","amount":"605.400000000000000000","createdAt":"2026-10-20T15:05:47.000Z","timeAgo":"21 hrs ago","explorerUrl":"https://bscscan.com/tx/0x410e0968b743398fe1b7e8c2502f556f79d9a1d654ef92c4a91173f93e17423e","certificateUrl":"https://rewards.fundingyourtrades.com/certificate/99d541c4-321f-4612-bb3b-9a3abff6aea8"},{"id":"0xd03edb86bcfd5677b22570fbbb97ef5706bc996ffe03acbb163ccbc296841398","traderName":"Khurram B.","country":"Pakistan","countryCode":"PK","amount":"4524.973828760000000000","createdAt":"2026-10-20T14:36:21.000Z","timeAgo":"21 hrs ago","explorerUrl":"https://bscscan.com/tx/0xd03edb86bcfd5677b22570fbbb97ef5706bc996ffe03acbb163ccbc296841398","certificateUrl":"https://rewards.fundingyourtrades.com/certificate/744a04a9-f0e9-4837-b53a-d67396d76b1f"},{"id":"0x225340b0d6b6675da9af833f9af597a4f5f6636423cfd63210400adf3e454b1d","traderName":"Bader Al-Shehri","country":"Saudi Arabia","countryCode":"SA","amount":"312.410000000000000000","createdAt":"2026-10-20T14:06:47.000Z","timeAgo":"22 hrs ago","explorerUrl":"https://bscscan.com/tx/0x225340b0d6b6675da9af833f9af597a4f5f6636423cfd63210400adf3e454b1d","certificateUrl":"https://rewards.fundingyourtrades.com/certificate/4f2f9c87-bf4b-40f2-8ab6-aeefa961e772"}]
+[api] certificates [{"certificateId":"99d541c4-321f-4612-bb3b-9a3abff6aea8","traderName":"Mihir Bhalerao","country":null,"countryCode":null,"amount":"605.400000000000000000","createdAt":"2026-10-20T15:05:47.000Z","imageUrl":"https://rewards.fundingyourtrades.com/api/v1/public/certificates/99d541c4-321f-4612-bb3b-9a3abff6aea8/image","certificateUrl":"https://rewards.fundingyourtrades.com/certificate/99d541c4-321f-4612-bb3b-9a3abff6aea8"},{"certificateId":"744a04a9-f0e9-4837-b53a-d67396d76b1f","traderName":"Khurram B.","country":null,"countryCode":null,"amount":"4524.973828760000000000","createdAt":"2026-10-20T14:36:21.000Z","imageUrl":"https://rewards.fundingyourtrades.com/api/v1/public/certificates/744a04a9-f0e9-4837-b53a-d67396d76b1f/image","certificateUrl":"https://rewards.fundingyourtrades.com/certificate/744a04a9-f0e9-4837-b53a-d67396d76b1f"},{"certificateId":"4f2f9c87-bf4b-40f2-8ab6-aeefa961e772","traderName":"Bader Al-Shehri","country":null,"countryCode":null,"amount":"312.410000000000000000","createdAt":"2026-10-20T14:06:47.000Z","imageUrl":"https://rewards.fundingyourtrades.com/api/v1/public/certificates/4f2f9c87-bf4b-40f2-8ab6-aeefa961e772/image","certificateUrl":"https://rewards.fundingyourtrades.com/certificate/4f2f9c87-bf4b-40f2-8ab6-aeefa961e772"}]
+[api] payouts total {"pagination":{"page":1,"pageSize":3,"totalItems":689,"totalPages":230,"hasNextPage":true,"hasPreviousPage":false}} certs total {"pagination":{"page":1,"pageSize":3,"totalItems":697,"totalPages":233,"hasNextPage":true,"hasPreviousPage":false}}
+[discord] 6NYNSAwxeZ http=200 guild=FYT (FundingYourTrades.Com) members=16330 online=274 expires=null code=6NYNSAwxeZ msg=
+[discord] fundingyourtrades http=200 guild=FYT (FundingYourTrades.Com) members=16330 online=274 expires=null code=fundingyourtrades msg=
+[desktop] console.error: Failed to load resource: net::ERR_FAILED
+[desktop] console.error: Access to fetch at 'https://rewards.fundingyourtrades.com/api/v1/public/globe-stats' from origin 'http://127.0.0.1:4173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[desktop] console.error: Failed to load resource: net::ERR_FAILED
+[desktop] scrollHeight 11790, shots 14
+[desktop] before gift: scrollY=2302 docH=12079
+[desktop] modal open: scrollY=2302 docH=12052
+[desktop] after unlock: scrollY=2302 docH=12052
+[desktop] 150ms after use: scrollY=2302 docH=12052
+[desktop] 1.3s after use: scrollY=2166 docH=12052
+[desktop] after Use my gift: scrollY=2166 pricingTop=120
+[mobile] console.error: Failed to load resource: net::ERR_FAILED
+[mobile] console.error: Access to fetch at 'https://rewards.fundingyourtrades.com/api/v1/public/globe-stats' from origin 'http://127.0.0.1:4173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[mobile] console.error: Failed to load resource: net::ERR_FAILED
+[mobile] scrollHeight 13977, shots 17
+[mobile] before gift: scrollY=2538 docH=14505
+[mobile] modal open: scrollY=2153 docH=14441
+[mobile] after unlock: scrollY=2153 docH=14441
+[mobile] 150ms after use: scrollY=2153 docH=14441
+[mobile] 1.3s after use: scrollY=2485 docH=14441
+[mobile] after Use my gift: scrollY=2485 pricingTop=120
+[desktop?welcomeback=1] console.error: Failed to load resource: net::ERR_FAILED
+[mobile?welcomeback=1] console.error: Failed to load resource: net::ERR_FAILED
+[desktop?exitdemo=1] console.error: Failed to load resource: net::ERR_FAILED
+[mobile?exitdemo=1] console.error: Failed to load resource: net::ERR_FAILED
