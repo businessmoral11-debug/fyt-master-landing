@@ -1141,6 +1141,10 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                   </div>
                 </div>
               </div>
+              <div className="flex flex-col gap-[10px] rounded-[16px] p-[12px] lg:p-[14px]" style={{ background: "rgba(0,0,0,0.22)" }}>
+                <Label>Why traders choose this</Label>
+                <PerkGrid p={p} cols={2} />
+              </div>
               </div>
 
               {/* Desktop: summary panel on the right. Phones: continues in the same column. */}
@@ -1161,10 +1165,6 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-[10px] rounded-[16px] p-[12px] lg:p-[14px]" style={{ background: "rgba(0,0,0,0.22)" }}>
-                <Label>Why traders choose this</Label>
-                <PerkGrid p={p} cols={2} />
-              </div>
 
               {p.halloween && <VaultSummary p={p} onPick={() => setSheet(true)} />}
               <motion.a
@@ -1197,9 +1197,9 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                     <Roll value={money(p.price)} className="text-[24px] font-bold leading-none" />
                     <s className="text-[13px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
                   </span>
-                  <span className="mt-[3px] text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}{p.halloween ? " · + BOGO instantly" : ""}</span>
+                  <span className="mt-[3px] whitespace-nowrap text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}</span>
                 </span>
-                <span className="relative flex items-center gap-[6px] rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
+                <span className="relative flex shrink-0 items-center whitespace-nowrap gap-[6px] rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
                   Get funded
                   <motion.span className="flex" animate={reduce ? undefined : { x: [0, 4, 0] }} transition={reduce ? undefined : { duration: 1.2, repeat: Infinity, ease: "easeInOut" }}>
                     <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#2563eb" w={2.6} />
