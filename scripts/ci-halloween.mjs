@@ -31,18 +31,23 @@ for (const vp of vps) {
   await sec.screenshot({ path: `${OUT}/${vp.name}-03-pricing-closed.png` });
   // Scroll-jump check: page position must stay put when picking options.
   const jump = async (label, loc) => {
-    await loc.scrollIntoViewIfNeeded().catch(() => {});
+    if (loc) await loc.scrollIntoViewIfNeeded().catch(() => {});
     await sleep(500);
-    const y0 = await page.evaluate(() => window.scrollY);
-    await loc.click().catch((e) => log.push(`click ${label} fail ${e.message.split("\n")[0]}`));
-    await sleep(1200);
-    const y1 = await page.evaluate(() => window.scrollY);
-    log.push(`[${vp.name}] ${label}: scroll ${y0} -> ${y1} (${y1 - y0 === 0 ? "OK" : "MOVED " + (y1 - y0)})`);
+    const st = () => page.evaluate(() => [Math.round(window.scrollY), document.documentElement.scrollHeight, Math.round(document.getElementById("challenge").getBoundingClientRect().top), document.activeElement?.tagName + ":" + (document.activeElement?.textContent || "").slice(0, 20)].join(" "));
+    const s0 = await st();
+    if (loc) await loc.click().catch((e) => log.push(`click ${label} fail ${e.message.split("\n")[0]}`));
+    await sleep(1500);
+    const s1 = await st();
+    log.push(`[${vp.name}] ${label}: [y h top focus] ${s0}  ->  ${s1}`);
   };
   await jump("tab 1-Step", sec.getByRole("tab", { name: /1-Step/ }));
   await jump("tab Instant", sec.getByRole("tab", { name: /Instant/ }));
   await jump("tab 2-Step", sec.getByRole("tab", { name: /2-Step/ }));
+  await jump("control no click", null);
   await jump("size $50K", sec.getByRole("button", { name: "$50K" }));
+  await jump("size $10K", sec.getByRole("button", { name: "$10K" }));
+  await jump("size $200K", sec.getByRole("button", { name: "$200K" }));
+  await jump("size $100K", sec.getByRole("button", { name: "$100K" }));
   await jump("type Classic", sec.getByRole("button", { name: /Classic/ }).first());
   await jump("platform 5", sec.getByRole("button", { name: /Platform 5/ }));
   await jump("open vault", page.locator("#fyt-vault > button"));
