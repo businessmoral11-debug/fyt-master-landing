@@ -100,6 +100,7 @@ for (const vp of vps) {
   await dlg.getByLabel("Your name").fill("Rahul").catch(() => {});
   await sleep(500);
   await page.screenshot({ path: `${OUT}/${vp.name}-07b-giveaway-filled.png` });
+  log.push(`[giveaway ${vp.name}] input font=${await dlg.getByLabel("Email address").evaluate((el) => getComputedStyle(el).fontSize)} panel overflowX=${await page.evaluate(() => { const d = document.querySelector('[aria-label="FYT Private Giveaway"] > div'); return d ? d.scrollWidth - d.clientWidth : -1; })} pageOverflowX=${await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)}`);
   log.push(`[giveaway ${vp.name}] dialog=${await dlg.count()}`);
   await dlg.getByRole("button", { name: "No thanks" }).click().catch(() => {});
   await page.evaluate(() => window.scrollTo(0, 2500));

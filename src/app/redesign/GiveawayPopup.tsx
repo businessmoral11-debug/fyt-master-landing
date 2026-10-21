@@ -98,7 +98,7 @@ function PrizeCard() {
       }}
       onPointerLeave={() => setTilt({ x: 0, y: 0 })}
     >
-      <span aria-hidden="true" className="absolute left-1/2 top-1/2 size-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "radial-gradient(circle, rgba(59,130,246,0.45), transparent 62%)", filter: "blur(6px)" }} />
+      <span aria-hidden="true" className="absolute left-1/2 top-1/2 size-[200px] -translate-x-1/2 md:size-[260px] -translate-y-1/2 rounded-full" style={{ background: "radial-gradient(circle, rgba(59,130,246,0.45), transparent 62%)", filter: "blur(6px)" }} />
       <motion.div
         aria-hidden="true"
         className="relative h-[150px] w-[244px] overflow-hidden rounded-[20px] p-[16px] text-left sm:h-[172px] sm:w-[280px]"
@@ -141,6 +141,7 @@ function GiveawayDialog({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [typing, setTyping] = useState(false);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   useEffect(() => {
@@ -163,13 +164,13 @@ function GiveawayDialog({ onClose }: { onClose: () => void }) {
 
   const field = "group flex h-[52px] w-full items-center gap-[10px] rounded-[14px] px-[14px] transition-shadow focus-within:shadow-[0_0_0_2px_#60a5fa]";
   const fieldStyle = { background: "rgba(255,255,255,0.05)", boxShadow: "inset 0 0 0 1px rgba(148,178,255,0.18)" };
-  const input = "h-full w-full min-w-0 border-0 bg-transparent text-[15px] text-white outline-none placeholder:text-[#7f8aa6]";
+  const input = "h-full w-full min-w-0 border-0 bg-transparent text-[16px] text-white outline-none placeholder:text-[#7f8aa6]";
 
   return createPortal(
-    <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-end justify-center md:items-center md:p-[20px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="FYT Private Giveaway">
-      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.78)", backdropFilter: "blur(10px)" }} />
+    <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-end justify-center overscroll-none md:items-center md:p-[20px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="FYT Private Giveaway">
+      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default touch-none border-0 p-0" style={{ background: "rgba(3,6,13,0.78)", backdropFilter: "blur(10px)" }} />
       <motion.div
-        className="relative grid max-h-[94vh] w-full max-w-[860px] overflow-y-auto rounded-t-[28px] text-white md:grid-cols-[1fr_1.05fr] md:overflow-hidden md:rounded-[30px]"
+        className="relative grid max-h-[92vh] max-h-[92dvh] w-full max-w-[860px] overflow-y-auto overflow-x-hidden overscroll-contain rounded-t-[28px] text-white md:grid-cols-[1fr_1.05fr] md:overflow-hidden md:rounded-[30px]"
         style={{ background: "#070d22", boxShadow: "0 0 0 1px rgba(147,197,253,0.2), 0 70px 140px -40px rgba(37,99,235,0.65)" }}
         initial={reduce ? false : { y: 40, opacity: 0, scale: 0.98 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -181,7 +182,7 @@ function GiveawayDialog({ onClose }: { onClose: () => void }) {
         </button>
 
         {/* Visual side */}
-        <div className="relative flex flex-col items-center justify-center gap-[18px] overflow-hidden px-[22px] pb-[8px] pt-[34px] md:px-[30px] md:py-[44px]" style={{ background: "radial-gradient(90% 70% at 50% 35%, #1b3c9c 0%, #0b1840 55%, #070d22 100%)" }}>
+        <div className={`relative flex-col items-center justify-center gap-[18px] overflow-hidden px-[22px] pb-[8px] pt-[30px] md:flex md:px-[30px] md:py-[44px] ${typing ? "hidden" : "flex"}`} style={{ background: "radial-gradient(90% 70% at 50% 35%, #1b3c9c 0%, #0b1840 55%, #070d22 100%)" }}>
           <span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.35]" style={{ backgroundImage: "linear-gradient(rgba(148,178,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,178,255,0.08) 1px, transparent 1px)", backgroundSize: "34px 34px", maskImage: "radial-gradient(70% 60% at 50% 40%, #000, transparent)", WebkitMaskImage: "radial-gradient(70% 60% at 50% 40%, #000, transparent)" }} />
           <PrizeCard />
           <span className="relative hidden items-center gap-[8px] rounded-full px-[12px] py-[6px] text-[11.5px] font-medium text-[#bfdbfe] md:inline-flex" style={{ background: "rgba(255,255,255,0.06)", boxShadow: "inset 0 0 0 1px rgba(148,178,255,0.2)" }}>
@@ -197,7 +198,7 @@ function GiveawayDialog({ onClose }: { onClose: () => void }) {
         <div className="relative px-[22px] pb-[max(22px,env(safe-area-inset-bottom))] pt-[18px] md:px-[34px] md:py-[40px]">
           <AnimatePresence mode="wait" initial={false}>
             {state !== "done" ? (
-              <motion.form key="form" onSubmit={submit} exit={{ opacity: 0, y: -8 }} className="flex flex-col gap-[14px] text-center md:text-left" noValidate>
+              <motion.form key="form" onSubmit={submit} onFocus={() => setTyping(true)} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setTyping(false); }} exit={{ opacity: 0, y: -8 }} className="flex flex-col gap-[14px] text-center md:text-left" noValidate>
                 <span className="flex items-center justify-center gap-[10px] text-[10.5px] font-semibold uppercase tracking-[0.24em] text-[#93c5fd] md:justify-start">
                   <span className="h-px w-[22px] bg-[#3b82f6]" />
                   The FYT Private Giveaway
