@@ -20,6 +20,7 @@ for (const vp of vps) {
   await page.goto(BASE + "?halloween=1", { waitUntil: "load", timeout: 60000 });
   await sleep(3500);
   await page.screenshot({ path: `${OUT}/${vp.name}-01-top.png` });
+  await page.screenshot({ path: `${OUT}/${vp.name}-01b-banner.png`, clip: { x: 0, y: 0, width: vp.width, height: 140 } });
   // Floating button
   await page.evaluate(() => window.scrollTo(0, window.innerHeight * 1.6));
   await sleep(1500);
@@ -28,29 +29,55 @@ for (const vp of vps) {
   await sec.scrollIntoViewIfNeeded();
   await sleep(1500);
   await sec.screenshot({ path: `${OUT}/${vp.name}-03-pricing-closed.png` });
-  // CTA without treats should open the vault, not leave the page.
+  // Scroll-jump check: page position must stay put when picking options.
+  const jump = async (label, loc) => {
+    await loc.scrollIntoViewIfNeeded().catch(() => {});
+    await sleep(500);
+    const y0 = await page.evaluate(() => window.scrollY);
+    await loc.click().catch((e) => log.push(`click ${label} fail ${e.message.split("\n")[0]}`));
+    await sleep(1200);
+    const y1 = await page.evaluate(() => window.scrollY);
+    log.push(`[${vp.name}] ${label}: scroll ${y0} -> ${y1} (${y1 - y0 === 0 ? "OK" : "MOVED " + (y1 - y0)})`);
+  };
+  await jump("tab 1-Step", sec.getByRole("tab", { name: /1-Step/ }));
+  await jump("tab Instant", sec.getByRole("tab", { name: /Instant/ }));
+  await jump("tab 2-Step", sec.getByRole("tab", { name: /2-Step/ }));
+  await jump("size $50K", sec.getByRole("button", { name: "$50K" }));
+  await jump("type Classic", sec.getByRole("button", { name: /Classic/ }).first());
+  await jump("platform 5", sec.getByRole("button", { name: /Platform 5/ }));
+  await jump("open vault", page.locator("#fyt-vault > button"));
+  await jump("treat Midnight", page.locator("#fyt-vault button", { hasText: "Midnight Rush" }));
+  await jump("treat Midnight off", page.locator("#fyt-vault button", { hasText: "Midnight Rush" }));
+  await jump("close vault", page.locator("#fyt-vault > button"));
+  // CTA without treats should open the treat sheet, not leave or scroll the page.
   const cta = sec.locator("a", { hasText: "Get funded" }).first();
-  const before = page.url();
+  await cta.scrollIntoViewIfNeeded();
+  await sleep(600);
+  const y0 = await page.evaluate(() => window.scrollY);
   await cta.click().catch((e) => log.push("cta1 " + e.message.split("\n")[0]));
-  await sleep(1500);
-  log.push(`[${vp.name}] after first CTA click url changed: ${page.url() !== before} vaultExpanded=${await page.locator("#fyt-vault > button").getAttribute("aria-expanded")}`);
-  await page.screenshot({ path: `${OUT}/${vp.name}-04-nudge.png` });
+  await sleep(1200);
+  const sheet = page.getByRole("dialog", { name: "Pick your treats" });
+  log.push(`[${vp.name}] CTA w/o treats: sheet=${await sheet.count()} scroll ${y0}->${await page.evaluate(() => window.scrollY)}`);
+  await page.screenshot({ path: `${OUT}/${vp.name}-04-sheet.png` });
   for (const name of ["Vampire's Share", "Nightmare Mode"]) {
-    await page.locator("#fyt-vault button", { hasText: name }).first().click().catch((e) => log.push("treat " + e.message.split("\n")[0]));
+    await sheet.locator("button", { hasText: name }).first().click().catch((e) => log.push("treat " + e.message.split("\n")[0]));
     await sleep(400);
   }
+  await sleep(500);
+  await page.screenshot({ path: `${OUT}/${vp.name}-04b-sheet-picked.png` });
+  log.push(`[${vp.name}] sheet CTA href: ${await sheet.locator("a").first().getAttribute("href")}`);
+  await page.keyboard.press("Escape");
   await sleep(800);
   await sec.screenshot({ path: `${OUT}/${vp.name}-05-pricing-picked.png` });
   log.push(`[${vp.name}] CTA href: ${await cta.getAttribute("href")}`);
-  // Switch model to Instant and log its link too.
-  await sec.getByRole("tab", { name: /Instant/ }).click().catch(() => {});
-  await sleep(900);
-  log.push(`[${vp.name}] Instant CTA href: ${await sec.locator("a", { hasText: "Get funded" }).first().getAttribute("href")}`);
   if (!vp.mobile) {
     await sleep(8500);
     await page.evaluate(() => document.dispatchEvent(new MouseEvent("mouseout", { clientX: 600, clientY: 0, bubbles: true, relatedTarget: null })));
     await sleep(1200);
     await page.screenshot({ path: `${OUT}/${vp.name}-06-exit.png` });
+    await page.getByRole("button", { name: /Keep my treats/ }).click().catch(() => {});
+    await sleep(1800);
+    log.push(`[desktop] after Keep my treats: #challenge top = ${await page.evaluate(() => Math.round(document.getElementById("challenge").getBoundingClientRect().top))}`);
   }
   await ctx.close();
 }

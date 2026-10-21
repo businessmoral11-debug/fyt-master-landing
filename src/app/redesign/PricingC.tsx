@@ -625,8 +625,6 @@ function OfferDetails({ p, giftParts }: { p: Pick; giftParts: [string, string][]
 
 /* ------------------------------ Halloween vault ----------------------------- */
 
-const VAULT_OPEN_EVENT = "fyt:vault-open";
-
 /** Brushed-steel dial that turns when the vault opens. */
 function VaultDial({ open }: { open: boolean }) {
   const reduce = useReducedMotion();
@@ -647,22 +645,56 @@ function VaultDial({ open }: { open: boolean }) {
   );
 }
 
+/** The 7 treats as selectable rows (2 columns from tablet up). */
+function TreatGrid({ p, cols = 2 }: { p: Pick; cols?: 1 | 2 }) {
+  const count = p.treats.length;
+  return (
+    <div className={`grid grid-cols-1 gap-[6px] ${cols === 2 ? "sm:grid-cols-2" : ""}`}>
+      {TREATS.map((t) => {
+        const on = p.treats.includes(t.id);
+        return (
+          <button
+            key={t.id}
+            type="button"
+            aria-pressed={on}
+            onClick={() => p.toggleTreat(t.id)}
+            className="flex min-h-[52px] cursor-pointer items-center gap-[10px] rounded-[14px] px-[10px] py-[7px] text-left text-white transition-[background,border-color,opacity] duration-200"
+            style={{ border: `1px solid ${on ? "rgba(255,138,61,0.75)" : "rgba(148,178,255,0.12)"}`, background: on ? "linear-gradient(135deg, rgba(255,138,61,0.18), rgba(37,99,235,0.1))" : "rgba(255,255,255,0.025)", opacity: count >= TREAT_PICKS && !on ? 0.62 : 1 }}
+          >
+            <span className="flex size-[30px] shrink-0 items-center justify-center rounded-[10px]" style={{ background: on ? "rgba(255,138,61,0.2)" : "rgba(59,130,246,0.14)" }}>
+              <Svg d={t.d} size={15} color={on ? EMBER_SOFT : "#93c5fd"} w={1.9} />
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col leading-tight">
+              <span className="text-[13px] font-semibold">{t.name}</span>
+              <span className="text-[11px] leading-[1.25]" style={{ color: on ? "#fed7aa" : MUTED }}>{t.line}</span>
+            </span>
+            <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full" style={{ border: `1.5px solid ${on ? EMBER : "#4b5568"}`, background: on ? EMBER : "transparent" }}>
+              {on && <Svg d={IC.check} size={10} color="#1a0a00" w={3.4} />}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function TreatDots({ count }: { count: number }) {
+  return (
+    <span className="flex items-center gap-[5px]">
+      {Array.from({ length: TREAT_PICKS }, (_, k) => (
+        <span key={k} className="h-[5px] w-[22px] rounded-full transition-colors duration-300" style={{ background: k < count ? EMBER : "rgba(255,255,255,0.14)" }} />
+      ))}
+    </span>
+  );
+}
+
 /** Replaces the offer switch while Halloween runs: one card, tap to open, pick 2 treats. */
 function VaultCard({ p }: { p: Pick }) {
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(() => p.treats.length > 0);
-  const [nudge, setNudge] = useState(0);
-  useEffect(() => {
-    const on = () => {
-      setOpen(true);
-      setNudge((n) => n + 1);
-    };
-    window.addEventListener(VAULT_OPEN_EVENT, on);
-    return () => window.removeEventListener(VAULT_OPEN_EVENT, on);
-  }, []);
   const count = p.treats.length;
   return (
-    <div id="fyt-vault" className="flex scroll-mt-[120px] flex-col gap-[10px]">
+    <div id="fyt-vault" className="flex flex-col gap-[10px]">
       <motion.button
         type="button"
         aria-expanded={open}
@@ -676,6 +708,7 @@ function VaultCard({ p }: { p: Pick }) {
           <motion.span aria-hidden="true" className="pointer-events-none absolute inset-y-0 w-[40%]" style={{ background: "linear-gradient(100deg, transparent, rgba(255,255,255,0.14), transparent)" }} initial={{ left: "-50%" }} animate={{ left: ["-50%", "130%"] }} transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }} />
         )}
         <span aria-hidden="true" className="pointer-events-none absolute -right-[40px] -top-[50px] size-[150px] rounded-full" style={{ background: `radial-gradient(circle, rgba(255,138,61,0.22), transparent 65%)` }} />
+        <WebCorner className="pointer-events-none absolute right-0 top-0 opacity-[0.22]" size={70} />
         <VaultDial open={open} />
         <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
           <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}><span className="hidden sm:inline">Halloween · </span>The Haunted Vault</span>
@@ -692,42 +725,13 @@ function VaultCard({ p }: { p: Pick }) {
       <AnimatePresence initial={false}>
         {open && (
           <motion.div key="treats" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.4, ease: EASE }} className="overflow-hidden">
-            <motion.div key={nudge} className="flex flex-col gap-[8px] rounded-[20px] p-[10px]" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${nudge ? "rgba(255,138,61,0.45)" : LINE}` }} animate={reduce || !nudge ? undefined : { x: [0, -6, 6, -4, 4, 0] }} transition={{ duration: 0.45 }}>
+            <div className="flex flex-col gap-[8px] rounded-[20px] p-[10px]" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${LINE}` }}>
               <div className="flex items-center justify-between px-[4px] pt-[2px]">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Pick your {TREAT_PICKS} treats</span>
-                <span className="flex items-center gap-[5px]">
-                  {Array.from({ length: TREAT_PICKS }, (_, k) => (
-                    <span key={k} className="h-[5px] w-[22px] rounded-full transition-colors duration-300" style={{ background: k < count ? EMBER : "rgba(255,255,255,0.14)" }} />
-                  ))}
-                </span>
+                <TreatDots count={count} />
               </div>
-              <div className="grid grid-cols-1 gap-[6px] sm:grid-cols-2">
-                {TREATS.map((t) => {
-                  const on = p.treats.includes(t.id);
-                  return (
-                    <button
-                      key={t.id}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => p.toggleTreat(t.id)}
-                      className="flex min-h-[52px] cursor-pointer items-center gap-[10px] rounded-[14px] px-[10px] py-[7px] text-left text-white transition-[background,border-color,opacity] duration-200"
-                      style={{ border: `1px solid ${on ? "rgba(255,138,61,0.75)" : "rgba(148,178,255,0.12)"}`, background: on ? "linear-gradient(135deg, rgba(255,138,61,0.18), rgba(37,99,235,0.1))" : "rgba(255,255,255,0.025)", opacity: count >= TREAT_PICKS && !on ? 0.62 : 1 }}
-                    >
-                      <span className="flex size-[30px] shrink-0 items-center justify-center rounded-[10px]" style={{ background: on ? "rgba(255,138,61,0.2)" : "rgba(59,130,246,0.14)" }}>
-                        <Svg d={t.d} size={15} color={on ? EMBER_SOFT : "#93c5fd"} w={1.9} />
-                      </span>
-                      <span className="flex min-w-0 flex-1 flex-col leading-tight">
-                        <span className="text-[13px] font-semibold">{t.name}</span>
-                        <span className="text-[11px] leading-[1.25]" style={{ color: on ? "#fed7aa" : MUTED }}>{t.line}</span>
-                      </span>
-                      <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full" style={{ border: `1.5px solid ${on ? EMBER : "#4b5568"}`, background: on ? EMBER : "transparent" }}>
-                        {on && <Svg d={IC.check} size={10} color="#1a0a00" w={3.4} />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
+              <TreatGrid p={p} />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -736,8 +740,8 @@ function VaultCard({ p }: { p: Pick }) {
   );
 }
 
-/** "Your vault" line above the CTA: the deal plus the 2 chosen treats (empty slots open the vault). */
-function VaultSummary({ p }: { p: Pick }) {
+/** "Your vault" line above the CTA: the deal plus the 2 chosen treats (empty slots open the picker). */
+function VaultSummary({ p, onPick }: { p: Pick; onPick: () => void }) {
   const names = p.treats.map((id) => TREATS.find((t) => t.id === id)?.name ?? id);
   const chip = "flex h-[28px] items-center gap-[6px] rounded-full px-[10px] text-[11.5px] font-semibold";
   return (
@@ -747,12 +751,12 @@ function VaultSummary({ p }: { p: Pick }) {
       <span className={chip} style={{ background: "rgba(59,130,246,0.18)", color: "#dbeafe" }}>+ BOGO</span>
       {Array.from({ length: TREAT_PICKS }, (_, k) =>
         names[k] ? (
-          <span key={k} className={chip} style={{ background: "rgba(255,138,61,0.16)", color: "#ffd9bf", border: "1px solid rgba(255,138,61,0.4)" }}>
+          <button key={k} type="button" onClick={onPick} className={`${chip} cursor-pointer`} style={{ background: "rgba(255,138,61,0.16)", color: "#ffd9bf", border: "1px solid rgba(255,138,61,0.4)" }}>
             <Svg d={IC.check} size={10} color={EMBER_SOFT} w={3} />
             {names[k]}
-          </span>
+          </button>
         ) : (
-          <button key={k} type="button" onClick={() => openVault()} className={`${chip} cursor-pointer bg-transparent`} style={{ border: "1px dashed rgba(255,138,61,0.55)", color: EMBER_SOFT }}>
+          <button key={k} type="button" onClick={onPick} className={`${chip} cursor-pointer bg-transparent`} style={{ border: "1px dashed rgba(255,138,61,0.55)", color: EMBER_SOFT }}>
             + Pick treat {k + 1}
           </button>
         ),
@@ -761,9 +765,75 @@ function VaultSummary({ p }: { p: Pick }) {
   );
 }
 
-function openVault() {
-  window.dispatchEvent(new Event(VAULT_OPEN_EVENT));
-  document.getElementById("fyt-vault")?.scrollIntoView({ behavior: "smooth", block: "start" });
+/** Treat picker as a sheet, right where the visitor is. No scrolling the page around. */
+function TreatSheet({ p, onClose }: { p: Pick; onClose: () => void }) {
+  const reduce = useReducedMotion();
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeRef.current();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+  const count = p.treats.length;
+  const done = count >= TREAT_PICKS;
+  return createPortal(
+    <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-end justify-center sm:items-center sm:p-[16px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Pick your treats">
+      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.72)", backdropFilter: "blur(6px)" }} />
+      <motion.div
+        className="relative flex max-h-[92vh] w-full max-w-[560px] flex-col gap-[12px] overflow-y-auto rounded-t-[26px] p-[16px] pb-[max(16px,env(safe-area-inset-bottom))] text-white sm:rounded-[26px] sm:p-[20px]"
+        style={{ background: "radial-gradient(120% 60% at 50% 0%, #1b3488 0%, #0a1433 55%, #060c1d 100%)", border: "1px solid rgba(147,197,253,0.3)", boxShadow: "0 -30px 80px -30px rgba(37,99,235,0.6)" }}
+        initial={reduce ? false : { y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={reduce ? { opacity: 0 } : { y: 40, opacity: 0 }}
+        transition={{ duration: 0.35, ease: EASE }}
+      >
+        <WebCorner className="pointer-events-none absolute right-0 top-0 opacity-[0.18]" size={90} />
+        <div className="flex items-center gap-[12px]">
+          <VaultDial open={done} />
+          <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
+            <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}>Free with your account</span>
+            <span className="text-[20px] font-semibold leading-tight tracking-[-0.02em]">Pick your {TREAT_PICKS} treats</span>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close" className="flex size-[34px] shrink-0 cursor-pointer items-center justify-center self-start rounded-full border-0" style={{ background: "rgba(255,255,255,0.08)" }}>
+            <Svg d="M6 6l12 12M18 6L6 18" size={14} color="#fff" w={2.2} />
+          </button>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[12.5px]" style={{ color: SOFT }}>{done ? "Both treats locked in." : `${count}/${TREAT_PICKS} picked`}</span>
+          <TreatDots count={count} />
+        </div>
+        <TreatGrid p={p} />
+        <a href={p.co.href} className="mt-[4px] flex h-[56px] shrink-0 items-center justify-between rounded-[18px] pl-[18px] pr-[8px] text-white no-underline" style={{ background: done ? "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)" : "rgba(255,255,255,0.08)", boxShadow: done ? "0 18px 36px -14px rgba(37,99,235,0.95)" : "none" }}>
+          <span className="flex items-baseline gap-[8px]">
+            <b className="text-[20px]">{money(p.price)}</b>
+            <s className="text-[12px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
+          </span>
+          <span className="flex items-center gap-[6px] rounded-[12px] px-[14px] py-[10px] text-[14px] font-bold" style={{ background: done ? "#fff" : "rgba(255,255,255,0.1)", color: done ? "#2563eb" : "#fff" }}>
+            {done ? "Get funded" : "Continue without treats"}
+            <Svg d="M5 12h14M13 6l6 6-6 6" size={14} color={done ? "#2563eb" : "#fff"} w={2.6} />
+          </span>
+        </a>
+      </motion.div>
+    </motion.div>,
+    document.body,
+  );
+}
+
+/** Thin spider-web corner, drawn in light strokes. */
+function WebCorner({ className, size = 80 }: { className?: string; size?: number }) {
+  return (
+    <svg aria-hidden="true" className={className} width={size} height={size} viewBox="0 0 80 80" fill="none" stroke="#dbeafe" strokeWidth="0.8">
+      <path d="M80 0L20 60M80 0L46 74M80 0L6 34M80 0L66 80M80 0L0 14" />
+      <path d="M62 0c0 6 4 12 10 14 2 4 6 8 8 8" />
+      <path d="M44 0c-1 11 7 22 17 26 4 9 12 16 19 17" />
+      <path d="M26 0c-2 16 10 32 24 38 6 13 18 23 30 25" />
+    </svg>
+  );
+}
+
+function scrollToTable() {
+  document.getElementById("challenge")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 const EXIT_KEY = "fyt_hw_exit_v1";
@@ -829,7 +899,7 @@ function VaultExitPopup() {
               type="button"
               onClick={() => {
                 setShow(false);
-                window.setTimeout(openVault, 250);
+                window.setTimeout(scrollToTable, 250);
               }}
               className="mt-[18px] flex h-[56px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[18px] border-0 text-[16px] font-bold text-white"
               style={{ background: BLUE, boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95)" }}
@@ -845,6 +915,56 @@ function VaultExitPopup() {
       )}
     </AnimatePresence>,
     document.body,
+  );
+}
+
+const BAT = "M12 14c-1.2-2.4-3.4-3.4-6-3 1 .8 1.4 1.8 1.2 3-1.4-.9-3.3-1-5.2-.2 2.3.6 3.8 2 4.4 4 1.6-1.4 3.6-1.8 5.6-.8 2-1 4-.6 5.6.8.6-2 2.1-3.4 4.4-4-1.9-.8-3.8-.7-5.2.2-.2-1.2.2-2.2 1.2-3-2.6-.4-4.8.6-6 3Z";
+
+/** Quiet Halloween layer behind the pricing section: moon, a few bats, rising embers, low fog. */
+function HalloweenDecor() {
+  const reduce = useReducedMotion();
+  const embers = useRef(
+    Array.from({ length: 14 }, (_, i) => ({
+      left: `${(i * 71) % 100}%`,
+      size: 2 + ((i * 7) % 3),
+      dur: 7 + ((i * 13) % 7),
+      delay: (i * 1.3) % 9,
+      drift: ((i % 2 ? 1 : -1) * (10 + ((i * 5) % 20))),
+    })),
+  ).current;
+  const bats = [
+    { top: "9%", size: 26, dur: 26, delay: 0 },
+    { top: "16%", size: 18, dur: 32, delay: 9 },
+    { top: "6%", size: 14, dur: 38, delay: 18 },
+  ];
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      {/* Crescent moon */}
+      <span className="absolute right-[6%] top-[40px] size-[70px] rounded-full lg:right-[8%] lg:top-[70px] lg:size-[96px]" style={{ boxShadow: "inset -16px 8px 0 0 #fde7c2", filter: "drop-shadow(0 0 22px rgba(255,190,120,0.45))", opacity: 0.5 }} />
+      {/* Embers */}
+      {!reduce &&
+        embers.map((e, i) => (
+          <motion.span
+            key={i}
+            className="absolute bottom-0 rounded-full"
+            style={{ left: e.left, width: e.size, height: e.size, background: "#ffb47a", boxShadow: "0 0 8px 2px rgba(255,138,61,0.7)" }}
+            initial={{ y: 0, x: 0, opacity: 0 }}
+            animate={{ y: [0, -520], x: [0, e.drift], opacity: [0, 0.9, 0] }}
+            transition={{ duration: e.dur, delay: e.delay, repeat: Infinity, ease: "easeOut" }}
+          />
+        ))}
+      {/* Bats */}
+      {!reduce &&
+        bats.map((b, i) => (
+          <motion.span key={i} className="absolute left-0" style={{ top: b.top }} initial={{ x: "-10vw" }} animate={{ x: ["-10vw", "110vw"], y: [0, -14, 6, -10, 0] }} transition={{ duration: b.dur, delay: b.delay, repeat: Infinity, ease: "linear" }}>
+            <motion.svg width={b.size} height={b.size} viewBox="0 0 24 24" style={{ opacity: 0.4 }} animate={{ scaleY: [1, 0.55, 1] }} transition={{ duration: 0.35, repeat: Infinity }}>
+              <path d={BAT} fill="#0b1230" stroke="rgba(147,197,253,0.5)" strokeWidth="0.6" />
+            </motion.svg>
+          </motion.span>
+        ))}
+      {/* Low fog */}
+      <motion.span className="absolute -left-[20%] bottom-0 h-[180px] w-[140%]" style={{ background: "radial-gradient(50% 60% at 30% 100%, rgba(147,197,253,0.08), transparent 70%), radial-gradient(40% 50% at 75% 100%, rgba(255,138,61,0.07), transparent 70%)" }} animate={reduce ? undefined : { x: ["0%", "6%", "0%"] }} transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
+    </div>
   );
 }
 
@@ -888,7 +1008,7 @@ function ModelTabs({ p }: { p: Pick }) {
             </span>
             <span className="flex items-baseline gap-[3px] lg:flex-col lg:items-end lg:gap-0">
               <span className="text-[10px]" style={{ color: MUTED }}>from</span>
-              <span className="text-[14px] font-bold text-[#93c5fd] lg:text-[17px]">{money(offerPrice(fromOld, p.offer))}</span>
+              <span className="text-[14px] font-bold text-[#93c5fd] lg:text-[17px]">{money(Math.round(offerPrice(fromOld, p.offer)))}</span>
             </span>
           </button>
         );
@@ -914,7 +1034,7 @@ function TrustRow() {
 function DefaultHeading() {
   return (
     <h2 className="m-0 text-center text-[34px] font-semibold leading-[1.06] tracking-[-0.035em] text-[#eef0f6] lg:text-left lg:text-[54px]">
-      Choose your <span className="fyt-gradient-text">challenge.</span>
+      Get funded <span className="fyt-gradient-text">your way.</span>
     </h2>
   );
 }
@@ -925,6 +1045,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
   const first = useRef(true);
   const [compare, setCompare] = useState(false);
   const nudged = useRef(false);
+  const [sheet, setSheet] = useState(false);
 
   // Remember the visitor's plan (welcome-back card) - skip the default on load.
   useEffect(() => {
@@ -956,6 +1077,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
   return (
     <section id="challenge" className="fyt-rd relative w-full shrink-0 scroll-mt-[120px] overflow-hidden" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, #03060d 70%)`, color: "#eef0f6" }}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
+      {p.halloween && <HalloweenDecor />}
       <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-[18px] px-[16px] pb-[64px] pt-[56px] lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-[48px] lg:px-[40px] lg:pb-[110px] lg:pt-[110px]">
         <div className={`flex flex-col gap-[18px] lg:self-start ${p.halloween ? "" : "lg:sticky lg:top-[140px]"}`}>
           {heading ?? <DefaultHeading />}
@@ -963,17 +1085,16 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
           <ModelTabs p={p} />
         </div>
 
-        <AnimatePresence mode="wait" initial={false}>
+        {/* Same card stays mounted when the model changes, so the page never jumps. */}
           <motion.div
-            key={p.step}
-            initial={reduce ? false : { opacity: 0, y: 16 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -10 }}
             transition={{ duration: 0.35, ease: EASE }}
             className="relative overflow-hidden rounded-[26px]"
             style={{ border: "1px solid rgba(96,165,250,0.6)", background: "linear-gradient(180deg, rgba(37,99,235,0.2) 0%, rgba(10,18,40,0.92) 45%)", boxShadow: "0 50px 100px -50px rgba(37,99,235,0.95)" }}
           >
             <span aria-hidden="true" className="pointer-events-none absolute -right-[70px] -top-[80px] size-[240px] rounded-full" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.35), transparent 65%)" }} />
+            {p.halloween && <WebCorner className="pointer-events-none absolute right-0 top-0 opacity-[0.16]" size={120} />}
             <div className="relative flex flex-col gap-[16px] p-[16px] sm:p-[22px] lg:gap-[18px] lg:p-[28px]">
 
               <div className="flex flex-col gap-[8px]">
@@ -1030,7 +1151,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                 <PerkGrid p={p} cols={2} />
               </div>
 
-              {p.halloween && <VaultSummary p={p} />}
+              {p.halloween && <VaultSummary p={p} onPick={() => setSheet(true)} />}
               <motion.a
                 href={p.co.href}
                 onClick={(e) => {
@@ -1038,7 +1159,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                   if (p.halloween && p.treats.length < TREAT_PICKS && !nudged.current) {
                     e.preventDefault();
                     nudged.current = true;
-                    openVault();
+                    setSheet(true);
                   }
                 }}
                 className="relative flex h-[64px] items-center justify-between overflow-hidden rounded-[18px] pl-[20px] pr-[8px] text-white no-underline transition-transform hover:-translate-y-[1px] active:scale-[0.99]"
@@ -1074,9 +1195,9 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
               <TrustRow />
             </div>
           </motion.div>
-        </AnimatePresence>
       </div>
       {p.halloween && <VaultExitPopup />}
+      <AnimatePresence>{sheet && <TreatSheet p={p} onClose={() => setSheet(false)} />}</AnimatePresence>
     </section>
   );
 }

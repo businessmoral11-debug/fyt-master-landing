@@ -601,6 +601,43 @@ function PromoCountdownPill({ compact = false, pulse, deadline = PROMO_DEADLINE,
   );
 }
 
+/** Small carved pumpkin used in the Halloween banner. */
+function PumpkinIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" className="shrink-0" style={{ filter: "drop-shadow(0 0 6px rgba(255,138,61,0.8))" }}>
+      <path d="M12 7.5c-.3-2 .4-3.6 2-4.5" stroke="#86efac" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      <ellipse cx="8" cy="14" rx="5.5" ry="7" fill="#e8590c" />
+      <ellipse cx="16" cy="14" rx="5.5" ry="7" fill="#e8590c" />
+      <ellipse cx="12" cy="14" rx="5" ry="7.4" fill="#ff8a3d" />
+      <path d="M7.5 12l2-2.2 1.6 2.2zM12.9 12l1.6-2.2 2 2.2zM8 16c2.4 2 5.6 2 8 0l-1.4.4-.9-.9-.9.9-.8-.9-.8.9-.9-.9-.9.9z" fill="#3b1300" />
+    </svg>
+  );
+}
+
+const BANNER_BAT = "M12 14c-1.2-2.4-3.4-3.4-6-3 1 .8 1.4 1.8 1.2 3-1.4-.9-3.3-1-5.2-.2 2.3.6 3.8 2 4.4 4 1.6-1.4 3.6-1.8 5.6-.8 2-1 4-.6 5.6.8.6-2 2.1-3.4 4.4-4-1.9-.8-3.8-.7-5.2.2-.2-1.2.2-2.2 1.2-3-2.6-.4-4.8.6-6 3Z";
+
+/** Halloween layer on the top banner: a bat crossing now and then, web corners, an ember line. */
+function HalloweenBannerDecor({ animate }: { animate: boolean }) {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <span className="absolute inset-x-0 bottom-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,138,61,0.9), transparent)" }} />
+      <svg className="absolute left-0 top-0 opacity-25" width="44" height="44" viewBox="0 0 80 80" fill="none" stroke="#dbeafe" strokeWidth="1.2" style={{ transform: "scaleX(-1)" }}>
+        <path d="M80 0L20 60M80 0L46 74M80 0L6 34M80 0L0 14M62 0c0 6 4 12 10 14 2 4 6 8 8 8M44 0c-1 11 7 22 17 26 4 9 12 16 19 17" />
+      </svg>
+      <svg className="absolute right-0 top-0 opacity-25" width="44" height="44" viewBox="0 0 80 80" fill="none" stroke="#dbeafe" strokeWidth="1.2">
+        <path d="M80 0L20 60M80 0L46 74M80 0L6 34M80 0L0 14M62 0c0 6 4 12 10 14 2 4 6 8 8 8M44 0c-1 11 7 22 17 26 4 9 12 16 19 17" />
+      </svg>
+      {animate && (
+        <motion.span className="absolute left-0 top-[4px]" initial={{ x: "-5vw" }} animate={{ x: ["-5vw", "105vw"], y: [0, 6, -2, 5, 0] }} transition={{ duration: 14, repeat: Infinity, repeatDelay: 6, ease: "linear" }}>
+          <motion.svg width="18" height="18" viewBox="0 0 24 24" animate={{ scaleY: [1, 0.5, 1] }} transition={{ duration: 0.3, repeat: Infinity }}>
+            <path d={BANNER_BAT} fill="#060b1f" />
+          </motion.svg>
+        </motion.span>
+      )}
+    </div>
+  );
+}
+
 function PromoBanner() {
   const reduceMotion = useReducedMotion();
   const hw = isHalloweenLive();
@@ -686,6 +723,7 @@ function PromoBanner() {
         className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)" }}
       />
+      {hw && <HalloweenBannerDecor animate={!reduceMotion && nearViewport} />}
       {!reduceMotion && (
         <div
           aria-hidden="true"
@@ -701,6 +739,7 @@ function PromoBanner() {
           After scrolling: folds to one slim line (short deal + CODE + countdown). */}
       <div className={`relative mx-auto flex w-full flex-col items-center justify-center px-[6px] transition-[padding] duration-300 ease-out md:hidden ${compact ? "py-[6px]" : "py-[7px]"}`}>
         <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
+          {hw && <PumpkinIcon size={14} />}
           <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[10px] tracking-[0.01em] min-[380px]:text-[10.5px]">
             {dealShort}
           </span>
@@ -732,6 +771,7 @@ function PromoBanner() {
           Each group stays on one line, so a narrow screen wraps between groups, never mid-offer. */}
       <div className="relative mx-auto hidden min-h-[36px] w-full max-w-[1440px] flex-wrap items-center justify-center gap-x-[12px] gap-y-[6px] px-[12px] py-[8px] md:flex lg:gap-x-[14px] lg:px-[20px] xl:px-[24px]">
         <div className="flex items-center gap-x-[10px] whitespace-nowrap lg:gap-x-[14px]">
+          {hw && <PumpkinIcon size={18} />}
           <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[12px] tracking-[0.02em] lg:text-[13px] xl:text-[14px]">
             {dealLine}
           </span>
