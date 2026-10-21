@@ -41,8 +41,8 @@ export const PROMO_ITEMS: PromoItem[] = [
   { kind: "code", label: "Dashboard Launch Offer", text: "40% off + Buy 1 Get 2 Instantly + 5% Instant Cashback", code: PROMO_CODE },
 ];
 
-/** Dashboard Launch Offer (NEWDASH) ends Wednesday 21 Oct 2026, 23:59:59 IST (extended by one day). */
-export const PROMO_DEADLINE = "2026-10-21T23:59:59+05:30";
+/** Dashboard Launch Offer (NEWDASH) ends Thursday 22 Oct 2026, 01:59:59 IST (extended by one day, then 2 more hours). */
+export const PROMO_DEADLINE = "2026-10-22T01:59:59+05:30";
 
 /** Spots left (not shown while the countdown runs; kept for switching back). Updated by hand from real sales. */
 export const PROMO_SPOTS_LEFT = 247;
