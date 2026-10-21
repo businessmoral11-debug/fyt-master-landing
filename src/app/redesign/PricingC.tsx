@@ -699,7 +699,7 @@ function VaultCard({ p }: { p: Pick }) {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="relative flex w-full cursor-pointer flex-wrap items-center gap-[14px] overflow-hidden rounded-[22px] border-0 p-[14px] text-left text-white"
+        className="relative flex w-full cursor-pointer items-center gap-[14px] overflow-hidden rounded-[22px] border-0 p-[14px] text-left text-white"
         style={{ background: "linear-gradient(150deg, #2448b8 0%, #142c74 42%, #0a1434 100%)", boxShadow: "0 0 0 1px rgba(147,197,253,0.38), 0 30px 60px -30px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.2)" }}
         animate={reduce || open ? undefined : { boxShadow: ["0 0 0 1px rgba(147,197,253,0.38), 0 30px 60px -30px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.2)", `0 0 0 1px rgba(255,138,61,0.6), 0 26px 60px -22px rgba(255,138,61,0.55), inset 0 1px 0 rgba(255,255,255,0.2)`, "0 0 0 1px rgba(147,197,253,0.38), 0 30px 60px -30px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.2)"] }}
         transition={reduce || open ? undefined : { duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
@@ -715,28 +715,21 @@ function VaultCard({ p }: { p: Pick }) {
           <span className="text-[21px] font-semibold leading-[1.05] tracking-[-0.025em]">
             45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO</span>
           </span>
-          <span className="text-[12px] font-medium text-[#bfdbfe]">{open ? (count >= TREAT_PICKS ? "Vault unlocked. Treats saved." : `Pick any ${TREAT_PICKS} treats below · ${count}/${TREAT_PICKS}`) : `+ ${TREAT_PICKS} free treats of your choice`}</span>
+          {open ? (
+            <span className="text-[12px] font-medium text-[#bfdbfe]">{count >= TREAT_PICKS ? "Vault unlocked. Treats saved." : `Pick any ${TREAT_PICKS} treats below · ${count}/${TREAT_PICKS}`}</span>
+          ) : (
+            <span className="relative mt-[3px] inline-flex w-fit items-center gap-[6px] overflow-hidden rounded-full py-[4px] pl-[8px] pr-[10px] text-[11.5px] font-semibold" style={{ color: "#ffd9bf", background: "rgba(255,138,61,0.12)", border: "1px solid rgba(255,138,61,0.45)" }}>
+              {!reduce && (
+                <motion.span aria-hidden="true" className="pointer-events-none absolute inset-y-0 w-[40%]" style={{ background: "linear-gradient(100deg, transparent, rgba(255,214,180,0.35), transparent)" }} initial={{ left: "-50%" }} animate={{ left: ["-50%", "140%"] }} transition={{ duration: 1.4, repeat: Infinity, repeatDelay: 2.6, ease: "easeInOut" }} />
+              )}
+              <Svg d="M7 11V8a5 5 0 0 1 9.6-2M5 11h14v10H5z" size={12} color={EMBER_SOFT} w={2.2} />
+              Tap to open · pick {TREAT_PICKS} free treats
+            </span>
+          )}
         </span>
         <motion.span className="relative flex size-[30px] shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.3 }}>
           <Svg d="M6 9l6 6 6-6" size={14} color="#fff" w={2.4} />
         </motion.span>
-        {!open && (
-          <motion.span
-            className="relative flex h-[46px] w-full items-center justify-center gap-[9px] overflow-hidden rounded-[14px] text-[14.5px] font-bold text-[#1a0a00]"
-            style={{ background: "linear-gradient(180deg,#ffc08f,#ff8a3d 60%,#f26a1b)", boxShadow: "0 12px 28px -10px rgba(255,138,61,0.9), inset 0 1px 0 rgba(255,255,255,0.5)" }}
-            animate={reduce ? undefined : { scale: [1, 1.025, 1] }}
-            transition={reduce ? undefined : { duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            {!reduce && (
-              <motion.span aria-hidden="true" className="pointer-events-none absolute inset-y-0 w-[35%]" style={{ background: "linear-gradient(100deg, transparent, rgba(255,255,255,0.55), transparent)" }} initial={{ left: "-40%" }} animate={{ left: ["-40%", "130%"] }} transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 1.6, ease: "easeInOut" }} />
-            )}
-            <Svg d="M7 11V8a5 5 0 0 1 9.6-2M5 11h14v10H5zM12 15v2" size={17} color="#1a0a00" w={2.2} />
-            Tap to open · pick your {TREAT_PICKS} free treats
-            <motion.span className="flex" animate={reduce ? undefined : { x: [0, 4, 0] }} transition={reduce ? undefined : { duration: 1.1, repeat: Infinity }}>
-              <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#1a0a00" w={2.6} />
-            </motion.span>
-          </motion.span>
-        )}
       </motion.button>
 
       <AnimatePresence initial={false}>
