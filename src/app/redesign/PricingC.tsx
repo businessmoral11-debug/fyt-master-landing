@@ -11,6 +11,7 @@ import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5.png";
 import { STEP_PLANS, STEP_SIZES, checkoutUrl, fmtSize, getEntry, type PlanId, type PlatformId, type StepId } from "@/app/data/pricing";
 import { ALT_PROMO_CODE, PROMO_CODE, PROMO_DEADLINE } from "@/app/data/promoBanner";
 import { SELECT_PLAN_EVENT, writeSavedPlan, type SavedPlan } from "@/app/data/savedPlan";
+import { HALLOWEEN_CODE, HALLOWEEN_END, HALLOWEEN_OFF, TREATS, TREAT_PICKS, halloweenStage, isHalloweenLive, withHalloween, type TreatId } from "@/app/data/halloween";
 
 const STEPS: StepId[] = ["1-Step", "2-Step", "Instant"];
 const PLATFORMS: { id: PlatformId; label: string; logo: string }[] = [
@@ -26,11 +27,15 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 /* ------------------------------ offers ----------------------------------- */
 
-type OfferId = "launch" | "welcome";
+type OfferId = "launch" | "welcome" | "halloween";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
   launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+ BOGO instantly", "+ 5% cashback"], who: "Instant BOGO · 5% cashback" },
   welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ BOGO instantly", "+ 5% instant cashback"], who: "Welcome gift" },
+  halloween: { off: HALLOWEEN_OFF, code: HALLOWEEN_CODE, title: "45% OFF", extras: ["+ BOGO instantly", "+ any 2 treats"], who: "Haunted Vault" },
 };
+const EMBER = "#ff8a3d";
+const EMBER_SOFT = "#ffb47a";
+const TREATS_KEY = "fyt_hw_treats_v1";
 
 function offerPrice(old: number, o: OfferId): number {
   return Math.round(old * (1 - OFFERS[o].off) * 100) / 100;
@@ -56,7 +61,27 @@ function usePick() {
   const [giftAt, setGiftAt] = useState<number | null>(() => (typeof window === "undefined" ? null : readGift()));
   const giftValid = giftAt !== null && Date.now() < giftAt + GIFT_MS;
   const [offerRaw, setOffer] = useState<OfferId>(() => (giftValid ? "welcome" : "launch"));
-  const offer: OfferId = offerRaw === "welcome" && giftValid ? "welcome" : "launch";
+  const halloween = isHalloweenLive();
+  const offer: OfferId = halloween ? "halloween" : offerRaw === "welcome" && giftValid ? "welcome" : "launch";
+  const [treats, setTreatsRaw] = useState<TreatId[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const v = JSON.parse(window.sessionStorage.getItem(TREATS_KEY) || "[]") as string[];
+      return v.filter((x): x is TreatId => TREATS.some((t) => t.id === x)).slice(0, TREAT_PICKS);
+    } catch {
+      return [];
+    }
+  });
+  const toggleTreat = (id: TreatId) =>
+    setTreatsRaw((cur) => {
+      const next = cur.includes(id) ? cur.filter((x) => x !== id) : cur.length >= TREAT_PICKS ? [...cur.slice(1), id] : [...cur, id];
+      try {
+        window.sessionStorage.setItem(TREATS_KEY, JSON.stringify(next));
+      } catch {
+        // Storage blocked: picks still work for this visit.
+      }
+      return next;
+    });
   const unlockGift = () => {
     const now = Date.now();
     try {
@@ -72,9 +97,9 @@ function usePick() {
   const size = sizes[Math.min(i, sizes.length - 1)];
   const entry = getEntry(step, plan, platform, size)!;
   const price = offerPrice(entry.priceOld, offer);
-  const co = offerCheckout(entry.productId, offer);
+  const co = halloween ? { href: withHalloween(checkoutUrl(entry.productId), entry.productId, treats), auto: true } : offerCheckout(entry.productId, offer);
   return {
-    step, plan, platform, i, plans, sizes, size, entry, offer, price, co,
+    step, plan, platform, i, plans, sizes, size, entry, offer, price, co, halloween, treats, toggleTreat,
     save: Math.round((entry.priceOld - price) * 100) / 100,
     setStep: (s: StepId) => { setStepRaw(s); setPlan("prime"); },
     setPlan, setPlatform, setI, setOffer, giftAt, unlockGift,
@@ -87,13 +112,13 @@ function money(n: number): string {
 }
 
 /** Hours-based countdown (29h 47m 12s reads more urgent than 1d 5h). */
-function useCountdown(): [string, string][] {
+function useCountdown(deadline: string = PROMO_DEADLINE): [string, string][] {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(t);
   }, []);
-  const left = Math.max(0, new Date(PROMO_DEADLINE).getTime() - now);
+  const left = Math.max(0, new Date(deadline).getTime() - now);
   const pad = (n: number) => String(n).padStart(2, "0");
   return [
     [pad(Math.floor(left / 36e5)), "h"],
@@ -554,11 +579,12 @@ function OfferSwitch({ p }: { p: Pick }) {
 
 /** One slim bar under the switch: countdown (red alert) plus the auto-applied code. */
 function OfferDetails({ p, giftParts }: { p: Pick; giftParts: [string, string][] | null }) {
-  const launchParts = useCountdown();
+  const hw = p.offer === "halloween";
+  const launchParts = useCountdown(hw ? HALLOWEEN_END : PROMO_DEADLINE);
   const reduce = useReducedMotion();
   const o = OFFERS[p.offer];
   const parts = giftParts ?? launchParts;
-  const gift = !!giftParts;
+  const gift = !!giftParts || hw;
   return (
     <motion.div
       className="flex h-[44px] items-center justify-between gap-[10px] rounded-[14px] pl-[12px] pr-[6px]"
@@ -571,7 +597,7 @@ function OfferDetails({ p, giftParts }: { p: Pick; giftParts: [string, string][]
           <span className="absolute inset-0 animate-ping rounded-full bg-[#ef4444] opacity-60" />
           <span className="relative size-[8px] rounded-full bg-[#ef4444]" />
         </span>
-        <span className="text-[12px] font-medium text-[#fecaca]">{gift ? "Gift ends in" : "Ends in"}</span>
+        <span className="text-[12px] font-medium text-[#fecaca]">{hw ? (halloweenStage() === "open" ? "Vault closes in" : "Final hours") : gift ? "Gift ends in" : "Ends in"}</span>
         <span className="tabular text-[15px] font-semibold tracking-[0.01em] text-white">
           {parts.map(([v, u]) => (
             <span key={u} className="mr-[4px] last:mr-0">
@@ -587,6 +613,231 @@ function OfferDetails({ p, giftParts }: { p: Pick; giftParts: [string, string][]
         <Svg d={IC.check} size={12} color="#4ade80" w={3} />
       </span>
     </motion.div>
+  );
+}
+
+/* ------------------------------ Halloween vault ----------------------------- */
+
+const VAULT_OPEN_EVENT = "fyt:vault-open";
+
+/** Brushed-steel dial that turns when the vault opens. */
+function VaultDial({ open }: { open: boolean }) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.span
+      aria-hidden="true"
+      className="relative flex size-[58px] shrink-0 items-center justify-center rounded-full"
+      style={{ background: "conic-gradient(from 0deg, #c9d8ff, #4a66b8, #dbe5ff, #3a5299, #c9d8ff, #4a66b8, #dbe5ff, #3a5299, #c9d8ff)", boxShadow: `inset 0 0 0 4px #0c1a45, 0 0 0 1px rgba(191,219,254,0.35), 0 10px 26px -8px rgba(0,0,0,0.8)` }}
+      animate={{ rotate: open ? 210 : 0 }}
+      transition={reduce ? { duration: 0 } : { duration: 1.1, ease: [0.3, 0.7, 0.2, 1] }}
+    >
+      {Array.from({ length: 12 }, (_, k) => (
+        <span key={k} className="absolute left-1/2 top-[5px] h-[5px] w-px -translate-x-1/2" style={{ background: "rgba(12,26,69,0.55)", transform: `rotate(${k * 30}deg)`, transformOrigin: "50% 24px" }} />
+      ))}
+      <span className="absolute inset-[15px] rounded-full" style={{ background: "radial-gradient(circle at 40% 35%, #1b2f6e, #08112c 70%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15)" }} />
+      <span className="absolute left-1/2 top-[4px] h-[11px] w-[3px] -translate-x-1/2 rounded-full" style={{ background: EMBER, boxShadow: `0 0 10px ${EMBER}` }} />
+    </motion.span>
+  );
+}
+
+/** Replaces the offer switch while Halloween runs: one card, tap to open, pick 2 treats. */
+function VaultCard({ p }: { p: Pick }) {
+  const reduce = useReducedMotion();
+  const [open, setOpen] = useState(() => p.treats.length > 0);
+  const [nudge, setNudge] = useState(0);
+  useEffect(() => {
+    const on = () => {
+      setOpen(true);
+      setNudge((n) => n + 1);
+    };
+    window.addEventListener(VAULT_OPEN_EVENT, on);
+    return () => window.removeEventListener(VAULT_OPEN_EVENT, on);
+  }, []);
+  const count = p.treats.length;
+  return (
+    <div id="fyt-vault" className="flex scroll-mt-[120px] flex-col gap-[10px]">
+      <motion.button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="relative flex w-full cursor-pointer items-center gap-[14px] overflow-hidden rounded-[22px] border-0 p-[14px] text-left text-white"
+        style={{ background: "linear-gradient(150deg, #2448b8 0%, #142c74 42%, #0a1434 100%)", boxShadow: "0 0 0 1px rgba(147,197,253,0.38), 0 30px 60px -30px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.2)" }}
+        animate={reduce || open ? undefined : { boxShadow: ["0 0 0 1px rgba(147,197,253,0.38), 0 30px 60px -30px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.2)", `0 0 0 1px rgba(255,138,61,0.6), 0 26px 60px -22px rgba(255,138,61,0.55), inset 0 1px 0 rgba(255,255,255,0.2)`, "0 0 0 1px rgba(147,197,253,0.38), 0 30px 60px -30px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.2)"] }}
+        transition={reduce || open ? undefined : { duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {!reduce && (
+          <motion.span aria-hidden="true" className="pointer-events-none absolute inset-y-0 w-[40%]" style={{ background: "linear-gradient(100deg, transparent, rgba(255,255,255,0.14), transparent)" }} initial={{ left: "-50%" }} animate={{ left: ["-50%", "130%"] }} transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }} />
+        )}
+        <span aria-hidden="true" className="pointer-events-none absolute -right-[40px] -top-[50px] size-[150px] rounded-full" style={{ background: `radial-gradient(circle, rgba(255,138,61,0.22), transparent 65%)` }} />
+        <VaultDial open={open} />
+        <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
+          <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}>Halloween · The Haunted Vault</span>
+          <span className="text-[21px] font-semibold leading-[1.05] tracking-[-0.025em]">
+            45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO</span>
+          </span>
+          <span className="text-[12px] font-medium text-[#bfdbfe]">{open ? (count >= TREAT_PICKS ? "Vault unlocked. Treats saved." : `Pick any ${TREAT_PICKS} treats below · ${count}/${TREAT_PICKS}`) : `+ any ${TREAT_PICKS} treats inside · tap to open`}</span>
+        </span>
+        <motion.span className="relative flex size-[30px] shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.3 }}>
+          <Svg d="M6 9l6 6 6-6" size={14} color="#fff" w={2.4} />
+        </motion.span>
+      </motion.button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div key="treats" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.4, ease: EASE }} className="overflow-hidden">
+            <motion.div key={nudge} className="flex flex-col gap-[8px] rounded-[20px] p-[10px]" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${nudge ? "rgba(255,138,61,0.45)" : LINE}` }} animate={reduce || !nudge ? undefined : { x: [0, -6, 6, -4, 4, 0] }} transition={{ duration: 0.45 }}>
+              <div className="flex items-center justify-between px-[4px] pt-[2px]">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Pick your {TREAT_PICKS} treats</span>
+                <span className="flex items-center gap-[5px]">
+                  {Array.from({ length: TREAT_PICKS }, (_, k) => (
+                    <span key={k} className="h-[5px] w-[22px] rounded-full transition-colors duration-300" style={{ background: k < count ? EMBER : "rgba(255,255,255,0.14)" }} />
+                  ))}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-[6px] sm:grid-cols-2">
+                {TREATS.map((t) => {
+                  const on = p.treats.includes(t.id);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => p.toggleTreat(t.id)}
+                      className="flex h-[54px] cursor-pointer items-center gap-[10px] rounded-[14px] px-[10px] text-left text-white transition-[background,border-color,opacity] duration-200"
+                      style={{ border: `1px solid ${on ? "rgba(255,138,61,0.75)" : "rgba(148,178,255,0.12)"}`, background: on ? "linear-gradient(135deg, rgba(255,138,61,0.18), rgba(37,99,235,0.1))" : "rgba(255,255,255,0.025)", opacity: count >= TREAT_PICKS && !on ? 0.62 : 1 }}
+                    >
+                      <span className="flex size-[30px] shrink-0 items-center justify-center rounded-[10px]" style={{ background: on ? "rgba(255,138,61,0.2)" : "rgba(59,130,246,0.14)" }}>
+                        <Svg d={t.d} size={15} color={on ? EMBER_SOFT : "#93c5fd"} w={1.9} />
+                      </span>
+                      <span className="flex min-w-0 flex-1 flex-col leading-tight">
+                        <span className="truncate text-[13px] font-semibold">{t.name}</span>
+                        <span className="truncate text-[11px]" style={{ color: on ? "#fed7aa" : MUTED }}>{t.line}</span>
+                      </span>
+                      <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full" style={{ border: `1.5px solid ${on ? EMBER : "#4b5568"}`, background: on ? EMBER : "transparent" }}>
+                        {on && <Svg d={IC.check} size={10} color="#1a0a00" w={3.4} />}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <OfferDetails p={p} giftParts={null} />
+    </div>
+  );
+}
+
+/** "Your vault" line above the CTA: the deal plus the 2 chosen treats (empty slots open the vault). */
+function VaultSummary({ p }: { p: Pick }) {
+  const names = p.treats.map((id) => TREATS.find((t) => t.id === id)?.name ?? id);
+  const chip = "flex h-[28px] items-center gap-[6px] rounded-full px-[10px] text-[11.5px] font-semibold";
+  return (
+    <div className="flex flex-wrap items-center gap-[6px]">
+      <span className="mr-[2px] text-[11px] font-semibold uppercase tracking-[0.14em] text-[#93c5fd]">Your vault</span>
+      <span className={chip} style={{ background: "rgba(59,130,246,0.18)", color: "#dbeafe" }}>45% OFF</span>
+      <span className={chip} style={{ background: "rgba(59,130,246,0.18)", color: "#dbeafe" }}>+ BOGO</span>
+      {Array.from({ length: TREAT_PICKS }, (_, k) =>
+        names[k] ? (
+          <span key={k} className={chip} style={{ background: "rgba(255,138,61,0.16)", color: "#ffd9bf", border: "1px solid rgba(255,138,61,0.4)" }}>
+            <Svg d={IC.check} size={10} color={EMBER_SOFT} w={3} />
+            {names[k]}
+          </span>
+        ) : (
+          <button key={k} type="button" onClick={() => openVault()} className={`${chip} cursor-pointer bg-transparent`} style={{ border: "1px dashed rgba(255,138,61,0.55)", color: EMBER_SOFT }}>
+            + Pick treat {k + 1}
+          </button>
+        ),
+      )}
+    </div>
+  );
+}
+
+function openVault() {
+  window.dispatchEvent(new Event(VAULT_OPEN_EVENT));
+  document.getElementById("fyt-vault")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+const EXIT_KEY = "fyt_hw_exit_v1";
+
+/** Desktop exit intent, once per session: "Don't leave the vault open". */
+function VaultExitPopup() {
+  const reduce = useReducedMotion();
+  const [show, setShow] = useState(false);
+  const parts = useCountdown(HALLOWEEN_END);
+  useEffect(() => {
+    if (typeof window === "undefined" || window.matchMedia?.("(pointer: coarse)").matches) return;
+    let seen = false;
+    try {
+      seen = window.sessionStorage.getItem(EXIT_KEY) === "1";
+    } catch {
+      // ignore
+    }
+    if (seen) return;
+    const armedAt = Date.now() + 8000;
+    const onOut = (e: MouseEvent) => {
+      if (e.relatedTarget || e.clientY > 8 || Date.now() < armedAt) return;
+      try {
+        window.sessionStorage.setItem(EXIT_KEY, "1");
+      } catch {
+        // ignore
+      }
+      document.removeEventListener("mouseout", onOut);
+      setShow(true);
+    };
+    document.addEventListener("mouseout", onOut);
+    return () => document.removeEventListener("mouseout", onOut);
+  }, []);
+  useEffect(() => {
+    if (!show) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setShow(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [show]);
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <AnimatePresence>
+      {show && (
+        <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-center justify-center p-[16px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Halloween offer">
+          <button type="button" aria-label="Close" onClick={() => setShow(false)} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.78)", backdropFilter: "blur(8px)" }} />
+          <motion.div
+            className="relative w-full max-w-[420px] overflow-hidden rounded-[28px] px-[24px] pb-[24px] pt-[30px] text-center text-white"
+            style={{ background: "radial-gradient(120% 70% at 50% 0%, #1f3f9e 0%, #0b1638 55%, #060c1d 100%)", border: "1px solid rgba(147,197,253,0.35)", boxShadow: "0 60px 120px -40px rgba(37,99,235,0.7), inset 0 1px 0 rgba(255,255,255,0.15)" }}
+            initial={reduce ? false : { scale: 0.94, y: 18 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: EASE }}
+          >
+            <button type="button" onClick={() => setShow(false)} aria-label="Close" className="absolute right-[12px] top-[12px] flex size-[34px] cursor-pointer items-center justify-center rounded-full border-0" style={{ background: "rgba(255,255,255,0.08)" }}>
+              <Svg d="M6 6l12 12M18 6L6 18" size={14} color="#fff" w={2.2} />
+            </button>
+            <div className="mx-auto mb-[16px] flex justify-center"><VaultDial open={false} /></div>
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: EMBER_SOFT }}>Wait, the vault is still open</span>
+            <h3 className="m-0 mt-[8px] text-[27px] font-semibold leading-[1.12] tracking-[-0.03em]">Don't leave your treats behind.</h3>
+            <p className="m-0 mt-[10px] text-[14.5px]" style={{ color: SOFT }}>45% off + BOGO instantly + any 2 treats of your choice.</p>
+            <p className="m-0 mt-[14px] text-[13px] text-[#fed7aa]">
+              Closes in <b className="tabular text-white">{parts.map(([v, u]) => `${v}${u}`).join(" ")}</b>
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setShow(false);
+                window.setTimeout(openVault, 250);
+              }}
+              className="mt-[18px] flex h-[56px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[18px] border-0 text-[16px] font-bold text-white"
+              style={{ background: BLUE, boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95)" }}
+            >
+              Keep my treats
+              <Svg d="M5 12h14M13 6l6 6-6 6" size={16} color="#fff" w={2.6} />
+            </button>
+            <button type="button" onClick={() => setShow(false)} className="mt-[10px] cursor-pointer border-0 bg-transparent text-[13px]" style={{ color: MUTED }}>
+              Maybe later
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body,
   );
 }
 
@@ -666,6 +917,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
   const reduce = useReducedMotion();
   const first = useRef(true);
   const [compare, setCompare] = useState(false);
+  const nudged = useRef(false);
 
   // Remember the visitor's plan (welcome-back card) - skip the default on load.
   useEffect(() => {
@@ -698,9 +950,9 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
     <section id="challenge" className="fyt-rd relative w-full shrink-0 scroll-mt-[120px] overflow-hidden" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, #03060d 70%)`, color: "#eef0f6" }}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-[18px] px-[16px] pb-[64px] pt-[56px] lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-[48px] lg:px-[40px] lg:pb-[110px] lg:pt-[110px]">
-        <div className="flex flex-col gap-[18px] lg:sticky lg:top-[140px] lg:self-start">
+        <div className={`flex flex-col gap-[18px] lg:self-start ${p.halloween ? "" : "lg:sticky lg:top-[140px]"}`}>
           {heading ?? <DefaultHeading />}
-          <OfferSwitch p={p} />
+          {p.halloween ? <VaultCard p={p} /> : <OfferSwitch p={p} />}
           <ModelTabs p={p} />
         </div>
 
@@ -771,8 +1023,17 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                 <PerkGrid p={p} cols={2} />
               </div>
 
+              {p.halloween && <VaultSummary p={p} />}
               <motion.a
                 href={p.co.href}
+                onClick={(e) => {
+                  // First click without treats: open the vault instead, so nobody misses them.
+                  if (p.halloween && p.treats.length < TREAT_PICKS && !nudged.current) {
+                    e.preventDefault();
+                    nudged.current = true;
+                    openVault();
+                  }
+                }}
                 className="relative flex h-[64px] items-center justify-between overflow-hidden rounded-[18px] pl-[20px] pr-[8px] text-white no-underline transition-transform hover:-translate-y-[1px] active:scale-[0.99]"
                 style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 22px 44px -18px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)" }}
                 animate={reduce ? undefined : { boxShadow: ["0 22px 44px -18px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)", "0 22px 60px -10px rgba(59,130,246,1), inset 0 1px 0 rgba(255,255,255,0.3)", "0 22px 44px -18px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)"] }}
@@ -793,7 +1054,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                     <Roll value={money(p.price)} className="text-[24px] font-bold leading-none" />
                     <s className="text-[13px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
                   </span>
-                  <span className="mt-[3px] text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}</span>
+                  <span className="mt-[3px] text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}{p.halloween ? " · + BOGO" : ""}</span>
                 </span>
                 <span className="relative flex items-center gap-[6px] rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
                   Get funded
@@ -808,6 +1069,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
           </motion.div>
         </AnimatePresence>
       </div>
+      {p.halloween && <VaultExitPopup />}
     </section>
   );
 }
