@@ -32,7 +32,7 @@ describe("HERO_CONTENT", () => {
       "Static Drawdown",
     ]);
     expect(HERO_CONTENT.ctaPrimary).toEqual({ label: "Get Started Now", href: "#challenge" });
-    expect(HERO_CONTENT.ctaSecondary).toEqual({ label: "Chat with us", href: "https://discord.gg/6NYNSAwxeZ" });
+    expect(HERO_CONTENT.ctaSecondary).toEqual({ label: "Chat with us", href: "https://discord.gg/fundingyourtrades" });
   });
 });
 
@@ -254,7 +254,7 @@ describe("FOOTER_LINKS", () => {
       { label: "Refund Policy", href: "https://fundingyourtrades.com/refund_returns/" },
     ]);
     expect(FOOTER_LINKS.social).toEqual([
-      { label: "Discord", href: "https://discord.gg/6NYNSAwxeZ" },
+      { label: "Discord", href: "https://discord.gg/fundingyourtrades" },
       { label: "Instagram", href: "https://www.instagram.com/fundingyourtrades" },
       { label: "Telegram", href: "https://t.me/fundingyourtrades" },
       { label: "X", href: "https://x.com/fundingurtrades" },
