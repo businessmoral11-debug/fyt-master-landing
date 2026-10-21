@@ -101,6 +101,10 @@ for (const vp of vps) {
   await sleep(500);
   await page.screenshot({ path: `${OUT}/${vp.name}-07b-giveaway-filled.png` });
   log.push(`[giveaway ${vp.name}] dialog=${await dlg.count()}`);
+  await dlg.getByRole("button", { name: "No thanks" }).click().catch(() => {});
+  await page.evaluate(() => window.scrollTo(0, 2500));
+  await sleep(1500);
+  await page.screenshot({ path: `${OUT}/${vp.name}-07c-teaser.png` });
   await ctx.close();
 }
 // Live dates: without the flag the launch offer should still show on a non-vercel host.

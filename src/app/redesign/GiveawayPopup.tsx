@@ -39,7 +39,7 @@ async function subscribe(email: string, name: string): Promise<boolean> {
             attributes: {
               email,
               ...(name ? { first_name: name } : {}),
-              properties: { signup_source: "Website pop-up", signup_offer: "200K giveaway" },
+              properties: { signup_source: "Website pop-up", signup_offer: "200K giveaway + 45% off + bonus account + 5% wallet cashback" },
             },
           },
         },
@@ -70,39 +70,70 @@ function pricingInView(): boolean {
   return r.top < window.innerHeight * 0.8 && r.bottom > window.innerHeight * 0.2;
 }
 
-/** Glossy "funded account" card: the prize, shown as an object instead of a paragraph. */
+const PERKS = [
+  { label: "45% OFF", sub: "on your challenge", d: "M3 12V4h8l10 10-8 8L3 12zM7.5 7.5h.01" },
+  { label: "Free bonus", sub: "account instantly", d: "M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7Zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7Z" },
+  { label: "5% cashback", sub: "to your FYT wallet", d: "M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M16 14h.01" },
+];
+
+function Icon({ d, size = 16, color = "#93c5fd", w = 1.9 }: { d: string; size?: number; color?: string; w?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
+      <path d={d} />
+    </svg>
+  );
+}
+
+/** Glossy "funded account" card: the prize as an object. Tilts with the pointer on desktop. */
 function PrizeCard() {
   const reduce = useReducedMotion();
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
   return (
-    <motion.div
-      aria-hidden="true"
-      className="relative mx-auto h-[150px] w-[250px] overflow-hidden rounded-[20px] p-[16px] text-left sm:h-[164px] sm:w-[272px]"
-      style={{
-        background: "linear-gradient(135deg, #3b7bff 0%, #1d4ed8 38%, #0f2a7a 70%, #0a1a4d 100%)",
-        boxShadow: "0 30px 60px -24px rgba(37,99,235,0.9), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 0 0 1px rgba(191,219,254,0.25)",
+    <div
+      className="relative flex items-center justify-center [perspective:900px]"
+      onPointerMove={(e) => {
+        if (reduce || e.pointerType !== "mouse") return;
+        const r = e.currentTarget.getBoundingClientRect();
+        setTilt({ x: ((e.clientY - r.top) / r.height - 0.5) * -10, y: ((e.clientX - r.left) / r.width - 0.5) * 14 });
       }}
-      initial={reduce ? false : { rotate: -6, y: 14, opacity: 0 }}
-      animate={{ rotate: -4, y: 0, opacity: 1 }}
-      transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+      onPointerLeave={() => setTilt({ x: 0, y: 0 })}
     >
-      {!reduce && (
-        <motion.span className="pointer-events-none absolute inset-y-0 w-[45%]" style={{ background: "linear-gradient(100deg, transparent, rgba(255,255,255,0.28), transparent)" }} initial={{ left: "-60%" }} animate={{ left: ["-60%", "140%"] }} transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2.8, ease: "easeInOut" }} />
-      )}
-      <span className="absolute -right-[40px] -top-[50px] size-[160px] rounded-full" style={{ background: "radial-gradient(circle, rgba(255,255,255,0.25), transparent 65%)" }} />
-      <div className="relative flex items-start justify-between">
-        <span className="text-[9.5px] font-semibold uppercase leading-[1.25] tracking-[0.14em] text-white/85">Funding Your<br />Trades</span>
-        <span className="rounded-full px-[8px] py-[3px] text-[9px] font-bold uppercase tracking-[0.12em] text-[#0a1a4d]" style={{ background: "linear-gradient(180deg,#fff,#dbeafe)" }}>Funded</span>
-      </div>
-      <span className="relative mt-[14px] block h-[22px] w-[30px] rounded-[5px]" style={{ background: "linear-gradient(135deg,#fde68a,#d4a73a)", boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.15)" }} />
-      <div className="relative mt-[10px] flex items-end justify-between">
-        <span className="flex flex-col">
-          <span className="text-[9px] font-medium uppercase tracking-[0.14em] text-white/70">Account balance</span>
-          <span className="tabular text-[26px] font-bold leading-none tracking-[-0.02em] text-white sm:text-[28px]">$200,000</span>
-        </span>
-        <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/70">Winner</span>
-      </div>
-    </motion.div>
+      <span aria-hidden="true" className="absolute left-1/2 top-1/2 size-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "radial-gradient(circle, rgba(59,130,246,0.45), transparent 62%)", filter: "blur(6px)" }} />
+      <motion.div
+        aria-hidden="true"
+        className="relative h-[150px] w-[244px] overflow-hidden rounded-[20px] p-[16px] text-left sm:h-[172px] sm:w-[280px]"
+        style={{
+          background: "linear-gradient(135deg, #4b86ff 0%, #1d4ed8 36%, #102b7d 68%, #08154a 100%)",
+          boxShadow: "0 34px 70px -26px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 0 0 1px rgba(191,219,254,0.28)",
+          transformStyle: "preserve-3d",
+        }}
+        initial={reduce ? false : { rotateZ: -8, y: 18, opacity: 0 }}
+        animate={{ rotateZ: -4, rotateX: tilt.x, rotateY: tilt.y, y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 140, damping: 18 }}
+      >
+        <span className="pointer-events-none absolute inset-0 opacity-[0.18]" style={{ backgroundImage: "repeating-linear-gradient(115deg, rgba(255,255,255,0.5) 0 1px, transparent 1px 9px)" }} />
+        {!reduce && (
+          <motion.span className="pointer-events-none absolute inset-y-0 w-[45%]" style={{ background: "linear-gradient(100deg, transparent, rgba(255,255,255,0.3), transparent)" }} initial={{ left: "-60%" }} animate={{ left: ["-60%", "140%"] }} transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }} />
+        )}
+        <div className="relative flex items-start justify-between">
+          <span className="text-[9.5px] font-semibold uppercase leading-[1.25] tracking-[0.16em] text-white/85">Funding Your<br />Trades</span>
+          <span className="rounded-full px-[8px] py-[3px] text-[9px] font-bold uppercase tracking-[0.14em] text-[#08154a]" style={{ background: "linear-gradient(180deg,#fff,#dbeafe)" }}>Funded</span>
+        </div>
+        <span className="relative mt-[14px] block h-[22px] w-[30px] rounded-[5px] sm:mt-[18px]" style={{ background: "linear-gradient(135deg,#fde68a,#c9972e)", boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.18)" }} />
+        <div className="relative mt-[10px] flex items-end justify-between">
+          <span className="flex flex-col">
+            <span className="text-[9px] font-medium uppercase tracking-[0.16em] text-white/70">Account balance</span>
+            <span className="tabular text-[26px] font-bold leading-none tracking-[-0.02em] text-white sm:text-[30px]">$200,000</span>
+          </span>
+          <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/70">Winner</span>
+        </div>
+      </motion.div>
+    </div>
   );
+}
+
+function Check({ size = 12 }: { size?: number }) {
+  return <Icon d="M5 12.5l4.5 4.5L19 7.5" size={size} color="#4ade80" w={3} />;
 }
 
 function GiveawayDialog({ onClose }: { onClose: () => void }) {
@@ -130,83 +161,159 @@ function GiveawayDialog({ onClose }: { onClose: () => void }) {
     } else setState("error");
   };
 
-  const input = "h-[52px] w-full rounded-[14px] border-0 px-[16px] text-[15px] text-white outline-none transition-shadow placeholder:text-[#7f8aa6] focus:shadow-[0_0_0_2px_#60a5fa]";
-  const inputStyle = { background: "rgba(255,255,255,0.06)", boxShadow: "inset 0 0 0 1px rgba(148,178,255,0.18)" };
+  const field = "group flex h-[52px] w-full items-center gap-[10px] rounded-[14px] px-[14px] transition-shadow focus-within:shadow-[0_0_0_2px_#60a5fa]";
+  const fieldStyle = { background: "rgba(255,255,255,0.05)", boxShadow: "inset 0 0 0 1px rgba(148,178,255,0.18)" };
+  const input = "h-full w-full min-w-0 border-0 bg-transparent text-[15px] text-white outline-none placeholder:text-[#7f8aa6]";
 
   return createPortal(
-    <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-end justify-center sm:items-center sm:p-[16px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="FYT Private Giveaway">
-      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.75)", backdropFilter: "blur(8px)" }} />
+    <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-end justify-center md:items-center md:p-[20px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="FYT Private Giveaway">
+      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.78)", backdropFilter: "blur(10px)" }} />
       <motion.div
-        className="relative max-h-[94vh] w-full max-w-[440px] overflow-y-auto rounded-t-[28px] px-[22px] pb-[max(22px,env(safe-area-inset-bottom))] pt-[26px] text-center text-white sm:rounded-[28px] sm:px-[30px] sm:pb-[28px]"
-        style={{ background: "radial-gradient(120% 55% at 50% 0%, #15307e 0%, #0a1433 55%, #060c1d 100%)", boxShadow: "0 0 0 1px rgba(147,197,253,0.22), 0 60px 120px -40px rgba(37,99,235,0.7), inset 0 1px 0 rgba(255,255,255,0.12)" }}
-        initial={reduce ? false : { y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        className="relative grid max-h-[94vh] w-full max-w-[860px] overflow-y-auto rounded-t-[28px] text-white md:grid-cols-[1fr_1.05fr] md:overflow-hidden md:rounded-[30px]"
+        style={{ background: "#070d22", boxShadow: "0 0 0 1px rgba(147,197,253,0.2), 0 70px 140px -40px rgba(37,99,235,0.65)" }}
+        initial={reduce ? false : { y: 40, opacity: 0, scale: 0.98 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={reduce ? { opacity: 0 } : { y: 40, opacity: 0 }}
-        transition={{ duration: 0.45, ease: EASE }}
+        transition={{ duration: 0.5, ease: EASE }}
       >
-        <button type="button" onClick={onClose} aria-label="Close" className="absolute right-[14px] top-[14px] z-[1] flex size-[34px] cursor-pointer items-center justify-center rounded-full border-0" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        <button type="button" onClick={onClose} aria-label="Close" className="absolute right-[14px] top-[14px] z-[3] flex size-[34px] cursor-pointer items-center justify-center rounded-full border-0" style={{ background: "rgba(255,255,255,0.08)" }}>
+          <Icon d="M6 6l12 12M18 6L6 18" size={14} color="#fff" w={2.2} />
         </button>
 
-        <PrizeCard />
+        {/* Visual side */}
+        <div className="relative flex flex-col items-center justify-center gap-[18px] overflow-hidden px-[22px] pb-[8px] pt-[34px] md:px-[30px] md:py-[44px]" style={{ background: "radial-gradient(90% 70% at 50% 35%, #1b3c9c 0%, #0b1840 55%, #070d22 100%)" }}>
+          <span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.35]" style={{ backgroundImage: "linear-gradient(rgba(148,178,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,178,255,0.08) 1px, transparent 1px)", backgroundSize: "34px 34px", maskImage: "radial-gradient(70% 60% at 50% 40%, #000, transparent)", WebkitMaskImage: "radial-gradient(70% 60% at 50% 40%, #000, transparent)" }} />
+          <PrizeCard />
+          <span className="relative hidden items-center gap-[8px] rounded-full px-[12px] py-[6px] text-[11.5px] font-medium text-[#bfdbfe] md:inline-flex" style={{ background: "rgba(255,255,255,0.06)", boxShadow: "inset 0 0 0 1px rgba(148,178,255,0.2)" }}>
+            <span className="relative flex size-[7px]">
+              <span className="absolute inset-0 animate-ping rounded-full bg-[#4ade80] opacity-60" />
+              <span className="relative size-[7px] rounded-full bg-[#4ade80]" />
+            </span>
+            Entries open now
+          </span>
+        </div>
 
-        <AnimatePresence mode="wait" initial={false}>
-          {state !== "done" ? (
-            <motion.form key="form" onSubmit={submit} exit={{ opacity: 0, y: -8 }} className="mt-[22px] flex flex-col items-center gap-[12px]" noValidate>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#93c5fd]">The FYT Private Giveaway</span>
-              <h3 className="m-0 text-[28px] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-[31px]">
-                A <span className="fyt-gradient-text">$200K</span> funded account.
-                <br />
-                Yours to win.
-              </h3>
-              <div className="mt-[2px] flex flex-col items-center gap-[8px]">
-                <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#8e98b0]">Your entry also unlocks</span>
-                <div className="flex flex-wrap justify-center gap-[8px]">
-                  {["45% OFF", "Free bonus account"].map((t) => (
-                    <span key={t} className="flex items-center gap-[6px] rounded-full px-[12px] py-[6px] text-[12.5px] font-semibold text-[#dbeafe]" style={{ background: "rgba(59,130,246,0.16)", boxShadow: "inset 0 0 0 1px rgba(96,165,250,0.35)" }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
-                      {t}
-                    </span>
-                  ))}
+        {/* Form side */}
+        <div className="relative px-[22px] pb-[max(22px,env(safe-area-inset-bottom))] pt-[18px] md:px-[34px] md:py-[40px]">
+          <AnimatePresence mode="wait" initial={false}>
+            {state !== "done" ? (
+              <motion.form key="form" onSubmit={submit} exit={{ opacity: 0, y: -8 }} className="flex flex-col gap-[14px] text-center md:text-left" noValidate>
+                <span className="flex items-center justify-center gap-[10px] text-[10.5px] font-semibold uppercase tracking-[0.24em] text-[#93c5fd] md:justify-start">
+                  <span className="h-px w-[22px] bg-[#3b82f6]" />
+                  The FYT Private Giveaway
+                </span>
+                <h3 className="m-0 text-[29px] font-semibold leading-[1.06] tracking-[-0.035em] md:text-[34px]">
+                  A <span className="fyt-gradient-text">$200K</span> funded account. Yours to win.
+                </h3>
+                <div className="flex flex-col gap-[8px]">
+                  <span className="text-[10.5px] font-medium uppercase tracking-[0.18em] text-[#8e98b0]">Your entry also unlocks</span>
+                  <div className="grid grid-cols-3 gap-[8px]">
+                    {PERKS.map((k) => (
+                      <div key={k.label} className="flex flex-col items-center gap-[6px] rounded-[14px] px-[6px] py-[10px] text-center md:items-start md:px-[10px] md:text-left" style={{ background: "linear-gradient(180deg, rgba(59,130,246,0.14), rgba(59,130,246,0.04))", boxShadow: "inset 0 0 0 1px rgba(96,165,250,0.22)" }}>
+                        <span className="flex size-[28px] items-center justify-center rounded-[9px]" style={{ background: "rgba(59,130,246,0.2)" }}>
+                          <Icon d={k.d} size={15} />
+                        </span>
+                        <span className="flex flex-col leading-tight">
+                          <span className="text-[12.5px] font-semibold text-white">{k.label}</span>
+                          <span className="text-[10.5px] text-[#8e98b0]">{k.sub}</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div className="mt-[6px] flex w-full flex-col gap-[10px]">
-                <input type="email" inputMode="email" autoComplete="email" required placeholder="Enter your email address" aria-label="Email address" value={email} onChange={(e) => { setEmail(e.target.value); if (state === "error") setState("idle"); }} className={input} style={inputStyle} />
-                <input type="text" autoComplete="given-name" placeholder="Your name" aria-label="Your name" value={name} onChange={(e) => setName(e.target.value)} className={input} style={inputStyle} />
-              </div>
-              <button
-                type="submit"
-                disabled={!valid || state === "sending"}
-                className="relative mt-[4px] flex h-[56px] w-full cursor-pointer items-center justify-center gap-[8px] overflow-hidden rounded-[16px] border-0 text-[16px] font-bold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
-                style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)" }}
-              >
-                {state === "sending" ? "Securing your entry..." : "Secure my entry"}
-                {state !== "sending" && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>}
-              </button>
-              {state === "error" && <span className="text-[12.5px] text-[#fca5a5]">Something went wrong. Please try again.</span>}
-              <button type="button" onClick={onClose} className="cursor-pointer border-0 bg-transparent text-[13px] text-[#7f8aa6] hover:text-[#c7d2e6]">No thanks</button>
-              <span className="text-[10.5px] leading-[1.4] text-[#5f6a85]">By entering you agree to receive emails from FundingYourTrades. Unsubscribe anytime.</span>
-            </motion.form>
-          ) : (
-            <motion.div key="done" initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }} className="mt-[22px] flex flex-col items-center gap-[12px]">
-              <span className="flex size-[44px] items-center justify-center rounded-full bg-[#22c55e]" style={{ boxShadow: "0 12px 30px -10px rgba(34,197,94,0.8)" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#04210f" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
-              </span>
-              <h3 className="m-0 text-[26px] font-semibold leading-[1.1] tracking-[-0.03em]">You're in.</h3>
-              <p className="m-0 text-[14.5px] leading-[1.5] text-[#c7d2e6]">Your entry is secured. Check your inbox for your 45% off code and bonus account.</p>
-              <a
-                href="#challenge"
-                onClick={onClose}
-                className="mt-[6px] flex h-[56px] w-full items-center justify-center gap-[8px] rounded-[16px] text-[16px] font-bold text-white no-underline"
-                style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95)" }}
-              >
-                See accounts
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-              </a>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                <div className="mt-[2px] flex flex-col gap-[10px]">
+                  <label className={field} style={fieldStyle}>
+                    <Icon d="M4 6h16v12H4zM4 7l8 6 8-6" size={16} color="#7f8aa6" />
+                    <input type="email" inputMode="email" autoComplete="email" required placeholder="Your email address" aria-label="Email address" value={email} onChange={(e) => { setEmail(e.target.value); if (state === "error") setState("idle"); }} className={input} />
+                    {valid && <Check size={14} />}
+                  </label>
+                  <label className={field} style={fieldStyle}>
+                    <Icon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0" size={16} color="#7f8aa6" />
+                    <input type="text" autoComplete="given-name" placeholder="Your name" aria-label="Your name" value={name} onChange={(e) => setName(e.target.value)} className={input} />
+                  </label>
+                </div>
+                <button
+                  type="submit"
+                  disabled={!valid || state === "sending"}
+                  className="relative flex h-[56px] w-full cursor-pointer items-center justify-center gap-[8px] overflow-hidden rounded-[16px] border-0 text-[16px] font-bold text-white transition-[opacity,transform] hover:-translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                  style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)" }}
+                >
+                  {!reduce && valid && state === "idle" && (
+                    <motion.span aria-hidden="true" className="pointer-events-none absolute inset-y-0 w-[40%]" style={{ background: "linear-gradient(100deg, transparent, rgba(255,255,255,0.25), transparent)" }} initial={{ left: "-50%" }} animate={{ left: ["-50%", "130%"] }} transition={{ duration: 1.3, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }} />
+                  )}
+                  {state === "sending" ? "Securing your entry..." : "Secure my entry"}
+                  {state !== "sending" && <Icon d="M5 12h14M13 6l6 6-6 6" size={16} color="#fff" w={2.6} />}
+                </button>
+                {state === "error" && <span className="text-[12.5px] text-[#fca5a5]">Something went wrong. Please try again.</span>}
+                <div className="flex flex-col items-center gap-[6px] md:items-start">
+                  <button type="button" onClick={onClose} className="cursor-pointer border-0 bg-transparent p-0 text-[13px] text-[#7f8aa6] hover:text-[#c7d2e6]">No thanks</button>
+                  <span className="text-[10.5px] leading-[1.45] text-[#56617c]">By entering you agree to receive emails from FundingYourTrades. Unsubscribe anytime.</span>
+                </div>
+              </motion.form>
+            ) : (
+              <motion.div key="done" initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }} className="flex flex-col items-center gap-[12px] text-center md:items-start md:py-[30px] md:text-left">
+                <span className="flex size-[46px] items-center justify-center rounded-full bg-[#22c55e]" style={{ boxShadow: "0 12px 30px -10px rgba(34,197,94,0.8)" }}>
+                  <Icon d="M5 12.5l4.5 4.5L19 7.5" size={20} color="#04210f" w={3} />
+                </span>
+                <h3 className="m-0 text-[28px] font-semibold leading-[1.1] tracking-[-0.03em]">You're in.</h3>
+                <p className="m-0 text-[14.5px] leading-[1.55] text-[#c7d2e6]">Your entry is secured. Your 45% off code, bonus account and 5% wallet cashback details are on their way to your inbox.</p>
+                <a href="#challenge" onClick={onClose} className="mt-[6px] flex h-[56px] w-full items-center justify-center gap-[8px] rounded-[16px] text-[16px] font-bold text-white no-underline" style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95)" }}>
+                  See accounts
+                  <Icon d="M5 12h14M13 6l6 6-6 6" size={16} color="#fff" w={2.6} />
+                </a>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
+    </motion.div>,
+    document.body,
+  );
+}
+
+const TEASER_HIDE_KEY = "fyt_giveaway_teaser_hidden";
+
+/** After "No thanks": a small tab bottom-left that reopens the giveaway. Never pushy. */
+function GiveawayTeaser({ onOpen }: { onOpen: () => void }) {
+  const reduce = useReducedMotion();
+  const [hidden, setHidden] = useState(() => {
+    try {
+      return window.sessionStorage.getItem(TEASER_HIDE_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  if (hidden) return null;
+  return createPortal(
+    <motion.div
+      className="fyt-rd fixed z-[2147482970] flex items-center"
+      style={{ left: "max(20px, env(safe-area-inset-left, 0px))", bottom: "calc(max(20px, env(safe-area-inset-bottom, 0px)) + 60px)" }}
+      initial={reduce ? false : { opacity: 0, x: -16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.4, ease: EASE }}
+    >
+      <button type="button" onClick={onOpen} className="flex h-[38px] cursor-pointer items-center gap-[8px] rounded-full border-0 py-0 pl-[6px] pr-[12px] text-[12.5px] font-semibold text-white" style={{ background: "linear-gradient(180deg,#1d4ed8,#0f2a7a)", boxShadow: "0 12px 28px -10px rgba(37,99,235,0.9), inset 0 0 0 1px rgba(147,197,253,0.35)" }}>
+        <span className="flex size-[26px] items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.14)" }}>
+          <Icon d={PERKS[1].d} size={14} color="#fff" w={2} />
+        </span>
+        $200K giveaway
+      </button>
+      <button
+        type="button"
+        aria-label="Hide giveaway"
+        onClick={() => {
+          try {
+            window.sessionStorage.setItem(TEASER_HIDE_KEY, "1");
+          } catch {
+            // ignore
+          }
+          setHidden(true);
+        }}
+        className="-ml-[6px] flex size-[20px] cursor-pointer items-center justify-center self-start rounded-full border-0"
+        style={{ background: "#0b1230", boxShadow: "inset 0 0 0 1px rgba(147,197,253,0.3)" }}
+      >
+        <Icon d="M6 6l12 12M18 6L6 18" size={9} color="#c7d2e6" w={2.6} />
+      </button>
     </motion.div>,
     document.body,
   );
@@ -214,6 +321,7 @@ function GiveawayDialog({ onClose }: { onClose: () => void }) {
 
 export function GiveawayPopup() {
   const [open, setOpen] = useState(false);
+  const [teaser, setTeaser] = useState(() => !!store(SEEN_KEY) && !store(DONE_KEY));
   useEffect(() => {
     const forced = new URLSearchParams(window.location.search).get("giveaway") === "1";
     if (forced) {
@@ -226,6 +334,12 @@ export function GiveawayPopup() {
 
     let fired = false;
     let retry = 0;
+    let timer = 0;
+    const cleanup = () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(retry);
+      window.removeEventListener("scroll", onScroll);
+    };
     const tryOpen = () => {
       if (fired) return;
       if (otherDialogOpen() || pricingInView()) {
@@ -239,18 +353,22 @@ export function GiveawayPopup() {
       setOpen(true);
       cleanup();
     };
-    const onScroll = () => {
+    function onScroll() {
       const h = document.documentElement.scrollHeight - window.innerHeight;
       if (h > 0 && window.scrollY / h > 0.5) tryOpen();
-    };
-    const timer = window.setTimeout(tryOpen, 20000);
+    }
+    timer = window.setTimeout(tryOpen, 20000);
     window.addEventListener("scroll", onScroll, { passive: true });
-    const cleanup = () => {
-      window.clearTimeout(timer);
-      window.clearTimeout(retry);
-      window.removeEventListener("scroll", onScroll);
-    };
     return cleanup;
   }, []);
-  return <AnimatePresence>{open && <GiveawayDialog onClose={() => setOpen(false)} />}</AnimatePresence>;
+  const close = () => {
+    setOpen(false);
+    setTeaser(!store(DONE_KEY));
+  };
+  return (
+    <>
+      <AnimatePresence>{open && <GiveawayDialog onClose={close} />}</AnimatePresence>
+      {teaser && !open && <GiveawayTeaser onOpen={() => setOpen(true)} />}
+    </>
+  );
 }
