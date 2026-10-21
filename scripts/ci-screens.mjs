@@ -28,6 +28,13 @@ try {
   log.push("[api] certificates " + JSON.stringify(c.data?.slice(0, 3)));
   log.push("[api] payouts total " + JSON.stringify(p.meta) + " certs total " + JSON.stringify(c.meta));
 } catch (e) { log.push("[api] fail " + e.message); }
+for (const code of ["6NYNSAwxeZ", "fundingyourtrades"]) {
+  try {
+    const r = await fetch(`https://discord.com/api/v9/invites/${code}?with_counts=true`);
+    const j = await r.json();
+    log.push(`[discord] ${code} http=${r.status} guild=${j.guild?.name} members=${j.approximate_member_count} online=${j.approximate_presence_count} expires=${j.expires_at} code=${j.code} msg=${j.message ?? ""}`);
+  } catch (e) { log.push(`[discord] ${code} fail ${e.message}`); }
+}
 
 const viewports = [
   { name: "desktop", width: 1440, height: 900, mobile: false },
