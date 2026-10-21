@@ -1186,7 +1186,7 @@ function HeroCta({
 }
 
 const HERO_TRUSTINDEX_LOADER_SRC = "https://cdn.trustindex.io/loader.js?e7ec0f57824081211c46a9bf46f";
-const HERO_TRUSTINDEX_REVIEW_LABEL = "4K+ reviews";
+const HERO_TRUSTINDEX_REVIEW_LABEL = "3K+ reviews";
 const HERO_TRUSTINDEX_RATING = "4.5";
 let heroTrustindexScriptInjected = false;
 

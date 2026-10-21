@@ -644,7 +644,7 @@ function TrustRow() {
     <div className="flex flex-wrap items-center justify-center gap-x-[14px] gap-y-[6px] text-[11.5px]" style={{ color: MUTED }}>
       <span className="flex items-center gap-[5px]">
         <span className="text-[#00b67a]" aria-hidden="true">★★★★★</span>
-        <span className="font-semibold text-[#c7d2e6]">4.5/5 · 4K+ reviews</span>
+        <span className="font-semibold text-[#c7d2e6]">4.5/5 · 3K+ reviews</span>
       </span>
       <span>Card or crypto</span>
       <span>Rewards in 24-48h</span>
