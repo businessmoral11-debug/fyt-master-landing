@@ -708,12 +708,11 @@ function VaultCard({ p }: { p: Pick }) {
           <motion.span aria-hidden="true" className="pointer-events-none absolute inset-y-0 w-[40%]" style={{ background: "linear-gradient(100deg, transparent, rgba(255,255,255,0.14), transparent)" }} initial={{ left: "-50%" }} animate={{ left: ["-50%", "130%"] }} transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }} />
         )}
         <span aria-hidden="true" className="pointer-events-none absolute -right-[40px] -top-[50px] size-[150px] rounded-full" style={{ background: `radial-gradient(circle, rgba(255,138,61,0.22), transparent 65%)` }} />
-        <WebCorner className="pointer-events-none absolute right-0 top-0 opacity-[0.22]" size={70} />
         <VaultDial open={open} />
         <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
           <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}><span className="hidden sm:inline">Halloween · </span>The Haunted Vault</span>
-          <span className="text-[21px] font-semibold leading-[1.05] tracking-[-0.025em]">
-            45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO</span>
+          <span className="text-[18px] font-semibold leading-[1.1] tracking-[-0.025em] sm:text-[21px]">
+            45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO instantly</span>
           </span>
           {open ? (
             <span className="text-[12px] font-medium text-[#bfdbfe]">{count >= TREAT_PICKS ? "Vault unlocked. Treats saved." : `Pick any ${TREAT_PICKS} treats below · ${count}/${TREAT_PICKS}`}</span>
@@ -758,7 +757,7 @@ function VaultSummary({ p, onPick }: { p: Pick; onPick: () => void }) {
     <div className="flex flex-wrap items-center gap-[6px]">
       <span className="mr-[2px] text-[11px] font-semibold uppercase tracking-[0.14em] text-[#93c5fd]">Your vault</span>
       <span className={chip} style={{ background: "rgba(59,130,246,0.18)", color: "#dbeafe" }}>45% OFF</span>
-      <span className={chip} style={{ background: "rgba(59,130,246,0.18)", color: "#dbeafe" }}>+ BOGO</span>
+      <span className={chip} style={{ background: "rgba(59,130,246,0.18)", color: "#dbeafe" }}>+ BOGO instantly</span>
       {Array.from({ length: TREAT_PICKS }, (_, k) =>
         names[k] ? (
           <button key={k} type="button" onClick={onPick} className={`${chip} cursor-pointer`} style={{ background: "rgba(255,138,61,0.16)", color: "#ffd9bf", border: "1px solid rgba(255,138,61,0.4)" }}>
@@ -798,7 +797,6 @@ function TreatSheet({ p, onClose }: { p: Pick; onClose: () => void }) {
         exit={reduce ? { opacity: 0 } : { y: 40, opacity: 0 }}
         transition={{ duration: 0.35, ease: EASE }}
       >
-        <WebCorner className="pointer-events-none absolute right-0 top-0 opacity-[0.18]" size={90} />
         <div className="flex items-center gap-[12px]">
           <VaultDial open={done} />
           <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
@@ -827,18 +825,6 @@ function TreatSheet({ p, onClose }: { p: Pick; onClose: () => void }) {
       </motion.div>
     </motion.div>,
     document.body,
-  );
-}
-
-/** Thin spider-web corner, drawn in light strokes. */
-function WebCorner({ className, size = 80 }: { className?: string; size?: number }) {
-  return (
-    <svg aria-hidden="true" className={className} width={size} height={size} viewBox="0 0 80 80" fill="none" stroke="#dbeafe" strokeWidth="0.8">
-      <path d="M80 0L20 60M80 0L46 74M80 0L6 34M80 0L66 80M80 0L0 14" />
-      <path d="M62 0c0 6 4 12 10 14 2 4 6 8 8 8" />
-      <path d="M44 0c-1 11 7 22 17 26 4 9 12 16 19 17" />
-      <path d="M26 0c-2 16 10 32 24 38 6 13 18 23 30 25" />
-    </svg>
   );
 }
 
@@ -1104,7 +1090,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
             style={{ border: "1px solid rgba(96,165,250,0.6)", background: "linear-gradient(180deg, rgba(37,99,235,0.2) 0%, rgba(10,18,40,0.92) 45%)", boxShadow: "0 50px 100px -50px rgba(37,99,235,0.95)" }}
           >
             <span aria-hidden="true" className="pointer-events-none absolute -right-[70px] -top-[80px] size-[240px] rounded-full" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.35), transparent 65%)" }} />
-            {p.halloween && <WebCorner className="pointer-events-none absolute right-0 top-0 opacity-[0.16]" size={120} />}
+            {p.halloween && <span aria-hidden="true" className="pointer-events-none absolute inset-x-[12%] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,138,61,0.85), transparent)" }} />}
             <div className="relative flex flex-col gap-[16px] p-[16px] sm:p-[22px] lg:gap-[18px] lg:p-[28px]">
 
               <div className="flex flex-col gap-[8px]">
@@ -1192,7 +1178,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                     <Roll value={money(p.price)} className="text-[24px] font-bold leading-none" />
                     <s className="text-[13px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
                   </span>
-                  <span className="mt-[3px] text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}{p.halloween ? " · + BOGO" : ""}</span>
+                  <span className="mt-[3px] text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}{p.halloween ? " · + BOGO instantly" : ""}</span>
                 </span>
                 <span className="relative flex items-center gap-[6px] rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
                   Get funded
