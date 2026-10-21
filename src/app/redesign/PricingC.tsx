@@ -239,7 +239,7 @@ function TypeCards({ p }: { p: Pick }) {
     <div className="grid grid-cols-2 gap-[8px]">
       {p.plans.map((x) => {
         const on = x.id === p.plan;
-        const note = x.id === "prime" && p.step !== "Instant" ? "No consistency" : "";
+        const note = x.id === "prime" ? "No consistency" : "";
         return (
           <button key={x.id} type="button" aria-pressed={on} onClick={() => p.setPlan(x.id)} className="flex h-[58px] cursor-pointer items-center justify-between gap-[8px] rounded-[16px] px-[14px] text-left text-white transition-colors" style={{ border: `1.5px solid ${on ? "#60a5fa" : LINE}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.26), rgba(37,99,235,0.06))" : "rgba(255,255,255,0.03)" }}>
             <span className="flex flex-col">
@@ -1029,7 +1029,7 @@ function TrustRow() {
 
 function DefaultHeading() {
   return (
-    <h2 className="m-0 text-center text-[34px] font-semibold leading-[1.06] tracking-[-0.035em] text-[#eef0f6] lg:text-left lg:text-[54px]">
+    <h2 className="m-0 text-center text-[34px] font-semibold leading-[1.06] tracking-[-0.035em] text-[#eef0f6] lg:text-left lg:text-[48px]">
       Get funded <span className="fyt-gradient-text">your way.</span>
     </h2>
   );
@@ -1074,7 +1074,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
     <section id="challenge" className="fyt-rd relative w-full shrink-0 scroll-mt-[120px] overflow-hidden" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, #03060d 70%)`, color: "#eef0f6" }}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       {p.halloween && <HalloweenDecor />}
-      <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-[18px] px-[16px] pb-[64px] pt-[56px] lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-[48px] lg:px-[40px] lg:pb-[110px] lg:pt-[110px]">
+      <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-[18px] px-[16px] pb-[64px] pt-[56px] lg:max-w-[1280px] lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:gap-[40px] lg:px-[40px] lg:pb-[110px] lg:pt-[110px]">
         <div className={`flex flex-col gap-[18px] lg:self-start ${p.halloween ? "" : "lg:sticky lg:top-[140px]"}`}>
           {heading ?? <DefaultHeading />}
           {p.halloween ? <VaultCard p={p} /> : <OfferSwitch p={p} />}
@@ -1091,8 +1091,8 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
           >
             <span aria-hidden="true" className="pointer-events-none absolute -right-[70px] -top-[80px] size-[240px] rounded-full" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.35), transparent 65%)" }} />
             {p.halloween && <span aria-hidden="true" className="pointer-events-none absolute inset-x-[12%] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,138,61,0.85), transparent)" }} />}
-            <div className="relative flex flex-col gap-[16px] p-[16px] sm:p-[22px] lg:gap-[18px] lg:p-[28px]">
-
+            <div className="relative flex flex-col gap-[16px] p-[16px] sm:p-[22px] lg:grid lg:grid-cols-2 lg:gap-0 lg:p-0">
+              <div className="flex flex-col gap-[16px] lg:gap-[22px] lg:p-[28px]">
               <div className="flex flex-col gap-[8px]">
                 <Label>Account size</Label>
                 <div className="grid grid-cols-5 gap-[6px]">
@@ -1131,7 +1131,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                 <div className="flex flex-col gap-[8px]">
                   <Label>Platform</Label>
                   <PlatformSeg p={p} />
-                  <div className="mt-[4px] grid grid-cols-4 gap-[6px] rounded-[16px] p-[10px]" style={{ background: "rgba(0,0,0,0.25)" }}>
+                  <div className="mt-[4px] grid grid-cols-4 gap-[6px] rounded-[16px] p-[10px] lg:hidden" style={{ background: "rgba(0,0,0,0.25)" }}>
                     {rules(p).map(([v, l]) => (
                       <span key={l} className="flex flex-col items-center gap-[2px]">
                         <span className="text-[15px] font-bold">{v}</span>
@@ -1141,8 +1141,27 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                   </div>
                 </div>
               </div>
+              </div>
 
-              <div className="flex flex-col gap-[10px] rounded-[16px] p-[12px] lg:p-[16px]" style={{ background: "rgba(0,0,0,0.22)" }}>
+              {/* Desktop: summary panel on the right. Phones: continues in the same column. */}
+              <div className="flex flex-col gap-[16px] lg:gap-[16px] lg:border-l lg:border-[rgba(148,178,255,0.14)] lg:bg-[rgba(3,8,22,0.45)] lg:p-[28px]">
+              <div className="hidden flex-col gap-[10px] lg:flex">
+                <Label>Your account</Label>
+                <div className="flex items-baseline justify-between gap-[10px]">
+                  <span className="text-[26px] font-semibold tracking-[-0.03em] text-white">{fmtSize(p.size)}</span>
+                  <span className="text-[12.5px] font-medium" style={{ color: SOFT }}>{p.step} · {p.plans.find((x) => x.id === p.plan)?.label} · {PLATFORMS.find((x) => x.id === p.platform)?.label}</span>
+                </div>
+                <div className="grid grid-cols-4 gap-[6px] rounded-[16px] p-[12px]" style={{ background: "rgba(0,0,0,0.3)", border: `1px solid ${LINE}` }}>
+                  {rules(p).map(([v, l]) => (
+                    <span key={l} className="flex flex-col items-center gap-[3px]">
+                      <span className="text-[16px] font-bold">{v}</span>
+                      <span className="text-[9.5px] uppercase tracking-[0.08em]" style={{ color: MUTED }}>{l}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-[10px] rounded-[16px] p-[12px] lg:p-[14px]" style={{ background: "rgba(0,0,0,0.22)" }}>
                 <Label>Why traders choose this</Label>
                 <PerkGrid p={p} cols={2} />
               </div>
@@ -1189,6 +1208,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
               </motion.a>
               <CodeLine p={p} />
               <TrustRow />
+              </div>
             </div>
           </motion.div>
       </div>
