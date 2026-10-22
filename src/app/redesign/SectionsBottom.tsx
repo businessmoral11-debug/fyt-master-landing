@@ -505,7 +505,7 @@ export function Faq() {
           <Eyebrow tone="light">FAQ</Eyebrow>
           <SectionTitle tone="light" lead="Frequently Asked" highlight="Questions" />
           <Reveal delay={0.2} className="hidden lg:block">
-            <Pill href="https://intercom.help/funding-your-trades/en/" target="_blank" rel="noopener noreferrer">
+            <Pill href="https://fundingyourtrades.com/faq/" target="_blank" rel="noopener noreferrer">
               Go to FAQs
             </Pill>
           </Reveal>
@@ -543,7 +543,7 @@ export function Faq() {
             </motion.div>
           </Accordion.Root>
           <Reveal className="mt-[28px] flex justify-center lg:hidden">
-            <Pill href="https://intercom.help/funding-your-trades/en/" target="_blank" rel="noopener noreferrer">
+            <Pill href="https://fundingyourtrades.com/faq/" target="_blank" rel="noopener noreferrer">
               Go to FAQs
             </Pill>
           </Reveal>

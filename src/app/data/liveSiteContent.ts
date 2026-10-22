@@ -168,7 +168,7 @@ export const FOOTER_LINKS = {
     { label: "Affiliate Registration", href: "https://fundingyourtrades.com/affiliate-registration/" },
     { label: "Affiliate Login", href: "https://fundingyourtrades.com/affiliate-account/" },
     { label: "Affiliate Reset Password", href: "https://fundingyourtrades.com/affiliate-reset-password/" },
-    { label: "FAQ", href: "https://intercom.help/funding-your-trades/en/" },
+    { label: "FAQ", href: "https://fundingyourtrades.com/faq/" },
     { label: "Contact Us", href: "https://fundingyourtrades.com/contact/" },
     { label: "Terms of Services", href: "https://fundingyourtrades.com/terms-of-services/" },
     { label: "Privacy Policy", href: "https://fundingyourtrades.com/privacy-policy/" },
@@ -198,7 +198,7 @@ export const NAV_LINKS = {
         { label: "Reset Password", href: "https://fundingyourtrades.com/affiliate-reset-password/" },
       ],
     },
-    { type: "link", label: "FAQ", href: "https://intercom.help/funding-your-trades/en/" },
+    { type: "link", label: "FAQ", href: "https://fundingyourtrades.com/faq/" },
     { type: "link", label: "Contact Us", href: "https://fundingyourtrades.com/contact/" },
   ],
   login: { label: "Login/Sign up", href: "https://app.fundingyourtrades.com/" },
@@ -216,7 +216,7 @@ export const FOOTER_COLUMNS = [
   {
     heading: "COMPANY",
     items: [
-      { label: "FAQ", href: "https://intercom.help/funding-your-trades/en/" },
+      { label: "FAQ", href: "https://fundingyourtrades.com/faq/" },
       { label: "Affiliate", href: "https://fundingyourtrades.com/affiliate-registration/" },
       { label: "Contact", href: "https://fundingyourtrades.com/contact/" },
     ],
