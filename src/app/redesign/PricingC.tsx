@@ -656,7 +656,7 @@ function VaultDial({ open }: { open: boolean }) {
   );
 }
 
-/** The 7 treats as selectable rows (2 columns from tablet up). */
+/** The 6 treats as selectable rows (2 columns from tablet up). */
 function TreatGrid({ p, cols = 2 }: { p: Pick; cols?: 1 | 2 }) {
   const count = p.treats.length;
   return (
