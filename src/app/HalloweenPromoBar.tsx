@@ -282,6 +282,29 @@ const CSS = `
   .fyt-hw-bar.fyt-hw-compact .fyt-hw-timer-body { font-size: 11px; gap: 3px; }
   .fyt-hw-bar.fyt-hw-compact .fyt-hw-left { display: none; }
 }
+/* ---------- Slimmer sizing (smaller countdown, slightly shorter bar) ---------- */
+.fyt-hw-bar, .fyt-hw-inner { min-height: 46px; }
+.fyt-hw-inner { padding-top: 5px; padding-bottom: 5px; }
+.fyt-hw-headline { font-size: 14px; }
+.fyt-hw-sub { font-size: 12.5px; }
+.fyt-hw-pumpkin, .fyt-hw-pumpkin svg { width: 22px; height: 22px; }
+.fyt-hw-code { height: 28px; padding: 0 12px 0 14px; }
+.fyt-hw-code-val { font-size: 13px; }
+.fyt-hw-timer { height: 28px; padding: 0 13px; }
+.fyt-hw-timer-body { font-size: 13.5px; gap: 5px; }
+@media (max-width: 860px) {
+  .fyt-hw-headline { font-size: 12px; }
+}
+@media (max-width: 640px) {
+  .fyt-hw-inner { padding: 6px 12px; gap: 5px 8px; }
+  .fyt-hw-headline { font-size: 11.5px; }
+  .fyt-hw-pumpkin, .fyt-hw-pumpkin svg { width: 18px; height: 18px; }
+  .fyt-hw-code { height: 24px; padding: 0 10px 0 11px; }
+  .fyt-hw-code-lbl { font-size: 9px; }
+  .fyt-hw-code-val { font-size: 12px; }
+  .fyt-hw-timer { height: 24px; padding: 0 11px; }
+  .fyt-hw-timer-body { font-size: 12px; gap: 4px; }
+}
 .fyt-hw-short, .fyt-hw-mid { display: none; }
 /* Laptops: keep everything on one row by dropping the secondary line earlier */
 @media (max-width: 1280px) {
