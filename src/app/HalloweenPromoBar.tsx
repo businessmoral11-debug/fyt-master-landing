@@ -282,7 +282,17 @@ const CSS = `
   .fyt-hw-bar.fyt-hw-compact .fyt-hw-timer-body { font-size: 11px; gap: 3px; }
   .fyt-hw-bar.fyt-hw-compact .fyt-hw-left { display: none; }
 }
-.fyt-hw-short { display: none; }
+.fyt-hw-short, .fyt-hw-mid { display: none; }
+/* Laptops: keep everything on one row by dropping the secondary line earlier */
+@media (max-width: 1280px) {
+  .fyt-hw-divider, .fyt-hw-sub { display: none; }
+}
+/* Phones: a shorter headline so it always fits on one line */
+@media (max-width: 480px) {
+  .fyt-hw-bar:not(.fyt-hw-compact) .fyt-hw-full { display: none; }
+  .fyt-hw-bar:not(.fyt-hw-compact) .fyt-hw-mid { display: inline; }
+  .fyt-hw-offer { gap: 7px; }
+}
 @media (max-width: 380px) { .fyt-hw-headline { font-size: 11px; } }
 `;
 
@@ -358,6 +368,7 @@ export function HalloweenPromoBar({ compact = false }: { compact?: boolean }) {
           </span>
           <span className="fyt-hw-headline">
             <span className="fyt-hw-full">45% OFF + BOGO INSTANTLY + PICK ANY 2 TREATS</span>
+            <span className="fyt-hw-mid">45% OFF + BOGO + PICK ANY 2 TREATS</span>
             <span className="fyt-hw-short">45% OFF + BOGO + 2 TREATS</span>
           </span>
           <span className="fyt-hw-divider" aria-hidden="true" />
