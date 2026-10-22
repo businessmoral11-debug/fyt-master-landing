@@ -20,6 +20,7 @@ import { HERO_STAGE_WIDTH, heroStageScale, heroLabelScale } from "@/app/motion/h
 import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
 import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
+import { HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
@@ -532,6 +533,9 @@ function Nav() {
 const PROMO_BANNER_ACTIVE_MARGIN_PX = 600;
 const PROMO_BANNER_GRADIENT =
   "linear-gradient(90deg, #172554 0%, #1d4ed8 28%, #2563eb 50%, #1d4ed8 72%, #172554 100%)";
+/** Halloween: same FYT blue, deeper at the edges, with a warm ember glow in the middle. */
+const HALLOWEEN_BANNER_GRADIENT =
+  "radial-gradient(60% 140% at 50% 120%, rgba(255,138,61,0.32), transparent 60%), linear-gradient(90deg, #0b1440 0%, #1a3aa8 30%, #2257e0 50%, #1a3aa8 70%, #0b1440 100%)";
 
 async function copyTextToClipboard(text: string): Promise<boolean> {
   try {
@@ -561,7 +565,7 @@ async function copyTextToClipboard(text: string): Promise<boolean> {
 }
 
 /** Red countdown pill on the top banner, ticking down to PROMO_DEADLINE; hidden once the offer ends. */
-function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pulse: boolean }) {
+function PromoCountdownPill({ compact = false, pulse, deadline = PROMO_DEADLINE, ember = false }: { compact?: boolean; pulse: boolean; deadline?: string; ember?: boolean }) {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -569,11 +573,16 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
     return () => window.clearInterval(id);
   }, []);
 
-  const left = formatHoursLeft(PROMO_DEADLINE, now);
+  const left = formatHoursLeft(deadline, now);
   if (left.expired) return null;
   // Hours only (e.g. 29H 47M 12S) - reads more urgent than "1D 05H".
   const hh = left.hh;
-  const label = compact ? `${hh}:${left.mm}:${left.ss} Left` : `${hh}H ${left.mm}M ${left.ss}S Left`;
+  const days = Math.floor(Number(hh) / 24);
+  const dh = String(Number(hh) % 24).padStart(2, "0");
+  // Halloween runs ~10 days: show days once there are 48h+ left.
+  const label = ember && days >= 2
+    ? (compact ? `${days}D ${dh}H ${left.mm}M Left` : `${days}D ${dh}H ${left.mm}M ${left.ss}S Left`)
+    : compact ? `${hh}:${left.mm}:${left.ss} Left` : `${hh}H ${left.mm}M ${left.ss}S Left`;
 
   return (
     <span
@@ -581,9 +590,9 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
       aria-label={`${Number(hh)} hours ${Number(left.mm)} minutes left`}
       className={`inline-flex shrink-0 items-center rounded-full font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] tabular-nums text-white ${compact ? "h-[19px] px-[8px] text-[9px]" : "h-[28px] px-[13px] text-[13px] lg:h-[30px] lg:px-[14px] lg:text-[14px]"}`}
       style={{
-        background: "#DC2626",
+        background: ember ? "linear-gradient(180deg,#ff8a3d,#e8590c)" : "#DC2626",
         border: "1px solid rgba(255,255,255,0.28)",
-        boxShadow: "0 2px 8px rgba(220,38,38,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
+        boxShadow: ember ? "0 2px 10px rgba(232,89,12,0.45), inset 0 1px 0 rgba(255,255,255,0.3)" : "0 2px 8px rgba(220,38,38,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
         animation: pulse ? "fyt-promo-urgency-pulse 2.4s ease-in-out infinite" : undefined,
       }}
     >
@@ -592,8 +601,51 @@ function PromoCountdownPill({ compact = false, pulse }: { compact?: boolean; pul
   );
 }
 
+/** Small carved pumpkin used in the Halloween banner. */
+function PumpkinIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" className="shrink-0" style={{ filter: "drop-shadow(0 0 6px rgba(255,138,61,0.8))" }}>
+      <path d="M12 7.5c-.3-2 .4-3.6 2-4.5" stroke="#86efac" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      <ellipse cx="8" cy="14" rx="5.5" ry="7" fill="#e8590c" />
+      <ellipse cx="16" cy="14" rx="5.5" ry="7" fill="#e8590c" />
+      <ellipse cx="12" cy="14" rx="5" ry="7.4" fill="#ff8a3d" />
+      <path d="M7.5 12l2-2.2 1.6 2.2zM12.9 12l1.6-2.2 2 2.2zM8 16c2.4 2 5.6 2 8 0l-1.4.4-.9-.9-.9.9-.8-.9-.8.9-.9-.9-.9.9z" fill="#3b1300" />
+    </svg>
+  );
+}
+
+const BANNER_BAT = "M12 14c-1.2-2.4-3.4-3.4-6-3 1 .8 1.4 1.8 1.2 3-1.4-.9-3.3-1-5.2-.2 2.3.6 3.8 2 4.4 4 1.6-1.4 3.6-1.8 5.6-.8 2-1 4-.6 5.6.8.6-2 2.1-3.4 4.4-4-1.9-.8-3.8-.7-5.2.2-.2-1.2.2-2.2 1.2-3-2.6-.4-4.8.6-6 3Z";
+
+/** Halloween layer on the top banner: a bat crossing now and then, web corners, an ember line. */
+function HalloweenBannerDecor({ animate }: { animate: boolean }) {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <span className="absolute inset-x-0 bottom-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,138,61,0.9), transparent)" }} />
+      <svg className="absolute left-0 top-0 opacity-25" width="44" height="44" viewBox="0 0 80 80" fill="none" stroke="#dbeafe" strokeWidth="1.2" style={{ transform: "scaleX(-1)" }}>
+        <path d="M80 0L20 60M80 0L46 74M80 0L6 34M80 0L0 14M62 0c0 6 4 12 10 14 2 4 6 8 8 8M44 0c-1 11 7 22 17 26 4 9 12 16 19 17" />
+      </svg>
+      <svg className="absolute right-0 top-0 opacity-25" width="44" height="44" viewBox="0 0 80 80" fill="none" stroke="#dbeafe" strokeWidth="1.2">
+        <path d="M80 0L20 60M80 0L46 74M80 0L6 34M80 0L0 14M62 0c0 6 4 12 10 14 2 4 6 8 8 8M44 0c-1 11 7 22 17 26 4 9 12 16 19 17" />
+      </svg>
+      {animate && (
+        <motion.span className="absolute left-0 top-[4px]" initial={{ x: "-5vw" }} animate={{ x: ["-5vw", "105vw"], y: [0, 6, -2, 5, 0] }} transition={{ duration: 14, repeat: Infinity, repeatDelay: 6, ease: "linear" }}>
+          <motion.svg width="18" height="18" viewBox="0 0 24 24" animate={{ scaleY: [1, 0.5, 1] }} transition={{ duration: 0.3, repeat: Infinity }}>
+            <path d={BANNER_BAT} fill="#060b1f" />
+          </motion.svg>
+        </motion.span>
+      )}
+    </div>
+  );
+}
+
 function PromoBanner() {
   const reduceMotion = useReducedMotion();
+  const hw = isHalloweenLive();
+  const code = hw ? HALLOWEEN_CODE : PROMO_CODE;
+  const dealLine = hw ? HALLOWEEN_DEAL_LINE : PROMO_DEAL_LINE;
+  const dealShort = hw ? HALLOWEEN_DEAL_SHORT : PROMO_DEAL_SHORT;
+  const benefits: readonly string[] = hw ? [STAGE_LABEL[halloweenStage()]] : PROMO_BENEFITS;
+  const deadline = hw ? HALLOWEEN_END : PROMO_DEADLINE;
   const { compact } = useContext(HeaderModeContext);
   const bannerRef = useRef<HTMLDivElement>(null);
   const [nearViewport, setNearViewport] = useState(true);
@@ -626,7 +678,7 @@ function PromoBanner() {
 
   async function copyCode(e: MouseEvent) {
     stopBannerNav(e);
-    const ok = await copyTextToClipboard(PROMO_CODE);
+    const ok = await copyTextToClipboard(code);
     if (!ok) return;
     setCopied(true);
     if (copiedTimerRef.current !== undefined) window.clearTimeout(copiedTimerRef.current);
@@ -641,12 +693,12 @@ function PromoBanner() {
         onClick={copyCode}
         className={`inline-flex shrink-0 items-center gap-[5px] rounded-full border-0 px-[10px] cursor-pointer transition-transform duration-200 hover:scale-[1.04] active:scale-[0.97] ${compact ? "h-[18px]" : "h-[22px]"}`}
         style={{ background: copied ? "#14532d" : "#0B1220", boxShadow: "0 2px 8px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.12)" }}
-        aria-label={copied ? `Copied ${PROMO_CODE}` : `Copy promo code ${PROMO_CODE}`}
+        aria-label={copied ? `Copied ${code}` : `Copy promo code ${code}`}
       >
         <span className={`font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.06em] text-[#93c5fd] ${compact ? "text-[8px]" : "text-[9px]"}`}>
           {copied ? "Copied" : "Code"}
         </span>
-        <span className={`font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] text-white ${compact ? "text-[9px]" : "text-[10px]"}`}>{PROMO_CODE}</span>
+        <span className={`font-['Inter:Bold',sans-serif] font-bold uppercase leading-none tracking-[0.04em] text-white ${compact ? "text-[9px]" : "text-[10px]"}`}>{code}</span>
       </button>
     );
   }
@@ -661,7 +713,7 @@ function PromoBanner() {
       aria-label="View current promotions, jump to pricing"
       className="group/promo relative z-[2] shrink-0 w-full cursor-pointer overflow-hidden"
       style={{
-        background: PROMO_BANNER_GRADIENT,
+        background: hw ? HALLOWEEN_BANNER_GRADIENT : PROMO_BANNER_GRADIENT,
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.25), 0 8px 28px rgba(37,99,235,0.35)",
         contain: "layout",
       }}
@@ -671,6 +723,7 @@ function PromoBanner() {
         className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)" }}
       />
+      {hw && <HalloweenBannerDecor animate={!reduceMotion && nearViewport} />}
       {!reduceMotion && (
         <div
           aria-hidden="true"
@@ -686,11 +739,12 @@ function PromoBanner() {
           After scrolling: folds to one slim line (short deal + CODE + countdown). */}
       <div className={`relative mx-auto flex w-full flex-col items-center justify-center px-[6px] transition-[padding] duration-300 ease-out md:hidden ${compact ? "py-[6px]" : "py-[7px]"}`}>
         <div className="flex items-center justify-center gap-x-[6px] whitespace-nowrap">
+          {hw && <PumpkinIcon size={14} />}
           <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[10px] tracking-[0.01em] min-[380px]:text-[10.5px]">
-            {PROMO_DEAL_SHORT}
+            {dealShort}
           </span>
           <CodePill compact />
-          {compact && <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} />}
+          {compact && <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} deadline={deadline} ember={hw} />}
         </div>
         <div
           className="grid w-full transition-[grid-template-rows,opacity] duration-300 ease-out"
@@ -699,7 +753,7 @@ function PromoBanner() {
         >
           <div className="overflow-hidden">
             <div className="flex items-center justify-center gap-x-[5px] whitespace-nowrap pt-[5px]">
-              {PROMO_BENEFITS.map((text, i) => (
+              {benefits.map((text, i) => (
                 <Fragment key={text}>
                   {i > 0 && <span aria-hidden="true" className="h-[8px] w-px shrink-0 bg-white/35" />}
                   <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[8.5px] tracking-[0.01em] text-white/85">
@@ -707,7 +761,7 @@ function PromoBanner() {
                   </span>
                 </Fragment>
               ))}
-              {!compact && <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} />}
+              {!compact && <PromoCountdownPill compact pulse={!reduceMotion && nearViewport} deadline={deadline} ember={hw} />}
             </div>
           </div>
         </div>
@@ -717,10 +771,11 @@ function PromoBanner() {
           Each group stays on one line, so a narrow screen wraps between groups, never mid-offer. */}
       <div className="relative mx-auto hidden min-h-[36px] w-full max-w-[1440px] flex-wrap items-center justify-center gap-x-[12px] gap-y-[6px] px-[12px] py-[8px] md:flex lg:gap-x-[14px] lg:px-[20px] xl:px-[24px]">
         <div className="flex items-center gap-x-[10px] whitespace-nowrap lg:gap-x-[14px]">
+          {hw && <PumpkinIcon size={18} />}
           <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[12px] tracking-[0.02em] lg:text-[13px] xl:text-[14px]">
-            {PROMO_DEAL_LINE}
+            {dealLine}
           </span>
-          {PROMO_BENEFITS.map((text) => (
+          {benefits.map((text) => (
             <Fragment key={text}>
               <span aria-hidden="true" className="h-[12px] w-px shrink-0 bg-white/25" />
               <span className="font-['DM_Sans',sans-serif] font-bold uppercase leading-none text-white whitespace-nowrap text-[11px] tracking-[0.02em] text-white/85 lg:text-[12px] xl:text-[13px]">
@@ -731,7 +786,7 @@ function PromoBanner() {
         </div>
         <div className="flex items-center gap-x-[8px] whitespace-nowrap lg:gap-x-[10px]">
           <CodePill />
-          <PromoCountdownPill pulse={!reduceMotion && nearViewport} />
+          <PromoCountdownPill pulse={!reduceMotion && nearViewport} deadline={deadline} ember={hw} />
         </div>
       </div>
     </div>
@@ -1343,6 +1398,26 @@ function HiddenWord({ delayIndex = 0 }: { delayIndex?: number }) {
   );
 }
 
+/** Small Halloween chip under the hero line; jumps to the vault in pricing. */
+function HalloweenHeroChip() {
+  return (
+    <motion.a
+      href="#challenge"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.56, ease: [0.16, 1, 0.3, 1] }}
+      className="group my-[18px] lg:my-[28px] inline-flex max-w-full items-center gap-[10px] rounded-full py-[6px] pl-[6px] pr-[14px] no-underline backdrop-blur-[8px]"
+      style={{ background: "linear-gradient(90deg, rgba(37,99,235,0.22), rgba(255,138,61,0.12))", boxShadow: "inset 0 0 0 1px rgba(147,197,253,0.3), 0 10px 30px -14px rgba(255,138,61,0.6)" }}
+    >
+      <span className="shrink-0 rounded-full px-[9px] py-[4px] font-['Inter:Bold',sans-serif] font-bold uppercase text-[10px] tracking-[0.12em] text-[#1a0a00]" style={{ background: "linear-gradient(180deg,#ffb47a,#ff8a3d)" }}>Halloween</span>
+      <span className="truncate font-['Inter:Semi_Bold',sans-serif] font-semibold text-[13px] lg:text-[14px] text-white">45% off + BOGO + any 2 treats</span>
+      <svg className="shrink-0 transition-transform duration-300 group-hover:translate-x-[3px]" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3.333 8h9.334M8.667 4l4 4-4 4" stroke="#ffb47a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </motion.a>
+  );
+}
+
 function Hero() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [animationsActive, setAnimationsActive] = useState(true);
@@ -1394,7 +1469,7 @@ function Hero() {
         >
           Zero rules during the evaluation phases, pass however you want.
         </motion.p>
-        <div className="h-[28px] lg:h-[48px] shrink-0" />
+        {isHalloweenLive() ? <HalloweenHeroChip /> : <div className="h-[28px] lg:h-[48px] shrink-0" />}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
