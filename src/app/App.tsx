@@ -20,6 +20,7 @@ import { HERO_STAGE_WIDTH, heroStageScale, heroLabelScale } from "@/app/motion/h
 import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
 import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
+import { HalloweenPromoBar } from "@/app/HalloweenPromoBar";
 import { HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
@@ -636,6 +637,12 @@ function HalloweenBannerDecor({ animate }: { animate: boolean }) {
       )}
     </div>
   );
+}
+
+/** Halloween uses its own animated bar; otherwise the regular promo banner. */
+function PromoSlot() {
+  const { compact } = useContext(HeaderModeContext);
+  return isHalloweenLive() ? <HalloweenPromoBar compact={compact} /> : <PromoBanner />;
 }
 
 function PromoBanner() {
@@ -1651,7 +1658,7 @@ export default function App() {
       <CursorSpotlight />
       <SiteHeader>
         <DesktopTopDisclaimer />
-        <PromoBanner />
+        <PromoSlot />
         <Nav />
       </SiteHeader>
       <Hero />
