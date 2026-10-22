@@ -36,6 +36,14 @@ const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras
 const EMBER = "#ff8a3d";
 const EMBER_SOFT = "#ffb47a";
 const TREATS_KEY = "fyt_hw_treats_v1";
+/** Same-site cookie the checkout reads, so the picked treats reach the order even if a redirect drops the link. */
+function writeTreatsCookie(ids: string[]) {
+  try {
+    document.cookie = ids.length ? `fyt_treats=${ids.join(",")}; path=/; max-age=604800; SameSite=Lax; Secure` : "fyt_treats=; path=/; max-age=0; SameSite=Lax; Secure";
+  } catch {
+    // ignore
+  }
+}
 
 function offerPrice(old: number, o: OfferId): number {
   return Math.round(old * (1 - OFFERS[o].off) * 100) / 100;
@@ -67,7 +75,9 @@ function usePick() {
     if (typeof window === "undefined") return [];
     try {
       const v = JSON.parse(window.sessionStorage.getItem(TREATS_KEY) || "[]") as string[];
-      return v.filter((x): x is TreatId => TREATS.some((t) => t.id === x)).slice(0, TREAT_PICKS);
+      const ids = v.filter((x): x is TreatId => TREATS.some((t) => t.id === x)).slice(0, TREAT_PICKS);
+      if (ids.length) writeTreatsCookie(ids);
+      return ids;
     } catch {
       return [];
     }
@@ -80,6 +90,7 @@ function usePick() {
       } catch {
         // Storage blocked: picks still work for this visit.
       }
+      writeTreatsCookie(next);
       return next;
     });
   const unlockGift = () => {
