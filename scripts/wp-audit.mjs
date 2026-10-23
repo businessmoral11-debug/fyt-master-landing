@@ -1,13 +1,13 @@
 // TEMPORARY: screenshots of the region-proof preview for several visitor countries.
 import { chromium } from "playwright";
 import { writeFileSync } from "node:fs";
-const URL = "https://fyt-master-landing-nqz2pwf51-bm-med.vercel.app/";
-const cases = [["IN", "d"], ["DE", "d"], ["ES", "d"], ["US", "l"], ["IN", "t"], ["XX", "d"]];
+const URL = "https://fyt-master-landing-khs2y0bk9-bm-med.vercel.app/";
+const cases = [["IN", "d"], ["ES", "d"], ["US", "l"], ["IN", "t"], ["DE", "p"], ["GB", "m"]];
 const log = [];
 const browser = await chromium.launch();
 for (const [cc, vpn] of cases) {
-  const m = false; const vw = { d: [1440, 900], l: [1280, 760], t: [1024, 768] }[vpn];
-  const ctx = await browser.newContext({ viewport: { width: vw[0], height: vw[1] }, deviceScaleFactor: 1, timezoneId: "Europe/London" });
+  const m = vpn === "m"; const vw = { d: [1440, 900], l: [1280, 760], t: [1024, 768], p: [768, 1000], m: [390, 844] }[vpn];
+  const ctx = await browser.newContext({ viewport: { width: vw[0], height: vw[1] }, isMobile: m, hasTouch: m, deviceScaleFactor: m ? 2 : 1, timezoneId: "Europe/London" });
   await ctx.addInitScript(() => { try { localStorage.setItem("fyt_known_visitor_v1", "1"); localStorage.setItem("fyt_giveaway_done_v1", String(Date.now())); sessionStorage.setItem("fyt_giveaway_teaser_hidden", "1"); } catch {} });
   const page = await ctx.newPage();
   const errs = [];
