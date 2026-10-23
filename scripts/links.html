@@ -1,0 +1,32 @@
+<script>
+/* FYT Links Fix - keeps WordPress page links in line with the new site.
+   FAQ            -> https://fundingyourtrades.com/faq
+   Login/Sign up  -> https://app.fundingyourtrades.com/
+   Runs on every WordPress page (desktop header, mobile menu, footer). */
+(function () {
+  var FAQ = "https://fundingyourtrades.com/faq";
+  var APP = "https://app.fundingyourtrades.com/";
+  function fix(a) {
+    var h = a.getAttribute("href");
+    if (!h) return;
+    if (/^https?:\/\/intercom\.help\/funding-your-trades\/en\/?$/i.test(h)) a.setAttribute("href", FAQ);
+    else if (/^https?:\/\/clients\.fundingyourtrades\.com(\/.*)?$/i.test(h)) a.setAttribute("href", APP);
+  }
+  function run() {
+    var list = document.querySelectorAll("a[href]");
+    for (var i = 0; i < list.length; i++) fix(list[i]);
+  }
+  run();
+  document.addEventListener("DOMContentLoaded", run);
+  window.addEventListener("load", run);
+  try {
+    var t;
+    new MutationObserver(function () { clearTimeout(t); t = setTimeout(run, 150); })
+      .observe(document.documentElement, { childList: true, subtree: true });
+  } catch (e) {}
+  document.addEventListener("click", function (e) {
+    var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
+    if (a) fix(a);
+  }, true);
+})();
+</script>
