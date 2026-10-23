@@ -1455,17 +1455,6 @@ function Hero() {
       <HeroBackground />
       {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-[20px] lg:px-[88px] w-full lg:absolute lg:top-[16px] lg:h-[496px]">
-        <div className="flex justify-center max-w-full shrink-0 min-h-[40px] lg:min-h-0 scale-90 origin-center lg:scale-100">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="flex justify-center max-w-full shrink-0"
-          >
-            <HeroTrustindexGate />
-          </motion.div>
-        </div>
-        <div className="h-[20px] lg:h-[24px] shrink-0" />
         <h1
           className="font-['DM_Sans',sans-serif] font-medium text-[44px] lg:text-[80px] w-full lg:max-w-[1264px]"
           style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}
@@ -1479,34 +1468,46 @@ function Hero() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.62, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col lg:flex-row gap-[12px] lg:gap-[16px] items-stretch lg:items-center shrink-0 w-full lg:w-auto"
+          className="flex flex-row gap-[10px] lg:gap-[14px] items-stretch lg:items-center shrink-0 w-full max-w-[460px] lg:max-w-none lg:w-auto"
         >
-          {/* One clear action (with the starting price) + a quiet secondary link. */}
+          {/* Two equal pills: primary with an arrow orb, secondary glass with a play orb. */}
           <HeroCta
             href={HERO_CONTENT.ctaPrimary.href}
             magneticStrength={0.22}
-            className="cta-shine group flex justify-center gap-[12px] items-center pl-[30px] pr-[10px] py-[10px] relative rounded-[999px] shrink-0"
+            className="cta-shine group flex h-[56px] lg:h-[58px] min-w-0 flex-1 lg:flex-none justify-between gap-[8px] lg:gap-[14px] items-center pl-[18px] pr-[6px] lg:pl-[30px] lg:pr-[7px] relative rounded-[999px]"
             style={{ ...PILL_CTA_GRADIENT_STYLE, boxShadow: `${PILL_CTA_GRADIENT_STYLE.boxShadow}, 0 0 0 rgba(59,130,246,0)` }}
           >
             <div aria-hidden className="absolute border border-[rgba(156,196,255,0.35)] border-solid inset-0 pointer-events-none rounded-[999px]" />
-            <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold not-italic text-[17px] text-white whitespace-nowrap">Get funded</p>
-            <span className="flex items-center gap-[8px] rounded-full bg-white py-[7px] pl-[12px] pr-[9px] shadow-[0_6px_16px_-6px_rgba(0,0,0,0.5)]">
-              <span className="font-['Inter:Semi_Bold',sans-serif] text-[13px] text-[#1d4ed8] whitespace-nowrap">from <b className="font-['Inter:Bold',sans-serif]">${heroFromPrice()}</b></span>
-              <svg className="shrink-0 transition-transform duration-300 group-hover:translate-x-[3px]" width="15" height="15" viewBox="0 0 16 16" fill="none">
-                <path d="M3.333 8h9.334M8.667 4l4 4-4 4" stroke="#1d4ed8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            <span className="flex flex-col items-start leading-none">
+              <span className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[16px] lg:text-[17px] text-white whitespace-nowrap">Get funded</span>
+              <span className="mt-[4px] font-['Inter:Medium',sans-serif] text-[11.5px] text-[#dbeafe] whitespace-nowrap">from ${heroFromPrice()}</span>
+            </span>
+            <span className="flex size-[42px] lg:size-[44px] shrink-0 items-center justify-center rounded-full bg-white shadow-[0_6px_16px_-6px_rgba(0,0,0,0.5)] transition-transform duration-300 group-hover:translate-x-[2px]">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3.333 8h9.334M8.667 4l4 4-4 4" stroke="#1d4ed8" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
           </HeroCta>
-          <a
+          <HeroCta
             href="#how-it-works"
-            onClick={() => pauseHeavyScenesForNav()}
-            className="group flex items-center justify-center gap-[10px] px-[12px] py-[10px] no-underline"
+            magneticStrength={0.16}
+            className="group flex h-[56px] lg:h-[58px] min-w-0 flex-1 lg:flex-none justify-start gap-[10px] lg:gap-[14px] items-center pl-[6px] pr-[16px] lg:pl-[7px] lg:pr-[28px] relative rounded-[999px] backdrop-blur-[7px]"
+            style={{ background: "rgba(255,255,255,0.05)" }}
           >
-            <span className="flex size-[34px] items-center justify-center rounded-full backdrop-blur-[7px] transition-colors duration-300 group-hover:bg-white/10" style={{ background: "rgba(255,255,255,0.06)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.18)" }}>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.5 2.2v7.6L9.8 6 3.5 2.2Z" fill="#e8ebf2" /></svg>
+            <div aria-hidden className="absolute border border-[rgba(255,255,255,0.18)] border-solid inset-0 pointer-events-none rounded-[999px]" />
+            <span className="flex size-[42px] lg:size-[44px] shrink-0 items-center justify-center rounded-full transition-colors duration-300 group-hover:bg-white/15" style={{ background: "rgba(255,255,255,0.08)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.16)" }}>
+              <svg width="13" height="13" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.5 2.2v7.6L9.8 6 3.5 2.2Z" fill="#e8ebf2" /></svg>
             </span>
-            <span className="font-['Inter:Medium',sans-serif] text-[15px] text-[#e8ebf2] whitespace-nowrap">How it works</span>
-          </a>
+            <span className="font-['Inter:Medium',sans-serif] font-medium text-[14.5px] lg:text-[16px] text-[#e8ebf2] whitespace-nowrap">How it works</span>
+          </HeroCta>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-[22px] lg:mt-[28px] flex justify-center max-w-full shrink-0 min-h-[40px] lg:min-h-0 scale-90 origin-center lg:scale-100"
+        >
+          <HeroTrustindexGate />
         </motion.div>
         <ul className="sr-only">
           {HERO_ORBIT_LABELS.map(({ label }) => <li key={label}>{label}</li>)}
