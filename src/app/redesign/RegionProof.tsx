@@ -506,7 +506,7 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
   const flag = scope.kind === "country" ? countryFlagUrl(scope.code) : null;
   const localFlag = local.kind === "country" ? countryFlagUrl(local.code) : null;
   const localChip = local.kind === "country" ? countryPlain(local.code) : local.kind === "region" ? REGION_CHIP[local.id] : "";
-  const scopeShort = scope.kind === "country" ? countryPlain(scope.code) : scope.kind === "region" ? REGION_CHIP[scope.id] : "worldwide";
+  const scopeShort = scope.kind === "country" ? countryThe(scope.code) : scope.kind === "region" ? REGION_NAME[scope.id] : "worldwide";
   const loading = state === "loading";
 
   return (
@@ -514,7 +514,7 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
       <div className="relative grid grid-cols-1 items-center gap-[40px] lg:grid-cols-12 lg:gap-[56px]">
         <div className="flex min-w-0 flex-col gap-[22px] lg:col-span-5 xl:col-span-4">
           <Eyebrow tone="light">Live rewards</Eyebrow>
-          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] [text-wrap:balance] sm:text-[42px] lg:text-[40px] xl:text-[46px]" style={{ color: C.textLight }}>
+          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] [text-wrap:balance] sm:text-[42px] lg:text-[40px] xl:text-[42px] min-[1400px]:text-[46px]" style={{ color: C.textLight }}>
             {scope.kind === "country" ? (
               <>
                 <span className="inline-flex flex-nowrap items-center gap-x-[12px] whitespace-nowrap">
