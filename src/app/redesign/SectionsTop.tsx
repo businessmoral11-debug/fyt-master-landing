@@ -24,6 +24,7 @@ import {
 } from "@/app/BelowFold";
 import { C, Eyebrow, Pill, Reveal, Section, SectionTitle, WordsReveal, spotlightMove, staggerChild, staggerParent, useShimmer } from "./ui";
 import { PricingOffer, PricingTrustLine } from "./Conversion";
+import { RegionProof } from "./RegionProof";
 
 const FeaturedCertificates = lazy(() => import("@/app/featuredCertificates").then((m) => ({ default: m.FeaturedCertificates })));
 const RecentVerifiedRewards = lazy(() => import("@/app/recentVerifiedRewards").then((m) => ({ default: m.RecentVerifiedRewards })));
@@ -312,7 +313,12 @@ export function ProofInNumbers() {
 /* Live rewards / verified proofs                                      */
 /* ------------------------------------------------------------------ */
 
+/** Live rewards: matched to the visitor (country, then region, then worldwide). The classic certificate section below is the fallback if the payout feed is unavailable. */
 export function LivePayouts() {
+  return <RegionProof fallback={<LivePayoutsClassic />} />;
+}
+
+function LivePayoutsClassic() {
   return (
     <Section tone="light" id="live-payouts">
       <div className="flex flex-col items-center gap-[18px] text-center">
