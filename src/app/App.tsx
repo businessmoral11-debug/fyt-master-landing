@@ -21,7 +21,7 @@ import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
 import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
 import { HalloweenPromoBar } from "@/app/HalloweenPromoBar";
-import { HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
+import { HALLOWEEN_OFF, HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
@@ -600,6 +600,13 @@ function PromoCountdownPill({ compact = false, pulse, deadline = PROMO_DEADLINE,
       {label}
     </span>
   );
+}
+
+/** Lowest starting price across the three models (Prime, MatchTrader, smallest size) with today's offer. */
+function heroFromPrice(): number {
+  const off = isHalloweenLive() ? HALLOWEEN_OFF : 0.4;
+  const prices = (Object.keys(STEP_SIZES) as StepId[]).map((st) => getEntry(st, "prime", "match-trader", STEP_SIZES[st][0])?.priceOld ?? Infinity);
+  return Math.round(Math.min(...prices) * (1 - off));
 }
 
 /** Small carved pumpkin used in the Halloween banner. */
@@ -1448,17 +1455,9 @@ function Hero() {
       <HeroBackground />
       {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-[20px] lg:px-[88px] w-full lg:absolute lg:top-[16px] lg:h-[496px]">
-        <div className="flex justify-center max-w-full shrink-0 min-h-[40px] lg:min-h-0 scale-90 origin-center lg:scale-100">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="flex justify-center max-w-full shrink-0"
-          >
-            <HeroTrustindexGate />
-          </motion.div>
+        <div className="lg:hidden mb-[18px] flex justify-center max-w-full shrink-0 min-h-[40px]">
+          <HeroTrustindexMobileWidget />
         </div>
-        <div className="h-[20px] lg:h-[24px] shrink-0" />
         <h1
           className="font-['DM_Sans',sans-serif] font-medium text-[44px] lg:text-[80px] w-full lg:max-w-[1264px]"
           style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}
@@ -1467,45 +1466,51 @@ function Hero() {
           <span className="block text-white"><RevealWords text="Trade Without" /> <HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
           <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
         </h1>
-        <div className="h-[16px] lg:h-[32px] shrink-0" />
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="font-['Inter:Regular',sans-serif] font-normal not-italic text-[#a6acbe] text-[16px] leading-[1.6] w-full lg:w-[760px]"
-        >
-          Zero rules during the evaluation phases, pass however you want.
-        </motion.p>
-        {isHalloweenLive() ? <HalloweenHeroChip /> : <div className="h-[28px] lg:h-[48px] shrink-0" />}
+        <div className="h-[28px] lg:h-[44px] shrink-0" />
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.62, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col lg:flex-row gap-[12px] lg:gap-[16px] items-stretch lg:items-center shrink-0 w-full lg:w-auto"
+          className="flex flex-row gap-[10px] lg:gap-[14px] items-stretch lg:items-center shrink-0 w-full max-w-[460px] lg:max-w-none lg:w-auto"
         >
-          {/* Primary — gradient pill, PDF label "View Programs" */}
+          {/* Two equal pills: primary with an arrow orb, secondary glass with a play orb. */}
           <HeroCta
             href={HERO_CONTENT.ctaPrimary.href}
             magneticStrength={0.22}
-            className="cta-shine flex justify-center gap-[10px] items-center pl-[32px] pr-[28px] py-[16px] relative rounded-[999px] shrink-0"
+            className="cta-shine group flex h-[56px] lg:h-[58px] min-w-0 flex-1 lg:flex-none lg:min-w-[230px] justify-between gap-[8px] lg:gap-[14px] items-center pl-[18px] pr-[6px] lg:pl-[30px] lg:pr-[7px] relative rounded-[999px]"
             style={{ ...PILL_CTA_GRADIENT_STYLE, boxShadow: `${PILL_CTA_GRADIENT_STYLE.boxShadow}, 0 0 0 rgba(59,130,246,0)` }}
           >
             <div aria-hidden className="absolute border border-[rgba(156,196,255,0.35)] border-solid inset-0 pointer-events-none rounded-[999px]" />
-            <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold not-italic text-[16px] text-white whitespace-nowrap">View Programs</p>
-            <svg className="shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3.333 8h9.334M8.667 4l4 4-4 4" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="flex flex-col items-start leading-none">
+              <span className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[16px] lg:text-[17px] text-white whitespace-nowrap">Get funded</span>
+              <span className="mt-[4px] font-['Inter:Medium',sans-serif] text-[11.5px] text-[#dbeafe] whitespace-nowrap">from ${heroFromPrice()}</span>
+            </span>
+            <span className="flex size-[42px] lg:size-[44px] shrink-0 items-center justify-center rounded-full bg-white shadow-[0_6px_16px_-6px_rgba(0,0,0,0.5)] transition-transform duration-300 group-hover:translate-x-[2px]">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3.333 8h9.334M8.667 4l4 4-4 4" stroke="#1d4ed8" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
           </HeroCta>
-          {/* Secondary — glassy pill, PDF label "See How It Works" */}
           <HeroCta
-            href="#how-it-works"
+            href="https://rewards.fundingyourtrades.com/"
             magneticStrength={0.16}
-            className="flex justify-center items-center px-[32px] py-[16px] relative rounded-[999px] shrink-0 backdrop-blur-[7px]"
+            className="group flex h-[56px] lg:h-[58px] min-w-0 flex-1 lg:flex-none lg:min-w-[210px] justify-start gap-[10px] lg:gap-[14px] items-center pl-[6px] pr-[16px] lg:pl-[7px] lg:pr-[28px] relative rounded-[999px] backdrop-blur-[7px]"
             style={{ background: "rgba(255,255,255,0.05)" }}
           >
             <div aria-hidden className="absolute border border-[rgba(255,255,255,0.18)] border-solid inset-0 pointer-events-none rounded-[999px]" />
-            <p className="font-['Inter:Medium',sans-serif] font-medium not-italic text-[16px] text-[#e8ebf2] whitespace-nowrap">See How It Works</p>
+            <span className="flex size-[42px] lg:size-[44px] shrink-0 items-center justify-center rounded-full transition-colors duration-300 group-hover:bg-white/15" style={{ background: "rgba(255,255,255,0.08)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.16)" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8ebf2" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4ZM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4" /></svg>
+            </span>
+            <span className="font-['Inter:Medium',sans-serif] font-medium text-[14.5px] lg:text-[16px] text-[#e8ebf2] whitespace-nowrap">View rewards</span>
           </HeroCta>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-[22px] lg:mt-[28px] flex justify-center max-w-full shrink-0 min-h-[40px] lg:min-h-0 scale-90 origin-center lg:scale-100"
+        >
+          <HeroTrustindexGate />
         </motion.div>
         <ul className="sr-only">
           {HERO_ORBIT_LABELS.map(({ label }) => <li key={label}>{label}</li>)}
@@ -1662,7 +1667,6 @@ export default function App() {
         <Nav />
       </SiteHeader>
       <Hero />
-      <AwardBadgeMobileBar />
       <TrustStripDesktop />
       <BelowFoldErrorBoundary>
         <Suspense fallback={null}>

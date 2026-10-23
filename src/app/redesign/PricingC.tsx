@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import imgMatchTraderLogo from "@/assets/live-site/platform-logos/match-trader.png";
-import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5.png";
+import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5-clear.png";
 import { STEP_PLANS, STEP_SIZES, checkoutUrl, fmtSize, getEntry, type PlanId, type PlatformId, type StepId } from "@/app/data/pricing";
 import { ALT_PROMO_CODE, PROMO_CODE, PROMO_DEADLINE } from "@/app/data/promoBanner";
 import { SELECT_PLAN_EVENT, writeSavedPlan, type SavedPlan } from "@/app/data/savedPlan";
@@ -154,10 +154,18 @@ const TYPE_INFO: Record<string, { badge: string; line: string }> = {
 };
 const INSTANT_PRIME = { badge: "More room", line: "6% max loss, 5 min days" };
 
+/** Key rules for the picked account, spelled out so nobody has to guess what a number means. */
 function rules(p: Pick): [string, string][] {
   const e = p.entry;
-  if (p.step === "Instant") return [[e.profit ?? "N/A", "Target"], [e.maxDaily, "Daily"], [e.maxOverall, "Max loss"], [e.split.replace("Up to ", ""), "Split"]];
-  return [[p.step === "2-Step" ? `${e.p1}/${e.p2}` : e.p1 ?? "", p.step === "2-Step" ? "Targets" : "Target"], [e.maxDaily, "Daily"], [e.maxOverall, "Max loss"], [e.split.replace("Up to ", ""), "Split"]];
+  const v = (x?: string) => (!x || x === "N/A" ? "None" : x);
+  if (p.step === "Instant")
+    return [[v(e.profit), "Min. profit for payout"], [v(e.maxDaily), "Daily loss limit"], [v(e.maxOverall), "Max loss limit"], [e.split, "Payout split"]];
+  return [
+    [p.step === "2-Step" ? `${e.p1} / ${e.p2}` : v(e.p1), p.step === "2-Step" ? "Profit targets" : "Profit target"],
+    [v(e.maxDaily), "Daily loss limit"],
+    [v(e.maxOverall), "Max loss limit"],
+    [e.split, "Payout split"],
+  ];
 }
 
 const IC = {
@@ -177,13 +185,11 @@ type Perk = { d: string; label: string; challengeOnly: boolean };
 function perks(p: Pick): Perk[] {
   if (p.step === "Instant")
     return [
-      { d: IC.split, label: "Up to 90% split", challengeOnly: false },
       { d: IC.wk, label: "Weekend holding", challengeOnly: false },
-      { d: IC.cal, label: "Bi-weekly rewards", challengeOnly: false },
+      { d: IC.cal, label: "Bi-weekly payouts", challengeOnly: false },
     ];
   const prime = p.plan === "prime";
   return [
-    { d: IC.split, label: "Up to 100% split", challengeOnly: false },
     { d: IC.news, label: "News trading", challengeOnly: prime },
     { d: IC.hedge, label: "Hedging", challengeOnly: prime },
     { d: IC.ea, label: "EA and copy", challengeOnly: true },
@@ -245,17 +251,24 @@ function Label({ n, children, right }: { n?: number; children: ReactNode; right?
   );
 }
 
+const TYPE_NOTE: Record<string, string> = {
+  "c-classic": "News + hedging",
+  "c-prime": "No consistency",
+  "i-plus": "Fewest rules",
+  "i-prime": "No consistency",
+};
+
 function TypeCards({ p }: { p: Pick }) {
   return (
     <div className="grid grid-cols-2 gap-[8px]">
       {p.plans.map((x) => {
         const on = x.id === p.plan;
-        const note = x.id === "prime" ? "No consistency" : "";
+        const note = TYPE_NOTE[`${p.step === "Instant" ? "i" : "c"}-${x.id}`] ?? "";
         return (
           <button key={x.id} type="button" aria-pressed={on} onClick={() => p.setPlan(x.id)} className="flex h-[58px] cursor-pointer items-center justify-between gap-[8px] rounded-[16px] px-[14px] text-left text-white transition-colors" style={{ border: `1.5px solid ${on ? "#60a5fa" : LINE}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.26), rgba(37,99,235,0.06))" : "rgba(255,255,255,0.03)" }}>
             <span className="flex flex-col">
               <span className="text-[16px] font-bold leading-tight">{x.label}</span>
-              {note && <span className="text-[11px] font-semibold text-[#86efac]">{note}</span>}
+              {note && <span className="text-[11px] font-semibold" style={{ color: x.id === "prime" ? "#86efac" : "#93c5fd" }}>{note}</span>}
             </span>
             <span className="size-[16px] shrink-0 rounded-full" style={{ border: `2px solid ${on ? "#60a5fa" : "#5b6478"}`, background: on ? "#60a5fa" : "transparent", boxShadow: on ? "inset 0 0 0 2px #0b1430" : "none" }} />
           </button>
@@ -265,28 +278,56 @@ function TypeCards({ p }: { p: Pick }) {
   );
 }
 
-/** Differences only, opened from the "Compare" link next to Type. */
+/** Differences only, opened from the "Compare" link next to Type. Tap a column to pick it. */
+type Cell = { t: string; good?: boolean };
 function CompareTable({ p }: { p: Pick }) {
   const instant = p.step === "Instant";
   const ids = p.plans.map((x) => x.id);
   const names = p.plans.map((x) => x.label);
   const e = ids.map((id) => getEntry(p.step, id, p.platform, p.size)!);
-  const rows: [string, string, string][] = instant
-    ? [["Profit target", e[0].profit ?? "-", e[1].profit ?? "-"], ["Daily loss", e[0].maxDaily, e[1].maxDaily], ["Max loss", e[0].maxOverall, e[1].maxOverall], ["Min trading days", e[0].minDays, e[1].minDays]]
-    : [["Consistency rule", "Applies", "None"], ["News trading", "Always", "Challenge"], ["Hedging", "Always", "Challenge"], ["Fee refund", "2nd reward", "1st reward"]];
+  const v = (x?: string) => (!x || x === "N/A" ? "None" : x);
+  const rows: [string, Cell, Cell][] = instant
+    ? [
+        ["Min. profit for payout", { t: v(e[0].profit) }, { t: v(e[1].profit) }],
+        ["Daily loss limit", { t: v(e[0].maxDaily) }, { t: v(e[1].maxDaily) }],
+        ["Max loss limit", { t: v(e[0].maxOverall) }, { t: v(e[1].maxOverall) }],
+        ["Min. trading days", { t: v(e[0].minDays) }, { t: v(e[1].minDays) }],
+      ]
+    : [
+        ["Consistency rule", { t: "Applies", good: false }, { t: "None", good: true }],
+        ["News trading when funded", { t: "Allowed", good: true }, { t: "Challenge only", good: false }],
+        ["Hedging when funded", { t: "Allowed", good: true }, { t: "Challenge only", good: false }],
+        ["Fee refunded with", { t: "2nd payout" }, { t: "1st payout", good: true }],
+      ];
   const href = instant ? "https://intercom.help/funding-your-trades/en/articles/14890800-instant-funding-models-compared" : "https://intercom.help/funding-your-trades/en/articles/13374417-fyt-classic-vs-fyt-prime";
+  const mark = (c: Cell) =>
+    c.good === undefined ? null : c.good ? (
+      <span className="flex size-[16px] shrink-0 items-center justify-center rounded-full bg-[#22c55e]"><Svg d={IC.check} size={9} color="#04210f" w={3.4} /></span>
+    ) : (
+      <span className="flex size-[16px] shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.1)" }}><Svg d="M7 7l10 10M17 7L7 17" size={8} color="#c7d2e6" w={3} /></span>
+    );
   return (
     <div className="overflow-hidden rounded-[16px]" style={{ background: "rgba(0,0,0,0.25)", border: `1px solid ${LINE}` }}>
-      <div className="grid grid-cols-[1.3fr_1fr_1fr] px-[12px] py-[9px] text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#93c5fd]">
+      <div className="grid grid-cols-[1.25fr_1fr_1fr] gap-[6px] px-[10px] py-[8px]">
         <span />
-        <span className="text-center">{names[0]}</span>
-        <span className="text-center">{names[1]}</span>
+        {ids.map((id, k) => {
+          const on = id === p.plan;
+          return (
+            <button key={id} type="button" onClick={() => p.setPlan(id)} aria-pressed={on} className="h-[30px] cursor-pointer rounded-full border-0 text-[12px] font-bold uppercase tracking-[0.08em]" style={{ background: on ? BLUE : "rgba(255,255,255,0.06)", color: on ? "#fff" : SOFT }}>
+              {names[k]}
+            </button>
+          );
+        })}
       </div>
       {rows.map(([k, a, b]) => (
-        <div key={k} className="grid grid-cols-[1.3fr_1fr_1fr] items-center px-[12px] py-[9px] text-[12.5px]" style={{ borderTop: "1px solid rgba(148,178,255,0.08)" }}>
+        <div key={k} className="grid grid-cols-[1.25fr_1fr_1fr] items-center gap-[6px] px-[12px] py-[9px] text-[12.5px]" style={{ borderTop: "1px solid rgba(148,178,255,0.08)" }}>
           <span style={{ color: SOFT }}>{k}</span>
-          <span className="text-center font-semibold" style={{ color: ids[0] === p.plan ? "#fff" : MUTED }}>{a}</span>
-          <span className="text-center font-semibold" style={{ color: ids[1] === p.plan ? "#fff" : MUTED }}>{b}</span>
+          {[a, b].map((c, j) => (
+            <span key={j} className="flex items-center justify-center gap-[6px] text-center font-semibold leading-tight" style={{ color: ids[j] === p.plan ? "#fff" : MUTED }}>
+              {mark(c)}
+              {c.t}
+            </span>
+          ))}
         </div>
       ))}
       <a href={href} target="_blank" rel="noopener noreferrer" className="block px-[12px] py-[9px] text-center text-[12px] font-semibold text-[#93c5fd] no-underline hover:underline" style={{ borderTop: "1px solid rgba(148,178,255,0.08)" }}>
@@ -296,22 +337,26 @@ function CompareTable({ p }: { p: Pick }) {
   );
 }
 
+/** Platform logo + name in the switch (as before, just larger so both logos read clearly). */
+function PlatformMark({ id, on }: { id: PlatformId; on: boolean }) {
+  const pl = PLATFORMS.find((x) => x.id === id)!;
+  return (
+    <>
+      {/* Logos in their real colours (no white-out), slightly dimmed when not picked. */}
+      <img src={pl.logo} alt="" className={`${id === "platform-5" ? "h-[24px]" : "h-[22px]"} w-auto transition-opacity duration-300`} style={{ opacity: on ? 1 : 0.7 }} />
+      <span>{pl.label}</span>
+    </>
+  );
+}
+
 function PlatformSeg({ p }: { p: Pick }) {
   return (
     <Seg
       items={PLATFORMS.map((x) => x.id)}
       value={p.platform}
       onPick={p.setPlatform}
-      size={46}
-      render={(id, on) => {
-        const pl = PLATFORMS.find((x) => x.id === id)!;
-        return (
-          <>
-            <img src={pl.logo} alt="" className="h-[16px] w-auto" style={{ filter: on ? "brightness(0) invert(1)" : "grayscale(1) brightness(1.6)", opacity: on ? 1 : 0.8 }} />
-            <span>{pl.label}</span>
-          </>
-        );
-      }}
+      size={52}
+      render={(id, on) => <PlatformMark id={id} on={on} />}
     />
   );
 }
@@ -699,6 +744,20 @@ function TreatDots({ count }: { count: number }) {
   );
 }
 
+/** Live "closes in" inside the vault card (replaces the separate countdown bar). */
+function VaultClock() {
+  const parts = useCountdown(HALLOWEEN_END);
+  return (
+    <span className="ml-[6px] inline-flex items-center gap-[5px] rounded-full px-[7px] py-[2px] align-middle normal-case tracking-normal" style={{ background: "rgba(0,0,0,0.28)", color: "#ffd9bf" }}>
+      <span className="relative flex size-[6px]">
+        <span className="absolute inset-0 animate-ping rounded-full bg-[#ef4444] opacity-60" />
+        <span className="relative size-[6px] rounded-full bg-[#ef4444]" />
+      </span>
+      <span className="tabular text-[10.5px] font-semibold">{parts.map(([v, u]) => `${v}${u}`).join(" ")}</span>
+    </span>
+  );
+}
+
 /** Replaces the offer switch while Halloween runs: one card, tap to open, pick 2 treats. */
 function VaultCard({ p }: { p: Pick }) {
   const reduce = useReducedMotion();
@@ -721,7 +780,7 @@ function VaultCard({ p }: { p: Pick }) {
         <span aria-hidden="true" className="pointer-events-none absolute -right-[40px] -top-[50px] size-[150px] rounded-full" style={{ background: `radial-gradient(circle, rgba(255,138,61,0.22), transparent 65%)` }} />
         <VaultDial open={open} />
         <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
-          <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}><span className="hidden sm:inline">Halloween · </span>The Haunted Vault</span>
+          <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}><span className="hidden sm:inline">Halloween · </span>The Haunted Vault <VaultClock /></span>
           <span className="text-[18px] font-semibold leading-[1.1] tracking-[-0.025em] sm:text-[21px]">
             45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO instantly</span>
           </span>
@@ -755,7 +814,6 @@ function VaultCard({ p }: { p: Pick }) {
           </motion.div>
         )}
       </AnimatePresence>
-      <OfferDetails p={p} giftParts={null} />
     </div>
   );
 }
@@ -975,6 +1033,81 @@ function HalloweenDecor() {
   );
 }
 
+/* ------------------------------ clean card pieces ------------------------- */
+
+function Hairline() {
+  return <div aria-hidden="true" className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(148,178,255,0.18), transparent)" }} />;
+}
+
+/** Account sizes as one sliding track (same feel as the platform switch). */
+function SizeTrack({ p }: { p: Pick }) {
+  const n = p.sizes.length;
+  const idx = Math.min(p.i, n - 1);
+  return (
+    <div className="relative grid rounded-full p-[4px]" style={{ gridTemplateColumns: `repeat(${n}, minmax(0,1fr))`, background: "rgba(255,255,255,0.04)", border: `1px solid ${LINE}` }}>
+      <span aria-hidden="true" className="absolute bottom-[4px] top-[4px] rounded-full transition-[left] duration-300" style={{ left: `calc(4px + ${idx} * (100% - 8px) / ${n})`, width: `calc((100% - 8px) / ${n})`, background: BLUE, boxShadow: "0 8px 20px -10px rgba(37,99,235,0.9)" }} />
+      {p.sizes.map((z, j) => {
+        const on = j === idx;
+        return (
+          <button key={z} type="button" aria-pressed={on} onClick={() => p.setI(j)} className="relative z-[1] h-[42px] cursor-pointer rounded-full border-0 bg-transparent text-[13px] font-bold transition-colors sm:text-[14px]" style={{ color: on ? "#fff" : SOFT }}>
+            {fmtSize(z)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** The four key rules in one clean strip, divided by hairlines. */
+function SpecStrip({ p }: { p: Pick }) {
+  return (
+    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[18px] sm:grid-cols-4" style={{ background: "rgba(148,178,255,0.12)", border: "1px solid rgba(148,178,255,0.12)" }}>
+      {rules(p).map(([v, l]) => (
+        <span key={l} className="flex flex-col items-center justify-center gap-[5px] px-[8px] py-[14px] text-center" style={{ background: "#0a1330" }}>
+          <span className="text-[17px] font-bold leading-none tracking-[-0.01em] text-white">{v}</span>
+          <span className="text-[11px] font-medium leading-tight" style={{ color: MUTED }}>{l}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** What's included, as quiet chips. */
+function PerkChips({ p }: { p: Pick }) {
+  return (
+    <div className="flex flex-wrap gap-[6px]">
+      {perks(p).map((k) => (
+        <span key={k.label} className="flex h-[30px] items-center gap-[6px] rounded-full px-[11px] text-[12px] font-medium text-[#dbe4f5]" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(148,178,255,0.12)" }}>
+          <Svg d={k.d} size={13} color="#4ade80" w={2} />
+          {k.label}
+          {k.challengeOnly && <span style={{ color: MUTED }}>· challenge</span>}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** "Your account" recap right above the button: size, model, type and platform. */
+function OrderSummary({ p }: { p: Pick }) {
+  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
+  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
+  return (
+    <div className="flex items-center justify-between gap-[12px]">
+      <div className="flex min-w-0 flex-col gap-[3px]">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Your account</span>
+        <span className="flex flex-wrap items-baseline gap-x-[8px] gap-y-[2px]">
+          <Roll value={fmtSize(p.size)} className="text-[24px] font-bold leading-none tracking-[-0.02em] text-white" />
+          <span className="text-[14px] font-semibold text-[#dbe4f5]">{p.step} · {type}</span>
+        </span>
+      </div>
+      <span className="flex h-[34px] shrink-0 items-center gap-[7px] rounded-full px-[12px] text-[12.5px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(148,178,255,0.18)" }}>
+        <img src={plat.logo} alt="" className={`${p.platform === "platform-5" ? "h-[19px]" : "h-[17px]"} w-auto`} />
+        {plat.label}
+      </span>
+    </div>
+  );
+}
+
 /* ============================ The pricing section ============================ */
 
 const MODEL_COPY: Record<StepId, { mark: string; line: string; short: string }> = {
@@ -1031,9 +1164,39 @@ function TrustRow() {
         <span className="text-[#00b67a]" aria-hidden="true">★★★★★</span>
         <span className="font-semibold text-[#c7d2e6]">4.5/5 · 3K+ reviews</span>
       </span>
-      <span>Card or crypto</span>
       <span>Rewards in 24-48h</span>
       <span>Fee back with reward</span>
+    </div>
+  );
+}
+
+/** Small payment marks: cards and crypto. Drawn in code (no images), same as the old payment row. */
+function PayMarks() {
+  const chip = "flex h-[24px] items-center justify-center rounded-[6px] px-[7px]";
+  const coin = (bg: string, child: ReactNode, label: string) => (
+    <span aria-label={label} className="flex size-[24px] items-center justify-center rounded-full" style={{ background: bg, boxShadow: "0 0 0 1.5px rgba(255,255,255,0.9)" }}>{child}</span>
+  );
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-[6px]" aria-label="Pay by card or crypto">
+      <span className={chip} style={{ background: "#fff" }} aria-label="Visa">
+        <span className="text-[12px] font-extrabold italic tracking-[-0.02em] text-[#1434CB]">VISA</span>
+      </span>
+      <span className={chip} style={{ background: "#fff" }} aria-label="Mastercard">
+        <span className="relative h-[14px] w-[22px]">
+          <span className="absolute left-0 top-0 size-[14px] rounded-full bg-[#EB001B]" />
+          <span className="absolute right-0 top-0 size-[14px] rounded-full bg-[#F79E1B] mix-blend-multiply" />
+        </span>
+      </span>
+      <span className={chip} style={{ background: "#1F72CD" }} aria-label="American Express">
+        <span className="text-[9.5px] font-extrabold tracking-[0.02em] text-white">AMEX</span>
+      </span>
+      <span className="mx-[4px] h-[14px] w-px" style={{ background: "rgba(148,178,255,0.25)" }} />
+      <span className="flex items-center -space-x-[5px]">
+        {coin("#F7931A", <span className="text-[13px] font-bold text-white">₿</span>, "Bitcoin")}
+        {coin("#26A17B", <span className="text-[12px] font-bold text-white">₮</span>, "USDT")}
+        {coin("#627EEA", <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 0.5 1.2 6.3 6 8.8l4.8-2.5L6 0.5Z" fill="#fff" fillOpacity="0.85" /><path d="M6 9.6 1.2 6.9 6 11.5l4.8-4.6L6 9.6Z" fill="#fff" /></svg>, "Ethereum")}
+      </span>
+      <span className="ml-[2px] text-[11px] font-medium" style={{ color: MUTED }}>+ more</span>
     </div>
   );
 }
@@ -1102,62 +1265,49 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
           >
             <span aria-hidden="true" className="pointer-events-none absolute -right-[70px] -top-[80px] size-[240px] rounded-full" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.35), transparent 65%)" }} />
             {p.halloween && <span aria-hidden="true" className="pointer-events-none absolute inset-x-[12%] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,138,61,0.85), transparent)" }} />}
-            <div className="relative flex flex-col gap-[16px] p-[16px] sm:p-[22px] lg:gap-[18px] lg:p-[28px]">
+            <div className="relative flex flex-col gap-[18px] p-[16px] sm:p-[22px] lg:gap-[20px] lg:p-[28px]">
 
-              <div className="flex flex-col gap-[8px]">
+              <div className="flex flex-col gap-[10px]">
                 <Label>Account size</Label>
-                <div className="grid grid-cols-5 gap-[6px]">
-                  {p.sizes.map((z, j) => {
-                    const on = j === p.i;
-                    return (
-                      <button key={z} type="button" aria-pressed={on} onClick={() => p.setI(j)} className="h-[46px] cursor-pointer rounded-[13px] text-[13px] font-bold transition-colors sm:text-[14px]" style={{ border: `1px solid ${on ? "#60a5fa" : "rgba(148,178,255,0.16)"}`, background: on ? "rgba(59,130,246,0.3)" : "rgba(255,255,255,0.02)", color: on ? "#fff" : SOFT }}>
-                        {fmtSize(z)}
-                      </button>
-                    );
-                  })}
-                </div>
+                <SizeTrack p={p} />
               </div>
 
-              <div className="grid grid-cols-1 gap-[16px]">
-                <div className="flex flex-col gap-[8px]">
-                  <Label
-                    right={
-                      <button type="button" aria-expanded={compare} onClick={() => setCompare((v) => !v)} className="flex cursor-pointer items-center gap-[6px] rounded-full border-0 px-[10px] py-[5px] text-[12px] font-semibold text-[#bfdbfe]" style={{ background: compare ? "rgba(59,130,246,0.25)" : "rgba(255,255,255,0.06)" }}>
-                        <Svg d="M7 7h11l-3-3M17 17H6l3 3" size={12} color="#bfdbfe" w={2.2} />
-                        {compare ? "Hide" : "Compare"}
-                      </button>
-                    }
-                  >
-                    Type
-                  </Label>
-                  <TypeCards p={p} />
-                  <AnimatePresence initial={false}>
-                    {compare && (
-                      <motion.div key="cmp" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }} className="overflow-hidden">
-                        <CompareTable p={p} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-                <div className="flex flex-col gap-[8px]">
-                  <Label>Platform</Label>
-                  <PlatformSeg p={p} />
-                  <div className="mt-[4px] grid grid-cols-4 gap-[6px] rounded-[16px] p-[10px]" style={{ background: "rgba(0,0,0,0.25)" }}>
-                    {rules(p).map(([v, l]) => (
-                      <span key={l} className="flex flex-col items-center gap-[2px]">
-                        <span className="text-[15px] font-bold">{v}</span>
-                        <span className="text-[9.5px] uppercase tracking-[0.08em]" style={{ color: MUTED }}>{l}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
+              <Hairline />
+
+              <div className="flex flex-col gap-[10px]">
+                <Label
+                  right={
+                    <button type="button" aria-expanded={compare} onClick={() => setCompare((v) => !v)} className="flex cursor-pointer items-center gap-[6px] rounded-full border-0 px-[10px] py-[5px] text-[12px] font-semibold text-[#bfdbfe]" style={{ background: compare ? "rgba(59,130,246,0.25)" : "rgba(255,255,255,0.06)" }}>
+                      <Svg d="M7 7h11l-3-3M17 17H6l3 3" size={12} color="#bfdbfe" w={2.2} />
+                      {compare ? "Hide" : "Compare"}
+                    </button>
+                  }
+                >
+                  Type
+                </Label>
+                <TypeCards p={p} />
+                <AnimatePresence initial={false}>
+                  {compare && (
+                    <motion.div key="cmp" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }} className="overflow-hidden">
+                      <CompareTable p={p} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              <div className="flex flex-col gap-[10px] rounded-[16px] p-[12px] lg:p-[16px]" style={{ background: "rgba(0,0,0,0.22)" }}>
-                <Label>Why traders choose this</Label>
-                <PerkGrid p={p} cols={2} />
+              <Hairline />
+
+              <div className="flex flex-col gap-[10px]">
+                <Label>Platform</Label>
+                <PlatformSeg p={p} />
               </div>
 
+              <SpecStrip p={p} />
+              <PerkChips p={p} />
+
+              <Hairline />
+
+              <OrderSummary p={p} />
               {p.halloween && <VaultSummary p={p} onPick={() => setSheet(true)} />}
               <motion.a
                 href={p.co.href}
@@ -1189,9 +1339,9 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                     <Roll value={money(p.price)} className="text-[24px] font-bold leading-none" />
                     <s className="text-[13px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
                   </span>
-                  <span className="mt-[3px] text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}{p.halloween ? " · + BOGO instantly" : ""}</span>
+                  <span className="mt-[3px] whitespace-nowrap text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}</span>
                 </span>
-                <span className="relative flex items-center gap-[6px] rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
+                <span className="relative flex shrink-0 items-center gap-[6px] whitespace-nowrap rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
                   Get funded
                   <motion.span className="flex" animate={reduce ? undefined : { x: [0, 4, 0] }} transition={reduce ? undefined : { duration: 1.2, repeat: Infinity, ease: "easeInOut" }}>
                     <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#2563eb" w={2.6} />
@@ -1200,6 +1350,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
               </motion.a>
               <CodeLine p={p} />
               <TrustRow />
+              <PayMarks />
             </div>
           </motion.div>
       </div>
