@@ -1,34 +1,26 @@
-// TEMPORARY: test the links-fix snippet on live pages (injected in the test browser only).
-import { chromium } from "playwright";
-import { readFileSync, writeFileSync } from "node:fs";
-const html = readFileSync("scripts/links.html", "utf8");
-const js = html.replace(/^<script>/, "").replace(/<\/script>\s*$/, "");
-const pages = ["affiliate-registration/", "contact/", "cart/", "my-account/", "product/instant-funding-prime/"];
-const log = [];
-const browser = await chromium.launch();
-for (const vp of [{ n: "d", w: 1440, h: 900, m: false }, { n: "m", w: 390, h: 844, m: true }]) {
-  const ctx = await browser.newContext({ viewport: { width: vp.w, height: vp.h }, isMobile: vp.m, hasTouch: vp.m });
-  const page = await ctx.newPage();
-  const errs = [];
-  page.on("pageerror", (e) => errs.push(e.message.slice(0, 70)));
-  for (const p of pages) {
-    try {
-      await page.goto("https://fundingyourtrades.com/" + p, { waitUntil: "load", timeout: 60000 });
-      await page.waitForTimeout(3000);
-      const count = () => page.evaluate(() => { const all = Array.from(document.querySelectorAll("a[href]")); const bad = all.filter((a) => /^https?:\/\/intercom\.help\/funding-your-trades\/en\/?$/i.test(a.getAttribute("href")) || /clients\.fundingyourtrades\.com/i.test(a.getAttribute("href"))); const faq = all.filter((a) => a.getAttribute("href") === "https://fundingyourtrades.com/faq").length; const app = all.filter((a) => a.getAttribute("href") === "https://app.fundingyourtrades.com/").length; const keep = all.filter((a) => /intercom\.help.*articles/.test(a.getAttribute("href"))).length; return { oldLeft: bad.length, toFaq: faq, toApp: app, articleLinksKept: keep }; });
-      const before = await count();
-      const e0 = errs.length;
-      await page.addScriptTag({ content: js });
-      await page.waitForTimeout(1500);
-      const after = await count();
-      // simulate a late-added link (e.g. a menu opened by a click)
-      await page.evaluate(() => { const a = document.createElement("a"); a.id = "late"; a.href = "https://clients.fundingyourtrades.com/login"; a.textContent = "x"; document.body.appendChild(a); });
-      await page.waitForTimeout(600);
-      const late = await page.evaluate(() => document.getElementById("late").getAttribute("href"));
-      log.push(`[${vp.n}] /${p} before=${JSON.stringify(before)} after=${JSON.stringify(after)} late=${late} newErrors=${errs.length - e0}`);
-    } catch (e) { log.push(`[${vp.n}] /${p} ERR ${String(e).slice(0, 120)}`); }
-  }
-  await ctx.close();
+// TEMPORARY: read-only look at the public featured-payouts feed (counts by country and recency).
+import { writeFileSync } from "node:fs";
+const base = "https://rewards.fundingyourtrades.com/api/v1/public/featured-payouts";
+const all = [];
+let totalItems = null;
+for (let page = 1; page <= 10; page++) {
+  const r = await fetch(`${base}?limit=100&page=${page}&sort=latest`);
+  if (!r.ok) { all.push({ err: r.status }); break; }
+  const j = await r.json();
+  totalItems = j.meta?.pagination?.totalItems ?? totalItems;
+  all.push(...j.data);
+  if (!j.meta?.pagination?.hasNextPage) break;
 }
-await browser.close();
-writeFileSync("ci-out/log.txt", log.join("\n") + "\n");
+const rows = all.filter((p) => p.amount !== undefined && Number(p.amount) > 0);
+const now = Date.now();
+const day = 86400000;
+const win = (d) => rows.filter((p) => p.createdAt && now - Date.parse(p.createdAt) <= d * day);
+const by = (arr) => { const m = {}; for (const p of arr) { const k = p.countryCode || "??"; (m[k] ||= { n: 0, usd: 0 }); m[k].n++; m[k].usd += Number(p.amount); } return Object.entries(m).sort((a, b) => b[1].n - a[1].n).map(([k, v]) => `${k}:${v.n}/$${Math.round(v.usd)}`).join(" "); };
+const dates = rows.map((p) => Date.parse(p.createdAt)).filter(Number.isFinite).sort((a, b) => a - b);
+const out = [];
+out.push(`totalItems(api)=${totalItems} fetched=${all.length} withAmount=${rows.length}`);
+out.push(`oldest=${new Date(dates[0]).toISOString()} newest=${new Date(dates[dates.length - 1]).toISOString()}`);
+for (const d of [7, 14, 30, 60, 90]) out.push(`last ${d}d: total=${win(d).length} countries=${new Set(win(d).map((p) => p.countryCode)).size} | ${by(win(d)).slice(0, 400)}`);
+out.push(`ALL: ${by(rows).slice(0, 900)}`);
+out.push(`sample: ${JSON.stringify(rows.slice(0, 2))}`);
+writeFileSync("ci-out/log.txt", out.join("\n") + "\n");
