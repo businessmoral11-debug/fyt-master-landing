@@ -1,20 +1,31 @@
-// TEMPORARY: screenshots of the hero-tweak preview (desktop + phone).
+// TEMPORARY: check live WP pages (no injection) for the installed promo bar snippet.
 import { chromium } from "playwright";
 import { writeFileSync } from "node:fs";
-const URL = "https://fyt-master-landing-p4f3fuh65-bm-med.vercel.app/";
+const pages = ["affiliate-registration/", "contact/", "cart/"];
 const log = [];
 const browser = await chromium.launch();
-for (const vp of [{ n: "d", w: 1440, h: 900, m: false }, { n: "l", w: 1280, h: 760, m: false }, { n: "m", w: 390, h: 844, m: true }]) {
-  const ctx = await browser.newContext({ viewport: { width: vp.w, height: vp.h }, isMobile: vp.m, hasTouch: vp.m, deviceScaleFactor: vp.m ? 2 : 1 });
+const UA_M = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1";
+for (const vp of [{ n: "d", w: 1440, h: 900, m: false }, { n: "m", w: 390, h: 844, m: true, ua: UA_M }]) {
+  const ctx = await browser.newContext({ viewport: { width: vp.w, height: vp.h }, isMobile: vp.m, hasTouch: vp.m, userAgent: vp.ua });
   const page = await ctx.newPage();
-  page.on("pageerror", (e) => log.push(`[${vp.n}] PAGEERROR ${e.message}`));
-  try {
-    await page.goto(URL, { waitUntil: "domcontentloaded", timeout: 60000 });
-    await page.waitForTimeout(9000);
-    const st = await page.evaluate(() => { const t = document.querySelector(".fyt-hw-timer"); const h = document.querySelector("h1"); const w = document.querySelectorAll(".ti-widget"); return { timerH: t ? t.offsetHeight : null, timerW: t ? t.offsetWidth : null, h1Top: h ? Math.round(h.getBoundingClientRect().top) : null, tiWidgets: Array.from(w).map((x) => Math.round(x.getBoundingClientRect().top)), overflowX: document.documentElement.scrollWidth - innerWidth }; });
-    log.push(`[${vp.n}] ${JSON.stringify(st)}`);
-    await page.screenshot({ path: `ci-out/${vp.n}-hero.png` });
-  } catch (e) { log.push(`[${vp.n}] ERR ${String(e).slice(0, 150)}`); }
+  for (const p of pages) {
+    try {
+      const res = await page.goto("https://fundingyourtrades.com/" + p, { waitUntil: "domcontentloaded", timeout: 45000 });
+      const h = res.headers();
+      log.push(`[${vp.n}] ${p} status=${res.status()} cache: ${["x-litespeed-cache","x-litespeed-cache-control","x-cache","cf-cache-status","x-hcdn-cache-status","x-qc-cache","cache-control","age","server","x-hcdn-request-id","platform"].map(k=>h[k]?k+"="+h[k]:"").filter(Boolean).join(" | ")}`);
+      await page.waitForTimeout(5000);
+      const st = await page.evaluate(() => {
+        const html = document.documentElement.outerHTML;
+        const b = document.getElementById("fyt-hw-bar");
+        const olds = Array.from(document.querySelectorAll("#fyt4wrap, [id^=fyt4], .fset")).map(e => e.id || e.className).slice(0,6);
+        const vis = Array.from(document.querySelectorAll("#fyt4wrap")).map(e => getComputedStyle(e).display + "/" + e.offsetHeight);
+        const summer = Array.from(document.querySelectorAll("body *")).filter(e => e.children.length === 0 && /SUMMER/i.test(e.textContent || "") && e.offsetHeight > 0).slice(0, 4).map(e => { const r = e.getBoundingClientRect(); let a = e, chain = []; for (let i = 0; i < 6 && a; i++) { chain.push((a.id ? "#" + a.id : a.tagName.toLowerCase()) + (a.className && typeof a.className === "string" ? "." + a.className.split(" ").slice(0,2).join(".") : "")); a = a.parentElement; } return { top: Math.round(r.top), text: e.textContent.trim().slice(0, 40), chain: chain.join(" < ") }; });
+        return { snippetInHtml: html.includes("fyt-hw-bar"), bar: !!b, barTop: b ? Math.round(b.getBoundingClientRect().top) : null, barH: b ? b.offsetHeight : null, olds, fyt4wrapVis: vis, summer };
+      });
+      log.push(`[${vp.n}] ${p} ${JSON.stringify(st)}`);
+      await page.screenshot({ path: `ci-out/${vp.n}-${p.replace(/\W+/g, "_")}.png`, clip: { x: 0, y: 0, width: vp.w, height: 300 } });
+    } catch (e) { log.push(`[${vp.n}] ${p} ERR ${String(e).slice(0, 150)}`); }
+  }
   await ctx.close();
 }
 await browser.close();
