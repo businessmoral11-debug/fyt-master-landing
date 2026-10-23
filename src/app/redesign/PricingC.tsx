@@ -253,9 +253,9 @@ function Label({ n, children, right }: { n?: number; children: ReactNode; right?
 
 const TYPE_NOTE: Record<string, string> = {
   "c-classic": "News + hedging always",
-  "c-prime": "No consistency rule",
+  "c-prime": "No consistency",
   "i-plus": "Fewest rules",
-  "i-prime": "No consistency rule",
+  "i-prime": "No consistency",
 };
 
 function TypeCards({ p }: { p: Pick }) {
@@ -1230,9 +1230,9 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                     <Roll value={money(p.price)} className="text-[24px] font-bold leading-none" />
                     <s className="text-[13px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
                   </span>
-                  <span className="mt-[3px] text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}{p.halloween ? " · + BOGO instantly" : ""}</span>
+                  <span className="mt-[3px] whitespace-nowrap text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}</span>
                 </span>
-                <span className="relative flex items-center gap-[6px] rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
+                <span className="relative flex shrink-0 items-center gap-[6px] whitespace-nowrap rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
                   Get funded
                   <motion.span className="flex" animate={reduce ? undefined : { x: [0, 4, 0] }} transition={reduce ? undefined : { duration: 1.2, repeat: Infinity, ease: "easeInOut" }}>
                     <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#2563eb" w={2.6} />
