@@ -1,0 +1,54 @@
+# TEMPORARY - halloween test branch only. NEVER merge this file into main. Builds the site and takes
+# desktop/mobile screenshots for review, then pushes them to the `ci-halloween`
+# branch (deleted after review). Never deploys anywhere.
+name: Halloween preview screenshots
+
+on:
+  push:
+    branches: [table-test]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: table-test
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Build and screenshot
+        run: |
+          set +e
+          mkdir -p ci-out
+          echo "sha=${GITHUB_SHA}" > ci-out/info.txt
+          VITE_BASE_PATH=/ npm run build > ci-out/build.txt 2>&1; B=$?; echo "exit $B" >> ci-out/build.txt
+          if [ $B -eq 0 ]; then
+            npm i --no-save playwright@1.55.0 > /dev/null 2>&1
+            npx playwright install --with-deps chromium > /dev/null 2>&1
+            VITE_BASE_PATH=/ npx vite preview --port 4173 --strictPort --host 127.0.0.1 > ci-out/preview.txt 2>&1 &
+            sleep 4
+            node scripts/ci-table.mjs > ci-out/screens.txt 2>&1; echo "exit $?" >> ci-out/screens.txt
+          fi
+          exit 0
+      - name: Publish results to ci-screens branch
+        run: |
+          cd ci-out
+          printf '{ "git": { "deploymentEnabled": false } }\n' > vercel.json
+          git init -q
+          git config user.name "testing-ci"
+          git config user.email "testing-ci@users.noreply.github.com"
+          git checkout -q -b ci-table
+          git add -A
+          git commit -q -m "screens for ${GITHUB_SHA}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-table
