@@ -154,10 +154,18 @@ const TYPE_INFO: Record<string, { badge: string; line: string }> = {
 };
 const INSTANT_PRIME = { badge: "More room", line: "6% max loss, 5 min days" };
 
+/** Key rules for the picked account, spelled out so nobody has to guess what a number means. */
 function rules(p: Pick): [string, string][] {
   const e = p.entry;
-  if (p.step === "Instant") return [[e.profit ?? "N/A", "Target"], [e.maxDaily, "Daily"], [e.maxOverall, "Max loss"], [e.split.replace("Up to ", ""), "Split"]];
-  return [[p.step === "2-Step" ? `${e.p1}/${e.p2}` : e.p1 ?? "", p.step === "2-Step" ? "Targets" : "Target"], [e.maxDaily, "Daily"], [e.maxOverall, "Max loss"], [e.split.replace("Up to ", ""), "Split"]];
+  const v = (x?: string) => (!x || x === "N/A" ? "None" : x);
+  if (p.step === "Instant")
+    return [[v(e.profit), "Min. profit for payout"], [v(e.maxDaily), "Daily loss limit"], [v(e.maxOverall), "Max loss limit"], [e.split, "Payout split"]];
+  return [
+    [p.step === "2-Step" ? `${e.p1} / ${e.p2}` : v(e.p1), p.step === "2-Step" ? "Profit targets" : "Profit target"],
+    [v(e.maxDaily), "Daily loss limit"],
+    [v(e.maxOverall), "Max loss limit"],
+    [e.split, "Payout split"],
+  ];
 }
 
 const IC = {
@@ -177,13 +185,11 @@ type Perk = { d: string; label: string; challengeOnly: boolean };
 function perks(p: Pick): Perk[] {
   if (p.step === "Instant")
     return [
-      { d: IC.split, label: "Up to 90% split", challengeOnly: false },
       { d: IC.wk, label: "Weekend holding", challengeOnly: false },
-      { d: IC.cal, label: "Bi-weekly rewards", challengeOnly: false },
+      { d: IC.cal, label: "Bi-weekly payouts", challengeOnly: false },
     ];
   const prime = p.plan === "prime";
   return [
-    { d: IC.split, label: "Up to 100% split", challengeOnly: false },
     { d: IC.news, label: "News trading", challengeOnly: prime },
     { d: IC.hedge, label: "Hedging", challengeOnly: prime },
     { d: IC.ea, label: "EA and copy", challengeOnly: true },
@@ -245,17 +251,24 @@ function Label({ n, children, right }: { n?: number; children: ReactNode; right?
   );
 }
 
+const TYPE_NOTE: Record<string, string> = {
+  "c-classic": "News + hedging always",
+  "c-prime": "No consistency rule",
+  "i-plus": "Fewest rules",
+  "i-prime": "No consistency rule",
+};
+
 function TypeCards({ p }: { p: Pick }) {
   return (
     <div className="grid grid-cols-2 gap-[8px]">
       {p.plans.map((x) => {
         const on = x.id === p.plan;
-        const note = x.id === "prime" ? "No consistency" : "";
+        const note = TYPE_NOTE[`${p.step === "Instant" ? "i" : "c"}-${x.id}`] ?? "";
         return (
           <button key={x.id} type="button" aria-pressed={on} onClick={() => p.setPlan(x.id)} className="flex h-[58px] cursor-pointer items-center justify-between gap-[8px] rounded-[16px] px-[14px] text-left text-white transition-colors" style={{ border: `1.5px solid ${on ? "#60a5fa" : LINE}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.26), rgba(37,99,235,0.06))" : "rgba(255,255,255,0.03)" }}>
             <span className="flex flex-col">
               <span className="text-[16px] font-bold leading-tight">{x.label}</span>
-              {note && <span className="text-[11px] font-semibold text-[#86efac]">{note}</span>}
+              {note && <span className="text-[11px] font-semibold" style={{ color: x.id === "prime" ? "#86efac" : "#93c5fd" }}>{note}</span>}
             </span>
             <span className="size-[16px] shrink-0 rounded-full" style={{ border: `2px solid ${on ? "#60a5fa" : "#5b6478"}`, background: on ? "#60a5fa" : "transparent", boxShadow: on ? "inset 0 0 0 2px #0b1430" : "none" }} />
           </button>
@@ -265,28 +278,56 @@ function TypeCards({ p }: { p: Pick }) {
   );
 }
 
-/** Differences only, opened from the "Compare" link next to Type. */
+/** Differences only, opened from the "Compare" link next to Type. Tap a column to pick it. */
+type Cell = { t: string; good?: boolean };
 function CompareTable({ p }: { p: Pick }) {
   const instant = p.step === "Instant";
   const ids = p.plans.map((x) => x.id);
   const names = p.plans.map((x) => x.label);
   const e = ids.map((id) => getEntry(p.step, id, p.platform, p.size)!);
-  const rows: [string, string, string][] = instant
-    ? [["Profit target", e[0].profit ?? "-", e[1].profit ?? "-"], ["Daily loss", e[0].maxDaily, e[1].maxDaily], ["Max loss", e[0].maxOverall, e[1].maxOverall], ["Min trading days", e[0].minDays, e[1].minDays]]
-    : [["Consistency rule", "Applies", "None"], ["News trading", "Always", "Challenge"], ["Hedging", "Always", "Challenge"], ["Fee refund", "2nd reward", "1st reward"]];
+  const v = (x?: string) => (!x || x === "N/A" ? "None" : x);
+  const rows: [string, Cell, Cell][] = instant
+    ? [
+        ["Min. profit for payout", { t: v(e[0].profit) }, { t: v(e[1].profit) }],
+        ["Daily loss limit", { t: v(e[0].maxDaily) }, { t: v(e[1].maxDaily) }],
+        ["Max loss limit", { t: v(e[0].maxOverall) }, { t: v(e[1].maxOverall) }],
+        ["Min. trading days", { t: v(e[0].minDays) }, { t: v(e[1].minDays) }],
+      ]
+    : [
+        ["Consistency rule", { t: "Applies", good: false }, { t: "None", good: true }],
+        ["News trading when funded", { t: "Allowed", good: true }, { t: "Challenge only", good: false }],
+        ["Hedging when funded", { t: "Allowed", good: true }, { t: "Challenge only", good: false }],
+        ["Fee refunded with", { t: "2nd payout" }, { t: "1st payout", good: true }],
+      ];
   const href = instant ? "https://intercom.help/funding-your-trades/en/articles/14890800-instant-funding-models-compared" : "https://intercom.help/funding-your-trades/en/articles/13374417-fyt-classic-vs-fyt-prime";
+  const mark = (c: Cell) =>
+    c.good === undefined ? null : c.good ? (
+      <span className="flex size-[16px] shrink-0 items-center justify-center rounded-full bg-[#22c55e]"><Svg d={IC.check} size={9} color="#04210f" w={3.4} /></span>
+    ) : (
+      <span className="flex size-[16px] shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.1)" }}><Svg d="M7 7l10 10M17 7L7 17" size={8} color="#c7d2e6" w={3} /></span>
+    );
   return (
     <div className="overflow-hidden rounded-[16px]" style={{ background: "rgba(0,0,0,0.25)", border: `1px solid ${LINE}` }}>
-      <div className="grid grid-cols-[1.3fr_1fr_1fr] px-[12px] py-[9px] text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#93c5fd]">
+      <div className="grid grid-cols-[1.25fr_1fr_1fr] gap-[6px] px-[10px] py-[8px]">
         <span />
-        <span className="text-center">{names[0]}</span>
-        <span className="text-center">{names[1]}</span>
+        {ids.map((id, k) => {
+          const on = id === p.plan;
+          return (
+            <button key={id} type="button" onClick={() => p.setPlan(id)} aria-pressed={on} className="h-[30px] cursor-pointer rounded-full border-0 text-[12px] font-bold uppercase tracking-[0.08em]" style={{ background: on ? BLUE : "rgba(255,255,255,0.06)", color: on ? "#fff" : SOFT }}>
+              {names[k]}
+            </button>
+          );
+        })}
       </div>
       {rows.map(([k, a, b]) => (
-        <div key={k} className="grid grid-cols-[1.3fr_1fr_1fr] items-center px-[12px] py-[9px] text-[12.5px]" style={{ borderTop: "1px solid rgba(148,178,255,0.08)" }}>
+        <div key={k} className="grid grid-cols-[1.25fr_1fr_1fr] items-center gap-[6px] px-[12px] py-[9px] text-[12.5px]" style={{ borderTop: "1px solid rgba(148,178,255,0.08)" }}>
           <span style={{ color: SOFT }}>{k}</span>
-          <span className="text-center font-semibold" style={{ color: ids[0] === p.plan ? "#fff" : MUTED }}>{a}</span>
-          <span className="text-center font-semibold" style={{ color: ids[1] === p.plan ? "#fff" : MUTED }}>{b}</span>
+          {[a, b].map((c, j) => (
+            <span key={j} className="flex items-center justify-center gap-[6px] text-center font-semibold leading-tight" style={{ color: ids[j] === p.plan ? "#fff" : MUTED }}>
+              {mark(c)}
+              {c.t}
+            </span>
+          ))}
         </div>
       ))}
       <a href={href} target="_blank" rel="noopener noreferrer" className="block px-[12px] py-[9px] text-center text-[12px] font-semibold text-[#93c5fd] no-underline hover:underline" style={{ borderTop: "1px solid rgba(148,178,255,0.08)" }}>
@@ -1142,11 +1183,11 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
                 <div className="flex flex-col gap-[8px]">
                   <Label>Platform</Label>
                   <PlatformSeg p={p} />
-                  <div className="mt-[4px] grid grid-cols-4 gap-[6px] rounded-[16px] p-[10px]" style={{ background: "rgba(0,0,0,0.25)" }}>
+                  <div className="mt-[4px] grid grid-cols-2 gap-[6px] sm:grid-cols-4">
                     {rules(p).map(([v, l]) => (
-                      <span key={l} className="flex flex-col items-center gap-[2px]">
-                        <span className="text-[15px] font-bold">{v}</span>
-                        <span className="text-[9.5px] uppercase tracking-[0.08em]" style={{ color: MUTED }}>{l}</span>
+                      <span key={l} className="flex flex-col items-center justify-center gap-[3px] rounded-[14px] px-[6px] py-[10px] text-center" style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(148,178,255,0.08)" }}>
+                        <span className="text-[16px] font-bold leading-none">{v}</span>
+                        <span className="text-[11px] font-medium leading-tight" style={{ color: MUTED }}>{l}</span>
                       </span>
                     ))}
                   </div>

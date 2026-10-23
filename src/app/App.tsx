@@ -1467,15 +1467,6 @@ function Hero() {
           <span className="block text-white"><RevealWords text="Trade Without" /> <HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
           <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
         </h1>
-        <div className="h-[16px] lg:h-[32px] shrink-0" />
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="font-['Inter:Regular',sans-serif] font-normal not-italic text-[#a6acbe] text-[16px] leading-[1.6] w-full lg:w-[760px]"
-        >
-          Zero rules during the evaluation phases, pass however you want.
-        </motion.p>
         {isHalloweenLive() ? <HalloweenHeroChip /> : <div className="h-[28px] lg:h-[48px] shrink-0" />}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
