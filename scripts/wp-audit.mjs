@@ -1,26 +1,37 @@
-// TEMPORARY: read-only look at the public featured-payouts feed (counts by country and recency).
+// TEMPORARY: screenshots of the region-proof preview for several visitor countries.
+import { chromium } from "playwright";
 import { writeFileSync } from "node:fs";
-const base = "https://rewards.fundingyourtrades.com/api/v1/public/featured-payouts";
-const all = [];
-let totalItems = null;
-for (let page = 1; page <= 10; page++) {
-  const r = await fetch(`${base}?limit=100&page=${page}&sort=latest`);
-  if (!r.ok) { all.push({ err: r.status }); break; }
-  const j = await r.json();
-  totalItems = j.meta?.pagination?.totalItems ?? totalItems;
-  all.push(...j.data);
-  if (!j.meta?.pagination?.hasNextPage) break;
+const URL = "https://fyt-master-landing-nqz2pwf51-bm-med.vercel.app/";
+const cases = [["IN", "d"], ["IN", "m"], ["DE", "d"], ["US", "m"], ["ES", "d"], ["NG", "m"], ["BR", "d"], ["XX", "m"]];
+const log = [];
+const browser = await chromium.launch();
+for (const [cc, vpn] of cases) {
+  const m = vpn === "m";
+  const ctx = await browser.newContext({ viewport: m ? { width: 390, height: 844 } : { width: 1440, height: 900 }, isMobile: m, hasTouch: m, deviceScaleFactor: m ? 2 : 1, timezoneId: "Europe/London" });
+  const page = await ctx.newPage();
+  const errs = [];
+  page.on("pageerror", (e) => errs.push(e.message.slice(0, 90)));
+  try {
+    await page.goto(`${URL}?halloween=0&country=${cc}`, { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.waitForTimeout(2500);
+    await page.evaluate(() => { const el = document.getElementById("live-payouts"); if (el) el.scrollIntoView(); });
+    await page.waitForTimeout(500);
+    for (let y = 0; y < 3; y++) { await page.mouse.wheel(0, 300); await page.waitForTimeout(400); }
+    await page.evaluate(() => document.getElementById("live-payouts")?.scrollIntoView());
+    await page.waitForTimeout(6000);
+    const st = await page.evaluate(() => {
+      const s = document.getElementById("live-payouts");
+      if (!s) return { found: false };
+      const h = s.querySelector("h2")?.textContent;
+      const rows = s.querySelectorAll("ul li button").length;
+      const txt = s.innerText.replace(/\s+/g, " ").slice(0, 330);
+      return { found: true, h2: h, rows, overflowX: document.documentElement.scrollWidth - innerWidth, text: txt };
+    });
+    log.push(`[${cc} ${vpn}] ${JSON.stringify(st)} errors=${JSON.stringify([...new Set(errs)])}`);
+    const el = await page.$("#live-payouts");
+    if (el) await el.screenshot({ path: `ci-out/${cc}-${vpn}.png` });
+  } catch (e) { log.push(`[${cc} ${vpn}] ERR ${String(e).slice(0, 160)}`); }
+  await ctx.close();
 }
-const rows = all.filter((p) => p.amount !== undefined && Number(p.amount) > 0);
-const now = Date.now();
-const day = 86400000;
-const win = (d) => rows.filter((p) => p.createdAt && now - Date.parse(p.createdAt) <= d * day);
-const by = (arr) => { const m = {}; for (const p of arr) { const k = p.countryCode || "??"; (m[k] ||= { n: 0, usd: 0 }); m[k].n++; m[k].usd += Number(p.amount); } return Object.entries(m).sort((a, b) => b[1].n - a[1].n).map(([k, v]) => `${k}:${v.n}/$${Math.round(v.usd)}`).join(" "); };
-const dates = rows.map((p) => Date.parse(p.createdAt)).filter(Number.isFinite).sort((a, b) => a - b);
-const out = [];
-out.push(`totalItems(api)=${totalItems} fetched=${all.length} withAmount=${rows.length}`);
-out.push(`oldest=${new Date(dates[0]).toISOString()} newest=${new Date(dates[dates.length - 1]).toISOString()}`);
-for (const d of [7, 14, 30, 60, 90]) out.push(`last ${d}d: total=${win(d).length} countries=${new Set(win(d).map((p) => p.countryCode)).size} | ${by(win(d)).slice(0, 400)}`);
-out.push(`ALL: ${by(rows).slice(0, 900)}`);
-out.push(`sample: ${JSON.stringify(rows.slice(0, 2))}`);
-writeFileSync("ci-out/log.txt", out.join("\n") + "\n");
+await browser.close();
+writeFileSync("ci-out/log.txt", log.join("\n") + "\n");
