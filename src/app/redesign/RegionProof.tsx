@@ -361,7 +361,7 @@ function CertificateStage({ item }: { item: ProofItem | undefined }) {
   const f = item ? countryFlagUrl(item.countryCode) : null;
   const showImage = !!cert && failed !== cert.certificateId;
   return (
-    <div className="flex flex-col gap-[14px]">
+    <div className="flex min-w-0 flex-col gap-[14px]">
       <a href={link} target="_blank" rel="noopener noreferrer" className="group relative block overflow-hidden rounded-[20px] no-underline" style={{ background: "#060b16", border: "1px solid rgba(148,178,255,0.24)", boxShadow: "0 30px 70px -30px rgba(37,99,235,0.85)" }}>
         <div className="relative aspect-[1.41] w-full">
           <span className="absolute inset-0" style={{ background: "radial-gradient(80% 70% at 50% 40%, #0f1d44, #060b16)" }} />
@@ -512,14 +512,14 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
   return (
     <Section tone="light" id="live-payouts">
       <div className="relative grid grid-cols-1 items-center gap-[40px] lg:grid-cols-12 lg:gap-[56px]">
-        <div className="flex flex-col gap-[22px] lg:col-span-4">
+        <div className="flex min-w-0 flex-col gap-[22px] lg:col-span-5 xl:col-span-4">
           <Eyebrow tone="light">Live rewards</Eyebrow>
-          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] sm:text-[42px] lg:text-[50px]" style={{ color: C.textLight }}>
+          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] [text-wrap:balance] sm:text-[42px] lg:text-[40px] xl:text-[46px]" style={{ color: C.textLight }}>
             {scope.kind === "country" ? (
               <>
-                <span className="inline-flex flex-wrap items-center gap-x-[14px]">
+                <span className="inline-flex flex-nowrap items-center gap-x-[12px] whitespace-nowrap">
                   Traders from
-                  {flag && <img src={flag} alt="" width={56} height={40} className="inline-block h-[0.66em] w-auto rounded-[6px] shadow-[0_8px_24px_rgba(15,23,42,0.25)] ring-1 ring-black/10" />}
+                  {flag && <img src={flag} alt="" width={56} height={40} className="inline-block h-[0.62em] w-auto shrink-0 rounded-[6px] shadow-[0_8px_24px_rgba(15,23,42,0.25)] ring-1 ring-black/10" />}
                 </span>
                 <br />
                 <span className="fyt-gradient-text">{countryThe(scope.code)} get paid.</span>
@@ -586,7 +586,7 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
           <DiscordStrip />
         </div>
 
-        <Reveal delay={0.1} className="lg:col-span-8">
+        <Reveal delay={0.1} className="min-w-0 lg:col-span-7 xl:col-span-8">
           <div ref={panelRef} className={`fyt-ring relative rounded-[28px] ${panelLive ? "fyt-live" : ""}`} style={{ boxShadow: "0 60px 120px -60px rgba(37,99,235,0.8)" }}>
             <div className="relative flex flex-col gap-[18px] p-[16px] sm:p-[24px]">
               <div className="flex items-center justify-between gap-[12px]">
@@ -607,9 +607,9 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
                   Live
                 </span>
               </div>
-              <div className="grid grid-cols-1 gap-[16px] md:grid-cols-[1.15fr_1fr]">
+              <div className="grid grid-cols-1 gap-[16px] md:grid-cols-[1.15fr_1fr] lg:grid-cols-1 xl:grid-cols-[1.15fr_1fr]">
                 <CertificateStage item={ordered[pick] ?? ordered[0]} />
-                <ul className="flex flex-col gap-[8px]">
+                <ul className="flex min-w-0 flex-col gap-[8px]">
                   {ordered.length
                     ? ordered.map((p, i) => (
                         <FeedRow
