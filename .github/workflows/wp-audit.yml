@@ -1,0 +1,28 @@
+# TEMPORARY - reads live WordPress pages to find old promo banners. Never merge into main.
+name: WP promo audit
+on:
+  push:
+    branches: [wp-audit]
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit
+        run: |
+          set +e
+          mkdir -p ci-out
+          npm i --no-save playwright@1.55.0 > /dev/null 2>&1
+          npx playwright install --with-deps chromium > /dev/null 2>&1
+          node scripts/wp-audit.mjs > ci-out/run.txt 2>&1; echo "exit $?" >> ci-out/run.txt
+          exit 0
+      - name: Publish
+        run: |
+          cd ci-out
+          printf '{ "git": { "deploymentEnabled": false } }\n' > vercel.json
+          git init -q && git config user.name ci && git config user.email ci@users.noreply.github.com
+          git checkout -q -b ci-wp-audit && git add -A && git commit -q -m audit
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" ci-wp-audit
