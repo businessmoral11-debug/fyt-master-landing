@@ -1466,7 +1466,7 @@ function Hero() {
           <span className="block text-white"><RevealWords text="Trade Without" /> <HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
           <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
         </h1>
-        {isHalloweenLive() ? <HalloweenHeroChip /> : <div className="h-[28px] lg:h-[48px] shrink-0" />}
+        <div className="h-[28px] lg:h-[44px] shrink-0" />
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1492,16 +1492,16 @@ function Hero() {
             </span>
           </HeroCta>
           <HeroCta
-            href="#how-it-works"
+            href="https://rewards.fundingyourtrades.com/"
             magneticStrength={0.16}
             className="group flex h-[56px] lg:h-[58px] min-w-0 flex-1 lg:flex-none lg:min-w-[210px] justify-start gap-[10px] lg:gap-[14px] items-center pl-[6px] pr-[16px] lg:pl-[7px] lg:pr-[28px] relative rounded-[999px] backdrop-blur-[7px]"
             style={{ background: "rgba(255,255,255,0.05)" }}
           >
             <div aria-hidden className="absolute border border-[rgba(255,255,255,0.18)] border-solid inset-0 pointer-events-none rounded-[999px]" />
             <span className="flex size-[42px] lg:size-[44px] shrink-0 items-center justify-center rounded-full transition-colors duration-300 group-hover:bg-white/15" style={{ background: "rgba(255,255,255,0.08)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.16)" }}>
-              <svg width="13" height="13" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.5 2.2v7.6L9.8 6 3.5 2.2Z" fill="#e8ebf2" /></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8ebf2" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4ZM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4" /></svg>
             </span>
-            <span className="font-['Inter:Medium',sans-serif] font-medium text-[14.5px] lg:text-[16px] text-[#e8ebf2] whitespace-nowrap">How it works</span>
+            <span className="font-['Inter:Medium',sans-serif] font-medium text-[14.5px] lg:text-[16px] text-[#e8ebf2] whitespace-nowrap">View rewards</span>
           </HeroCta>
         </motion.div>
         <motion.div
