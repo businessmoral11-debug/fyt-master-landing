@@ -13,6 +13,7 @@ for (const vp of [{ n: "d", w: 1440, h: 900, m: false }, { n: "m", w: 390, h: 84
     try {
       await page.goto("https://fundingyourtrades.com/" + p, { waitUntil: "domcontentloaded", timeout: 45000 });
       await page.waitForTimeout(3000);
+      log.push(`[${vp.n}] ${p} --- inject now ---`);
       await page.evaluate((h) => {
         const box = document.createElement("div");
         box.innerHTML = h;
