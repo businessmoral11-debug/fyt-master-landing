@@ -12,7 +12,7 @@ for (const vp of [{ n: "d", w: 1440, h: 900, m: false }, { n: "m", w: 390, h: 84
     try {
       const res = await page.goto("https://fundingyourtrades.com/" + p, { waitUntil: "domcontentloaded", timeout: 45000 });
       const h = res.headers();
-      log.push(`[${vp.n}] ${p} status=${res.status()} cache: ${["x-litespeed-cache","x-litespeed-cache-control","x-cache","cf-cache-status","x-hcdn-cache-status","x-qc-cache","cache-control","age","server","x-hcdn-request-id","platform"].map(k=>h[k]?k+"="+h[k]:"").filter(Boolean).join(" | ")}`);
+      log.push(`[${vp.n}] ${p} status=${res.status()} headers=${JSON.stringify(h)}`);
       await page.waitForTimeout(5000);
       const st = await page.evaluate(() => {
         const html = document.documentElement.outerHTML;
@@ -20,7 +20,7 @@ for (const vp of [{ n: "d", w: 1440, h: 900, m: false }, { n: "m", w: 390, h: 84
         const olds = Array.from(document.querySelectorAll("#fyt4wrap, [id^=fyt4], .fset")).map(e => e.id || e.className).slice(0,6);
         const vis = Array.from(document.querySelectorAll("#fyt4wrap")).map(e => getComputedStyle(e).display + "/" + e.offsetHeight);
         const summer = Array.from(document.querySelectorAll("body *")).filter(e => e.children.length === 0 && /SUMMER/i.test(e.textContent || "") && e.offsetHeight > 0).slice(0, 4).map(e => { const r = e.getBoundingClientRect(); let a = e, chain = []; for (let i = 0; i < 6 && a; i++) { chain.push((a.id ? "#" + a.id : a.tagName.toLowerCase()) + (a.className && typeof a.className === "string" ? "." + a.className.split(" ").slice(0,2).join(".") : "")); a = a.parentElement; } return { top: Math.round(r.top), text: e.textContent.trim().slice(0, 40), chain: chain.join(" < ") }; });
-        return { snippetInHtml: html.includes("fyt-hw-bar"), bar: !!b, barTop: b ? Math.round(b.getBoundingClientRect().top) : null, barH: b ? b.offsetHeight : null, olds, fyt4wrapVis: vis, summer };
+        const wpcode = (html.match(/wpcode[^"\' >]{0,40}/gi) || []).slice(0, 8); const footerTail = document.body.innerHTML.slice(-1500).replace(/\s+/g," "); return { wpcode, footerTail, snippetInHtml: html.includes("fyt-hw-bar"), bar: !!b, barTop: b ? Math.round(b.getBoundingClientRect().top) : null, barH: b ? b.offsetHeight : null, olds, fyt4wrapVis: vis, summer };
       });
       log.push(`[${vp.n}] ${p} ${JSON.stringify(st)}`);
       await page.screenshot({ path: `ci-out/${vp.n}-${p.replace(/\W+/g, "_")}.png`, clip: { x: 0, y: 0, width: vp.w, height: 300 } });
