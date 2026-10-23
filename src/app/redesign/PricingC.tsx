@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import imgMatchTraderLogo from "@/assets/live-site/platform-logos/match-trader.png";
-import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5.png";
+import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5-clear.png";
 import { STEP_PLANS, STEP_SIZES, checkoutUrl, fmtSize, getEntry, type PlanId, type PlatformId, type StepId } from "@/app/data/pricing";
 import { ALT_PROMO_CODE, PROMO_CODE, PROMO_DEADLINE } from "@/app/data/promoBanner";
 import { SELECT_PLAN_EVENT, writeSavedPlan, type SavedPlan } from "@/app/data/savedPlan";
@@ -342,8 +342,8 @@ function PlatformMark({ id, on }: { id: PlatformId; on: boolean }) {
   const pl = PLATFORMS.find((x) => x.id === id)!;
   return (
     <>
-      {/* Platform 5's file has a lot of empty space around the mark, so it gets more height. */}
-      <img src={pl.logo} alt="" className={`${id === "platform-5" ? "-my-[4px] h-[34px]" : "h-[22px]"} w-auto`} style={{ filter: on ? "brightness(0) invert(1)" : "grayscale(1) brightness(1.6)", opacity: on ? 1 : 0.85 }} />
+      {/* Logos in their real colours (no white-out), slightly dimmed when not picked. */}
+      <img src={pl.logo} alt="" className={`${id === "platform-5" ? "h-[24px]" : "h-[22px]"} w-auto transition-opacity duration-300`} style={{ opacity: on ? 1 : 0.7 }} />
       <span>{pl.label}</span>
     </>
   );
@@ -1101,7 +1101,7 @@ function OrderSummary({ p }: { p: Pick }) {
         </span>
       </div>
       <span className="flex h-[34px] shrink-0 items-center gap-[7px] rounded-full px-[12px] text-[12.5px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(148,178,255,0.18)" }}>
-        <img src={plat.logo} alt="" className={`${p.platform === "platform-5" ? "-my-[3px] h-[26px]" : "h-[17px]"} w-auto`} style={{ filter: "brightness(0) invert(1)" }} />
+        <img src={plat.logo} alt="" className={`${p.platform === "platform-5" ? "h-[19px]" : "h-[17px]"} w-auto`} />
         {plat.label}
       </span>
     </div>
