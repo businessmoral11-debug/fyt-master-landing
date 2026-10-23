@@ -1474,7 +1474,7 @@ function Hero() {
           <HeroCta
             href={HERO_CONTENT.ctaPrimary.href}
             magneticStrength={0.22}
-            className="cta-shine group flex h-[56px] lg:h-[58px] min-w-0 flex-1 lg:flex-none justify-between gap-[8px] lg:gap-[14px] items-center pl-[18px] pr-[6px] lg:pl-[30px] lg:pr-[7px] relative rounded-[999px]"
+            className="cta-shine group flex h-[56px] lg:h-[58px] min-w-0 flex-1 lg:flex-none lg:min-w-[230px] justify-between gap-[8px] lg:gap-[14px] items-center pl-[18px] pr-[6px] lg:pl-[30px] lg:pr-[7px] relative rounded-[999px]"
             style={{ ...PILL_CTA_GRADIENT_STYLE, boxShadow: `${PILL_CTA_GRADIENT_STYLE.boxShadow}, 0 0 0 rgba(59,130,246,0)` }}
           >
             <div aria-hidden className="absolute border border-[rgba(156,196,255,0.35)] border-solid inset-0 pointer-events-none rounded-[999px]" />
@@ -1491,7 +1491,7 @@ function Hero() {
           <HeroCta
             href="#how-it-works"
             magneticStrength={0.16}
-            className="group flex h-[56px] lg:h-[58px] min-w-0 flex-1 lg:flex-none justify-start gap-[10px] lg:gap-[14px] items-center pl-[6px] pr-[16px] lg:pl-[7px] lg:pr-[28px] relative rounded-[999px] backdrop-blur-[7px]"
+            className="group flex h-[56px] lg:h-[58px] min-w-0 flex-1 lg:flex-none lg:min-w-[210px] justify-start gap-[10px] lg:gap-[14px] items-center pl-[6px] pr-[16px] lg:pl-[7px] lg:pr-[28px] relative rounded-[999px] backdrop-blur-[7px]"
             style={{ background: "rgba(255,255,255,0.05)" }}
           >
             <div aria-hidden className="absolute border border-[rgba(255,255,255,0.18)] border-solid inset-0 pointer-events-none rounded-[999px]" />
