@@ -1,0 +1,734 @@
+<!-- =====================================================================
+     FYT PROMO BAR for WordPress pages (affiliate, contact, legal pages, cart...)
+     Replaces the old "SUMMER SPECIAL / SUMMER40" bar with the current
+     Halloween bar - same design as the homepage. Turns itself off after
+     31 Oct 23:59 IST. Not shown on checkout.
+     WPCode: Add Snippet > HTML Snippet > Location: Site Wide Footer > Active.
+     ===================================================================== -->
+<div id="fyt-hw-bar" class="fyt-hw-bar" role="link" tabindex="0" aria-label="Halloween offer: 45% off plus BOGO. See plans">
+
+  <!-- Background effects (behind the text) -->
+  <div class="fyt-hw-bg" aria-hidden="true">
+    <div class="fyt-hw-fog fyt-hw-fog-1"></div>
+    <div class="fyt-hw-fog fyt-hw-fog-2"></div>
+    <div class="fyt-hw-sweep"></div>
+    <div class="fyt-hw-blast-glow"></div>
+
+    <!-- Cobweb, left corner -->
+    <svg class="fyt-hw-web fyt-hw-web-l" viewBox="0 0 64 56" width="64" height="56">
+      <g fill="none" stroke="rgba(200,210,255,.38)" stroke-width=".7">
+        <path d="M0 0L64 6M0 0L56 30M0 0L38 52M0 0L14 56M0 0L0 56"/>
+        <path d="M14 1.3Q12 7 12.3 11.9Q8 13 6.1 16.4Q4 18 3 19.5Q1.5 20 0 20"/>
+        <path d="M28 2.6Q25 13 24.5 23.7Q17 28 13 33Q8 36 6 39Q3 40 0 40"/>
+        <path d="M44 4.1Q40 18 38.5 21.4M38.5 21.4Q33 34 26 36.8Q19 44 9.3 47Q5 49 0 50"/>
+        <path d="M56 5.3Q52 20 50 26.8Q42 38 33 44"/>
+      </g>
+    </svg>
+    <!-- Cobweb, right corner (mirrored copy) -->
+    <svg class="fyt-hw-web fyt-hw-web-r" viewBox="0 0 64 56" width="64" height="56">
+      <g fill="none" stroke="rgba(200,210,255,.38)" stroke-width=".7" transform="translate(64 0) scale(-1 1)">
+        <path d="M0 0L64 6M0 0L56 30M0 0L38 52M0 0L14 56M0 0L0 56"/>
+        <path d="M14 1.3Q12 7 12.3 11.9Q8 13 6.1 16.4Q4 18 3 19.5Q1.5 20 0 20"/>
+        <path d="M28 2.6Q25 13 24.5 23.7Q17 28 13 33Q8 36 6 39Q3 40 0 40"/>
+        <path d="M44 4.1Q40 18 38.5 21.4M38.5 21.4Q33 34 26 36.8Q19 44 9.3 47Q5 49 0 50"/>
+        <path d="M56 5.3Q52 20 50 26.8Q42 38 33 44"/>
+      </g>
+    </svg>
+
+    <!-- Spiders and bats are created here by the script -->
+    <div class="fyt-hw-critters"></div>
+  </div>
+
+  <!-- Foreground content -->
+  <div class="fyt-hw-inner">
+    <div class="fyt-hw-offer">
+      <span class="fyt-hw-pumpkin" aria-hidden="true">
+        <span class="fyt-hw-pumpkin-glow"></span>
+        <svg viewBox="0 0 32 32" width="26" height="26">
+          <path d="M16 7.5c0-2 .6-3.6 2.4-4.6" stroke="#3f7d20" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <ellipse cx="9.5"  cy="18.5" rx="7.5" ry="10" fill="#e8630f"/>
+          <ellipse cx="22.5" cy="18.5" rx="7.5" ry="10" fill="#e8630f"/>
+          <ellipse cx="16"   cy="18.5" rx="7.8" ry="10.6" fill="#ff8a1f"/>
+          <path d="M16 8.5v20" stroke="#e8630f" stroke-width=".8" opacity=".7"/>
+          <g class="fyt-hw-face" fill="#ffe066">
+            <path d="M9 15.5l3.4-2.4.4 3.6z"/>
+            <path d="M23 15.5l-3.4-2.4-.4 3.6z"/>
+            <path d="M16 17.2l1.5 2.4h-3z"/>
+            <path d="M8.6 21.6q7.4 5.6 14.8 0l-2 .4-1.2 1.6-1.6-1.2-1.8 1.6-1.6-1.6-1.8 1.4-1.2-1.6z"/>
+          </g>
+        </svg>
+      </span>
+      <span class="fyt-hw-headline"><span class="fyt-hw-full">45% OFF + BOGO INSTANTLY + PICK ANY 2 TREATS</span><span class="fyt-hw-mid">45% OFF + BOGO + PICK ANY 2 TREATS</span><span class="fyt-hw-short">45% OFF + BOGO + 2 TREATS</span></span>
+      <span class="fyt-hw-divider" aria-hidden="true"></span>
+      <span class="fyt-hw-sub">THE HAUNTED VAULT IS OPEN</span>
+    </div>
+
+    <!-- Coupon pill: click to copy -->
+    <button type="button" class="fyt-hw-code" aria-label="Copy coupon code FYTWEEN">
+      <span class="fyt-hw-code-lbl">CODE</span>
+      <span class="fyt-hw-code-val">
+        <span class="fyt-hw-code-txt">FYTWEEN</span>
+        <span class="fyt-hw-code-ok" aria-hidden="true">COPIED!</span>
+      </span>
+      <svg class="fyt-hw-code-ico" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true">
+        <rect x="5" y="5" width="9" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M11 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      </svg>
+    </button>
+
+    <!-- Countdown pill (numbers are filled in live by the script) -->
+    <div class="fyt-hw-timer" role="timer" aria-live="off">
+      <span class="fyt-hw-timer-body">
+        <span class="fyt-hw-seg"><span class="fyt-hw-num" data-unit="d">9</span>D</span>
+        <span class="fyt-hw-seg"><span class="fyt-hw-num" data-unit="h">04</span>H</span>
+        <span class="fyt-hw-seg"><span class="fyt-hw-num" data-unit="m">18</span>M</span>
+        <span class="fyt-hw-seg"><span class="fyt-hw-num" data-unit="s">47</span>S</span>
+        <span class="fyt-hw-left">LEFT</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Pumpkin ember particles are spawned here (above the text, very brief) -->
+  <div class="fyt-hw-fxtop" aria-hidden="true"></div>
+  <!-- Screen-reader announcement for "copied" -->
+  <span class="fyt-hw-sr" aria-live="polite"></span>
+</div>
+
+<style>
+
+/* ---------- Base / layout ---------------------------------------------- */
+.fyt-hw-bar, .fyt-hw-bar *, .fyt-hw-bar *::before, .fyt-hw-bar *::after { box-sizing: border-box; }
+.fyt-hw-bar {
+  /* Brand colours: tweak here */
+  --fyt-hw-navy: #0b0f1b;
+  --fyt-hw-blue: #2354dc;
+  --fyt-hw-orange-1: #fd8a42;
+  --fyt-hw-orange-2: #ec6a1d;
+  
+
+  position: relative;            /* add "position: sticky; top: 0; z-index: 1000;" to make it sticky */
+  width: 100%;
+  min-height: 54px;
+  overflow: hidden;
+  isolation: isolate;
+  color: #fff;
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1;
+  background:
+    radial-gradient(120% 140% at 50% 120%, rgba(255,138,61,.16), transparent 60%),
+    linear-gradient(90deg, #0b0f1b 0%, #13215f 12%, #1a38a6 30%, #2354dc 48%, #1c3dae 66%, #1e2b62 82%, #121a40 100%);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  -webkit-font-smoothing: antialiased;
+  cursor: pointer;
+}
+.fyt-hw-inner {
+  position: relative; z-index: 2;
+  min-height: 54px;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+  gap: 8px 22px;
+  padding: 8px 64px;
+}
+.fyt-hw-offer { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.fyt-hw-headline {
+  font-weight: 800; font-size: 15px; letter-spacing: .02em; white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+}
+.fyt-hw-divider { width: 1px; height: 18px; background: rgba(255,255,255,.35); }
+.fyt-hw-sub {
+  font-weight: 600; font-size: 13.5px; letter-spacing: .04em; white-space: nowrap;
+  color: rgba(235,240,255,.88);
+}
+
+/* ---------- Background effects ---------------------------------------- */
+.fyt-hw-bg { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.fyt-hw-fog {
+  position: absolute; top: -20%; left: 0; width: 200%; height: 140%;
+  will-change: transform;
+}
+.fyt-hw-fog-1 {
+  background:
+    radial-gradient(30% 60% at 10% 70%, rgba(190,200,255,.10), transparent 70%),
+    radial-gradient(25% 50% at 35% 40%, rgba(96,165,250,.12), transparent 70%),
+    radial-gradient(30% 60% at 60% 75%, rgba(190,200,255,.08), transparent 70%),
+    radial-gradient(25% 50% at 85% 40%, rgba(96,165,250,.10), transparent 70%);
+  animation: fyt-hw-drift 38s linear infinite;
+}
+.fyt-hw-fog-2 {
+  background:
+    radial-gradient(22% 70% at 20% 90%, rgba(255,255,255,.07), transparent 70%),
+    radial-gradient(22% 70% at 70% 90%, rgba(255,255,255,.06), transparent 70%);
+  animation: fyt-hw-drift 26s linear infinite reverse, fyt-hw-breathe 7s ease-in-out infinite;
+}
+.fyt-hw-sweep {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 22%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,.10) 45%, rgba(255,190,120,.10) 55%, transparent 100%);
+  transform: translateX(-120%) skewX(-18deg);
+  animation: fyt-hw-sweep 9s ease-in-out 1.5s infinite;
+  will-change: transform;
+}
+.fyt-hw-blast-glow {
+  position: absolute; width: 180px; height: 180px; left: 0; top: 0; margin: -90px 0 0 -90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,140,40,.55), rgba(96,165,250,.22) 45%, transparent 70%);
+  opacity: 0; transform: scale(.2);
+}
+.fyt-hw-blast-glow.fyt-hw-on { animation: fyt-hw-blastglow .9s ease-out; }
+
+.fyt-hw-web { position: absolute; top: 0; will-change: transform; }
+.fyt-hw-web-l { left: 0;  transform-origin: 0 0;    animation: fyt-hw-sway 6s ease-in-out infinite alternate; }
+.fyt-hw-web-r { right: 0; transform-origin: 100% 0; animation: fyt-hw-sway-r 7s ease-in-out infinite alternate; }
+
+.fyt-hw-critters { position: absolute; inset: 0; }
+
+/* Spider (built by JS). Thread + body move with transforms only. */
+.fyt-hw-spider { position: absolute; top: 0; width: 22px; height: 1px; }
+.fyt-hw-thread {
+  position: absolute; left: 10.5px; top: 0; width: 1px; height: 1px;
+  background: linear-gradient(rgba(255,255,255,.75), rgba(255,255,255,.45));
+  transform-origin: 50% 0; transform: scaleY(0); will-change: transform;
+}
+.fyt-hw-spider-body { position: absolute; left: 0; top: -11px; width: 22px; height: 22px; will-change: transform; }
+.fyt-hw-spider-body svg { display: block; overflow: visible; }
+.fyt-hw-legs-l, .fyt-hw-legs-r { transform-origin: 0 0; animation: fyt-hw-legs .5s ease-in-out infinite alternate; }
+.fyt-hw-legs-r { animation-direction: alternate-reverse; }
+.fyt-hw-walking .fyt-hw-legs-l, .fyt-hw-walking .fyt-hw-legs-r { animation-duration: .12s; }
+.fyt-hw-eye { animation: fyt-hw-eyes 2.4s ease-in-out infinite; }
+
+/* Bat (built by JS) */
+.fyt-hw-bat { position: absolute; left: 0; top: 0; width: 30px; height: 14px; will-change: transform; }
+.fyt-hw-bat svg { display: block; overflow: visible; }
+.fyt-hw-wing { transform-origin: 0 0; animation: fyt-hw-flap .18s ease-in-out infinite alternate; }
+
+/* ---------- Pumpkin --------------------------------------------------- */
+.fyt-hw-pumpkin { position: relative; display: inline-flex; width: 26px; height: 26px; flex: none; }
+.fyt-hw-pumpkin svg { position: relative; display: block; transform-origin: 50% 85%; }
+.fyt-hw-pumpkin-glow {
+  position: absolute; inset: -10px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,150,40,.65), rgba(255,120,20,.15) 55%, transparent 70%);
+  animation: fyt-hw-flicker 3.2s ease-in-out infinite;
+}
+.fyt-hw-face { animation: fyt-hw-facefl 2.1s steps(2, end) infinite; }
+.fyt-hw-pumpkin.fyt-hw-pop svg  { animation: fyt-hw-wobble .95s cubic-bezier(.3,.7,.3,1); }
+.fyt-hw-pumpkin.fyt-hw-pop .fyt-hw-pumpkin-glow { animation: fyt-hw-glowpop .95s ease-out; }
+
+/* Ember particles & shock ring */
+.fyt-hw-fxtop { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.fyt-hw-p { position: absolute; left: 0; top: 0; border-radius: 50%; will-change: transform, opacity; }
+.fyt-hw-ring {
+  position: absolute; left: 0; top: 0; width: 24px; height: 24px; margin: -12px 0 0 -12px;
+  border-radius: 50%; border: 2px solid rgba(255,170,70,.9);
+  box-shadow: 0 0 8px rgba(255,140,40,.8), inset 0 0 6px rgba(255,170,90,.5);
+  will-change: transform, opacity;
+}
+
+/* ---------- Coupon pill ----------------------------------------------- */
+.fyt-hw-code {
+  position: relative; overflow: hidden; flex: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 32px; padding: 0 14px 0 16px; margin: 0;
+  border-radius: 999px; border: 1px solid rgba(255,255,255,.14);
+  background: linear-gradient(180deg, #0d1324, #03050c);
+  color: #fff; font: inherit; cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 0 0 rgba(96,165,250,0);
+  transition: transform .15s ease, border-color .2s ease;
+}
+.fyt-hw-code:hover { transform: translateY(-1px); border-color: rgba(255,170,90,.55); }
+.fyt-hw-code:active { transform: translateY(0) scale(.97); }
+.fyt-hw-code:focus-visible { outline: 2px solid #ffb066; outline-offset: 2px; }
+.fyt-hw-code::after { /* shimmer */
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.22), transparent);
+  transform: translateX(-150%) skewX(-20deg);
+  animation: fyt-hw-shimmer 4.5s ease-in-out .8s infinite;
+  pointer-events: none;
+}
+.fyt-hw-code-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .14em; color: #9aa6c4; }
+.fyt-hw-code-val { display: inline-grid; font-size: 14px; font-weight: 800; letter-spacing: .06em; }
+.fyt-hw-code-txt, .fyt-hw-code-ok { grid-area: 1 / 1; text-align: center; transition: opacity .2s ease, transform .25s ease; }
+.fyt-hw-code-ok { color: #7dffb0; opacity: 0; transform: translateY(70%); }
+.fyt-hw-code-ico { color: #9aa6c4; transition: color .2s; }
+.fyt-hw-code:hover .fyt-hw-code-ico { color: #ffb066; }
+.fyt-hw-code.fyt-hw-copied .fyt-hw-code-txt { opacity: 0; transform: translateY(-70%); }
+.fyt-hw-code.fyt-hw-copied .fyt-hw-code-ok  { opacity: 1; transform: translateY(0); }
+.fyt-hw-code.fyt-hw-copied { border-color: rgba(125,255,176,.6); }
+
+/* ---------- Countdown pill -------------------------------------------- */
+.fyt-hw-timer {
+  position: relative; flex: none;
+  display: inline-flex; align-items: center;
+  height: 36px; padding: 0 20px; border-radius: 999px;
+  background: linear-gradient(180deg, var(--fyt-hw-orange-1), var(--fyt-hw-orange-2));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 10px rgba(236,106,29,.35);
+  animation: fyt-hw-heartbeat 2s ease-in-out infinite;
+  will-change: transform;
+}
+.fyt-hw-timer::before { /* pulsing outer glow (opacity-only) */
+  content: ""; position: absolute; inset: -5px; border-radius: inherit; z-index: -1;
+  background: radial-gradient(closest-side, rgba(255,140,50,.85), rgba(255,120,30,0));
+  filter: blur(4px);
+  animation: fyt-hw-glow 2s ease-in-out infinite;
+}
+.fyt-hw-timer-body {
+  display: inline-flex; align-items: baseline; gap: 7px;
+  font-size: 17px; font-weight: 800; letter-spacing: .03em; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 1px rgba(120,40,0,.35);
+}
+.fyt-hw-num { display: inline-block; min-width: 1.15em; text-align: right; transform-origin: 50% 0; }
+.fyt-hw-num.fyt-hw-tick { animation: fyt-hw-flip .42s cubic-bezier(.2,.8,.3,1.3); }
+.fyt-hw-timer.fyt-hw-ended { background: linear-gradient(180deg, #5b6178, #3a3f52); animation: none; }
+.fyt-hw-timer.fyt-hw-ended::before { display: none; }
+
+.fyt-hw-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Pause everything while the tab is hidden (toggled by JS) */
+.fyt-hw-paused *, .fyt-hw-paused *::before, .fyt-hw-paused *::after { animation-play-state: paused !important; }
+
+/* ---------- Keyframes (transform / opacity only) ---------------------- */
+@keyframes fyt-hw-drift   { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes fyt-hw-breathe { 0%,100% { opacity: .6; } 50% { opacity: 1; } }
+@keyframes fyt-hw-sweep   { 0% { transform: translateX(-120%) skewX(-18deg); } 45%,100% { transform: translateX(560%) skewX(-18deg); } }
+@keyframes fyt-hw-sway    { from { transform: rotate(-2.5deg); } to { transform: rotate(3deg); } }
+@keyframes fyt-hw-sway-r  { from { transform: rotate(2.5deg); } to { transform: rotate(-3deg); } }
+@keyframes fyt-hw-legs    { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+@keyframes fyt-hw-eyes    { 0%,92%,100% { opacity: 1; } 95% { opacity: .1; } }
+@keyframes fyt-hw-flap    { from { transform: scaleY(1); } to { transform: scaleY(-.35); } }
+@keyframes fyt-hw-flicker { 0%,100% { opacity: .55; transform: scale(1); } 30% { opacity: .8; } 55% { opacity: .45; transform: scale(.92); } 75% { opacity: .9; transform: scale(1.05); } }
+@keyframes fyt-hw-facefl  { 0% { opacity: 1; } 50% { opacity: .78; } }
+@keyframes fyt-hw-wobble  {
+  0%   { transform: rotate(0) scale(1); }
+  12%  { transform: rotate(-14deg) scale(1.02); }
+  24%  { transform: rotate(12deg) scale(1.04); }
+  36%  { transform: rotate(-9deg) scale(1.08); }
+  46%  { transform: rotate(0) scale(.82, 1.12); }
+  56%  { transform: rotate(0) scale(1.38); }
+  72%  { transform: rotate(0) scale(.94); }
+  100% { transform: rotate(0) scale(1); }
+}
+@keyframes fyt-hw-glowpop { 0%,40% { opacity: .6; transform: scale(1); } 56% { opacity: 1; transform: scale(2.1); } 100% { opacity: .55; transform: scale(1); } }
+@keyframes fyt-hw-blastglow { 0% { opacity: 0; transform: scale(.2); } 25% { opacity: .9; } 100% { opacity: 0; transform: scale(1.6); } }
+@keyframes fyt-hw-shimmer { 0% { transform: translateX(-150%) skewX(-20deg); } 40%,100% { transform: translateX(350%) skewX(-20deg); } }
+@keyframes fyt-hw-heartbeat { 0%,60%,100% { transform: scale(1); } 15% { transform: scale(1.045); } 30% { transform: scale(1); } 42% { transform: scale(1.025); } }
+@keyframes fyt-hw-glow    { 0%,60%,100% { opacity: .35; } 15% { opacity: .95; } 42% { opacity: .7; } }
+@keyframes fyt-hw-flip    { 0% { transform: translateY(-45%) scaleY(.2); opacity: 0; } 60% { transform: translateY(6%) scaleY(1.08); opacity: 1; } 100% { transform: none; opacity: 1; } }
+
+/* ---------- Responsive ------------------------------------------------ */
+@media (max-width: 1180px) {
+  .fyt-hw-inner { gap: 8px 16px; padding: 8px 48px; }
+  .fyt-hw-headline { font-size: 14px; }
+  .fyt-hw-sub { font-size: 12.5px; }
+  .fyt-hw-timer-body { font-size: 16px; }
+}
+@media (max-width: 960px) {            /* tablet: drop the secondary line */
+  .fyt-hw-divider, .fyt-hw-sub { display: none; }
+  .fyt-hw-inner { padding: 8px 16px; gap: 8px 12px; }
+}
+@media (max-width: 860px) {
+  .fyt-hw-headline { font-size: 12px; }
+  .fyt-hw-offer { gap: 9px; }
+  .fyt-hw-timer { padding: 0 13px; }
+  .fyt-hw-timer-body { font-size: 14px; gap: 4px; }
+  .fyt-hw-code { padding: 0 13px; gap: 6px; }
+  .fyt-hw-code-ico { display: none; }
+}
+@media (max-width: 640px) {            /* mobile: two compact rows */
+  .fyt-hw-inner { padding: 8px 12px; gap: 7px 10px; }
+  .fyt-hw-offer { flex-basis: 100%; justify-content: center; gap: 8px; }
+  .fyt-hw-headline { font-size: 12px; letter-spacing: .01em; }
+  .fyt-hw-pumpkin, .fyt-hw-pumpkin svg { width: 20px; height: 20px; }
+  .fyt-hw-code { height: 28px; padding: 0 11px 0 12px; gap: 6px; }
+  .fyt-hw-code-lbl { font-size: 9.5px; }
+  .fyt-hw-code-val { font-size: 12.5px; }
+  .fyt-hw-timer { height: 30px; padding: 0 13px; }
+  .fyt-hw-timer-body { font-size: 13.5px; gap: 5px; }
+  .fyt-hw-web { width: 44px; height: 40px; }
+  .fyt-hw-fog-2, .fyt-hw-sweep { display: none; }
+}
+@media (max-width: 360px) {
+  .fyt-hw-headline { font-size: 10.5px; }
+  .fyt-hw-left { display: none; }
+}
+
+/* ---------- Reduced motion: static bar, countdown still live ----------- */
+@media (prefers-reduced-motion: reduce) {
+  .fyt-hw-bar *, .fyt-hw-bar *::before, .fyt-hw-bar *::after { animation: none !important; transition: none !important; }
+  .fyt-hw-critters, .fyt-hw-fxtop, .fyt-hw-sweep, .fyt-hw-blast-glow { display: none !important; }
+  .fyt-hw-pumpkin-glow { opacity: .6; }
+}
+
+/* ---------- Phone, header folded while scrolling: one slim row ---------- */
+@media (max-width: 767px) {
+  .fyt-hw-bar.fyt-hw-compact, .fyt-hw-bar.fyt-hw-compact .fyt-hw-inner { min-height: 36px; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-inner { padding: 5px 10px; flex-wrap: nowrap; gap: 8px; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-offer { flex-basis: auto; gap: 6px; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-code, .fyt-hw-bar.fyt-hw-compact .fyt-hw-web { display: none; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-pumpkin, .fyt-hw-bar.fyt-hw-compact .fyt-hw-pumpkin svg { width: 16px; height: 16px; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-headline { font-size: 10.5px; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-full { display: none; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-short { display: inline; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-timer { height: 24px; padding: 0 9px; animation: none; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-timer-body { font-size: 11px; gap: 3px; }
+  .fyt-hw-bar.fyt-hw-compact .fyt-hw-left { display: none; }
+}
+.fyt-hw-short { display: none; }
+@media (max-width: 380px) { .fyt-hw-headline { font-size: 11px; } }
+
+/* ---------- Slimmer sizing (smaller countdown, slightly shorter bar) ---------- */
+.fyt-hw-bar, .fyt-hw-inner { min-height: 46px; }
+.fyt-hw-inner { padding-top: 5px; padding-bottom: 5px; }
+.fyt-hw-headline { font-size: 14px; }
+.fyt-hw-sub { font-size: 12.5px; }
+.fyt-hw-pumpkin, .fyt-hw-pumpkin svg { width: 22px; height: 22px; }
+.fyt-hw-code { height: 28px; padding: 0 12px 0 14px; }
+.fyt-hw-code-val { font-size: 13px; }
+.fyt-hw-timer { height: 28px; padding: 0 13px; }
+.fyt-hw-timer-body { font-size: 13.5px; gap: 5px; }
+@media (max-width: 860px) {
+  .fyt-hw-headline { font-size: 12px; }
+}
+@media (max-width: 640px) {
+  .fyt-hw-inner { padding: 6px 12px; gap: 5px 8px; }
+  .fyt-hw-headline { font-size: 11.5px; }
+  .fyt-hw-pumpkin, .fyt-hw-pumpkin svg { width: 18px; height: 18px; }
+  .fyt-hw-code { height: 24px; padding: 0 10px 0 11px; }
+  .fyt-hw-code-lbl { font-size: 9px; }
+  .fyt-hw-code-val { font-size: 12px; }
+  .fyt-hw-timer { height: 24px; padding: 0 11px; }
+  .fyt-hw-timer-body { font-size: 12px; gap: 4px; }
+}
+.fyt-hw-short, .fyt-hw-mid { display: none; }
+/* Laptops: keep everything on one row by dropping the secondary line earlier */
+@media (max-width: 1280px) {
+  .fyt-hw-divider, .fyt-hw-sub { display: none; }
+}
+/* Phones: a shorter headline so it always fits on one line */
+@media (max-width: 480px) {
+  .fyt-hw-bar:not(.fyt-hw-compact) .fyt-hw-full { display: none; }
+  .fyt-hw-bar:not(.fyt-hw-compact) .fyt-hw-mid { display: inline; }
+  .fyt-hw-offer { gap: 7px; }
+}
+@media (max-width: 380px) { .fyt-hw-headline { font-size: 11px; } }
+
+/* WordPress pages: the old "Summer Special" bar is replaced by this one */
+#fyt4wrap { display: none !important; }
+.fyt-hw-bar { display: block; }
+
+</style>
+<script>
+/* FYT promo bar placement: put the Halloween bar where the old "Summer Special" bar was,
+   never on checkout, and remove it automatically after the offer ends. */
+(function () {
+  var bar = document.getElementById('fyt-hw-bar');
+  if (!bar) return;
+  var END = new Date('2026-10-31T23:59:59+05:30').getTime();
+  var onCheckout = document.body.classList.contains('woocommerce-checkout') || /\/checkout(\/|-link)/.test(location.pathname);
+  var old = document.getElementById('fyt4wrap');
+  if (Date.now() > END || onCheckout || !old) { bar.parentNode.removeChild(bar); return; }
+  old.parentNode.insertBefore(bar, old);
+  function go() { window.location.href = 'https://fundingyourtrades.com/#challenge'; }
+  bar.addEventListener('click', go);
+  bar.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ===================================================================
+     CONFIG: change these values only.
+     endDate: when the offer ends, ISO 8601 with a timezone offset.
+              (+05:30 = India Standard Time). Countdown shows
+              OFFER ENDED once this moment passes.
+     =================================================================== */
+  var FYT_HW_CONFIG = {
+    endDate:    '2026-10-31T23:59:59+05:30',
+    couponCode: 'FYTWEEN',
+    endedText:  'OFFER ENDED',
+    copiedText: 'COPIED!'
+  };
+
+  var bar = document.getElementById('fyt-hw-bar');
+  if (!bar || bar.getAttribute('data-fyt-hw-init')) return;
+  bar.setAttribute('data-fyt-hw-init', '1');
+
+  var $ = function (sel) { return bar.querySelector(sel); };
+  var critters = $('.fyt-hw-critters');
+  var fxTop    = $('.fyt-hw-fxtop');
+  var pumpkin  = $('.fyt-hw-pumpkin');
+  var blastGlow = $('.fyt-hw-blast-glow');
+
+  var reduceMQ = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  var smallMQ  = window.matchMedia ? matchMedia('(max-width: 640px)') : { matches: false };
+  var canAnimate = typeof Element !== 'undefined' && !!Element.prototype.animate;
+  function motionOK() { return canAnimate && !reduceMQ.matches && !document.hidden; }
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  /* ---------------- Countdown ---------------- */
+  var endTime = new Date(FYT_HW_CONFIG.endDate).getTime();
+  var timer = $('.fyt-hw-timer');
+  var nums = {};
+  bar.querySelectorAll('.fyt-hw-num').forEach(function (el) { nums[el.getAttribute('data-unit')] = el; });
+  var lastVals = {};
+  var tickHandle = null;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function setNum(unit, val) {
+    var el = nums[unit];
+    if (!el || lastVals[unit] === val) return;
+    var first = !(unit in lastVals);
+    lastVals[unit] = val;
+    el.textContent = val;
+    if (!first && !reduceMQ.matches) {        // little flip/bump on change
+      el.classList.remove('fyt-hw-tick');
+      void el.offsetWidth;                    // restart the CSS animation
+      el.classList.add('fyt-hw-tick');
+    }
+  }
+  function updateCountdown() {
+    var diff = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+    if (isNaN(endTime) || diff <= 0) {
+      timer.classList.add('fyt-hw-ended');
+      timer.querySelector('.fyt-hw-timer-body').textContent = FYT_HW_CONFIG.endedText;
+      timer.setAttribute('aria-label', FYT_HW_CONFIG.endedText);
+      if (tickHandle) clearTimeout(tickHandle);
+      return false;
+    }
+    var d = Math.floor(diff / 86400), h = Math.floor(diff % 86400 / 3600),
+        m = Math.floor(diff % 3600 / 60), s = diff % 60;
+    setNum('d', String(d)); setNum('h', pad(h)); setNum('m', pad(m)); setNum('s', pad(s));
+    timer.setAttribute('aria-label', d + ' days ' + h + ' hours ' + m + ' minutes left');
+    return true;
+  }
+  (function loop() {                          // aligned to the start of each second
+    if (updateCountdown()) tickHandle = setTimeout(loop, 1000 - (Date.now() % 1000) + 15);
+  })();
+
+  /* ---------------- Click-to-copy coupon ---------------- */
+  var codeBtn = $('.fyt-hw-code');
+  var sr = $('.fyt-hw-sr');
+  $('.fyt-hw-code-txt').textContent = FYT_HW_CONFIG.couponCode;
+  $('.fyt-hw-code-ok').textContent = FYT_HW_CONFIG.copiedText;
+  codeBtn.setAttribute('aria-label', 'Copy coupon code ' + FYT_HW_CONFIG.couponCode);
+  var copyReset = null;
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+  codeBtn.addEventListener('click', function (ev) {
+    ev.stopPropagation(); ev.preventDefault();
+    var code = FYT_HW_CONFIG.couponCode;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(code).catch(function () { fallbackCopy(code); });
+    } else { fallbackCopy(code); }
+    codeBtn.classList.add('fyt-hw-copied');
+    sr.textContent = 'Coupon code ' + code + ' copied';
+    clearTimeout(copyReset);
+    copyReset = setTimeout(function () { codeBtn.classList.remove('fyt-hw-copied'); sr.textContent = ''; }, 1800);
+    burst(true);                               // a celebratory pumpkin pop
+  });
+
+  /* ---------------- Helpers for effects ---------------- */
+  function rel(el) {                           // element rect relative to the bar
+    var b = bar.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return { l: r.left - b.left, r: r.right - b.left, t: r.top - b.top, b: r.bottom - b.top,
+             cx: (r.left + r.right) / 2 - b.left, cy: (r.top + r.bottom) / 2 - b.top };
+  }
+  // Horizontal gaps not covered by text/pills, so spiders never hang over the copy.
+  function freeSpots() {
+    var W = bar.clientWidth, blocks = [];
+    ['.fyt-hw-pumpkin', '.fyt-hw-headline', '.fyt-hw-sub', '.fyt-hw-divider', '.fyt-hw-code', '.fyt-hw-timer']
+      .forEach(function (s) {
+        var el = $(s);
+        if (el && el.offsetParent !== null) { var r = rel(el); blocks.push([r.l - 8, r.r + 8]); }
+      });
+    blocks.sort(function (a, b) { return a[0] - b[0]; });
+    var gaps = [], x = 4;
+    blocks.forEach(function (bk) { if (bk[0] - x >= 24) gaps.push([x, bk[0] - 22]); x = Math.max(x, bk[1]); });
+    if (W - 26 - x >= 2) gaps.push([x, W - 26]);
+    return gaps.filter(function (g) { return g[1] >= g[0]; });
+  }
+  var live = [];                               // running WAAPI animations (for pause/resume)
+  function track(anim, el) {
+    live.push(anim);
+    anim.onfinish = anim.oncancel = function () {
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+      var i = live.indexOf(anim); if (i > -1) live.splice(i, 1);
+    };
+    return anim;
+  }
+
+  var SPIDER_SVG =
+    '<svg viewBox="-10 -10 20 20" width="22" height="22">' +
+    '<g stroke="#0b1430" stroke-width="1.25" fill="none" stroke-linecap="round" stroke-linejoin="round">' +
+      '<g class="fyt-hw-legs-l"><path d="M-1.5-2.5L-5-7L-8-5.5M-2-1L-7-3L-9.5 0M-2 1L-7 2.5L-9 6M-1.5 2.5L-5 6.5L-6 9.5"/></g>' +
+      '<g class="fyt-hw-legs-r"><path d="M1.5-2.5L5-7L8-5.5M2-1L7-3L9.5 0M2 1L7 2.5L9 6M1.5 2.5L5 6.5L6 9.5"/></g>' +
+    '</g>' +
+    '<ellipse cx="0" cy="2.4" rx="3.3" ry="4" fill="#070b18" stroke="rgba(190,210,255,.6)" stroke-width=".6"/>' +
+    '<circle cx="0" cy="-2.6" r="2.2" fill="#070b18" stroke="rgba(190,210,255,.6)" stroke-width=".6"/>' +
+    '<path d="M-1.6 3.2h3.2M0 1.2v4" stroke="#ff7a1a" stroke-width=".7" opacity=".8"/>' +
+    '<g class="fyt-hw-eye" fill="#ff8a1f"><circle cx="-.9" cy="-3.1" r=".6"/><circle cx=".9" cy="-3.1" r=".6"/></g>' +
+    '</svg>';
+
+  var BAT_SVG =
+    '<svg viewBox="-20 -8 40 16" width="30" height="12">' +
+    '<g fill="#070b18" stroke="rgba(170,195,255,.35)" stroke-width=".5">' +
+      '<path class="fyt-hw-wing" d="M-2-1C-6-6-12-6-18-3C-15-1-14 1-13 3C-11 1-9 1-8 3C-6 1-4 1-2 2Z"/>' +
+      '<g transform="scale(-1 1)"><path class="fyt-hw-wing" d="M-2-1C-6-6-12-6-18-3C-15-1-14 1-13 3C-11 1-9 1-8 3C-6 1-4 1-2 2Z"/></g>' +
+      '<ellipse cx="0" cy="0.5" rx="2.6" ry="3.4"/>' +
+      '<path d="M-2-2L-1.6-5L-.4-2.6ZM2-2L1.6-5L.4-2.6Z"/>' +
+    '</g>' +
+    '<circle cx="-.9" cy="-.6" r=".45" fill="#ff9d3a"/><circle cx=".9" cy="-.6" r=".45" fill="#ff9d3a"/>' +
+    '</svg>';
+
+  /* ---------------- Spider dropping on a silk thread ---------------- */
+  var activeDrops = 0, dropXs = [];
+  function dropSpider() {
+    if (!motionOK()) return;
+    var maxDrops = smallMQ.matches ? 1 : 2;
+    if (activeDrops >= maxDrops) return;
+    var gaps = freeSpots();
+    if (!gaps.length) { var W0 = bar.clientWidth; gaps = [[0, 3], [W0 - 25, W0 - 22]]; } // tight layouts: use the web corners
+    var x, tries = 0;
+    do { var g = pick(gaps); x = rand(g[0], g[1]); tries++; }
+    while (tries < 8 && dropXs.some(function (o) { return Math.abs(o - x) < 34; }));
+    if (dropXs.some(function (o) { return Math.abs(o - x) < 34; })) return;   // too close to another spider
+    dropXs.push(x);
+    var H = bar.clientHeight;
+    var hang = rand(H * 0.42, H * 0.62);       // how far down it hangs
+    var el = document.createElement('div');
+    el.className = 'fyt-hw-spider';
+    el.style.left = x + 'px';
+    el.innerHTML = '<div class="fyt-hw-thread"></div><div class="fyt-hw-spider-body">' + SPIDER_SVG + '</div>';
+    critters.appendChild(el);
+    activeDrops++;
+    var body = el.lastChild, thread = el.firstChild;
+    var dur = rand(4200, 6000), sway = rand(-5, 5);
+    var ys = [-12, hang, hang - 4, hang + 1, hang, hang, -12];
+    var off = [0, .32, .42, .5, .56, .74, 1];
+    var ease = ['cubic-bezier(.3,.6,.4,1)', 'ease-in-out', 'ease-in-out', 'ease-in-out', 'linear', 'cubic-bezier(.6,0,.8,.4)'];
+    body.animate(ys.map(function (y, i) {
+      return { transform: 'translateY(' + y + 'px) rotate(' + (i === 3 ? sway : i === 4 ? -sway / 2 : 0) + 'deg)', offset: off[i], easing: ease[i] };
+    }), { duration: dur, fill: 'both' });
+    var a = thread.animate(ys.map(function (y, i) {
+      return { transform: 'scaleY(' + Math.max(0, y - 2) + ')', offset: off[i], easing: ease[i] };
+    }), { duration: dur, fill: 'both' });
+    track(a, el);
+    a.addEventListener('finish', function () { activeDrops--; dropXs.splice(dropXs.indexOf(x), 1); });
+  }
+
+  /* ---------------- Spider scuttling along the top edge ---------------- */
+  function scuttle() {
+    if (!motionOK() || smallMQ.matches) return;
+    var W = bar.clientWidth, ltr = Math.random() < 0.5;
+    var el = document.createElement('div');
+    el.className = 'fyt-hw-spider fyt-hw-walking';
+    el.style.left = '0px';
+    el.innerHTML = '<div class="fyt-hw-spider-body" style="top:0">' + SPIDER_SVG + '</div>';
+    critters.appendChild(el);
+    var body = el.firstChild, rot = ltr ? 90 : -90;
+    var from = ltr ? -24 : W + 6, to = ltr ? W + 6 : -24;
+    var stop = from + (to - from) * rand(0.25, 0.45);   // stops halfway to "look around"
+    var y = 1;
+    var a = body.animate([
+      { transform: 'translate(' + from + 'px,' + y + 'px) rotate(' + rot + 'deg)', offset: 0 },
+      { transform: 'translate(' + stop + 'px,' + y + 'px) rotate(' + rot + 'deg)', offset: .38, easing: 'ease-out' },
+      { transform: 'translate(' + stop + 'px,' + (y + 1) + 'px) rotate(' + (rot + 20) + 'deg)', offset: .46 },
+      { transform: 'translate(' + stop + 'px,' + y + 'px) rotate(' + (rot - 15) + 'deg)', offset: .54 },
+      { transform: 'translate(' + stop + 'px,' + y + 'px) rotate(' + rot + 'deg)', offset: .58, easing: 'ease-in' },
+      { transform: 'translate(' + to + 'px,' + y + 'px) rotate(' + rot + 'deg)', offset: 1 }
+    ], { duration: Math.max(6000, W * 6.5), fill: 'both' });
+    track(a, el);
+  }
+
+  /* ---------------- Bat flying across ---------------- */
+  function bat() {
+    if (!motionOK()) return;
+    var W = bar.clientWidth, H = bar.clientHeight, rtl = Math.random() < 0.6;
+    var el = document.createElement('div');
+    el.className = 'fyt-hw-bat';
+    el.innerHTML = BAT_SVG;
+    critters.appendChild(el);
+    var frames = [], n = 10, base = rand(2, Math.max(4, H * 0.22)), amp = rand(3, 6);
+    for (var i = 0; i <= n; i++) {
+      var t = i / n, x = rtl ? W + 10 - t * (W + 50) : -40 + t * (W + 50);
+      var yy = base + Math.sin(t * Math.PI * 4) * amp;
+      frames.push({ transform: 'translate(' + x + 'px,' + yy + 'px) scale(' + (smallMQ.matches ? .8 : 1) + ')' });
+    }
+    track(el.animate(frames, { duration: Math.max(3800, W * 4), easing: 'linear', fill: 'both' }), el);
+  }
+
+  /* ---------------- Pumpkin wobble + ember blast ---------------- */
+  var COLORS = ['#ff8a1f', '#ffb347', '#ff6a00', '#ffd166', '#60a5fa', '#93c5fd', '#ffffff'];
+  function burst(manual) {
+    if (!motionOK() && !manual) return;
+    if (!canAnimate || reduceMQ.matches) return;
+    pumpkin.classList.remove('fyt-hw-pop'); void pumpkin.offsetWidth; pumpkin.classList.add('fyt-hw-pop');
+    setTimeout(function () {                   // emit at the "pop" moment of the wobble
+      var c = rel(pumpkin), H = bar.clientHeight;
+      blastGlow.style.left = c.cx + 'px'; blastGlow.style.top = c.cy + 'px';
+      blastGlow.classList.remove('fyt-hw-on'); void blastGlow.offsetWidth; blastGlow.classList.add('fyt-hw-on');
+
+      var ring = document.createElement('div');
+      ring.className = 'fyt-hw-ring';
+      fxTop.appendChild(ring);
+      track(ring.animate([
+        { transform: 'translate(' + c.cx + 'px,' + c.cy + 'px) scale(.3)', opacity: 1 },
+        { transform: 'translate(' + c.cx + 'px,' + c.cy + 'px) scale(3.4)', opacity: 0 }
+      ], { duration: 700, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'both' }), ring);
+
+      var count = smallMQ.matches ? 14 : 28;
+      for (var i = 0; i < count; i++) {
+        var p = document.createElement('div');
+        p.className = 'fyt-hw-p';
+        var size = rand(3, 7.5), col = pick(COLORS);
+        p.style.width = p.style.height = size + 'px';
+        p.style.marginLeft = p.style.marginTop = (-size / 2) + 'px';
+        p.style.background = col;
+        p.style.boxShadow = '0 0 ' + (size * 1.6) + 'px ' + col;
+        fxTop.appendChild(p);
+        var ang = rand(0, Math.PI * 2), dist = rand(26, smallMQ.matches ? 60 : 120);
+        var dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist * 0.45;
+        // keep embers inside the bar vertically, then let them "fall" a little
+        var ex = c.cx + dx, ey = Math.min(H - 4, Math.max(4, c.cy + dy));
+        var fy = Math.min(H - 2, ey + rand(4, 12));
+        track(p.animate([
+          { transform: 'translate(' + c.cx + 'px,' + c.cy + 'px) scale(1)', opacity: 1 },
+          { transform: 'translate(' + ex + 'px,' + ey + 'px) scale(.9)', opacity: 1, offset: .55 },
+          { transform: 'translate(' + (ex + dx * 0.12) + 'px,' + fy + 'px) scale(0)', opacity: 0 }
+        ], { duration: rand(900, 1600), easing: 'cubic-bezier(.15,.75,.35,1)', fill: 'both' }), p);
+      }
+    }, 520);
+    setTimeout(function () { pumpkin.classList.remove('fyt-hw-pop'); }, 1000);
+  }
+
+  /* ---------------- Scheduler (random intervals, skips when hidden) ---------------- */
+  function every(fn, firstDelay, min, max) {
+    setTimeout(function run() {
+      try { fn(); } catch (e) { /* never break the host page */ }
+      setTimeout(run, rand(min, max) * (smallMQ.matches ? 1.6 : 1));
+    }, firstDelay);
+  }
+  if (canAnimate) {
+    every(function () { burst(false); }, 1100, 5500, 8000);   // pumpkin blast
+    every(function () { dropSpider(); },  300, 2600, 4800);   // descending spiders
+    every(function () { scuttle(); },    2300, 11000, 17000); // top-edge scuttler
+    every(function () { bat(); },        3200, 9000, 15000);  // bat fly-by
+  }
+
+  /* ---------------- Pause when the tab is hidden ---------------- */
+  function onVis() {
+    var hidden = document.hidden;
+    bar.classList.toggle('fyt-hw-paused', hidden);
+    live.forEach(function (a) { try { hidden ? a.pause() : a.play(); } catch (e) {} });
+    if (!hidden) updateCountdown();
+  }
+  document.addEventListener('visibilitychange', onVis);
+})();
+</script>
+<!-- ======================= END FYT PROMO BAR ======================= -->
