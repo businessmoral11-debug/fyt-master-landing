@@ -252,7 +252,7 @@ function Label({ n, children, right }: { n?: number; children: ReactNode; right?
 }
 
 const TYPE_NOTE: Record<string, string> = {
-  "c-classic": "News + hedging always",
+  "c-classic": "News + hedging",
   "c-prime": "No consistency",
   "i-plus": "Fewest rules",
   "i-prime": "No consistency",
