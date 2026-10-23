@@ -337,15 +337,12 @@ function CompareTable({ p }: { p: Pick }) {
   );
 }
 
-/** Platform logo on its own tile so both marks read clearly (MatchTrader is white, Platform 5 is full colour). */
+/** Platform logo + name in the switch (as before, just larger so both logos read clearly). */
 function PlatformMark({ id, on }: { id: PlatformId; on: boolean }) {
   const pl = PLATFORMS.find((x) => x.id === id)!;
-  const mt = id === "match-trader";
   return (
     <>
-      <span className="flex size-[30px] shrink-0 items-center justify-center overflow-hidden rounded-[9px]" style={{ background: mt ? "linear-gradient(160deg,#22356f,#0f1a3d)" : "#ffffff", boxShadow: on ? "0 0 0 1.5px rgba(255,255,255,0.75)" : "0 0 0 1px rgba(148,178,255,0.25)" }}>
-        <img src={pl.logo} alt="" className={mt ? "h-[18px] w-[18px] object-contain" : "h-[26px] w-[26px] object-contain"} />
-      </span>
+      <img src={pl.logo} alt="" className="h-[24px] w-auto" style={{ filter: on ? "brightness(0) invert(1)" : "grayscale(1) brightness(1.6)", opacity: on ? 1 : 0.85 }} />
       <span>{pl.label}</span>
     </>
   );
@@ -1103,9 +1100,7 @@ function OrderSummary({ p }: { p: Pick }) {
         </span>
       </div>
       <span className="flex h-[34px] shrink-0 items-center gap-[7px] rounded-full px-[12px] text-[12.5px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(148,178,255,0.18)" }}>
-        <span className="flex size-[22px] items-center justify-center overflow-hidden rounded-[6px]" style={{ background: p.platform === "match-trader" ? "linear-gradient(160deg,#22356f,#0f1a3d)" : "#fff" }}>
-          <img src={plat.logo} alt="" className={p.platform === "match-trader" ? "h-[13px] w-[13px] object-contain" : "h-[19px] w-[19px] object-contain"} />
-        </span>
+        <img src={plat.logo} alt="" className="h-[18px] w-auto" style={{ filter: "brightness(0) invert(1)" }} />
         {plat.label}
       </span>
     </div>

@@ -1455,6 +1455,9 @@ function Hero() {
       <HeroBackground />
       {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-[20px] lg:px-[88px] w-full lg:absolute lg:top-[16px] lg:h-[496px]">
+        <div className="lg:hidden mb-[18px] flex justify-center max-w-full shrink-0 min-h-[40px]">
+          <HeroTrustindexMobileWidget />
+        </div>
         <h1
           className="font-['DM_Sans',sans-serif] font-medium text-[44px] lg:text-[80px] w-full lg:max-w-[1264px]"
           style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}
@@ -1664,7 +1667,6 @@ export default function App() {
         <Nav />
       </SiteHeader>
       <Hero />
-      <AwardBadgeMobileBar />
       <TrustStripDesktop />
       <BelowFoldErrorBoundary>
         <Suspense fallback={null}>
