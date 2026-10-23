@@ -290,8 +290,9 @@ const CSS = `
 .fyt-hw-pumpkin, .fyt-hw-pumpkin svg { width: 22px; height: 22px; }
 .fyt-hw-code { height: 28px; padding: 0 12px 0 14px; }
 .fyt-hw-code-val { font-size: 13px; }
-.fyt-hw-timer { height: 28px; padding: 0 13px; }
-.fyt-hw-timer-body { font-size: 13.5px; gap: 5px; }
+.fyt-hw-timer { height: 25px; padding: 0 11px; }
+.fyt-hw-timer::before { inset: -3px; }
+.fyt-hw-timer-body { font-size: 12.5px; gap: 4px; }
 @media (max-width: 860px) {
   .fyt-hw-headline { font-size: 12px; }
 }

@@ -1384,7 +1384,22 @@ function HeroTrustindexGate() {
   // Mobile: swapped with the award badge (which now sits here at the top,
   // while the mobile Trustindex widget moved down to AwardBadgeMobileBar's
   // old spot, below the hero) — desktop is unchanged.
-  return isDesktop ? <HeroTrustindexWidget /> : <AwardBadge />;
+  // Desktop: the Trustindex widget now sits above the headline (HeroTopTrustindex),
+  // so this lower slot is mobile-only and shows the award badge.
+  return isDesktop ? null : <AwardBadge />;
+}
+
+/** Above the headline: desktop Trustindex widget on desktop, mobile widget on phones. */
+function HeroTopTrustindex() {
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 1024px)").matches);
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return isDesktop ? <HeroTrustindexWidget /> : <HeroTrustindexMobileWidget />;
 }
 
 const HERO_ANIMATIONS_ACTIVE_MARGIN_PX = 600;
@@ -1455,8 +1470,8 @@ function Hero() {
       <HeroBackground />
       {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-[20px] lg:px-[88px] w-full lg:absolute lg:top-[16px] lg:h-[496px]">
-        <div className="lg:hidden mb-[18px] flex justify-center max-w-full shrink-0 min-h-[40px]">
-          <HeroTrustindexMobileWidget />
+        <div className="mb-[18px] lg:mb-[26px] flex justify-center max-w-full shrink-0 min-h-[40px] lg:min-h-[36px]">
+          <HeroTopTrustindex />
         </div>
         <h1
           className="font-['DM_Sans',sans-serif] font-medium text-[44px] lg:text-[80px] w-full lg:max-w-[1264px]"
@@ -1508,7 +1523,7 @@ function Hero() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-[22px] lg:mt-[28px] flex justify-center max-w-full shrink-0 min-h-[40px] lg:min-h-0 scale-90 origin-center lg:scale-100"
+          className="lg:hidden mt-[22px] flex justify-center max-w-full shrink-0 min-h-[40px] scale-90 origin-center"
         >
           <HeroTrustindexGate />
         </motion.div>
