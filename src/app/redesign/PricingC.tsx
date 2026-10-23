@@ -342,7 +342,8 @@ function PlatformMark({ id, on }: { id: PlatformId; on: boolean }) {
   const pl = PLATFORMS.find((x) => x.id === id)!;
   return (
     <>
-      <img src={pl.logo} alt="" className="h-[24px] w-auto" style={{ filter: on ? "brightness(0) invert(1)" : "grayscale(1) brightness(1.6)", opacity: on ? 1 : 0.85 }} />
+      {/* Platform 5's file has a lot of empty space around the mark, so it gets more height. */}
+      <img src={pl.logo} alt="" className={`${id === "platform-5" ? "-my-[4px] h-[34px]" : "h-[22px]"} w-auto`} style={{ filter: on ? "brightness(0) invert(1)" : "grayscale(1) brightness(1.6)", opacity: on ? 1 : 0.85 }} />
       <span>{pl.label}</span>
     </>
   );
@@ -1100,7 +1101,7 @@ function OrderSummary({ p }: { p: Pick }) {
         </span>
       </div>
       <span className="flex h-[34px] shrink-0 items-center gap-[7px] rounded-full px-[12px] text-[12.5px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(148,178,255,0.18)" }}>
-        <img src={plat.logo} alt="" className="h-[18px] w-auto" style={{ filter: "brightness(0) invert(1)" }} />
+        <img src={plat.logo} alt="" className={`${p.platform === "platform-5" ? "-my-[3px] h-[26px]" : "h-[17px]"} w-auto`} style={{ filter: "brightness(0) invert(1)" }} />
         {plat.label}
       </span>
     </div>
