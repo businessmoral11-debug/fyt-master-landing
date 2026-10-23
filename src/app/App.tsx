@@ -21,7 +21,7 @@ import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
 import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
 import { HalloweenPromoBar } from "@/app/HalloweenPromoBar";
-import { HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
+import { HALLOWEEN_OFF, HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
@@ -600,6 +600,13 @@ function PromoCountdownPill({ compact = false, pulse, deadline = PROMO_DEADLINE,
       {label}
     </span>
   );
+}
+
+/** Lowest starting price across the three models (Prime, MatchTrader, smallest size) with today's offer. */
+function heroFromPrice(): number {
+  const off = isHalloweenLive() ? HALLOWEEN_OFF : 0.4;
+  const prices = (Object.keys(STEP_SIZES) as StepId[]).map((st) => getEntry(st, "prime", "match-trader", STEP_SIZES[st][0])?.priceOld ?? Infinity);
+  return Math.round(Math.min(...prices) * (1 - off));
 }
 
 /** Small carved pumpkin used in the Halloween banner. */
@@ -1474,29 +1481,32 @@ function Hero() {
           transition={{ duration: 0.6, delay: 0.62, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col lg:flex-row gap-[12px] lg:gap-[16px] items-stretch lg:items-center shrink-0 w-full lg:w-auto"
         >
-          {/* Primary — gradient pill, PDF label "View Programs" */}
+          {/* One clear action (with the starting price) + a quiet secondary link. */}
           <HeroCta
             href={HERO_CONTENT.ctaPrimary.href}
             magneticStrength={0.22}
-            className="cta-shine flex justify-center gap-[10px] items-center pl-[32px] pr-[28px] py-[16px] relative rounded-[999px] shrink-0"
+            className="cta-shine group flex justify-center gap-[12px] items-center pl-[30px] pr-[10px] py-[10px] relative rounded-[999px] shrink-0"
             style={{ ...PILL_CTA_GRADIENT_STYLE, boxShadow: `${PILL_CTA_GRADIENT_STYLE.boxShadow}, 0 0 0 rgba(59,130,246,0)` }}
           >
             <div aria-hidden className="absolute border border-[rgba(156,196,255,0.35)] border-solid inset-0 pointer-events-none rounded-[999px]" />
-            <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold not-italic text-[16px] text-white whitespace-nowrap">View Programs</p>
-            <svg className="shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3.333 8h9.334M8.667 4l4 4-4 4" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold not-italic text-[17px] text-white whitespace-nowrap">Get funded</p>
+            <span className="flex items-center gap-[8px] rounded-full bg-white py-[7px] pl-[12px] pr-[9px] shadow-[0_6px_16px_-6px_rgba(0,0,0,0.5)]">
+              <span className="font-['Inter:Semi_Bold',sans-serif] text-[13px] text-[#1d4ed8] whitespace-nowrap">from <b className="font-['Inter:Bold',sans-serif]">${heroFromPrice()}</b></span>
+              <svg className="shrink-0 transition-transform duration-300 group-hover:translate-x-[3px]" width="15" height="15" viewBox="0 0 16 16" fill="none">
+                <path d="M3.333 8h9.334M8.667 4l4 4-4 4" stroke="#1d4ed8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
           </HeroCta>
-          {/* Secondary — glassy pill, PDF label "See How It Works" */}
-          <HeroCta
+          <a
             href="#how-it-works"
-            magneticStrength={0.16}
-            className="flex justify-center items-center px-[32px] py-[16px] relative rounded-[999px] shrink-0 backdrop-blur-[7px]"
-            style={{ background: "rgba(255,255,255,0.05)" }}
+            onClick={() => pauseHeavyScenesForNav()}
+            className="group flex items-center justify-center gap-[10px] px-[12px] py-[10px] no-underline"
           >
-            <div aria-hidden className="absolute border border-[rgba(255,255,255,0.18)] border-solid inset-0 pointer-events-none rounded-[999px]" />
-            <p className="font-['Inter:Medium',sans-serif] font-medium not-italic text-[16px] text-[#e8ebf2] whitespace-nowrap">See How It Works</p>
-          </HeroCta>
+            <span className="flex size-[34px] items-center justify-center rounded-full backdrop-blur-[7px] transition-colors duration-300 group-hover:bg-white/10" style={{ background: "rgba(255,255,255,0.06)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.18)" }}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.5 2.2v7.6L9.8 6 3.5 2.2Z" fill="#e8ebf2" /></svg>
+            </span>
+            <span className="font-['Inter:Medium',sans-serif] text-[15px] text-[#e8ebf2] whitespace-nowrap">How it works</span>
+          </a>
         </motion.div>
         <ul className="sr-only">
           {HERO_ORBIT_LABELS.map(({ label }) => <li key={label}>{label}</li>)}

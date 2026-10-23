@@ -740,6 +740,20 @@ function TreatDots({ count }: { count: number }) {
   );
 }
 
+/** Live "closes in" inside the vault card (replaces the separate countdown bar). */
+function VaultClock() {
+  const parts = useCountdown(HALLOWEEN_END);
+  return (
+    <span className="ml-[6px] inline-flex items-center gap-[5px] rounded-full px-[7px] py-[2px] align-middle normal-case tracking-normal" style={{ background: "rgba(0,0,0,0.28)", color: "#ffd9bf" }}>
+      <span className="relative flex size-[6px]">
+        <span className="absolute inset-0 animate-ping rounded-full bg-[#ef4444] opacity-60" />
+        <span className="relative size-[6px] rounded-full bg-[#ef4444]" />
+      </span>
+      <span className="tabular text-[10.5px] font-semibold">{parts.map(([v, u]) => `${v}${u}`).join(" ")}</span>
+    </span>
+  );
+}
+
 /** Replaces the offer switch while Halloween runs: one card, tap to open, pick 2 treats. */
 function VaultCard({ p }: { p: Pick }) {
   const reduce = useReducedMotion();
@@ -762,7 +776,7 @@ function VaultCard({ p }: { p: Pick }) {
         <span aria-hidden="true" className="pointer-events-none absolute -right-[40px] -top-[50px] size-[150px] rounded-full" style={{ background: `radial-gradient(circle, rgba(255,138,61,0.22), transparent 65%)` }} />
         <VaultDial open={open} />
         <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
-          <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}><span className="hidden sm:inline">Halloween · </span>The Haunted Vault</span>
+          <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}><span className="hidden sm:inline">Halloween · </span>The Haunted Vault <VaultClock /></span>
           <span className="text-[18px] font-semibold leading-[1.1] tracking-[-0.025em] sm:text-[21px]">
             45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO instantly</span>
           </span>
@@ -796,7 +810,6 @@ function VaultCard({ p }: { p: Pick }) {
           </motion.div>
         )}
       </AnimatePresence>
-      <OfferDetails p={p} giftParts={null} />
     </div>
   );
 }
@@ -1147,9 +1160,39 @@ function TrustRow() {
         <span className="text-[#00b67a]" aria-hidden="true">★★★★★</span>
         <span className="font-semibold text-[#c7d2e6]">4.5/5 · 3K+ reviews</span>
       </span>
-      <span>Card or crypto</span>
       <span>Rewards in 24-48h</span>
       <span>Fee back with reward</span>
+    </div>
+  );
+}
+
+/** Small payment marks: cards and crypto. Drawn in code (no images), same as the old payment row. */
+function PayMarks() {
+  const chip = "flex h-[24px] items-center justify-center rounded-[6px] px-[7px]";
+  const coin = (bg: string, child: ReactNode, label: string) => (
+    <span aria-label={label} className="flex size-[24px] items-center justify-center rounded-full" style={{ background: bg, boxShadow: "0 0 0 1.5px rgba(255,255,255,0.9)" }}>{child}</span>
+  );
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-[6px]" aria-label="Pay by card or crypto">
+      <span className={chip} style={{ background: "#fff" }} aria-label="Visa">
+        <span className="text-[12px] font-extrabold italic tracking-[-0.02em] text-[#1434CB]">VISA</span>
+      </span>
+      <span className={chip} style={{ background: "#fff" }} aria-label="Mastercard">
+        <span className="relative h-[14px] w-[22px]">
+          <span className="absolute left-0 top-0 size-[14px] rounded-full bg-[#EB001B]" />
+          <span className="absolute right-0 top-0 size-[14px] rounded-full bg-[#F79E1B] mix-blend-multiply" />
+        </span>
+      </span>
+      <span className={chip} style={{ background: "#1F72CD" }} aria-label="American Express">
+        <span className="text-[9.5px] font-extrabold tracking-[0.02em] text-white">AMEX</span>
+      </span>
+      <span className="mx-[4px] h-[14px] w-px" style={{ background: "rgba(148,178,255,0.25)" }} />
+      <span className="flex items-center -space-x-[5px]">
+        {coin("#F7931A", <span className="text-[13px] font-bold text-white">₿</span>, "Bitcoin")}
+        {coin("#26A17B", <span className="text-[12px] font-bold text-white">₮</span>, "USDT")}
+        {coin("#627EEA", <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 0.5 1.2 6.3 6 8.8l4.8-2.5L6 0.5Z" fill="#fff" fillOpacity="0.85" /><path d="M6 9.6 1.2 6.9 6 11.5l4.8-4.6L6 9.6Z" fill="#fff" /></svg>, "Ethereum")}
+      </span>
+      <span className="ml-[2px] text-[11px] font-medium" style={{ color: MUTED }}>+ more</span>
     </div>
   );
 }
@@ -1303,6 +1346,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
               </motion.a>
               <CodeLine p={p} />
               <TrustRow />
+              <PayMarks />
             </div>
           </motion.div>
       </div>
