@@ -2,12 +2,13 @@
 import { chromium } from "playwright";
 import { writeFileSync } from "node:fs";
 const URL = "https://fyt-master-landing-nqz2pwf51-bm-med.vercel.app/";
-const cases = [["IN", "d"], ["IN", "m"], ["DE", "d"], ["US", "m"], ["ES", "d"], ["NG", "m"], ["BR", "d"], ["XX", "m"]];
+const cases = [["IN", "d"], ["DE", "d"], ["ES", "d"], ["US", "l"], ["IN", "t"], ["XX", "d"]];
 const log = [];
 const browser = await chromium.launch();
 for (const [cc, vpn] of cases) {
-  const m = vpn === "m";
-  const ctx = await browser.newContext({ viewport: m ? { width: 390, height: 844 } : { width: 1440, height: 900 }, isMobile: m, hasTouch: m, deviceScaleFactor: m ? 2 : 1, timezoneId: "Europe/London" });
+  const m = false; const vw = { d: [1440, 900], l: [1280, 760], t: [1024, 768] }[vpn];
+  const ctx = await browser.newContext({ viewport: { width: vw[0], height: vw[1] }, deviceScaleFactor: 1, timezoneId: "Europe/London" });
+  await ctx.addInitScript(() => { try { localStorage.setItem("fyt_known_visitor_v1", "1"); localStorage.setItem("fyt_giveaway_done_v1", String(Date.now())); sessionStorage.setItem("fyt_giveaway_teaser_hidden", "1"); } catch {} });
   const page = await ctx.newPage();
   const errs = [];
   page.on("pageerror", (e) => errs.push(e.message.slice(0, 90)));
