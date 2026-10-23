@@ -1016,6 +1016,81 @@ function HalloweenDecor() {
   );
 }
 
+/* ------------------------------ clean card pieces ------------------------- */
+
+function Hairline() {
+  return <div aria-hidden="true" className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(148,178,255,0.18), transparent)" }} />;
+}
+
+/** Account sizes as one sliding track (same feel as the platform switch). */
+function SizeTrack({ p }: { p: Pick }) {
+  const n = p.sizes.length;
+  const idx = Math.min(p.i, n - 1);
+  return (
+    <div className="relative grid rounded-full p-[4px]" style={{ gridTemplateColumns: `repeat(${n}, minmax(0,1fr))`, background: "rgba(255,255,255,0.04)", border: `1px solid ${LINE}` }}>
+      <span aria-hidden="true" className="absolute bottom-[4px] top-[4px] rounded-full transition-[left] duration-300" style={{ left: `calc(4px + ${idx} * (100% - 8px) / ${n})`, width: `calc((100% - 8px) / ${n})`, background: BLUE, boxShadow: "0 8px 20px -10px rgba(37,99,235,0.9)" }} />
+      {p.sizes.map((z, j) => {
+        const on = j === idx;
+        return (
+          <button key={z} type="button" aria-pressed={on} onClick={() => p.setI(j)} className="relative z-[1] h-[42px] cursor-pointer rounded-full border-0 bg-transparent text-[13px] font-bold transition-colors sm:text-[14px]" style={{ color: on ? "#fff" : SOFT }}>
+            {fmtSize(z)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** The four key rules in one clean strip, divided by hairlines. */
+function SpecStrip({ p }: { p: Pick }) {
+  return (
+    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[18px] sm:grid-cols-4" style={{ background: "rgba(148,178,255,0.12)", border: "1px solid rgba(148,178,255,0.12)" }}>
+      {rules(p).map(([v, l]) => (
+        <span key={l} className="flex flex-col items-center justify-center gap-[5px] px-[8px] py-[14px] text-center" style={{ background: "#0a1330" }}>
+          <span className="text-[17px] font-bold leading-none tracking-[-0.01em] text-white">{v}</span>
+          <span className="text-[11px] font-medium leading-tight" style={{ color: MUTED }}>{l}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** What's included, as quiet chips. */
+function PerkChips({ p }: { p: Pick }) {
+  return (
+    <div className="flex flex-wrap gap-[6px]">
+      {perks(p).map((k) => (
+        <span key={k.label} className="flex h-[30px] items-center gap-[6px] rounded-full px-[11px] text-[12px] font-medium text-[#dbe4f5]" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(148,178,255,0.12)" }}>
+          <Svg d={k.d} size={13} color="#4ade80" w={2} />
+          {k.label}
+          {k.challengeOnly && <span style={{ color: MUTED }}>· challenge</span>}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** "Your account" recap right above the button: size, model, type and platform. */
+function OrderSummary({ p }: { p: Pick }) {
+  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
+  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
+  return (
+    <div className="flex items-center justify-between gap-[12px]">
+      <div className="flex min-w-0 flex-col gap-[3px]">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Your account</span>
+        <span className="flex flex-wrap items-baseline gap-x-[8px] gap-y-[2px]">
+          <Roll value={fmtSize(p.size)} className="text-[24px] font-bold leading-none tracking-[-0.02em] text-white" />
+          <span className="text-[14px] font-semibold text-[#dbe4f5]">{p.step} · {type}</span>
+        </span>
+      </div>
+      <span className="flex h-[34px] shrink-0 items-center gap-[7px] rounded-full px-[12px] text-[12.5px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(148,178,255,0.18)" }}>
+        <img src={plat.logo} alt="" className="h-[14px] w-auto" style={{ filter: "brightness(0) invert(1)" }} />
+        {plat.label}
+      </span>
+    </div>
+  );
+}
+
 /* ============================ The pricing section ============================ */
 
 const MODEL_COPY: Record<StepId, { mark: string; line: string; short: string }> = {
@@ -1143,62 +1218,49 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
           >
             <span aria-hidden="true" className="pointer-events-none absolute -right-[70px] -top-[80px] size-[240px] rounded-full" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.35), transparent 65%)" }} />
             {p.halloween && <span aria-hidden="true" className="pointer-events-none absolute inset-x-[12%] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,138,61,0.85), transparent)" }} />}
-            <div className="relative flex flex-col gap-[16px] p-[16px] sm:p-[22px] lg:gap-[18px] lg:p-[28px]">
+            <div className="relative flex flex-col gap-[18px] p-[16px] sm:p-[22px] lg:gap-[20px] lg:p-[28px]">
 
-              <div className="flex flex-col gap-[8px]">
+              <div className="flex flex-col gap-[10px]">
                 <Label>Account size</Label>
-                <div className="grid grid-cols-5 gap-[6px]">
-                  {p.sizes.map((z, j) => {
-                    const on = j === p.i;
-                    return (
-                      <button key={z} type="button" aria-pressed={on} onClick={() => p.setI(j)} className="h-[46px] cursor-pointer rounded-[13px] text-[13px] font-bold transition-colors sm:text-[14px]" style={{ border: `1px solid ${on ? "#60a5fa" : "rgba(148,178,255,0.16)"}`, background: on ? "rgba(59,130,246,0.3)" : "rgba(255,255,255,0.02)", color: on ? "#fff" : SOFT }}>
-                        {fmtSize(z)}
-                      </button>
-                    );
-                  })}
-                </div>
+                <SizeTrack p={p} />
               </div>
 
-              <div className="grid grid-cols-1 gap-[16px]">
-                <div className="flex flex-col gap-[8px]">
-                  <Label
-                    right={
-                      <button type="button" aria-expanded={compare} onClick={() => setCompare((v) => !v)} className="flex cursor-pointer items-center gap-[6px] rounded-full border-0 px-[10px] py-[5px] text-[12px] font-semibold text-[#bfdbfe]" style={{ background: compare ? "rgba(59,130,246,0.25)" : "rgba(255,255,255,0.06)" }}>
-                        <Svg d="M7 7h11l-3-3M17 17H6l3 3" size={12} color="#bfdbfe" w={2.2} />
-                        {compare ? "Hide" : "Compare"}
-                      </button>
-                    }
-                  >
-                    Type
-                  </Label>
-                  <TypeCards p={p} />
-                  <AnimatePresence initial={false}>
-                    {compare && (
-                      <motion.div key="cmp" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }} className="overflow-hidden">
-                        <CompareTable p={p} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-                <div className="flex flex-col gap-[8px]">
-                  <Label>Platform</Label>
-                  <PlatformSeg p={p} />
-                  <div className="mt-[4px] grid grid-cols-2 gap-[6px] sm:grid-cols-4">
-                    {rules(p).map(([v, l]) => (
-                      <span key={l} className="flex flex-col items-center justify-center gap-[3px] rounded-[14px] px-[6px] py-[10px] text-center" style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(148,178,255,0.08)" }}>
-                        <span className="text-[16px] font-bold leading-none">{v}</span>
-                        <span className="text-[11px] font-medium leading-tight" style={{ color: MUTED }}>{l}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
+              <Hairline />
+
+              <div className="flex flex-col gap-[10px]">
+                <Label
+                  right={
+                    <button type="button" aria-expanded={compare} onClick={() => setCompare((v) => !v)} className="flex cursor-pointer items-center gap-[6px] rounded-full border-0 px-[10px] py-[5px] text-[12px] font-semibold text-[#bfdbfe]" style={{ background: compare ? "rgba(59,130,246,0.25)" : "rgba(255,255,255,0.06)" }}>
+                      <Svg d="M7 7h11l-3-3M17 17H6l3 3" size={12} color="#bfdbfe" w={2.2} />
+                      {compare ? "Hide" : "Compare"}
+                    </button>
+                  }
+                >
+                  Type
+                </Label>
+                <TypeCards p={p} />
+                <AnimatePresence initial={false}>
+                  {compare && (
+                    <motion.div key="cmp" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }} className="overflow-hidden">
+                      <CompareTable p={p} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              <div className="flex flex-col gap-[10px] rounded-[16px] p-[12px] lg:p-[16px]" style={{ background: "rgba(0,0,0,0.22)" }}>
-                <Label>Why traders choose this</Label>
-                <PerkGrid p={p} cols={2} />
+              <Hairline />
+
+              <div className="flex flex-col gap-[10px]">
+                <Label>Platform</Label>
+                <PlatformSeg p={p} />
               </div>
 
+              <SpecStrip p={p} />
+              <PerkChips p={p} />
+
+              <Hairline />
+
+              <OrderSummary p={p} />
               {p.halloween && <VaultSummary p={p} onPick={() => setSheet(true)} />}
               <motion.a
                 href={p.co.href}
