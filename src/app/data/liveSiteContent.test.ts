@@ -274,7 +274,7 @@ describe("VIDEO_URLS", () => {
       ...Object.values(VIDEO_URLS.testimonials),
       ...Object.values(VIDEO_URLS.misc),
     ];
-    expect(all).toHaveLength(21);
+    expect(all).toHaveLength(23);
     for (const url of all) {
       expect(url).toMatch(/^https:\/\/fundingyourtrades\.com\/wp-content\/uploads\/.+\.mp4$/);
     }

@@ -254,6 +254,8 @@ export const VIDEO_URLS = {
     nadir: "https://fundingyourtrades.com/wp-content/uploads/2026/06/NADIR-HUSSAIN-FINAL-.mp4",
     nicholas: "https://fundingyourtrades.com/wp-content/uploads/2026/06/Nicholas-Video.mp4",
     rohit: "https://fundingyourtrades.com/wp-content/uploads/2026/06/ROHIT-VIDEO-FINAL-.mp4",
+    anaas: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Anaas-Morocco.mp4",
+    hongKong: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Trader-video-2025-10-b.mp4",
   },
   misc: {
     howToPurchase: "https://fundingyourtrades.com/wp-content/uploads/2025/05/How-to-make-a-Successful-Purchase-at-FYT.mp4",

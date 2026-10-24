@@ -38,6 +38,8 @@ const VIDEO_COUNTRY: Record<string, string> = {
   Anisha: "IN",
   Charls: "BH",
   Dylan: "NZ",
+  Anaas: "MA",
+  "Hong Kong trader": "HK",
 };
 
 type Visitor = { code: string | null; region: RegionId | null };

@@ -58,6 +58,8 @@ export const TESTIMONIAL_VIDEOS: TestimonialVideo[] = [
   { name: "Anisha", caption: "This funding experience completely changed the way I trade and scale accounts.", videoUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/05/Anisha-part-2.mp4", posterUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636970.jpg" },
   { name: "Charls", caption: "This funding experience completely changed the way I trade and scale accounts.", videoUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/05/Charles-part-2.mp4", posterUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636969.jpg" },
   { name: "Dylan", caption: "This funding experience completely changed the way I trade and scale accounts.", videoUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/05/FYT-Dylan.mp4", posterUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/05/6066483156774227824.jpg" },
+  { name: "Anaas", caption: "Live payout during the interview, proof that payouts really move.", videoUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Anaas-Morocco.mp4", posterUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/IMG_3308.jpeg" },
+  { name: "Hong Kong trader", caption: "This funding experience completely changed the way I trade and scale accounts.", videoUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Trader-video-2025-10-b.mp4", posterUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/IMG_3309.jpeg" },
 ];
 
 export type TestimonialSlideItem =
