@@ -51,6 +51,10 @@ function shuffle<T>(list: T[]): T[] {
   return a;
 }
 
+/** Shown rarely: only a quarter of visits include these, and always at the very end. */
+const LOW_PRIORITY = new Set(["Gabriel"]);
+const LOW_SHOW_CHANCE = 0.25;
+
 const ASIA_REGIONS: RegionId[] = ["south-asia", "southeast-asia", "east-asia", "middle-east"];
 
 /**
@@ -60,7 +64,8 @@ const ASIA_REGIONS: RegionId[] = ["south-asia", "southeast-asia", "east-asia", "
  * (USA, South Africa, Kenya, New Zealand, Germany) and Asian ones last.
  */
 function buildDeck(videos: TestimonialVideo[], v: Visitor): { order: number[]; scope: string } {
-  const all = videos.map((_, i) => i);
+  const low = videos.map((_, i) => i).filter((i) => LOW_PRIORITY.has(videos[i].name));
+  const all = videos.map((_, i) => i).filter((i) => !low.includes(i));
   const cc = (i: number) => VIDEO_COUNTRY[videos[i].name];
   const isAsia = (i: number) => ASIA_REGIONS.includes(regionOf(cc(i)) as RegionId);
   const sameCountry = v.code ? all.filter((i) => cc(i) === v.code) : [];
@@ -74,7 +79,8 @@ function buildDeck(videos: TestimonialVideo[], v: Visitor): { order: number[]; s
     far = left.filter((i) => isAsia(i) !== visitorAsia);
   }
   const scope = sameCountry.length && v.code ? `from ${countryPlain(v.code)}` : sameRegion.length && v.region ? `from ${REGION_NAME[v.region]}` : "worldwide";
-  return { order: [...shuffle(sameCountry), ...shuffle(sameRegion), ...shuffle(near), ...shuffle(far)], scope };
+  const tail = Math.random() < LOW_SHOW_CHANCE ? shuffle(low) : [];
+  return { order: [...shuffle(sameCountry), ...shuffle(sameRegion), ...shuffle(near), ...shuffle(far), ...tail], scope };
 }
 
 function PlayIcon({ size = 22 }: { size?: number }) {
@@ -101,13 +107,13 @@ function Flag({ code, w = 20 }: { code: string | undefined; w?: number }) {
 
 export function HeroVideoProof() {
   const videos = TESTIMONIAL_VIDEOS;
-  const n = videos.length;
   const reduce = useReducedMotion();
   const visitorRef = useRef<Visitor>({ code: null, region: null });
   const [deck, setDeck] = useState<{ order: number[]; scope: string }>(() => {
     visitorRef.current = detectVisitor();
     return buildDeck(videos, visitorRef.current);
   });
+  const n = deck.order.length;
   const [pos, setPos] = useState(0);
   const [auto, setAuto] = useState(true);
   const [hover, setHover] = useState(false);

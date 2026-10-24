@@ -2731,6 +2731,7 @@ export function VideoLightbox({ source, onClose }: { source: VideoSource | null;
   useEffect(() => {
     if (!source) return;
     const previouslyFocusedElement = document.activeElement;
+    const scrollY = window.scrollY;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -2741,7 +2742,12 @@ export function VideoLightbox({ source, onClose }: { source: VideoSource | null;
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
-      (previouslyFocusedElement as HTMLElement | null)?.focus?.();
+      (previouslyFocusedElement as HTMLElement | null)?.focus?.({ preventScroll: true });
+      // Closing must leave the page exactly where it was (phones used to jump back to the top).
+      const back = () => window.scrollTo({ top: scrollY, left: 0, behavior: "instant" as ScrollBehavior });
+      back();
+      window.requestAnimationFrame(back);
+      window.setTimeout(back, 120);
     };
   }, [source, onClose]);
 
