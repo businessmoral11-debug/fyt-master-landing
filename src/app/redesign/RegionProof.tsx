@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useSpring } from "motion/react";
+import { useMotionValue, useMotionValueEvent, useSpring } from "motion/react";
 import { API_BASE_URL } from "@/app/api/apiBaseUrl";
 import { countryFlagUrl, fetchFeaturedPayouts, formatPayoutAmount, type PublicCertificate, type PublicPayout } from "@/app/api/rewardsApi";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
-import { C, EASE, Eyebrow, Pill, Reveal, Section, useLive } from "./ui";
+import { C, Eyebrow, Pill, Reveal, Section, useLive } from "./ui";
 
 /* ------------------------------------------------------------------ */
 /* Live rewards, matched to the visitor: country -> region -> world.   */
@@ -354,38 +354,39 @@ function StatTile({ label, children, accent = false }: { label: string; children
 /* ----------------------- right column: certificate ---------------------- */
 
 function CertificateStage({ item }: { item: ProofItem | undefined }) {
-  const reduce = useReducedMotion();
+  // The text certificate is always underneath; the real image fades in on top once it has loaded,
+  // so a slow or failed image never leaves an empty black box (seen on iPhone).
+  const [loaded, setLoaded] = useState<string | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
   const cert = item?.cert;
   const link = cert?.certificateUrl || item?.certificateUrl || item?.explorerUrl || undefined;
   const f = item ? countryFlagUrl(item.countryCode) : null;
   const showImage = !!cert && failed !== cert.certificateId;
+  const ready = !!cert && loaded === cert.certificateId;
   return (
     <div className="flex min-w-0 flex-col gap-[14px]">
       <a href={link} target="_blank" rel="noopener noreferrer" className="group relative block overflow-hidden rounded-[20px] no-underline" style={{ background: "#060b16", border: "1px solid rgba(148,178,255,0.24)", boxShadow: "0 30px 70px -30px rgba(37,99,235,0.85)" }}>
         <div className="relative aspect-[1.41] w-full">
-          <span className="absolute inset-0" style={{ background: "radial-gradient(80% 70% at 50% 40%, #0f1d44, #060b16)" }} />
-          <AnimatePresence mode="popLayout" initial={false}>
-            {showImage ? (
-              <motion.img
-                key={cert!.certificateId}
-                src={cert!.imageUrl}
-                alt={`Payout certificate for ${cert!.traderName ?? "FYT trader"}`}
-                onError={() => setFailed(cert!.certificateId)}
-                className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.04 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.6, ease: EASE }}
-              />
-            ) : item ? (
-              <motion.div key={`fallback-${item.id}`} className="absolute inset-0 flex flex-col items-center justify-center gap-[6px] text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#93c5fd]">Performance reward</span>
-                <span className="tabular fyt-gradient-text text-[44px] font-semibold tracking-[-0.03em]">{formatPayoutAmount(item.amount)}</span>
-                <span className="text-[14px] font-semibold text-white">{item.traderName ?? "FYT trader"}</span>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+          <span className="absolute inset-0" style={{ background: "radial-gradient(80% 70% at 50% 40%, #12234f, #060b16)" }} />
+          {item && (
+            <span className="absolute inset-0 flex flex-col items-center justify-center gap-[6px] text-center">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#93c5fd]">Performance reward</span>
+              <span className="tabular fyt-gradient-text text-[44px] font-semibold tracking-[-0.03em]">{formatPayoutAmount(item.amount)}</span>
+              <span className="text-[14px] font-semibold text-white">{item.traderName ?? "FYT trader"}</span>
+            </span>
+          )}
+          {showImage && (
+            <img
+              key={cert!.certificateId}
+              src={cert!.imageUrl}
+              alt={`Payout certificate for ${cert!.traderName ?? "FYT trader"}`}
+              decoding="async"
+              onLoad={() => setLoaded(cert!.certificateId)}
+              onError={() => setFailed(cert!.certificateId)}
+              className="absolute inset-0 size-full object-cover transition-[opacity,transform] duration-700 group-hover:scale-[1.03]"
+              style={{ opacity: ready ? 1 : 0 }}
+            />
+          )}
           <span className="absolute left-[12px] top-[12px] flex items-center gap-[6px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.12em] text-[#86efac]" style={{ background: "rgba(3,6,13,0.78)", border: "1px solid rgba(34,197,94,0.38)", backdropFilter: "blur(6px)" }}>
             <Check size={10} /> Verified on-chain
           </span>
