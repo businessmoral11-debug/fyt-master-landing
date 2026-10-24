@@ -110,7 +110,7 @@ export function HeroVideoProof() {
           </AnimatePresence>
           <span className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(3,6,13,0.25) 0%, rgba(3,6,13,0) 30%, rgba(3,6,13,0.85) 100%)" }} />
           <span className="absolute left-[12px] top-[12px] flex items-center gap-[7px] rounded-full px-[11px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.14em] text-white" style={{ background: "rgba(239,68,68,0.9)", boxShadow: "0 8px 20px -8px rgba(239,68,68,0.9)" }}>
-            <span className="size-[6px] rounded-full bg-white" /> Real trader
+            <span className="size-[6px] rounded-full bg-white" /> Funded trader
           </span>
           <span className="absolute left-1/2 top-1/2 flex size-[64px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-110 sm:size-[76px]" style={{ background: "rgba(255,255,255,0.16)", border: "1px solid rgba(255,255,255,0.45)", backdropFilter: "blur(10px)", boxShadow: "0 18px 40px -12px rgba(0,0,0,0.6)" }}>
             <span className="ml-[3px]">
@@ -119,7 +119,7 @@ export function HeroVideoProof() {
           </span>
           <span className="absolute inset-x-[16px] bottom-[14px] flex flex-col gap-[3px]">
             <span className="text-[17px] font-semibold text-white sm:text-[19px]">{current.name}</span>
-            <span className="line-clamp-1 text-[12.5px] text-[#c7d2ea]">Funded trader · tap to watch</span>
+            <span className="line-clamp-1 text-[12.5px] text-[#c7d2ea]">Watch their story</span>
           </span>
           {running && <span key={`${pos}-${order[0]}`} aria-hidden="true" className="fyt-hv-progress absolute inset-x-0 bottom-0 h-[3px] origin-left" style={{ background: "linear-gradient(90deg,#3b82f6,#93c5fd)" }} />}
         </button>

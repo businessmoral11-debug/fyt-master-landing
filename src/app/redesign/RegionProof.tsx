@@ -122,6 +122,48 @@ export function detectVisitor(): { code: string | null; region: RegionId | null 
   return { code: null, region: null };
 }
 
+/** Country from the visitor's IP (so a VPN or travel is respected). Cached for the tab. */
+async function lookupIpCountry(): Promise<string | null> {
+  const KEY = "fyt_ip_cc_v1";
+  try {
+    const hit = window.sessionStorage.getItem(KEY);
+    if (hit && /^[A-Z]{2}$/.test(hit)) return hit;
+  } catch {
+    // Storage blocked: just look it up.
+  }
+  const ask = async (url: string, pick: (r: Response) => Promise<string | null | undefined>): Promise<string | null> => {
+    const ctrl = new AbortController();
+    const t = window.setTimeout(() => ctrl.abort(), 2500);
+    try {
+      const r = await fetch(url, { signal: ctrl.signal, cache: "no-store" });
+      if (!r.ok) return null;
+      const cc = (await pick(r))?.trim().toUpperCase();
+      return cc && /^[A-Z]{2}$/.test(cc) && cc !== "XX" && cc !== "T1" ? cc : null;
+    } catch {
+      return null;
+    } finally {
+      window.clearTimeout(t);
+    }
+  };
+  const cc = await new Promise<string | null>((resolve) => {
+    let left = 2;
+    const done = (v: string | null) => {
+      if (v) resolve(v);
+      else if (--left === 0) resolve(null);
+    };
+    ask("https://api.country.is/", async (r) => (await r.json()).country).then(done);
+    ask("https://www.cloudflare.com/cdn-cgi/trace", async (r) => /(?:^|\n)loc=([A-Z]{2})/.exec(await r.text())?.[1]).then(done);
+  });
+  if (cc) {
+    try {
+      window.sessionStorage.setItem(KEY, cc);
+    } catch {
+      // Not cached: fine.
+    }
+  }
+  return cc;
+}
+
 const NAME_THE: Record<string, string> = { US: "the USA", GB: "the UK", AE: "the UAE", NL: "the Netherlands", PH: "the Philippines" };
 const NAME_PLAIN: Record<string, string> = { US: "USA", GB: "UK", AE: "UAE", CZ: "Czechia" };
 
@@ -475,11 +517,22 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
   const [pick, setPick] = useState(0);
   const [auto, setAuto] = useState(true);
   const [more, setMore] = useState(false);
+  const [geoDone, setGeoDone] = useState(false);
   const [panelRef, panelLive] = useLive<HTMLDivElement>();
 
   useEffect(() => {
-    setVisitor(detectVisitor());
     let cancelled = false;
+    const first = detectVisitor();
+    setVisitor(first);
+    // ?country=XX is a manual override; otherwise the IP decides (the time zone can't see a VPN).
+    const manual = /^[a-z]{2}$/i.test(new URLSearchParams(window.location.search).get("country") ?? "");
+    if (manual) setGeoDone(true);
+    else
+      lookupIpCountry().then((cc) => {
+        if (cancelled) return;
+        if (cc) setVisitor({ code: cc, region: regionOf(cc) ?? first.region });
+        setGeoDone(true);
+      });
     loadAllPayouts()
       .then((list) => {
         if (cancelled) return;
@@ -530,14 +583,14 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
   const localFlag = local.kind === "country" ? countryFlagUrl(local.code) : null;
   const localChip = local.kind === "country" ? countryPlain(local.code) : local.kind === "region" ? REGION_CHIP[local.id] : "";
   const scopeShort = scope.kind === "country" ? countryThe(scope.code) : scope.kind === "region" ? REGION_NAME[scope.id] : "worldwide";
-  const loading = state === "loading";
+  const loading = state === "loading" || !geoDone;
 
   return (
     <Section tone="light" id="live-payouts">
       <div className="relative grid grid-cols-1 items-center gap-[40px] lg:grid-cols-12 lg:gap-[56px]">
         <div className="flex min-w-0 flex-col gap-[22px] lg:col-span-5 xl:col-span-4">
           <Eyebrow tone="light">Live rewards</Eyebrow>
-          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] [text-wrap:balance] sm:text-[42px] lg:text-[40px] xl:text-[42px] min-[1400px]:text-[46px]" style={{ color: C.textLight }}>
+          <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] transition-opacity duration-500 [text-wrap:balance] sm:text-[42px] lg:text-[40px] xl:text-[42px] min-[1400px]:text-[46px]" style={{ color: C.textLight, opacity: loading ? 0 : 1 }}>
             {scope.kind === "country" ? (
               <>
                 <span className="inline-flex flex-nowrap items-center gap-x-[12px] whitespace-nowrap">
@@ -662,7 +715,7 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
                   <Check size={14} color="#1d4ed8" /> See every reward on-chain
                 </a>
                 <Pill href="#challenge" onClick={() => pauseHeavyScenesForNav()} className="px-[22px]! py-[12px]! text-[14px]!">
-                  Start my challenge
+                  Get funded
                 </Pill>
               </div>
             </div>
