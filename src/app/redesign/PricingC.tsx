@@ -1192,17 +1192,10 @@ function BuyButton({ p, onNeedTreats, wide = false }: { p: Pick; onNeedTreats: (
   );
 }
 
-/* ======================= Desktop layout options (A, B, C) ======================= */
-/* Only desktop (lg and up). Phones keep the original layout. Open with ?layout=a, b or c. */
+/* ======================= Desktop pricing layout ======================= */
+/* Desktop (lg and up) gets this pinned-summary layout. Phones keep the original stacked layout. */
 
-type Variant = "current" | "a" | "b" | "c";
 const CARD_STYLE = { border: "1px solid rgba(96,165,250,0.6)", background: "linear-gradient(180deg, rgba(37,99,235,0.2) 0%, rgba(10,18,40,0.92) 45%)", boxShadow: "0 50px 100px -50px rgba(37,99,235,0.95)" } as const;
-
-function readVariant(): Variant {
-  if (typeof window === "undefined") return "current";
-  const v = new URLSearchParams(window.location.search).get("layout");
-  return v === "a" || v === "b" || v === "c" || v === "current" ? v : "current";
-}
 
 function useDesktop(): boolean {
   const q = "(min-width: 1024px)";
@@ -1215,25 +1208,6 @@ function useDesktop(): boolean {
     return () => m.removeEventListener("change", f);
   }, []);
   return on;
-}
-
-function hasVariantParam(): boolean {
-  return typeof window !== "undefined" && new URLSearchParams(window.location.search).get("layout") !== null;
-}
-
-/** Temporary: lets you flip between the layouts while comparing. Removed once one is chosen. */
-function LayoutSwitcher({ value, onChange }: { value: Variant; onChange: (v: Variant) => void }) {
-  const items: { id: Variant; label: string }[] = [{ id: "current", label: "Current" }, { id: "a", label: "A" }, { id: "b", label: "B" }, { id: "c", label: "C" }];
-  return (
-    <div className="fixed bottom-[24px] right-[96px] z-[2147482990] hidden items-center gap-[4px] rounded-full p-[4px] lg:flex" style={{ background: "rgba(8,14,32,0.92)", border: "1px solid rgba(148,178,255,0.3)", boxShadow: "0 18px 40px -12px rgba(0,0,0,0.7)" }} role="group" aria-label="Pricing layout">
-      <span className="px-[10px] text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: MUTED }}>Layout</span>
-      {items.map((it) => (
-        <button key={it.id} type="button" aria-pressed={value === it.id} onClick={() => onChange(it.id)} className="h-[32px] min-w-[44px] cursor-pointer rounded-full border-0 px-[12px] text-[13px] font-bold text-white" style={{ background: value === it.id ? BLUE : "transparent" }}>
-          {it.label}
-        </button>
-      ))}
-    </div>
-  );
 }
 
 function useStickyTop(): number {
@@ -1332,10 +1306,6 @@ function ModelRow({ p }: { p: Pick }) {
   );
 }
 
-function OfferBlock({ p }: { p: Pick }) {
-  return p.halloween ? <VaultCard p={p} /> : <OfferSwitch p={p} />;
-}
-
 function CompareToggle({ compare, setCompare }: { compare: boolean; setCompare: (f: (v: boolean) => boolean) => void }) {
   return (
     <button type="button" aria-expanded={compare} onClick={() => setCompare((v) => !v)} className="flex cursor-pointer items-center gap-[6px] rounded-full border-0 px-[10px] py-[5px] text-[12px] font-semibold text-[#bfdbfe]" style={{ background: compare ? "rgba(59,130,246,0.25)" : "rgba(255,255,255,0.06)" }}>
@@ -1362,7 +1332,6 @@ function TypeBlock({ p, compare, setCompare, n }: { p: Pick; compare: boolean; s
   );
 }
 
-/* ---------- A: pinned live summary on the left, short card on the right ---------- */
 
 function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
   const top = useStickyTop();
@@ -1428,222 +1397,7 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
   );
 }
 
-/* ---------- B and C share the step content ---------- */
-
 type LayoutProps = { p: Pick; heading?: ReactNode; compare: boolean; setCompare: (f: (v: boolean) => boolean) => void; openSheet: () => void };
-
-const STEP_TITLES = ["Model", "Account size", "Type and platform", "Review"];
-
-function StepList({ p, idx, onGo }: { p: Pick; idx: number; onGo: (k: number) => void }) {
-  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
-  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
-  const values = [p.step, fmtSize(p.size), `${type} · ${plat.label}`, money(p.price)];
-  return (
-    <div className="flex flex-col gap-[8px]">
-      {STEP_TITLES.map((t, k) => {
-        const on = k === idx;
-        const done = k < idx;
-        return (
-          <button key={t} type="button" onClick={() => onGo(k)} aria-current={on ? "step" : undefined} className="flex h-[56px] cursor-pointer items-center gap-[12px] rounded-[16px] px-[12px] text-left text-white transition-colors" style={{ border: `1.5px solid ${on ? "rgba(96,165,250,0.85)" : LINE}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.26), rgba(37,99,235,0.06))" : "rgba(255,255,255,0.03)" }}>
-            <span className="flex size-[28px] shrink-0 items-center justify-center rounded-full text-[12px] font-bold" style={{ background: done ? "#16a34a" : on ? BLUE : "rgba(255,255,255,0.08)" }}>
-              {done ? <Svg d={IC.check} size={13} color="#fff" w={3} /> : k + 1}
-            </span>
-            <span className="flex min-w-0 flex-1 flex-col">
-              <span className="text-[10.5px] font-semibold uppercase tracking-[0.12em]" style={{ color: MUTED }}>{t}</span>
-              <span className="truncate text-[15px] font-bold">{values[k]}</span>
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function StepPanel({ p, idx, compare, setCompare, openSheet }: Omit<LayoutProps, "heading"> & { idx: number }) {
-  const reduce = useReducedMotion();
-  let body: ReactNode;
-  if (idx === 0) {
-    body = (
-      <>
-        <Label>Choose your model</Label>
-        <ModelTabs p={p} />
-        <SpecStrip p={p} />
-        <PerkChips p={p} />
-      </>
-    );
-  } else if (idx === 1) {
-    const cur = Math.min(p.i, p.sizes.length - 1);
-    body = (
-      <>
-        <Label>Account size</Label>
-        <div className="grid gap-[10px]" style={{ gridTemplateColumns: `repeat(${p.sizes.length}, minmax(0,1fr))` }}>
-          {p.sizes.map((z, j) => {
-            const on = j === cur;
-            const e = getEntry(p.step, p.plan, p.platform, z);
-            const price = e ? Math.round(offerPrice(e.priceOld, p.offer)) : 0;
-            return (
-              <button key={z} type="button" aria-pressed={on} onClick={() => p.setI(j)} className="flex cursor-pointer flex-col items-center gap-[4px] rounded-[18px] px-[6px] py-[24px] text-white transition-colors" style={{ border: `1.5px solid ${on ? "rgba(96,165,250,0.9)" : LINE}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.32), rgba(37,99,235,0.08))" : "rgba(255,255,255,0.03)", boxShadow: on ? "0 24px 50px -28px rgba(37,99,235,0.95)" : "none" }}>
-                <span className="text-[22px] font-bold tracking-[-0.02em]">{fmtSize(z)}</span>
-                <span className="text-[11px]" style={{ color: MUTED }}>from</span>
-                <span className="text-[16px] font-bold text-[#93c5fd]">{money(price)}</span>
-              </button>
-            );
-          })}
-        </div>
-        <SpecStrip p={p} />
-      </>
-    );
-  } else if (idx === 2) {
-    body = (
-      <>
-        <TypeBlock p={p} compare={compare} setCompare={setCompare} />
-        <Hairline />
-        <div className="flex flex-col gap-[10px]">
-          <Label>Platform</Label>
-          <PlatformSeg p={p} />
-        </div>
-        <PerkChips p={p} />
-      </>
-    );
-  } else {
-    body = (
-      <>
-        <SpecStrip p={p} />
-        <PerkChips p={p} />
-        <Hairline />
-        <OrderSummary p={p} />
-        {p.halloween && <VaultSummary p={p} onPick={openSheet} />}
-        <BuyButton p={p} onNeedTreats={openSheet} />
-        <CodeLine p={p} />
-        <TrustRow />
-        <PayMarks />
-      </>
-    );
-  }
-  return (
-    <motion.div key={idx} initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: EASE }} className="flex flex-col gap-[18px]">
-      {body}
-    </motion.div>
-  );
-}
-
-function ProgressBars({ idx }: { idx: number }) {
-  return (
-    <div className="flex items-center gap-[6px]" aria-hidden="true">
-      {STEP_TITLES.map((t, k) => (
-        <span key={t} className="h-[4px] flex-1 rounded-full transition-colors duration-300" style={{ background: k <= idx ? "#60a5fa" : "rgba(148,178,255,0.18)" }} />
-      ))}
-    </div>
-  );
-}
-
-/* ---------- B: one step at a time, Back and Continue ---------- */
-
-function VariantB(props: LayoutProps) {
-  const { p, heading } = props;
-  const STICKY_TOP = useStickyTop();
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    const on = () => setIdx(3);
-    window.addEventListener(SELECT_PLAN_EVENT, on);
-    return () => window.removeEventListener(SELECT_PLAN_EVENT, on);
-  }, []);
-  return (
-    <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-[minmax(0,420px)_minmax(0,1fr)] items-start gap-[48px] px-[40px] pb-[110px] pt-[100px]">
-      <div className="sticky flex flex-col gap-[18px] overflow-y-auto pb-[4px] [scrollbar-width:none] [&>*]:shrink-0" style={{ top: STICKY_TOP, maxHeight: `calc(100vh - ${STICKY_TOP + 16}px)` }}>
-        <div className="[&_h2]:text-[40px]">{heading ?? <DefaultHeading />}</div>
-        <OfferBlock p={p} />
-        <StepList p={p} idx={idx} onGo={setIdx} />
-      </div>
-      <div className="relative flex min-h-[580px] flex-col gap-[20px] overflow-hidden rounded-[26px] p-[28px]" style={CARD_STYLE}>
-        <ProgressBars idx={idx} />
-        <div className="flex-1">
-          <StepPanel {...props} idx={idx} />
-        </div>
-        <div className="flex items-center justify-between gap-[12px]">
-          <button type="button" onClick={() => setIdx((k) => Math.max(0, k - 1))} disabled={idx === 0} className="h-[48px] cursor-pointer rounded-[14px] border-0 px-[20px] text-[14px] font-semibold text-[#dbe4f5] disabled:cursor-default disabled:opacity-0" style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${LINE}` }}>
-            Back
-          </button>
-          {idx < 3 && (
-            <button type="button" onClick={() => setIdx((k) => Math.min(3, k + 1))} className="flex h-[48px] cursor-pointer items-center gap-[8px] rounded-[14px] border-0 px-[26px] text-[15px] font-bold text-white" style={{ background: BLUE, boxShadow: "0 16px 32px -14px rgba(37,99,235,0.95)" }}>
-              Continue
-              <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#fff" w={2.6} />
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- C: the section stays pinned, scrolling moves through the steps ---------- */
-
-function VariantC(props: LayoutProps) {
-  const { p, heading } = props;
-  const topNow = useStickyTop();
-  const topRef = useRef(topNow);
-  topRef.current = topNow;
-  const STICKY_TOP = topNow;
-  const wrap = useRef<HTMLDivElement>(null);
-  const inner = useRef<HTMLDivElement>(null);
-  const [idx, setIdx] = useState(0);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const w = wrap.current;
-      const i = inner.current;
-      if (!w || !i) return;
-      const range = w.offsetHeight - i.offsetHeight;
-      if (range <= 0) return;
-      const prog = Math.min(1, Math.max(0, (topRef.current - w.getBoundingClientRect().top) / range));
-      setIdx(Math.min(3, Math.floor(prog * 4)));
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, []);
-
-  const go = (k: number) => {
-    const w = wrap.current;
-    const i = inner.current;
-    if (!w || !i) return;
-    const range = w.offsetHeight - i.offsetHeight;
-    const top = w.getBoundingClientRect().top + window.scrollY - topRef.current + ((k + 0.5) / 4) * range;
-    window.scrollTo({ top, behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    const on = () => window.setTimeout(() => go(3), 700);
-    window.addEventListener(SELECT_PLAN_EVENT, on);
-    return () => window.removeEventListener(SELECT_PLAN_EVENT, on);
-  }, []);
-
-  return (
-    <div ref={wrap} className="relative mx-auto w-full max-w-[1180px] px-[40px] pb-[60px] pt-[40px]" style={{ height: "calc(100vh + 150px + 150vh)" }}>
-      <div ref={inner} className="sticky grid grid-cols-[minmax(0,420px)_minmax(0,1fr)] items-start gap-[48px]" style={{ top: STICKY_TOP, height: `calc(100vh - ${STICKY_TOP + 20}px)`, minHeight: 560 }}>
-        <div className="flex max-h-full flex-col gap-[16px] overflow-y-auto pb-[4px] [scrollbar-width:none] [&>*]:shrink-0">
-          <div className="[&_h2]:text-[40px]">{heading ?? <DefaultHeading />}</div>
-          <OfferBlock p={p} />
-          <StepList p={p} idx={idx} onGo={go} />
-        </div>
-        <div className="relative flex h-full flex-col gap-[18px] overflow-y-auto rounded-[26px] p-[28px] [scrollbar-width:none]" style={CARD_STYLE}>
-          <ProgressBars idx={idx} />
-          <StepPanel {...props} idx={idx} />
-          {idx < 3 && (
-            <span className="mt-auto flex items-center justify-center gap-[8px] pt-[6px] text-[12px] font-semibold" style={{ color: MUTED }}>
-              <Svg d="M6 9l6 6 6-6" size={14} color={MUTED} w={2.4} />
-              Scroll for the next step
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function ChallengePricing({ heading }: { heading?: ReactNode }) {
   const p = usePick();
@@ -1679,19 +1433,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
     return () => window.removeEventListener(SELECT_PLAN_EVENT, on);
   }, [setStep, setPlan, setPlatform, setI]);
 
-  const [variant, setVariant] = useState<Variant>(readVariant);
-  const [showSwitch] = useState(hasVariantParam);
   const desktop = useDesktop();
-  const changeVariant = (v: Variant) => {
-    setVariant(v);
-    try {
-      const u = new URL(window.location.href);
-      u.searchParams.set("layout", v);
-      window.history.replaceState(null, "", u.toString());
-    } catch {
-      // URL update is only a convenience.
-    }
-  };
   const lp: LayoutProps = { p, heading, compare, setCompare, openSheet: () => setSheet(true) };
   const current = (
       <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-[18px] px-[16px] pb-[64px] pt-[56px] lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-[48px] lg:px-[40px] lg:pb-[110px] lg:pt-[110px]">
@@ -1768,8 +1510,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
     <section id="challenge" className="fyt-rd relative w-full shrink-0 scroll-mt-[120px] overflow-clip" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, #03060d 70%)`, color: "#eef0f6" }}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       {p.halloween && <HalloweenDecor />}
-      {variant === "current" || !desktop ? current : variant === "a" ? <VariantA {...lp} /> : variant === "b" ? <VariantB {...lp} /> : <VariantC {...lp} />}
-      {showSwitch && <LayoutSwitcher value={variant} onChange={changeVariant} />}
+      {desktop ? <VariantA {...lp} /> : current}
       <AnimatePresence>{sheet && <TreatSheet p={p} onClose={() => setSheet(false)} />}</AnimatePresence>
     </section>
   );
