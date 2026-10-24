@@ -17,8 +17,8 @@ for (const cc of ["GB", "DE", "BR", "ID", "VN", "PH", "AU", "NG"]) {
 const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
 await p.goto(B + "?country=IN", { waitUntil: "load" });
 await p.waitForTimeout(2000);
-await p.mouse.move(700, 300); await p.mouse.move(700, 0); await p.mouse.move(700, -5).catch(() => {});
-await p.waitForTimeout(40000);
+for (let i = 0; i < 12; i++) { await p.mouse.wheel(0, 700); await p.waitForTimeout(500); }
+await p.waitForTimeout(8000);
 out.push("dialogs: " + JSON.stringify(await p.evaluate(() => [...document.querySelectorAll('[role=dialog]')].map((d) => (d.getAttribute("aria-label") || "") + "|" + (d.textContent || "").slice(0, 80)))));
 await p.screenshot({ path: "ci-out/popup.png" });
 console.log(out.join("\n"));
