@@ -29,9 +29,9 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 type OfferId = "launch" | "welcome" | "halloween";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
-  launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+ BOGO instantly", "+ 5% cashback"], who: "Instant BOGO · 5% cashback" },
-  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ BOGO instantly", "+ 5% instant cashback"], who: "Welcome gift" },
-  halloween: { off: HALLOWEEN_OFF, code: HALLOWEEN_CODE, title: "45% OFF", extras: ["+ BOGO instantly", "+ any 2 treats"], who: "Haunted Vault" },
+  launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+ 1 free account instantly", "+ 5% cashback"], who: "1 free account · 5% cashback" },
+  welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ 1 free account instantly", "+ 5% instant cashback"], who: "Welcome gift" },
+  halloween: { off: HALLOWEEN_OFF, code: HALLOWEEN_CODE, title: "45% OFF", extras: ["+ 1 free account instantly", "+ any 2 treats"], who: "Haunted Vault" },
 };
 const EMBER = "#ff8a3d";
 const EMBER_SOFT = "#ffb47a";
@@ -612,7 +612,7 @@ function OfferSwitch({ p }: { p: Pick }) {
                 <Svg d={GiftIcon} size={15} color="#fde68a" w={2} />
                 45% OFF
               </span>
-              <span className="mt-[4px] text-[11px] font-medium" style={{ color: welcomeOn ? "#fde68a" : MUTED }}>Instant BOGO · 5% cashback</span>
+              <span className="mt-[4px] text-[11px] font-medium" style={{ color: welcomeOn ? "#fde68a" : MUTED }}>1 free account · 5% cashback</span>
             </button>
           ) : (
             <motion.button
@@ -781,7 +781,7 @@ function VaultCard({ p }: { p: Pick }) {
         <span className="relative flex min-w-0 flex-1 flex-col gap-[3px]">
           <span className="text-[10.5px] font-bold uppercase tracking-[0.18em]" style={{ color: EMBER_SOFT }}><span className="hidden sm:inline">Halloween · </span>The Haunted Vault <VaultClock /></span>
           <span className="text-[18px] font-semibold leading-[1.1] tracking-[-0.025em] sm:text-[21px]">
-            45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO instantly</span>
+            45% OFF <span style={{ color: EMBER_SOFT }}>+ 1 free account instantly</span>
           </span>
           {open ? (
             <span className="text-[12px] font-medium text-[#bfdbfe]">{count >= TREAT_PICKS ? "Vault unlocked. Treats saved." : `Pick any ${TREAT_PICKS} treats below · ${count}/${TREAT_PICKS}`}</span>
@@ -825,7 +825,7 @@ function VaultSummary({ p, onPick }: { p: Pick; onPick: () => void }) {
     <div className="flex flex-wrap items-center gap-[6px]">
       <span className="mr-[2px] text-[11px] font-semibold uppercase tracking-[0.14em] text-[#93c5fd]">Your vault</span>
       <span className={chip} style={{ background: "rgba(59,130,246,0.18)", color: "#dbeafe" }}>45% OFF</span>
-      <span className={chip} style={{ background: "rgba(59,130,246,0.18)", color: "#dbeafe" }}>+ BOGO instantly</span>
+      <span className={chip} style={{ background: "rgba(59,130,246,0.18)", color: "#dbeafe" }}>+ 1 free account instantly</span>
       {Array.from({ length: TREAT_PICKS }, (_, k) =>
         names[k] ? (
           <button key={k} type="button" onClick={onPick} className={`${chip} cursor-pointer`} style={{ background: "rgba(255,138,61,0.16)", color: "#ffd9bf", border: "1px solid rgba(255,138,61,0.4)" }}>
@@ -1250,7 +1250,7 @@ function OfferBar({ p, small = false }: { p: Pick; small?: boolean }) {
       <span className={`relative flex shrink-0 items-center justify-center ${small ? "size-[38px]" : "size-[46px]"}`}><span className={`origin-center ${small ? "scale-[0.66]" : "scale-[0.8]"}`}><VaultDial open={p.treats.length >= TREAT_PICKS} /></span></span>
       <span className="relative flex min-w-0 flex-1 flex-col gap-[2px]">
         <span className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: EMBER_SOFT }}>Haunted Vault</span>
-        <span className={`whitespace-nowrap font-semibold leading-[1.1] tracking-[-0.02em] text-white ${small ? "text-[16px]" : "text-[18px]"}`}>45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO</span></span>
+        <span className={`whitespace-nowrap font-semibold leading-[1.1] tracking-[-0.02em] text-white ${small ? "text-[16px]" : "text-[18px]"}`}>45% OFF <span style={{ color: EMBER_SOFT }}>+ 1 free account</span></span>
       </span>
       <span className="relative flex shrink-0 items-center gap-[5px]" role="timer" aria-label="Time left">
         {shown.map(([v, u]) => (
