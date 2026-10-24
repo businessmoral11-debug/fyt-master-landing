@@ -1413,9 +1413,9 @@ function readMLayout(): MLayout {
 function MobileSwitcher({ value, onChange }: { value: MLayout; onChange: (v: MLayout) => void }) {
   const items: { id: MLayout; label: string }[] = [{ id: "current", label: "Old" }, { id: "1", label: "1" }, { id: "2", label: "2" }, { id: "3", label: "3" }];
   return (
-    <div className="fixed left-[6px] top-1/2 z-[2147482990] flex -translate-y-1/2 flex-col gap-[4px] rounded-full p-[4px] lg:hidden" style={{ background: "rgba(8,14,32,0.92)", border: "1px solid rgba(148,178,255,0.3)" }} role="group" aria-label="Phone pricing layout">
+    <div className="fixed right-[10px] top-[108px] z-[2147482990] flex gap-[3px] rounded-full p-[3px] lg:hidden" style={{ background: "rgba(8,14,32,0.92)", border: "1px solid rgba(148,178,255,0.3)" }} role="group" aria-label="Phone pricing layout">
       {items.map((it) => (
-        <button key={it.id} type="button" aria-pressed={value === it.id} onClick={() => onChange(it.id)} className="size-[36px] cursor-pointer rounded-full border-0 text-[12px] font-bold text-white" style={{ background: value === it.id ? BLUE : "transparent" }}>
+        <button key={it.id} type="button" aria-pressed={value === it.id} onClick={() => onChange(it.id)} className="h-[30px] min-w-[34px] cursor-pointer rounded-full border-0 px-[6px] text-[11.5px] font-bold text-white" style={{ background: value === it.id ? BLUE : "transparent" }}>
           {it.label}
         </button>
       ))}
