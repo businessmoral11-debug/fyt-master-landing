@@ -1,9 +1,25 @@
-import { chromium, webkit, devices } from "playwright";
-const BASE = "https://fyt-master-landing-git-region-proof-bm-med.vercel.app/?country=IN";
+import { chromium } from "playwright";
+const B = "https://fyt-master-landing-git-region-proof-bm-med.vercel.app/";
 await new Promise((r) => setTimeout(r, 150000));
-for (const [k, n, o] of [[chromium, "desk", { viewport: { width: 1440, height: 900 } }], [chromium, "lap", { viewport: { width: 1100, height: 800 } }], [webkit, "phone", { ...devices["iPhone 14"] }]]) {
-  const b = await k.launch(); const p = await (await b.newContext(o)).newPage();
-  await p.goto(BASE, { waitUntil: "load", timeout: 60000 }); await p.waitForTimeout(4000);
-  await p.screenshot({ path: `ci-out/top-${n}.png` });
-  await b.close();
+const out = [];
+const b = await chromium.launch();
+for (const cc of ["GB", "DE", "BR", "ID", "VN", "PH", "AU", "NG"]) {
+  const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+  await p.goto(B + "?country=" + cc, { waitUntil: "load", timeout: 60000 });
+  await p.waitForTimeout(3000);
+  const order = [];
+  // advance through the deck via thumbnails shown over time is slow; read main + thumbs
+  const info = await p.evaluate(() => ({ main: document.querySelector('button[aria-label^="Play video:"]')?.getAttribute("aria-label"), thumbs: [...document.querySelectorAll('button[aria-label^="Show video:"]')].map((t) => t.getAttribute("aria-label").replace("Show video: ", "")), scope: [...document.querySelectorAll("span")].find((s) => /^Funded traders /.test(s.textContent || ""))?.textContent }));
+  out.push(cc + " " + JSON.stringify(info));
+  await p.close();
 }
+// popup check: wait for giveaway popup on IN
+const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+await p.goto(B + "?country=IN", { waitUntil: "load" });
+await p.waitForTimeout(2000);
+await p.mouse.move(700, 300); await p.mouse.move(700, 0); await p.mouse.move(700, -5).catch(() => {});
+await p.waitForTimeout(40000);
+out.push("dialogs: " + JSON.stringify(await p.evaluate(() => [...document.querySelectorAll('[role=dialog]')].map((d) => (d.getAttribute("aria-label") || "") + "|" + (d.textContent || "").slice(0, 80)))));
+await p.screenshot({ path: "ci-out/popup.png" });
+console.log(out.join("\n"));
+await b.close();
