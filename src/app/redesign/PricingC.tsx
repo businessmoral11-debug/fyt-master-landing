@@ -977,13 +977,13 @@ function SizeTrack({ p }: { p: Pick }) {
 }
 
 /** The four key rules in one clean strip, divided by hairlines. */
-function SpecStrip({ p }: { p: Pick }) {
+function SpecStrip({ p, compact = false }: { p: Pick; compact?: boolean }) {
   return (
-    <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[18px] sm:grid-cols-4" style={{ background: "rgba(148,178,255,0.12)", border: "1px solid rgba(148,178,255,0.12)" }}>
+    <div className="grid shrink-0 grid-cols-2 gap-px overflow-hidden rounded-[18px] sm:grid-cols-4" style={{ background: "rgba(148,178,255,0.12)", border: "1px solid rgba(148,178,255,0.12)" }}>
       {rules(p).map(([v, l]) => (
-        <span key={l} className="flex flex-col items-center justify-center gap-[5px] px-[8px] py-[14px] text-center" style={{ background: "#0a1330" }}>
-          <span className="text-[17px] font-bold leading-none tracking-[-0.01em] text-white">{v}</span>
-          <span className="text-[11px] font-medium leading-tight" style={{ color: MUTED }}>{l}</span>
+        <span key={l} className={`flex flex-col items-center justify-center text-center ${compact ? "gap-[4px] px-[4px] py-[10px]" : "gap-[5px] px-[8px] py-[14px]"}`} style={{ background: "#0a1330" }}>
+          <span className={`font-bold leading-none tracking-[-0.01em] text-white ${compact ? "text-[15px]" : "text-[17px]"}`}>{v}</span>
+          <span className={`font-medium leading-tight ${compact ? "text-[10px]" : "text-[11px]"}`} style={{ color: MUTED }}>{l}</span>
         </span>
       ))}
     </div>
@@ -1128,9 +1128,27 @@ function DefaultHeading() {
 }
 
 /** The main buy button: price, saving and the Get funded call to action. */
-function BuyButton({ p, onNeedTreats }: { p: Pick; onNeedTreats: () => void }) {
+function BuyButton({ p, onNeedTreats, wide = false }: { p: Pick; onNeedTreats: () => void; wide?: boolean }) {
   const reduce = useReducedMotion();
   const nudged = useRef(false);
+  if (wide)
+    return (
+      <a
+        href={p.co.href}
+        onClick={(e) => {
+          if (p.halloween && p.treats.length < TREAT_PICKS && !nudged.current) {
+            e.preventDefault();
+            nudged.current = true;
+            onNeedTreats();
+          }
+        }}
+        className="relative flex h-[56px] shrink-0 items-center justify-center gap-[10px] overflow-hidden rounded-[16px] text-[16px] font-bold text-white no-underline transition-transform hover:-translate-y-[1px] active:scale-[0.99]"
+        style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 18px 36px -16px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)" }}
+      >
+        Get funded
+        <Svg d="M5 12h14M13 6l6 6-6 6" size={16} color="#fff" w={2.6} />
+      </a>
+    );
   return (
     <motion.a
       href={p.co.href}
@@ -1178,7 +1196,6 @@ function BuyButton({ p, onNeedTreats }: { p: Pick; onNeedTreats: () => void }) {
 /* Only desktop (lg and up). Phones keep the original layout. Open with ?layout=a, b or c. */
 
 type Variant = "current" | "a" | "b" | "c";
-const STICKY_TOP = 196;
 const CARD_STYLE = { border: "1px solid rgba(96,165,250,0.6)", background: "linear-gradient(180deg, rgba(37,99,235,0.2) 0%, rgba(10,18,40,0.92) 45%)", boxShadow: "0 50px 100px -50px rgba(37,99,235,0.95)" } as const;
 
 function readVariant(): Variant {
@@ -1215,6 +1232,82 @@ function LayoutSwitcher({ value, onChange }: { value: Variant; onChange: (v: Var
           {it.label}
         </button>
       ))}
+    </div>
+  );
+}
+
+function useStickyTop(): number {
+  const [top, setTop] = useState(150);
+  useEffect(() => {
+    const measure = () => {
+      let bottom = 0;
+      for (const y of [2, 50, 90, 130, 170, 210]) {
+        for (const el of document.elementsFromPoint(window.innerWidth / 2, y)) {
+          if (el.closest("#challenge")) continue;
+          let n: Element | null = el;
+          while (n && n !== document.body) {
+            const pos = getComputedStyle(n).position;
+            if (pos === "fixed" || pos === "sticky") break;
+            n = n.parentElement;
+          }
+          if (!n || n === document.body) continue;
+          const r = n.getBoundingClientRect();
+          if (r.height < 200 && r.bottom < 260) bottom = Math.max(bottom, r.bottom);
+        }
+      }
+      setTop(Math.round(Math.min(240, Math.max(96, bottom + 16))));
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    const id = window.setInterval(measure, 1200);
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.clearInterval(id);
+    };
+  }, []);
+  return top;
+}
+
+function OfferBar({ p }: { p: Pick }) {
+  const parts = useCountdown(HALLOWEEN_END);
+  const shown = parts.slice(0, 3);
+  return (
+    <div className="relative flex shrink-0 items-center gap-[12px] overflow-hidden rounded-[20px] p-[12px]" style={{ background: "linear-gradient(150deg, #2448b8 0%, #142c74 45%, #0a1434 100%)", boxShadow: "0 0 0 1px rgba(147,197,253,0.32), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
+      <span aria-hidden="true" className="pointer-events-none absolute -right-[30px] -top-[40px] size-[130px] rounded-full" style={{ background: "radial-gradient(circle, rgba(255,138,61,0.2), transparent 65%)" }} />
+      <span className="relative flex size-[46px] shrink-0 items-center justify-center"><span className="origin-center scale-[0.8]"><VaultDial open={p.treats.length >= TREAT_PICKS} /></span></span>
+      <span className="relative flex min-w-0 flex-1 flex-col gap-[2px]">
+        <span className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: EMBER_SOFT }}>Haunted Vault</span>
+        <span className="whitespace-nowrap text-[18px] font-semibold leading-[1.1] tracking-[-0.02em] text-white">45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO</span></span>
+      </span>
+      <span className="relative flex shrink-0 items-center gap-[5px]" role="timer" aria-label="Time left">
+        {shown.map(([v, u]) => (
+          <span key={u} className="flex w-[38px] flex-col items-center rounded-[10px] py-[5px]" style={{ background: "rgba(3,8,24,0.55)", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <span className="tabular text-[15px] font-bold leading-none text-white">{v}</span>
+            <span className="mt-[3px] text-[8.5px] font-semibold uppercase leading-none tracking-[0.12em]" style={{ color: EMBER_SOFT }}>{u}</span>
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+}
+
+/** The two free treats as two even slots: tap to pick, tap again to change. */
+function TreatSlots({ p, onPick }: { p: Pick; onPick: () => void }) {
+  const names = p.treats.map((id) => TREATS.find((t) => t.id === id)?.name ?? id);
+  return (
+    <div className="flex shrink-0 flex-col gap-[8px]">
+      <div className="flex items-center justify-between">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Your free treats</span>
+        <span className="text-[11px] font-semibold" style={{ color: p.treats.length >= TREAT_PICKS ? "#86efac" : MUTED }}>{p.treats.length}/{TREAT_PICKS}</span>
+      </div>
+      <div className="grid grid-cols-2 gap-[8px]">
+        {Array.from({ length: TREAT_PICKS }, (_, k) => (
+          <button key={k} type="button" onClick={onPick} className="flex h-[40px] min-w-0 cursor-pointer items-center justify-center gap-[6px] rounded-[12px] px-[8px] text-[12.5px] font-semibold" style={names[k] ? { background: "rgba(255,138,61,0.14)", color: "#ffd9bf", border: "1px solid rgba(255,138,61,0.4)" } : { background: "transparent", color: EMBER_SOFT, border: "1px dashed rgba(255,138,61,0.55)" }}>
+            {names[k] ? <Svg d={IC.check} size={11} color={EMBER_SOFT} w={3} /> : <span aria-hidden="true">+</span>}
+            <span className="truncate">{names[k] ?? `Pick treat ${k + 1}`}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1272,19 +1365,41 @@ function TypeBlock({ p, compare, setCompare, n }: { p: Pick; compare: boolean; s
 /* ---------- A: pinned live summary on the left, short card on the right ---------- */
 
 function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
+  const top = useStickyTop();
+  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
+  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
   return (
     <div className="relative mx-auto w-full max-w-[1180px] px-[40px] pb-[110px] pt-[100px]">
       <div className="mb-[34px]">{heading ?? <DefaultHeading />}</div>
-      <div className="grid grid-cols-[minmax(0,430px)_minmax(0,1fr)] items-start gap-[44px]">
-        <div className="sticky flex flex-col gap-[14px] overflow-y-auto pb-[4px] [scrollbar-width:none]" style={{ top: STICKY_TOP, maxHeight: `calc(100vh - ${STICKY_TOP + 16}px)` }}>
-          <OfferBlock p={p} />
-          <div className="relative flex flex-col gap-[16px] overflow-hidden rounded-[26px] p-[22px]" style={{ ...CARD_STYLE, boxShadow: "none" }}>
-            <OrderSummary p={p} />
-            <SpecStrip p={p} />
-            {p.halloween && <VaultSummary p={p} onPick={openSheet} />}
-            <BuyButton p={p} onNeedTreats={openSheet} />
+      <div className="grid grid-cols-[minmax(0,420px)_minmax(0,1fr)] items-start gap-[40px]">
+        <div className="sticky flex flex-col gap-[12px] overflow-y-auto [scrollbar-width:none] [&>*]:shrink-0" style={{ top, maxHeight: `calc(100vh - ${top + 16}px)` }}>
+          {p.halloween ? <OfferBar p={p} /> : <OfferSwitch p={p} />}
+          <div className="relative flex flex-col gap-[14px] rounded-[24px] p-[18px]" style={{ ...CARD_STYLE, boxShadow: "none" }}>
+            <div className="flex items-center justify-between gap-[10px]">
+              <div className="flex min-w-0 flex-col gap-[3px]">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Your account</span>
+                <span className="flex items-baseline gap-[8px] whitespace-nowrap">
+                  <Roll value={fmtSize(p.size)} className="text-[24px] font-bold leading-none tracking-[-0.02em] text-white" />
+                  <span className="text-[13px] font-semibold text-[#dbe4f5]">{p.step} · {type}</span>
+                </span>
+              </div>
+              <span className="flex h-[30px] shrink-0 items-center gap-[6px] rounded-full px-[10px] text-[11.5px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(148,178,255,0.18)" }}>
+                <img src={plat.logo} alt="" className={`${p.platform === "platform-5" ? "h-[16px]" : "h-[14px]"} w-auto`} />
+                {plat.label}
+              </span>
+            </div>
+            <SpecStrip p={p} compact />
+            {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
+            <Hairline />
+            <div className="flex shrink-0 items-end justify-between gap-[10px]">
+              <span className="flex items-baseline gap-[8px]">
+                <Roll value={money(p.price)} className="text-[32px] font-bold leading-none tracking-[-0.025em] text-white" />
+                <s className="text-[14px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+              </span>
+              <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
+            </div>
+            <BuyButton p={p} onNeedTreats={openSheet} wide />
             <CodeLine p={p} />
-            <TrustRow />
           </div>
         </div>
         <div className="relative flex flex-col gap-[20px] overflow-hidden rounded-[26px] p-[28px]" style={CARD_STYLE}>
@@ -1305,6 +1420,7 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
             <PlatformSeg p={p} />
           </div>
           <PerkChips p={p} />
+          <TrustRow />
           <PayMarks />
         </div>
       </div>
@@ -1425,6 +1541,7 @@ function ProgressBars({ idx }: { idx: number }) {
 
 function VariantB(props: LayoutProps) {
   const { p, heading } = props;
+  const STICKY_TOP = useStickyTop();
   const [idx, setIdx] = useState(0);
   useEffect(() => {
     const on = () => setIdx(3);
@@ -1433,7 +1550,7 @@ function VariantB(props: LayoutProps) {
   }, []);
   return (
     <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-[minmax(0,420px)_minmax(0,1fr)] items-start gap-[48px] px-[40px] pb-[110px] pt-[100px]">
-      <div className="sticky flex flex-col gap-[18px] overflow-y-auto pb-[4px] [scrollbar-width:none]" style={{ top: STICKY_TOP, maxHeight: `calc(100vh - ${STICKY_TOP + 16}px)` }}>
+      <div className="sticky flex flex-col gap-[18px] overflow-y-auto pb-[4px] [scrollbar-width:none] [&>*]:shrink-0" style={{ top: STICKY_TOP, maxHeight: `calc(100vh - ${STICKY_TOP + 16}px)` }}>
         <div className="[&_h2]:text-[40px]">{heading ?? <DefaultHeading />}</div>
         <OfferBlock p={p} />
         <StepList p={p} idx={idx} onGo={setIdx} />
@@ -1463,6 +1580,10 @@ function VariantB(props: LayoutProps) {
 
 function VariantC(props: LayoutProps) {
   const { p, heading } = props;
+  const topNow = useStickyTop();
+  const topRef = useRef(topNow);
+  topRef.current = topNow;
+  const STICKY_TOP = topNow;
   const wrap = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
@@ -1474,7 +1595,7 @@ function VariantC(props: LayoutProps) {
       if (!w || !i) return;
       const range = w.offsetHeight - i.offsetHeight;
       if (range <= 0) return;
-      const prog = Math.min(1, Math.max(0, (STICKY_TOP - w.getBoundingClientRect().top) / range));
+      const prog = Math.min(1, Math.max(0, (topRef.current - w.getBoundingClientRect().top) / range));
       setIdx(Math.min(3, Math.floor(prog * 4)));
     };
     onScroll();
@@ -1491,7 +1612,7 @@ function VariantC(props: LayoutProps) {
     const i = inner.current;
     if (!w || !i) return;
     const range = w.offsetHeight - i.offsetHeight;
-    const top = w.getBoundingClientRect().top + window.scrollY - STICKY_TOP + ((k + 0.5) / 4) * range;
+    const top = w.getBoundingClientRect().top + window.scrollY - topRef.current + ((k + 0.5) / 4) * range;
     window.scrollTo({ top, behavior: "smooth" });
   };
 
@@ -1504,7 +1625,7 @@ function VariantC(props: LayoutProps) {
   return (
     <div ref={wrap} className="relative mx-auto w-full max-w-[1180px] px-[40px] pb-[60px] pt-[40px]" style={{ height: "calc(100vh + 150px + 150vh)" }}>
       <div ref={inner} className="sticky grid grid-cols-[minmax(0,420px)_minmax(0,1fr)] items-start gap-[48px]" style={{ top: STICKY_TOP, height: `calc(100vh - ${STICKY_TOP + 20}px)`, minHeight: 560 }}>
-        <div className="flex max-h-full flex-col gap-[16px] overflow-y-auto pb-[4px] [scrollbar-width:none]">
+        <div className="flex max-h-full flex-col gap-[16px] overflow-y-auto pb-[4px] [scrollbar-width:none] [&>*]:shrink-0">
           <div className="[&_h2]:text-[40px]">{heading ?? <DefaultHeading />}</div>
           <OfferBlock p={p} />
           <StepList p={p} idx={idx} onGo={go} />
