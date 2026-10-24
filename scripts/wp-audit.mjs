@@ -5,6 +5,7 @@ const out = [];
 const b = await webkit.launch();
 for (const m of ["1", "2", "3"]) {
   const ctx = await b.newContext({ ...devices["iPhone 14"] });
+  await ctx.addInitScript(() => { try { localStorage.setItem("fyt_giveaway_done_v1", String(Date.now())); localStorage.setItem("fyt_known_visitor_v1", "1"); } catch {} });
   const p = await ctx.newPage();
   const errs = []; p.on("pageerror", (e) => errs.push(String(e)));
   await p.goto(B + "?country=IN&mlayout=" + m, { waitUntil: "load", timeout: 60000 });
