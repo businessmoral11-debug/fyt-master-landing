@@ -465,36 +465,6 @@ function FeedRow({ p, active, running, onPick, className = "" }: { p: ProofItem;
   );
 }
 
-/* ------------------------- all-time strip (top) ------------------------- */
-
-function LifetimeStrip({ loading, total, count, latest }: { loading: boolean; total: number; count: number; latest: string | null }) {
-  const cells: { label: string; node: ReactNode; live?: boolean }[] = [
-    { label: "Paid out so far", node: loading ? "-" : <SpringNumber value={Math.round(total)} format={(n) => money(Math.round(n))} /> },
-    { label: "Payouts sent", node: loading ? "-" : <SpringNumber value={count} format={(n) => Math.round(n).toLocaleString("en-US")} /> },
-    { label: "Last payout", node: loading || !latest ? "-" : relTime(latest), live: true },
-  ];
-  return (
-    <div className="grid grid-cols-1 overflow-hidden rounded-[22px] sm:grid-cols-3" style={{ background: "linear-gradient(180deg,#ffffff,#f4f8ff)", border: `1px solid ${C.borderLight}`, boxShadow: "0 40px 80px -52px rgba(30,64,175,0.55)" }}>
-      {cells.map((c, i) => (
-        <div key={c.label} className="flex flex-col gap-[8px] px-[22px] py-[18px] sm:py-[22px]" style={i ? { borderTop: `1px solid ${C.borderLight}` } : undefined}>
-          <span className="flex items-center gap-[8px] text-[10.5px] font-semibold uppercase tracking-[0.13em]" style={{ color: C.mutedLight }}>
-            {c.live && (
-              <span className="relative flex size-[8px]">
-                <span className="fyt-rd-ping absolute inset-0 rounded-full bg-[#22c55e]" />
-                <span className="relative size-[8px] rounded-full bg-[#22c55e]" />
-              </span>
-            )}
-            {c.label}
-          </span>
-          <span className="tabular text-[34px] font-semibold leading-none tracking-[-0.035em] sm:text-[38px]" style={{ color: C.textLight }}>
-            {c.node}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /* -------------------------------- section -------------------------------- */
 
 export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
@@ -528,16 +498,6 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
   const rows = useMemo(() => {
     const cutoff = Date.now() - WINDOW_DAYS * DAY;
     return allRows.filter((p) => Date.parse(p.createdAt ?? "") >= cutoff);
-  }, [allRows]);
-  const lifetime = useMemo(() => {
-    let total = 0;
-    let latest = 0;
-    for (const p of allRows) {
-      total += Number(p.amount) || 0;
-      const t = Date.parse(p.createdAt ?? "");
-      if (t > latest) latest = t;
-    }
-    return { total, count: allRows.length, latest: latest ? new Date(latest).toISOString() : null };
   }, [allRows]);
 
   const countryRows = useMemo(() => (visitor.code ? rows.filter((p) => (p.countryCode ?? "").toUpperCase() === visitor.code) : []), [rows, visitor.code]);
@@ -574,8 +534,7 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
 
   return (
     <Section tone="light" id="live-payouts">
-      <LifetimeStrip loading={loading} total={lifetime.total} count={lifetime.count} latest={lifetime.latest} />
-      <div className="relative mt-[28px] grid grid-cols-1 items-center gap-[40px] lg:grid-cols-12 lg:gap-[56px]">
+      <div className="relative grid grid-cols-1 items-center gap-[40px] lg:grid-cols-12 lg:gap-[56px]">
         <div className="flex min-w-0 flex-col gap-[22px] lg:col-span-5 xl:col-span-4">
           <Eyebrow tone="light">Live rewards</Eyebrow>
           <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] [text-wrap:balance] sm:text-[42px] lg:text-[40px] xl:text-[42px] min-[1400px]:text-[46px]" style={{ color: C.textLight }}>
