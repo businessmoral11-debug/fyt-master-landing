@@ -3,7 +3,6 @@ import { ProveYourExpertise } from "./ProveExpertise";
 import { ChallengePricing } from "./PricingC";
 import { ClosingCta, Comparison, Faq, Footer, HowItWorks, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
-import { FloatingCta } from "./Conversion";
 import { GiveawayPopup } from "./GiveawayPopup";
 
 /**
@@ -27,7 +26,6 @@ export function BelowFold() {
       <ClosingCta />
       <Faq />
       <Footer />
-      <FloatingCta />
       <GiveawayPopup />
     </>
   );

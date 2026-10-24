@@ -365,14 +365,14 @@ function CertificateStage({ item }: { item: ProofItem | undefined }) {
   const ready = !!cert && loaded === cert.certificateId;
   return (
     <div className="flex min-w-0 flex-col gap-[14px]">
-      <a href={link} target="_blank" rel="noopener noreferrer" className="group relative block overflow-hidden rounded-[20px] no-underline" style={{ background: "#060b16", border: "1px solid rgba(148,178,255,0.24)", boxShadow: "0 30px 70px -30px rgba(37,99,235,0.85)" }}>
+      <a href={link} target="_blank" rel="noopener noreferrer" className="group relative block overflow-hidden rounded-[20px] no-underline" style={{ background: "#eef4ff", border: "1px solid rgba(37,99,235,0.14)", boxShadow: "0 34px 70px -38px rgba(30,64,175,0.55), 0 2px 6px rgba(15,23,42,0.06)" }}>
         <div className="relative aspect-[1.41] w-full">
-          <span className="absolute inset-0" style={{ background: "radial-gradient(80% 70% at 50% 40%, #12234f, #060b16)" }} />
+          <span className="absolute inset-0" style={{ background: "radial-gradient(85% 75% at 50% 35%, #ffffff, #e3edff 70%, #d6e4ff)" }} />
           {item && (
             <span className="absolute inset-0 flex flex-col items-center justify-center gap-[6px] text-center">
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#93c5fd]">Performance reward</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#2563eb]">Performance reward</span>
               <span className="tabular fyt-gradient-text text-[44px] font-semibold tracking-[-0.03em]">{formatPayoutAmount(item.amount)}</span>
-              <span className="text-[14px] font-semibold text-white">{item.traderName ?? "FYT trader"}</span>
+              <span className="text-[14px] font-semibold" style={{ color: C.textLight }}>{item.traderName ?? "FYT trader"}</span>
             </span>
           )}
           {showImage && (
@@ -387,7 +387,7 @@ function CertificateStage({ item }: { item: ProofItem | undefined }) {
               style={{ opacity: ready ? 1 : 0 }}
             />
           )}
-          <span className="absolute left-[12px] top-[12px] flex items-center gap-[6px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.12em] text-[#86efac]" style={{ background: "rgba(3,6,13,0.78)", border: "1px solid rgba(34,197,94,0.38)", backdropFilter: "blur(6px)" }}>
+          <span className="absolute left-[12px] top-[12px] flex items-center gap-[6px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.12em] text-[#15803d]" style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 6px 16px -8px rgba(15,23,42,0.35)", backdropFilter: "blur(6px)" }}>
             <Check size={10} /> Verified on-chain
           </span>
         </div>
@@ -397,8 +397,8 @@ function CertificateStage({ item }: { item: ProofItem | undefined }) {
           <span className="flex min-w-0 items-center gap-[10px]">
             {f && <img src={f} alt="" width={26} height={18} className="h-[18px] w-[26px] shrink-0 rounded-[3px] object-cover" />}
             <span className="flex min-w-0 flex-col">
-              <span className="truncate text-[15px] font-semibold text-white">{item.traderName ?? "FYT trader"}</span>
-              <span className="truncate text-[12px]" style={{ color: C.mutedDark }}>
+              <span className="truncate text-[15px] font-semibold" style={{ color: C.textLight }}>{item.traderName ?? "FYT trader"}</span>
+              <span className="truncate text-[12px]" style={{ color: C.mutedLight }}>
                 {[item.country, relTime(item.createdAt)].filter(Boolean).join(" · ")}
               </span>
             </span>
@@ -419,12 +419,13 @@ function FeedRow({ p, active, running, onPick, className = "" }: { p: ProofItem;
         onClick={onPick}
         className="relative flex w-full cursor-pointer items-center gap-[12px] overflow-hidden rounded-[16px] border-0 px-[10px] py-[10px] text-left transition-colors"
         style={{
-          background: active ? "linear-gradient(90deg, rgba(59,130,246,0.24), rgba(59,130,246,0.06))" : "linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015))",
-          border: `1px solid ${active ? "rgba(96,165,250,0.55)" : C.borderDark}`,
+          background: active ? "linear-gradient(90deg, #eaf1ff, #f6f9ff)" : "#fff",
+          border: `1px solid ${active ? "rgba(37,99,235,0.45)" : C.borderLight}`,
+          boxShadow: active ? "0 14px 30px -20px rgba(37,99,235,0.6)" : "0 1px 2px rgba(15,23,42,0.04)",
         }}
       >
         {p.cert ? (
-          <span className="relative h-[40px] w-[56px] shrink-0 overflow-hidden rounded-[8px]" style={{ border: "1px solid rgba(148,178,255,0.25)", background: "#0a1226" }}>
+          <span className="relative h-[40px] w-[56px] shrink-0 overflow-hidden rounded-[8px]" style={{ border: "1px solid rgba(37,99,235,0.16)", background: "#e6eeff" }}>
             <img src={p.cert.imageUrl} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
           </span>
         ) : (
@@ -433,16 +434,16 @@ function FeedRow({ p, active, running, onPick, className = "" }: { p: ProofItem;
           </span>
         )}
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="flex items-center gap-[6px] truncate text-[14.5px] font-semibold text-white">
+          <span className="flex items-center gap-[6px] truncate text-[14.5px] font-semibold" style={{ color: C.textLight }}>
             {f && <img src={f} alt="" width={16} height={12} loading="lazy" className="h-[12px] w-[16px] shrink-0 rounded-[2px] object-cover" />}
             <span className="truncate">{p.traderName ?? "FYT trader"}</span>
           </span>
-          <span className="truncate text-[12px]" style={{ color: C.mutedDark }}>
+          <span className="truncate text-[12px]" style={{ color: C.mutedLight }}>
             {relTime(p.createdAt)}
           </span>
         </span>
-        <span className="tabular shrink-0 text-[16px] font-semibold text-[#4ade80]">+{formatPayoutAmount(p.amount)}</span>
-        {active && running && <span aria-hidden="true" className="fyt-rp-progress absolute inset-x-0 bottom-0 h-[2px] origin-left" style={{ background: "linear-gradient(90deg,#60a5fa,#93c5fd)" }} />}
+        <span className="tabular shrink-0 text-[16px] font-semibold text-[#16a34a]">+{formatPayoutAmount(p.amount)}</span>
+        {active && running && <span aria-hidden="true" className="fyt-rp-progress absolute inset-x-0 bottom-0 h-[2px] origin-left" style={{ background: "linear-gradient(90deg,#2563eb,#60a5fa)" }} />}
       </button>
     </li>
   );
@@ -588,19 +589,19 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
         </div>
 
         <Reveal delay={0.1} className="min-w-0 lg:col-span-7 xl:col-span-8">
-          <div ref={panelRef} className={`fyt-ring relative rounded-[28px] ${panelLive ? "fyt-live" : ""}`} style={{ boxShadow: "0 60px 120px -60px rgba(37,99,235,0.8)" }}>
+          <div ref={panelRef} className={`relative rounded-[28px] ${panelLive ? "fyt-live" : ""}`} style={{ background: "linear-gradient(180deg,#ffffff,#f6f9ff)", border: `1px solid ${C.borderLight}`, boxShadow: "0 50px 100px -56px rgba(30,64,175,0.55), 0 2px 8px rgba(15,23,42,0.05)" }}>
             <div className="relative flex flex-col gap-[18px] p-[16px] sm:p-[24px]">
               <div className="flex items-center justify-between gap-[12px]">
                 <span className="flex min-w-0 flex-col gap-[2px]">
-                  <span className="flex items-center gap-[10px] text-[14px] font-semibold text-white">
+                  <span className="flex items-center gap-[10px] text-[14px] font-semibold" style={{ color: C.textLight }}>
                     {flag ? <img src={flag} alt="" width={22} height={16} className="h-[16px] w-[22px] shrink-0 rounded-[3px] object-cover" /> : <Globe />}
                     <span className="truncate">Recent rewards {scope.kind === "world" ? "worldwide" : `from ${scopeShort}`}</span>
                   </span>
-                  <span className="text-[11.5px]" style={{ color: C.mutedDark }}>
+                  <span className="text-[11.5px]" style={{ color: C.mutedLight }}>
                     Last {WINDOW_DAYS} days
                   </span>
                 </span>
-                <span className="flex shrink-0 items-center gap-[7px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#86efac]" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.28)" }}>
+                <span className="flex shrink-0 items-center gap-[7px] rounded-full px-[10px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#15803d]" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)" }}>
                   <span className="relative flex size-[7px]">
                     <span className="fyt-rd-ping-gated absolute inset-0 rounded-full bg-[#22c55e]" />
                     <span className="relative size-[7px] rounded-full bg-[#22c55e]" />
@@ -625,19 +626,19 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
                           }}
                         />
                       ))
-                    : Array.from({ length: 5 }, (_, i) => <li key={i} className="h-[62px] animate-pulse rounded-[16px]" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${C.borderDark}` }} />)}
+                    : Array.from({ length: 5 }, (_, i) => <li key={i} className="h-[62px] animate-pulse rounded-[16px]" style={{ background: "#eef3fb", border: `1px solid ${C.borderLight}` }} />)}
                   {ordered.length > 3 && !more && (
                     <li className="md:hidden">
-                      <button type="button" onClick={() => setMore(true)} className="w-full cursor-pointer rounded-[14px] border-0 py-[12px] text-[13.5px] font-semibold text-[#93c5fd]" style={{ background: "rgba(59,130,246,0.08)", border: "1px solid rgba(96,165,250,0.22)" }}>
+                      <button type="button" onClick={() => setMore(true)} className="w-full cursor-pointer rounded-[14px] border-0 py-[12px] text-[13.5px] font-semibold text-[#1d4ed8]" style={{ background: "rgba(37,99,235,0.07)", border: "1px solid rgba(37,99,235,0.2)" }}>
                         View more
                       </button>
                     </li>
                   )}
                 </ul>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-[12px] border-t pt-[14px]" style={{ borderColor: C.borderDark }}>
-                <a href="https://rewards.fundingyourtrades.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-[7px] text-[13px] font-semibold text-[#93c5fd] no-underline hover:underline">
-                  <Check size={14} color="#93c5fd" /> See every reward on-chain
+              <div className="flex flex-wrap items-center justify-between gap-[12px] border-t pt-[14px]" style={{ borderColor: C.borderLight }}>
+                <a href="https://rewards.fundingyourtrades.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-[7px] text-[13px] font-semibold text-[#1d4ed8] no-underline hover:underline">
+                  <Check size={14} color="#1d4ed8" /> See every reward on-chain
                 </a>
                 <Pill href="#challenge" onClick={() => pauseHeavyScenesForNav()} className="px-[22px]! py-[12px]! text-[14px]!">
                   Start my challenge
