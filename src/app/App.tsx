@@ -1518,15 +1518,12 @@ function Hero() {
             <div className="mb-[14px] flex max-w-full shrink-0 justify-center lg:mb-[26px] lg:justify-start min-h-[40px] lg:min-h-[36px]">
               <HeroTopTrustindex />
             </div>
-            <h1 className="w-full font-['DM_Sans',sans-serif] text-[36px] font-medium lg:text-[58px] xl:text-[66px]" style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}>
+            <h1 className="w-full font-['DM_Sans',sans-serif] text-[44px] font-medium lg:text-[68px] xl:text-[78px]" style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}>
               <span className="block text-white"><RevealWords text="Trade Without" /></span>
               <span className="block text-white"><HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
               <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
             </h1>
-            <p className="mt-[14px] lg:mt-[18px] max-w-[460px] text-[14px] leading-[1.5] text-[#a6b4d0] lg:text-[16.5px]">
-              Real traders, paid live on our calls. <span className="font-semibold text-white">Unedited.</span>
-            </p>
-            <div className="h-[20px] shrink-0 lg:h-[34px]" />
+            <div className="h-[24px] shrink-0 lg:h-[40px]" />
             <HeroCtaRow />
             <p className="mt-[20px] hidden flex-wrap items-center justify-center gap-x-[18px] gap-y-[6px] text-[12.5px] text-[#8fa0c4] lg:flex lg:justify-start">
               <span><span className="text-[#4ade80]">&#10003;</span> Paid in 24-48h</span>
