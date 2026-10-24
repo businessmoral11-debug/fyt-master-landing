@@ -1,22 +1,10 @@
-// TEMPORARY: no giveaway pop-up, calm countdown. Fresh visitor (no stored flags), scrolls the whole page.
+// TEMPORARY: contact sheet of trader video posters.
 import { chromium } from "playwright";
-import { writeFileSync } from "node:fs";
-const URL = "https://fyt-master-landing-7s7dthuvg-bm-med.vercel.app/";
-const log = [];
+const items = [["Devon", "https://fundingyourtrades.com/wp-content/uploads/2026/08/6079921074356295115.jpg"], ["Waqas", "https://fundingyourtrades.com/wp-content/uploads/2025/12/waqas.jpg"], ["Taufiq Sayed", "https://fundingyourtrades.com/wp-content/uploads/2026/08/6079921074356295116.jpg"], ["Damien", "https://fundingyourtrades.com/wp-content/uploads/2025/12/damien.jpg"], ["Kush", "https://fundingyourtrades.com/wp-content/uploads/2026/08/6079921074356295117.jpg"], ["Nicolas", "https://fundingyourtrades.com/wp-content/uploads/2026/06/6181506534194483764.jpg"], ["Edmund", "https://fundingyourtrades.com/wp-content/uploads/2025/12/edmund.jpg"], ["Nadir", "https://fundingyourtrades.com/wp-content/uploads/2026/06/6181506534194483765.jpg"], ["Katherine", "https://fundingyourtrades.com/wp-content/uploads/2026/01/photo_6311796192479743598_y.jpg"], ["Rohit", "https://fundingyourtrades.com/wp-content/uploads/2026/06/6181506534194483766.jpg"], ["Abigail", "https://fundingyourtrades.com/wp-content/uploads/2026/03/IMG_8135.jpg"], ["Shubham", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636965.jpg"], ["Bharath", "https://fundingyourtrades.com/wp-content/uploads/2026/01/6328118554263228298.jpg"], ["Emad", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636968.jpg"], ["Gabriel", "https://fundingyourtrades.com/wp-content/uploads/2025/12/Gabriel.jpg"], ["Ibrahim", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636967.jpg"], ["Anisha", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636970.jpg"], ["Charls", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636969.jpg"], ["Dylan", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6066483156774227824.jpg"]];
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, timezoneId: "Europe/London" });
-const page = await ctx.newPage();
-const errs = [];
-page.on("pageerror", (e) => errs.push(e.message.slice(0, 100)));
-await page.goto(URL + "?halloween=1", { waitUntil: "domcontentloaded", timeout: 60000 });
-await page.waitForSelector("#live-payouts", { timeout: 45000 });
-let dialogs = 0;
-for (let y = 0; y < 9000; y += 450) { await page.evaluate((v) => window.scrollTo({ top: v, behavior: "instant" }), y); await page.waitForTimeout(500); dialogs += await page.evaluate(() => Array.from(document.querySelectorAll("[role=dialog]")).filter((d) => !/demo accounts/i.test(d.textContent || "") && !/Find my best fit/.test(d.getAttribute("aria-label") || "")).length); }
-log.push("pop-up dialogs seen while scrolling: " + dialogs);
-await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-await page.waitForTimeout(1500);
-log.push("timer: " + JSON.stringify(await page.evaluate(() => { const t = document.querySelector(".fyt-hw-timer"); if (!t) return "no timer"; const cs = getComputedStyle(t); const b = getComputedStyle(t, "::before"); const n = document.querySelector(".fyt-hw-num"); return { anim: cs.animationName, glowAnim: b.animationName, glowOp: b.opacity, numAnim: n ? getComputedStyle(n).animationName : null }; })));
-await page.screenshot({ path: "ci-out/top.png" });
-log.push("errors " + JSON.stringify([...new Set(errs)]));
+const page = await browser.newPage({ viewport: { width: 1500, height: 1100 } });
+const html = "<body style='margin:0;background:#111;color:#fff;font:14px sans-serif'><div style='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px'>" + items.map(([n,u]) => "<div><div style='padding:2px'>" + n + "</div><img src='" + u + "' style='width:100%;height:230px;object-fit:cover'></div>").join("") + "</div></body>";
+await page.setContent(html, { waitUntil: "networkidle", timeout: 60000 });
+await page.waitForTimeout(3000);
+await page.screenshot({ path: "ci-out/posters.png", fullPage: true });
 await browser.close();
-writeFileSync("ci-out/log.txt", log.join("\n") + "\n");
