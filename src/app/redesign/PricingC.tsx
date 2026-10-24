@@ -1421,8 +1421,7 @@ function PriceRow({ p }: { p: Pick }) {
 }
 
 /** Rules and perks tucked into one tappable row. */
-function WhatsIncluded({ p }: { p: Pick }) {
-  const [open, setOpen] = useState(false);
+function WhatsIncluded({ p, open, setOpen }: { p: Pick; open: boolean; setOpen: (v: boolean | ((x: boolean) => boolean)) => void }) {
   const reduce = useReducedMotion();
   return (
     <div className="flex shrink-0 flex-col gap-[10px]">
@@ -1510,13 +1509,42 @@ function AccountHead({ p }: { p: Pick }) {
 }
 
 function MobileTwo({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
+  // "What's included" is open while the visitor is picking, and folds away on its own once the
+  // price card comes up the screen. Scrolling back up to the picker opens it again.
+  const [open, setOpen] = useState(true);
+  const buyRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let raf = 0;
+    let zone: "pick" | "price" = "pick";
+    const check = () => {
+      raf = 0;
+      const el = buyRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      const vh = window.innerHeight;
+      const next = top < vh * 0.62 ? "price" : top > vh * 0.9 ? "pick" : zone;
+      if (next !== zone) {
+        zone = next;
+        setOpen(next === "pick");
+      }
+    };
+    const on = () => { if (!raf) raf = requestAnimationFrame(check); };
+    window.addEventListener("scroll", on, { passive: true });
+    window.addEventListener("resize", on);
+    check();
+    return () => {
+      window.removeEventListener("scroll", on);
+      window.removeEventListener("resize", on);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
   return (
     <MobileShell heading={heading} p={p}>
       <div className="flex flex-col gap-[18px] rounded-[24px] p-[16px]" style={CARD_STYLE}>
         <MobileChoices p={p} compare={compare} setCompare={setCompare} />
-        <WhatsIncluded p={p} />
+        <WhatsIncluded p={p} open={open} setOpen={setOpen} />
       </div>
-      <div className="flex flex-col gap-[14px] rounded-[24px] p-[16px]" style={{ ...CARD_STYLE, boxShadow: "none" }}>
+      <div ref={buyRef} className="flex flex-col gap-[14px] rounded-[24px] p-[16px]" style={{ ...CARD_STYLE, boxShadow: "none" }}>
         <AccountHead p={p} />
         <Hairline />
         <PriceRow p={p} />
