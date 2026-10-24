@@ -1,7 +1,7 @@
 // TEMPORARY: desktop + phone screenshots of the live-rewards section.
 import { chromium, webkit, devices } from "playwright";
 import { writeFileSync } from "node:fs";
-const URL = "https://fyt-master-landing-qiaq2482j-bm-med.vercel.app/";
+const URL = "https://fyt-master-landing-h1d2wr5kk-bm-med.vercel.app/";
 const log = [];
 async function shot(browser, name, ctxOpts, cc) {
   const ctx = await browser.newContext({ ...ctxOpts, timezoneId: "Europe/London" });
@@ -19,7 +19,7 @@ async function shot(browser, name, ctxOpts, cc) {
       const s = document.getElementById("live-payouts");
       const imgs = Array.from(s.querySelectorAll("a img[alt^='Payout certificate']"));
       const fixedBottom = Array.from(document.querySelectorAll("*")).filter((e) => { const c = getComputedStyle(e); const r = e.getBoundingClientRect(); return c.position === "fixed" && r.bottom > innerHeight - 140 && r.width > 0 && /claim|offer|buy/i.test(e.textContent || ""); }).length;
-      return { h2: s.querySelector("h2")?.textContent, img: imgs.map((i) => [i.naturalWidth, getComputedStyle(i).opacity]), overflowX: document.documentElement.scrollWidth - innerWidth, floatingOfferEls: fixedBottom };
+      return { h2: s.querySelector("h2")?.textContent, img: imgs.map((i) => [i.naturalWidth, getComputedStyle(i).opacity]), overflowX: document.documentElement.scrollWidth - innerWidth, floatingOfferEls: fixedBottom, links: Array.from(s.querySelectorAll("a")).filter(a=>/View (certificate|transaction)/.test(a.textContent)).map(a=>[a.textContent.trim(),a.href]) };
     });
     log.push(`[${name} ${cc}] ${JSON.stringify(st)} errors=${JSON.stringify([...new Set(errs)])}`);
     await page.screenshot({ path: `ci-out/${name}-${cc}.png` });
