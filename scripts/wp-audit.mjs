@@ -1,51 +1,40 @@
-// TEMPORARY: plan finder flow + section order.
+// TEMPORARY: best-fit guide flow.
 import { chromium, webkit, devices } from "playwright";
 import { writeFileSync } from "node:fs";
-const URL = "https://fyt-master-landing-omta6jp7w-bm-med.vercel.app/";
+const URL = "https://fyt-master-landing-f272goyp4-bm-med.vercel.app/";
 const log = [];
-async function run(browser, name, opts) {
+async function run(browser, name, opts, answers) {
   const ctx = await browser.newContext({ ...opts, timezoneId: "Europe/London" });
   await ctx.addInitScript(() => { try { localStorage.setItem("fyt_known_visitor_v1", "1"); localStorage.setItem("fyt_giveaway_done_v1", String(Date.now())); sessionStorage.setItem("fyt_giveaway_teaser_hidden", "1"); } catch {} });
   const page = await ctx.newPage();
   const errs = [];
   page.on("pageerror", (e) => errs.push(e.message.slice(0, 100)));
   try {
-    await page.goto(`${URL}?country=IN`, { waitUntil: "domcontentloaded", timeout: 60000 });
-    await page.waitForTimeout(3000);
-    for (let i = 0; i < 10; i++) { await page.evaluate(() => document.getElementById("plan-finder")?.scrollIntoView()); await page.evaluate((y) => window.scrollBy(0, y), 80 * i); await page.waitForTimeout(300); }
-    const order = await page.evaluate(() => Array.from(document.querySelectorAll("section[id], section")).slice(0, 14).map((s) => s.id || (s.querySelector("h2")?.textContent || "").slice(0, 25)));
-    log.push(`[${name}] order ${JSON.stringify(order)}`);
-    await page.evaluate(() => document.getElementById("plan-finder")?.scrollIntoView({ block: "center" }));
-    await page.waitForTimeout(1600);
-    await page.screenshot({ path: `ci-out/${name}-q1.png` });
-    await page.click("text=One simple target"); await page.waitForTimeout(1600);
-    await page.screenshot({ path: `ci-out/${name}-q2.png` });
-    await page.click("#plan-finder button:has-text('$50K')"); await page.waitForTimeout(1600);
-    await page.click("#plan-finder button:has-text('MatchTrader')"); await page.waitForTimeout(1600);
-    await page.screenshot({ path: `ci-out/${name}-result.png` });
-    const dbg = await page.evaluate(() => { const el = document.querySelector("#plan-finder .fyt-pf-in"); if (!el) return "no el"; const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); const kids = Array.from(el.querySelectorAll("*")).slice(0, 4).map((k) => { const c = getComputedStyle(k); return [k.tagName, c.opacity, c.visibility, c.color].join("/"); }); return JSON.stringify({ op: cs.opacity, an: cs.animationName, st: cs.animationPlayState, h: r.height, top: r.top, anims: el.getAnimations().map((x) => x.playState + ":" + x.currentTime), kids, zoomed: document.documentElement.className }); });
-    log.push(`[${name}] DEBUG ${dbg}`);
-    const top = await page.evaluate(() => { const el = document.querySelector("#plan-finder .fyt-pf-in"); const r = el.getBoundingClientRect(); const pts = [0.2, 0.5, 0.8].map((f) => { const y = r.top + r.height * f; const e = document.elementFromPoint(r.left + r.width / 2, Math.min(y, innerHeight - 5)); return [Math.round(y), e ? e.tagName + "." + String(e.className).slice(0, 60) : null]; }); return JSON.stringify({ vh: innerHeight, sy: scrollY, pts }); });
-    log.push(`[${name}] TOP ${top}`);
-    await page.evaluate(() => window.scrollBy(0, 1)); await page.waitForTimeout(500);
-    await page.screenshot({ path: `ci-out/${name}-result-nudged.png` });
-    try { await page.locator("#plan-finder .fyt-pf-in").screenshot({ path: `ci-out/${name}-result-el.png` }); } catch (e) { log.push("el shot fail " + e); }
-    const res = await page.evaluate(() => document.getElementById("plan-finder").innerText.replace(/\n/g, " | ").slice(0, 300));
-    log.push(`[${name}] result ${res}`);
-    const href = await page.evaluate(() => Array.from(document.querySelectorAll("#plan-finder a")).map((a) => a.href));
-    log.push(`[${name}] cta ${JSON.stringify(href)}`);
-    await page.click("text=See it in the table"); await page.waitForTimeout(1800);
-    const tbl = await page.evaluate(() => (document.getElementById("challenge")?.innerText || "").slice(0, 400).replace(/\n/g, " | "));
-    log.push(`[${name}] table after click: ${tbl}`);
-    await page.screenshot({ path: `ci-out/${name}-table.png` });
-  } catch (e) { log.push(`[${name}] ERR ${String(e).slice(0, 300)}`); }
-  log.push(`[${name}] errors ${JSON.stringify([...new Set(errs)])}`);
+    await page.goto(URL + "?country=IN", { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.waitForTimeout(2500);
+    await page.evaluate(() => window.scrollTo(0, 1500));
+    await page.waitForTimeout(1200);
+    await page.screenshot({ path: "ci-out/" + name + "-pill.png" });
+    await page.click("button[aria-label^='Find my best fit']");
+    await page.waitForTimeout(700);
+    await page.screenshot({ path: "ci-out/" + name + "-q1.png" });
+    for (const a of answers) { await page.click("[role=dialog] button:has-text('" + a + "')"); await page.waitForTimeout(450); }
+    await page.waitForTimeout(700);
+    log.push("[" + name + "] result " + (await page.evaluate(() => document.querySelector("[role=dialog]").innerText.replace(/\n/g, " | ").slice(0, 400))));
+    await page.locator("[role=dialog] > div").screenshot({ path: "ci-out/" + name + "-result.png" });
+    await page.click("[role=dialog] button:has-text('Get my account')");
+    await page.waitForTimeout(2200);
+    log.push("[" + name + "] after go: dialog open=" + (await page.evaluate(() => !!document.querySelector("[role=dialog]"))) + " table: " + (await page.evaluate(() => { const s = document.getElementById("challenge"); const on = Array.from(s.querySelectorAll("[aria-pressed=true]")).map((b) => b.textContent.trim().replace(/\s+/g, " ").slice(0, 28)); return JSON.stringify(on); })));
+    await page.screenshot({ path: "ci-out/" + name + "-table.png" });
+  } catch (e) { log.push("[" + name + "] ERR " + String(e).slice(0, 300)); }
+  log.push("[" + name + "] errors " + JSON.stringify([...new Set(errs)]));
   await ctx.close();
 }
 const cr = await chromium.launch();
-await run(cr, "desk", { viewport: { width: 1440, height: 900 } });
+await run(cr, "deskFast", { viewport: { width: 1440, height: 900 } }, ["3+ years", "Scalping", "London", "Fast", "$25K"]);
+await run(cr, "deskSlow", { viewport: { width: 1440, height: 900 } }, ["Just starting", "Swing trading", "A mix", "Slow and steady", "$50K"]);
 await cr.close();
 const wk = await webkit.launch();
-await run(wk, "iphone", { ...devices["iPhone 14"] });
+await run(wk, "iphone", { ...devices["iPhone 14"] }, ["1 to 3 years", "Day trading", "New York", "Balanced", "$10K"]);
 await wk.close();
 writeFileSync("ci-out/log.txt", log.join("\n") + "\n");
