@@ -1,7 +1,7 @@
 // TEMPORARY: best-fit guide flow.
 import { chromium, webkit, devices } from "playwright";
 import { writeFileSync } from "node:fs";
-const URL = "https://fyt-master-landing-f272goyp4-bm-med.vercel.app/";
+const URL = "https://fyt-master-landing-k06ddcb30-bm-med.vercel.app/";
 const log = [];
 async function run(browser, name, opts, answers) {
   const ctx = await browser.newContext({ ...opts, timezoneId: "Europe/London" });
@@ -12,7 +12,7 @@ async function run(browser, name, opts, answers) {
   try {
     await page.goto(URL + "?country=IN", { waitUntil: "domcontentloaded", timeout: 60000 });
     await page.waitForTimeout(2500);
-    for (let i = 0; i < 12; i++) { await page.evaluate(() => window.scrollBy(0, 160)); await page.waitForTimeout(250); }
+    await page.evaluate(() => document.getElementById('live-payouts')?.scrollIntoView()); await page.waitForTimeout(600); await page.evaluate(() => window.scrollBy(0, 40));
     await page.waitForTimeout(800);
     await page.screenshot({ path: "ci-out/" + name + "-pill.png" });
     await page.click("button[aria-label^='Find my best fit']");
