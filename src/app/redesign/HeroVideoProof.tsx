@@ -154,7 +154,7 @@ export function HeroVideoProof() {
 
       {/* Header line: who you are seeing */}
       <div className="mb-[12px] flex items-center justify-between gap-[12px] px-[2px]">
-        <span className="flex min-w-0 items-center gap-[8px] text-[12px] font-semibold uppercase tracking-[0.14em] text-[#9fb4de]">
+        <span className="flex min-w-0 items-center gap-[8px] text-[11px] font-semibold uppercase tracking-[0.07em] text-[#9fb4de] sm:text-[12px] sm:tracking-[0.14em]">
           <span className="relative flex size-[7px] shrink-0">
             <span className="fyt-rd-ping-gated absolute inset-0 rounded-full bg-[#22c55e]" />
             <span className="relative size-[7px] rounded-full bg-[#22c55e]" />
@@ -163,6 +163,7 @@ export function HeroVideoProof() {
         </span>
         <button
           type="button"
+          aria-label="Shuffle videos"
           onClick={() => {
             touched.current = true;
             setDeck(buildDeck(videos, visitorRef.current));
@@ -171,7 +172,7 @@ export function HeroVideoProof() {
           className="inline-flex shrink-0 cursor-pointer items-center gap-[6px] rounded-full border-0 px-[11px] py-[6px] text-[11.5px] font-semibold text-[#c9d8f5] transition-colors hover:text-white"
           style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
         >
-          <ShuffleIcon /> Shuffle
+          <ShuffleIcon /> <span className="hidden sm:inline">Shuffle</span>
         </button>
       </div>
 
