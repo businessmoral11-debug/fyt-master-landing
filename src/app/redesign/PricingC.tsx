@@ -1250,7 +1250,8 @@ function OfferBar({ p, small = false }: { p: Pick; small?: boolean }) {
       <span className={`relative flex shrink-0 items-center justify-center ${small ? "size-[38px]" : "size-[46px]"}`}><span className={`origin-center ${small ? "scale-[0.66]" : "scale-[0.8]"}`}><VaultDial open={p.treats.length >= TREAT_PICKS} /></span></span>
       <span className="relative flex min-w-0 flex-1 flex-col gap-[2px]">
         <span className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: EMBER_SOFT }}>Haunted Vault</span>
-        <span className={`whitespace-nowrap font-semibold leading-[1.1] tracking-[-0.02em] text-white ${small ? "text-[16px]" : "text-[18px]"}`}>45% OFF <span style={{ color: EMBER_SOFT }}>+ 1 free account</span></span>
+        <span className={`whitespace-nowrap font-semibold leading-[1.1] tracking-[-0.02em] text-white ${small ? "text-[16px]" : "text-[18px]"}`}>45% OFF</span>
+        <span className="whitespace-nowrap text-[12px] font-semibold leading-[1.1]" style={{ color: EMBER_SOFT }}>+ 1 free account</span>
       </span>
       <span className="relative flex shrink-0 items-center gap-[5px]" role="timer" aria-label="Time left">
         {shown.map(([v, u]) => (
