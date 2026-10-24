@@ -1,6 +1,7 @@
 import { FeaturedIn, LivePayouts, ProofInNumbers, Testimonials } from "./SectionsTop";
 import { ProveYourExpertise } from "./ProveExpertise";
 import { ChallengePricing } from "./PricingC";
+import { PlanFinder } from "./PlanFinder";
 import { ClosingCta, Comparison, Faq, Footer, HowItWorks, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
 import { GiveawayPopup } from "./GiveawayPopup";
@@ -17,8 +18,9 @@ export function BelowFold() {
       <FeaturedIn />
       <ProveYourExpertise />
       <LivePayouts />
-      <ProofInNumbers />
+      <PlanFinder />
       <ChallengePricing />
+      <ProofInNumbers />
       <Testimonials />
       <HowItWorks />
       <Comparison />
