@@ -15,6 +15,7 @@ async function run(browser, name, opts, answers) {
     await page.evaluate(() => document.getElementById('live-payouts')?.scrollIntoView()); await page.waitForTimeout(600); await page.evaluate(() => window.scrollBy(0, 40));
     await page.waitForTimeout(800);
     await page.screenshot({ path: "ci-out/" + name + "-pill.png" });
+    log.push("[" + name + "] DBG " + (await page.evaluate(() => JSON.stringify({ sy: window.scrollY, po: window.pageYOffset, st: document.documentElement.scrollTop, bt: document.body.scrollTop, btn: document.querySelectorAll("button[aria-label^='Find my best fit']").length, ch: document.getElementById("challenge")?.getBoundingClientRect().top, lp: document.getElementById("live-payouts")?.getBoundingClientRect().top, ih: innerHeight, sh: document.documentElement.scrollHeight }))));
     await page.click("button[aria-label^='Find my best fit']");
     await page.waitForTimeout(700);
     await page.screenshot({ path: "ci-out/" + name + "-q1.png" });
