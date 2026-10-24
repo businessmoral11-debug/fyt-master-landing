@@ -24,8 +24,14 @@ for (const cc of ["IN", "DE"]) {
       });
       log.push(`[${cc} iphone t${k}] ${JSON.stringify(st)} errors=${JSON.stringify([...new Set(errs)])}`);
     }
-    const el = await page.$("#live-payouts");
-    if (el) await el.screenshot({ path: `ci-out/${cc}-iphone.png` });
+    await page.evaluate(() => document.querySelector("#live-payouts .fyt-ring")?.scrollIntoView({ block: "center" }));
+    await page.waitForTimeout(3500);
+    const op = await page.evaluate(() => { let e = document.querySelector("#live-payouts .fyt-ring"); const out = []; for (let i = 0; i < 4 && e; i++) { out.push(getComputedStyle(e).opacity); e = e.parentElement; } return out; });
+    log.push(`[${cc} panel opacity chain] ${JSON.stringify(op)}`);
+    await page.screenshot({ path: `ci-out/${cc}-iphone.png` });
+    await page.evaluate(() => window.scrollBy(0, 520));
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: `ci-out/${cc}-iphone2.png` });
   } catch (e) { log.push(`[${cc}] ERR ${String(e).slice(0, 200)}`); }
   await ctx.close();
 }
