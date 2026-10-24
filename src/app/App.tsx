@@ -1513,7 +1513,7 @@ function Hero() {
     return (
       <div ref={heroRef} className={`bg-[#03060d] relative overflow-hidden shrink-0 w-full ${animationsActive ? "" : "hero-anims-paused"}`}>
         <HeroBackground />
-        <div className="relative z-10 mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-[34px] px-[20px] pb-[36px] pt-[28px] lg:grid-cols-[1fr_1.1fr] lg:gap-[56px] lg:px-[56px] lg:py-[84px]">
+        <div className="relative z-10 mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-[34px] px-[20px] pb-[36px] pt-[28px] lg:grid-cols-[1fr_1.1fr] lg:gap-[56px] lg:px-[56px] lg:pb-[84px] lg:pt-[52px]">
           <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
             <div className="mb-[14px] flex max-w-full shrink-0 justify-center lg:mb-[26px] lg:justify-start min-h-[40px] lg:min-h-[36px]">
               <HeroTopTrustindex />
