@@ -1242,21 +1242,21 @@ function useStickyTop(): number {
   return top;
 }
 
-function OfferBar({ p }: { p: Pick }) {
+function OfferBar({ p, small = false }: { p: Pick; small?: boolean }) {
   const parts = useCountdown(HALLOWEEN_END);
   const shown = parts.slice(0, 3);
   return (
-    <div className="relative flex shrink-0 items-center gap-[12px] overflow-hidden rounded-[20px] p-[12px]" style={{ background: "linear-gradient(150deg, #2448b8 0%, #142c74 45%, #0a1434 100%)", boxShadow: "0 0 0 1px rgba(147,197,253,0.32), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
+    <div className={`relative flex shrink-0 items-center overflow-hidden rounded-[20px] ${small ? "gap-[10px] p-[10px]" : "gap-[12px] p-[12px]"}`} style={{ background: "linear-gradient(150deg, #2448b8 0%, #142c74 45%, #0a1434 100%)", boxShadow: "0 0 0 1px rgba(147,197,253,0.32), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
       <span aria-hidden="true" className="pointer-events-none absolute -right-[30px] -top-[40px] size-[130px] rounded-full" style={{ background: "radial-gradient(circle, rgba(255,138,61,0.2), transparent 65%)" }} />
-      <span className="relative flex size-[46px] shrink-0 items-center justify-center"><span className="origin-center scale-[0.8]"><VaultDial open={p.treats.length >= TREAT_PICKS} /></span></span>
+      <span className={`relative flex shrink-0 items-center justify-center ${small ? "size-[38px]" : "size-[46px]"}`}><span className={`origin-center ${small ? "scale-[0.66]" : "scale-[0.8]"}`}><VaultDial open={p.treats.length >= TREAT_PICKS} /></span></span>
       <span className="relative flex min-w-0 flex-1 flex-col gap-[2px]">
         <span className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: EMBER_SOFT }}>Haunted Vault</span>
-        <span className="whitespace-nowrap text-[18px] font-semibold leading-[1.1] tracking-[-0.02em] text-white">45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO</span></span>
+        <span className={`whitespace-nowrap font-semibold leading-[1.1] tracking-[-0.02em] text-white ${small ? "text-[16px]" : "text-[18px]"}`}>45% OFF <span style={{ color: EMBER_SOFT }}>+ BOGO</span></span>
       </span>
       <span className="relative flex shrink-0 items-center gap-[5px]" role="timer" aria-label="Time left">
         {shown.map(([v, u]) => (
-          <span key={u} className="flex w-[38px] flex-col items-center rounded-[10px] py-[5px]" style={{ background: "rgba(3,8,24,0.55)", border: "1px solid rgba(255,255,255,0.1)" }}>
-            <span className="tabular text-[15px] font-bold leading-none text-white">{v}</span>
+          <span key={u} className={`flex flex-col items-center rounded-[10px] py-[5px] ${small ? "w-[34px]" : "w-[38px]"}`} style={{ background: "rgba(3,8,24,0.55)", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <span className={`tabular font-bold leading-none text-white ${small ? "text-[14px]" : "text-[15px]"}`}>{v}</span>
             <span className="mt-[3px] text-[8.5px] font-semibold uppercase leading-none tracking-[0.12em]" style={{ color: EMBER_SOFT }}>{u}</span>
           </span>
         ))}
@@ -1399,6 +1399,322 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
 
 type LayoutProps = { p: Pick; heading?: ReactNode; compare: boolean; setCompare: (f: (v: boolean) => boolean) => void; openSheet: () => void };
 
+/* ======================= Phone pricing layouts (options 1, 2, 3) ======================= */
+
+type MLayout = "current" | "1" | "2" | "3";
+
+function readMLayout(): MLayout {
+  if (typeof window === "undefined") return "current";
+  const v = new URLSearchParams(window.location.search).get("mlayout");
+  return v === "1" || v === "2" || v === "3" || v === "current" ? v : "current";
+}
+
+/** Temporary: flip between the phone options while comparing. Removed once one is chosen. */
+function MobileSwitcher({ value, onChange }: { value: MLayout; onChange: (v: MLayout) => void }) {
+  const items: { id: MLayout; label: string }[] = [{ id: "current", label: "Old" }, { id: "1", label: "1" }, { id: "2", label: "2" }, { id: "3", label: "3" }];
+  return (
+    <div className="fixed left-[6px] top-1/2 z-[2147482990] flex -translate-y-1/2 flex-col gap-[4px] rounded-full p-[4px] lg:hidden" style={{ background: "rgba(8,14,32,0.92)", border: "1px solid rgba(148,178,255,0.3)" }} role="group" aria-label="Phone pricing layout">
+      {items.map((it) => (
+        <button key={it.id} type="button" aria-pressed={value === it.id} onClick={() => onChange(it.id)} className="size-[36px] cursor-pointer rounded-full border-0 text-[12px] font-bold text-white" style={{ background: value === it.id ? BLUE : "transparent" }}>
+          {it.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function useBottomOffset(): number {
+  const [b, setB] = useState(0);
+  useEffect(() => {
+    const m = () => {
+      const el = document.getElementById("noyona_mobile_bottom_disclaimer");
+      let off = 0;
+      if (el) {
+        const r = el.getBoundingClientRect();
+        if (getComputedStyle(el).display !== "none" && r.height > 0 && r.top > window.innerHeight * 0.5) off = Math.round(window.innerHeight - r.top);
+      }
+      setB(off);
+    };
+    m();
+    const id = window.setInterval(m, 1000);
+    window.addEventListener("resize", m);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("resize", m);
+    };
+  }, []);
+  return b;
+}
+
+function TrustLine() {
+  return (
+    <p className="m-0 shrink-0 text-center text-[11.5px]" style={{ color: MUTED }}>
+      <span className="text-[#00b67a]">★</span> <b className="text-[#c7d2e6]">4.5/5</b> · 3K+ reviews · Rewards in 24-48h
+    </p>
+  );
+}
+
+function PriceRow({ p }: { p: Pick }) {
+  return (
+    <div className="flex shrink-0 items-end justify-between gap-[10px]">
+      <span className="flex items-baseline gap-[8px]">
+        <Roll value={money(p.price)} className="text-[30px] font-bold leading-none tracking-[-0.025em] text-white" />
+        <s className="text-[13px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+      </span>
+      <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
+    </div>
+  );
+}
+
+/** Rules and perks tucked into one tappable row. */
+function WhatsIncluded({ p }: { p: Pick }) {
+  const [open, setOpen] = useState(false);
+  const reduce = useReducedMotion();
+  return (
+    <div className="flex shrink-0 flex-col gap-[10px]">
+      <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="flex min-h-[50px] w-full cursor-pointer items-center justify-between gap-[10px] rounded-[14px] px-[14px] py-[8px] text-left text-white" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${LINE}` }}>
+        <span className="flex min-w-0 flex-col gap-[1px]">
+          <span className="text-[13.5px] font-semibold">What's included</span>
+          <span className="truncate text-[11px]" style={{ color: MUTED }}>{rules(p).map(([v]) => v).join(" · ")}</span>
+        </span>
+        <motion.span className="flex shrink-0" animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.25 }}>
+          <Svg d="M6 9l6 6 6-6" size={16} color="#fff" w={2.4} />
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div key="inc" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }} className="overflow-hidden">
+            <div className="flex flex-col gap-[12px]">
+              <SpecStrip p={p} compact />
+              <PerkChips p={p} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function MobileChoices({ p, compare, setCompare }: Pick2) {
+  return (
+    <>
+      <div className="flex flex-col gap-[6px]">
+        <Label n={1}>Model</Label>
+        <ModelRow p={p} />
+      </div>
+      <div className="flex flex-col gap-[10px]">
+        <Label n={2}>Account size</Label>
+        <SizeTrack p={p} />
+      </div>
+      <TypeBlock n={3} p={p} compare={compare} setCompare={setCompare} />
+      <div className="flex flex-col gap-[10px]">
+        <Label n={4}>Platform</Label>
+        <PlatformSeg p={p} />
+      </div>
+    </>
+  );
+}
+type Pick2 = { p: Pick; compare: boolean; setCompare: (f: (v: boolean) => boolean) => void };
+
+function MobileShell({ heading, p, children }: { heading?: ReactNode; p: Pick; children: ReactNode }) {
+  return (
+    <div className="relative mx-auto flex w-full max-w-[560px] flex-col gap-[16px] px-[16px] pb-[64px] pt-[52px]">
+      {heading ?? <DefaultHeading />}
+      {p.halloween ? <OfferBar p={p} small /> : <OfferSwitch p={p} />}
+      {children}
+    </div>
+  );
+}
+
+/* ---------- Phone 2: same page, decluttered ---------- */
+
+function MobileTwo({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
+  return (
+    <MobileShell heading={heading} p={p}>
+      <div className="flex flex-col gap-[18px] rounded-[24px] p-[16px]" style={CARD_STYLE}>
+        <MobileChoices p={p} compare={compare} setCompare={setCompare} />
+        <WhatsIncluded p={p} />
+      </div>
+      <div className="flex flex-col gap-[14px] rounded-[24px] p-[16px]" style={{ ...CARD_STYLE, boxShadow: "none" }}>
+        <PriceRow p={p} />
+        {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
+        <BuyButton p={p} onNeedTreats={openSheet} wide />
+        <CodeLine p={p} />
+        <TrustLine />
+      </div>
+    </MobileShell>
+  );
+}
+
+/* ---------- Phone 1: choices only, buy bar floats at the bottom ---------- */
+
+function StickyBuyBar({ p, on, onNeedTreats }: { p: Pick; on: boolean; onNeedTreats: () => void }) {
+  const reduce = useReducedMotion();
+  const bottom = useBottomOffset();
+  const nudged = useRef(false);
+  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
+  useEffect(() => {
+    document.body.classList.toggle("fyt-buybar", on);
+    return () => document.body.classList.remove("fyt-buybar");
+  }, [on]);
+  return createPortal(
+    <AnimatePresence>
+      {on && (
+        <motion.div
+          initial={reduce ? false : { y: 90, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={reduce ? { opacity: 0 } : { y: 90, opacity: 0 }}
+          transition={{ duration: 0.35, ease: EASE }}
+          className="fixed inset-x-[10px] z-[2147482900] flex items-center justify-between gap-[10px] rounded-[20px] py-[9px] pl-[16px] pr-[9px] lg:hidden"
+          style={{ bottom: `calc(env(safe-area-inset-bottom, 0px) + ${bottom + 10}px)`, background: "rgba(7,12,28,0.94)", border: "1px solid rgba(96,165,250,0.45)", boxShadow: "0 24px 50px -16px rgba(0,0,0,0.85), 0 0 0 1px rgba(0,0,0,0.4)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)" }}
+        >
+          <span className="flex min-w-0 flex-col gap-[2px]">
+            <span className="flex items-baseline gap-[7px]">
+              <Roll value={money(p.price)} className="text-[22px] font-bold leading-none tracking-[-0.02em] text-white" />
+              <s className="text-[12px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+            </span>
+            <span className="truncate text-[11px]" style={{ color: MUTED }}>{fmtSize(p.size)} · {p.step} · {type}</span>
+          </span>
+          <a
+            href={p.co.href}
+            onClick={(e) => {
+              if (p.halloween && p.treats.length < TREAT_PICKS && !nudged.current) {
+                e.preventDefault();
+                nudged.current = true;
+                onNeedTreats();
+              }
+            }}
+            className="flex h-[48px] shrink-0 items-center gap-[8px] rounded-[14px] px-[18px] text-[15px] font-bold text-white no-underline"
+            style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 12px 24px -12px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)" }}
+          >
+            Get funded
+            <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#fff" w={2.6} />
+          </a>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body,
+  );
+}
+
+function MobileOne({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver((e) => setOn(!!e[0]?.isIntersecting), { threshold: 0.12 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref}>
+      <MobileShell heading={heading} p={p}>
+        <div className="flex flex-col gap-[18px] rounded-[24px] p-[16px]" style={CARD_STYLE}>
+          <MobileChoices p={p} compare={compare} setCompare={setCompare} />
+          <WhatsIncluded p={p} />
+          {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
+          <CodeLine p={p} />
+          <TrustLine />
+        </div>
+        <div className="h-[84px]" aria-hidden="true" />
+      </MobileShell>
+      <StickyBuyBar p={p} on={on} onNeedTreats={openSheet} />
+    </div>
+  );
+}
+
+/* ---------- Phone 3: one step at a time ---------- */
+
+function MobileThree({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
+  const [idx, setIdx] = useState(0);
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    const on = () => setIdx(3);
+    window.addEventListener(SELECT_PLAN_EVENT, on);
+    return () => window.removeEventListener(SELECT_PLAN_EVENT, on);
+  }, []);
+  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
+  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
+  const titles = ["Model", "Size", "Type", "Review"];
+  let body: ReactNode;
+  if (idx === 0) {
+    body = (
+      <>
+        <Label>Choose your model</Label>
+        <ModelRow p={p} />
+        <p className="m-0 text-center text-[13px]" style={{ color: MUTED }}>{MODEL_COPY[p.step].line}</p>
+      </>
+    );
+  } else if (idx === 1) {
+    body = (
+      <>
+        <Label>Account size</Label>
+        <SizeTrack p={p} />
+        <PriceRow p={p} />
+        <SpecStrip p={p} compact />
+      </>
+    );
+  } else if (idx === 2) {
+    body = (
+      <>
+        <TypeBlock p={p} compare={compare} setCompare={setCompare} />
+        <div className="flex flex-col gap-[10px]">
+          <Label>Platform</Label>
+          <PlatformSeg p={p} />
+        </div>
+      </>
+    );
+  } else {
+    const rows: [string, string, number][] = [["Model", p.step, 0], ["Size", fmtSize(p.size), 1], ["Type", type, 2], ["Platform", plat.label, 2]];
+    body = (
+      <>
+        <div className="flex flex-col overflow-hidden rounded-[16px]" style={{ border: `1px solid ${LINE}` }}>
+          {rows.map(([l, v, k], i) => (
+            <button key={l} type="button" onClick={() => setIdx(k)} className="flex h-[44px] cursor-pointer items-center justify-between border-0 bg-transparent px-[14px] text-left text-white" style={{ borderTop: i ? `1px solid ${LINE}` : "none" }}>
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em]" style={{ color: MUTED }}>{l}</span>
+              <span className="flex items-center gap-[8px] text-[14.5px] font-bold">{v}<span className="text-[11px] font-semibold text-[#93c5fd]">Change</span></span>
+            </button>
+          ))}
+        </div>
+        <WhatsIncluded p={p} />
+        {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
+        <PriceRow p={p} />
+        <BuyButton p={p} onNeedTreats={openSheet} wide />
+        <CodeLine p={p} />
+      </>
+    );
+  }
+  return (
+    <MobileShell heading={heading} p={p}>
+      <div className="flex min-h-[430px] flex-col gap-[16px] rounded-[24px] p-[16px]" style={CARD_STYLE}>
+        <div className="flex items-center gap-[6px]">
+          {titles.map((t, k) => (
+            <button key={t} type="button" onClick={() => setIdx(k)} aria-label={`Step ${k + 1}: ${t}`} aria-current={k === idx ? "step" : undefined} className="flex flex-1 cursor-pointer flex-col items-center gap-[5px] border-0 bg-transparent p-0">
+              <span className="h-[4px] w-full rounded-full transition-colors duration-300" style={{ background: k <= idx ? "#60a5fa" : "rgba(148,178,255,0.18)" }} />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: k === idx ? "#bfdbfe" : MUTED }}>{t}</span>
+            </button>
+          ))}
+        </div>
+        <motion.div key={idx} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: EASE }} className="flex flex-1 flex-col gap-[16px]">
+          {body}
+        </motion.div>
+        <div className="flex items-center justify-between gap-[10px]">
+          <button type="button" onClick={() => setIdx((k) => Math.max(0, k - 1))} disabled={idx === 0} className="h-[48px] cursor-pointer rounded-[14px] px-[20px] text-[14px] font-semibold text-[#dbe4f5] disabled:cursor-default disabled:opacity-0" style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${LINE}` }}>
+            Back
+          </button>
+          {idx < 3 && (
+            <button type="button" onClick={() => setIdx((k) => Math.min(3, k + 1))} className="flex h-[48px] flex-1 cursor-pointer items-center justify-center gap-[8px] rounded-[14px] border-0 text-[15px] font-bold text-white" style={{ background: BLUE, boxShadow: "0 16px 32px -14px rgba(37,99,235,0.95)" }}>
+              Continue
+              <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#fff" w={2.6} />
+            </button>
+          )}
+        </div>
+      </div>
+    </MobileShell>
+  );
+}
+
 export function ChallengePricing({ heading }: { heading?: ReactNode }) {
   const p = usePick();
   const reduce = useReducedMotion();
@@ -1434,6 +1750,18 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
   }, [setStep, setPlan, setPlatform, setI]);
 
   const desktop = useDesktop();
+  const [mlayout, setMlayout] = useState<MLayout>(readMLayout);
+  const [showMSwitch] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mlayout") !== null);
+  const changeM = (v: MLayout) => {
+    setMlayout(v);
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.set("mlayout", v);
+      window.history.replaceState(null, "", u.toString());
+    } catch {
+      // The address bar is only a convenience.
+    }
+  };
   const lp: LayoutProps = { p, heading, compare, setCompare, openSheet: () => setSheet(true) };
   const current = (
       <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-[18px] px-[16px] pb-[64px] pt-[56px] lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-[48px] lg:px-[40px] lg:pb-[110px] lg:pt-[110px]">
@@ -1510,7 +1838,8 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
     <section id="challenge" className="fyt-rd relative w-full shrink-0 scroll-mt-[120px] overflow-clip" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, #03060d 70%)`, color: "#eef0f6" }}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       {p.halloween && <HalloweenDecor />}
-      {desktop ? <VariantA {...lp} /> : current}
+      {desktop ? <VariantA {...lp} /> : mlayout === "1" ? <MobileOne {...lp} /> : mlayout === "2" ? <MobileTwo {...lp} /> : mlayout === "3" ? <MobileThree {...lp} /> : current}
+      {showMSwitch && !desktop && <MobileSwitcher value={mlayout} onChange={changeM} />}
       <AnimatePresence>{sheet && <TreatSheet p={p} onClose={() => setSheet(false)} />}</AnimatePresence>
     </section>
   );

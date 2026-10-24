@@ -298,3 +298,9 @@ html.fyt-zoomed *::after {
 .fyt-pf-in { animation: fyt-pf-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
 @keyframes fyt-pf-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .fyt-pf-in { animation: none; } }
+
+/* Phones: while the floating buy bar is showing, hide the corner launchers so nothing overlaps it. */
+@media (max-width: 1023px) {
+  body.fyt-buybar #intercom-chat-button,
+  body.fyt-buybar a[aria-label="Join FYT on Discord"] { display: none !important; }
+}
