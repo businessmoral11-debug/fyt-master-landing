@@ -159,18 +159,13 @@ function rules(p: Pick): [string, string][] {
   const e = p.entry;
   const v = (x?: string) => (!x || x === "N/A" ? "None" : x);
   if (p.step === "Instant")
-    return [[v(e.profit), "Min. profit for payout"], [v(e.maxDaily), "Daily loss limit"], [v(e.maxOverall), "Trailing max loss"], [e.split, "Payout split"]];
+    return [[v(e.profit), "Min. profit for payout"], [v(e.maxDaily), "Daily loss (Static)"], [v(e.maxOverall), "Max loss (Trailing)"], [e.split, "Payout split"]];
   return [
     [p.step === "2-Step" ? `${e.p1} / ${e.p2}` : v(e.p1), p.step === "2-Step" ? "Profit targets" : "Profit target"],
-    [v(e.maxDaily), "Daily loss limit"],
-    [v(e.maxOverall), "Static max loss"],
+    [v(e.maxDaily), "Daily loss (Static)"],
+    [v(e.maxOverall), "Max loss (Static)"],
     [e.split, "Payout split"],
   ];
-}
-
-/** Which drawdown applies, in plain words (from the FAQ and the comparison table). */
-function drawdownNote(p: Pick): string {
-  return p.step === "Instant" ? "Trailing max loss" : "Static drawdown · balance based daily loss";
 }
 
 const IC = {
@@ -257,7 +252,6 @@ function Label({ n, children, right }: { n?: number; children: ReactNode; right?
 }
 
 const TYPE_NOTE: Record<string, string> = {
-  "c-classic": "Consistency rule",
   "c-prime": "No consistency",
   "i-plus": "Fewest rules",
   "i-prime": "No consistency",
@@ -294,8 +288,8 @@ function CompareTable({ p }: { p: Pick }) {
   const rows: [string, Cell, Cell][] = instant
     ? [
         ["Min. profit for payout", { t: v(e[0].profit) }, { t: v(e[1].profit) }],
-        ["Daily loss limit", { t: v(e[0].maxDaily) }, { t: v(e[1].maxDaily) }],
-        ["Max loss limit", { t: v(e[0].maxOverall) }, { t: v(e[1].maxOverall) }],
+        ["Daily loss (Static)", { t: v(e[0].maxDaily) }, { t: v(e[1].maxDaily) }],
+        ["Max loss (Trailing)", { t: v(e[0].maxOverall) }, { t: v(e[1].maxOverall) }],
         ["Min. trading days", { t: v(e[0].minDays) }, { t: v(e[1].minDays) }],
       ]
     : [
@@ -1363,7 +1357,6 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
               </span>
             </div>
             <SpecStrip p={p} compact />
-            <p className="m-0 shrink-0 text-center text-[11px] font-medium text-[#93c5fd]">{drawdownNote(p)}</p>
             {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
             <Hairline />
             <div className="flex shrink-0 items-end justify-between gap-[10px]">
@@ -1436,7 +1429,7 @@ function WhatsIncluded({ p }: { p: Pick }) {
       <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="flex min-h-[50px] w-full cursor-pointer items-center justify-between gap-[10px] rounded-[14px] px-[14px] py-[8px] text-left text-white" style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${LINE}` }}>
         <span className="flex min-w-0 flex-col gap-[1px]">
           <span className="text-[13.5px] font-semibold">What's included</span>
-          <span className="truncate text-[11px]" style={{ color: MUTED }}>{drawdownNote(p)}</span>
+          <span className="truncate text-[11px]" style={{ color: MUTED }}>Limits, perks and payouts</span>
         </span>
         <motion.span className="flex shrink-0" animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.25 }}>
           <Svg d="M6 9l6 6 6-6" size={16} color="#fff" w={2.4} />
@@ -1447,7 +1440,6 @@ function WhatsIncluded({ p }: { p: Pick }) {
           <motion.div key="inc" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }} className="overflow-hidden">
             <div className="flex flex-col gap-[12px]">
               <SpecStrip p={p} compact />
-              <p className="m-0 text-center text-[11.5px] font-medium text-[#93c5fd]">{drawdownNote(p)}</p>
               <PerkChips p={p} />
             </div>
           </motion.div>
@@ -1513,7 +1505,6 @@ function AccountHead({ p }: { p: Pick }) {
           </span>
         ))}
       </div>
-      <p className="m-0 text-center text-[11.5px] font-medium text-[#93c5fd]">{drawdownNote(p)}</p>
     </div>
   );
 }
