@@ -1513,12 +1513,12 @@ function Hero() {
     return (
       <div ref={heroRef} className={`bg-[#03060d] relative overflow-hidden shrink-0 w-full ${animationsActive ? "" : "hero-anims-paused"}`}>
         <HeroBackground />
-        <div className="relative z-10 mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-[34px] px-[20px] pb-[36px] pt-[28px] lg:grid-cols-[1fr_1.1fr] lg:gap-[56px] lg:px-[56px] lg:pb-[84px] lg:pt-[52px]">
+        <div className="relative z-10 mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-[34px] [@media(min-width:1024px)_and_(max-height:860px)]:[zoom:0.85] px-[20px] pb-[36px] pt-[28px] lg:grid-cols-[1fr_1.1fr] lg:gap-[56px] lg:px-[56px] lg:pb-[84px] lg:pt-[52px]">
           <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
             <div className="mb-[14px] flex max-w-full shrink-0 justify-center lg:mb-[26px] lg:justify-start min-h-[40px] lg:min-h-[36px]">
               <HeroTopTrustindex />
             </div>
-            <h1 className="w-full font-['DM_Sans',sans-serif] text-[44px] font-medium lg:text-[clamp(50px,9vh,68px)] xl:text-[clamp(54px,9.2vh,78px)]" style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}>
+            <h1 className="w-full font-['DM_Sans',sans-serif] text-[44px] font-medium lg:text-[68px] xl:text-[78px]" style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}>
               <span className="block text-white"><RevealWords text="Trade Without" /></span>
               <span className="block text-white"><HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
               <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
