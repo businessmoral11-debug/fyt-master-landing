@@ -290,3 +290,7 @@ html.fyt-zoomed *::after {
 .fyt-rp-progress { animation: fyt-rp-fill 4.5s linear forwards; }
 @keyframes fyt-rp-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (prefers-reduced-motion: reduce) { .fyt-rp-progress { animation: none; transform: scaleX(1); } }
+
+.fyt-hv-progress { animation: fyt-hv-fill 6.5s linear forwards; }
+@keyframes fyt-hv-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .fyt-hv-progress { animation: none; transform: scaleX(1); } }

@@ -25,6 +25,7 @@ import { HALLOWEEN_OFF, HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHOR
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
+import { HeroVideoProof } from "@/app/redesign/HeroVideoProof";
 import { DesktopTopDisclaimer, MobileBottomDisclaimer } from "@/app/TradingDisclaimer";
 const loadGlobe = () => import("@/app/globe");
 const loadRecentVerifiedRewards = () => import("@/app/recentVerifiedRewards");
@@ -814,6 +815,8 @@ function PromoBanner() {
 // rule it out during future debugging; the animation/timing logic itself
 // (HERO_SWEEP_CSS, per-label glow keyframes) is unchanged from before.
 const HERO_RADAR_ENABLED = true;
+// Trader video wall replaces the radar in the hero (radar code is kept, just not rendered).
+const HERO_VIDEO_ENABLED = true;
 
 function HeroStage({
   labelScale = 1,
@@ -1164,11 +1167,13 @@ function HeroBackground() {
 
 
       {/* Fixed 1440×1080 stage centered horizontally; scene coords are spec px */}
-      <div className="absolute left-1/2 top-0 hidden lg:block" style={{ width: 1440, height: 1080, transform: "translateX(-50%)" }}>
-        <HeroStage sweepPaused={!nearViewport} />
-      </div>
+      {!HERO_VIDEO_ENABLED && (
+        <div className="absolute left-1/2 top-0 hidden lg:block" style={{ width: 1440, height: 1080, transform: "translateX(-50%)" }}>
+          <HeroStage sweepPaused={!nearViewport} />
+        </div>
+      )}
 
-      <HeroStageMobile sweepPaused={!nearViewport} />
+      {!HERO_VIDEO_ENABLED && <HeroStageMobile sweepPaused={!nearViewport} />}
 
       {/* Vignette (spec: radial at 50% 62%) */}
       <div
@@ -1447,46 +1452,13 @@ function HalloweenHeroChip() {
   );
 }
 
-function Hero() {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const [animationsActive, setAnimationsActive] = useState(true);
-
-  useEffect(() => {
-    const el = heroRef.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver(
-      (entries) => setAnimationsActive(!!entries[0]?.isIntersecting),
-      { rootMargin: `${HERO_ANIMATIONS_ACTIVE_MARGIN_PX}px 0px ${HERO_ANIMATIONS_ACTIVE_MARGIN_PX}px 0px` },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
+function HeroCtaRow({ left = false }: { left?: boolean }) {
   return (
-    <div
-      ref={heroRef}
-      className={`bg-[#03060d] relative flex flex-col items-center overflow-hidden shrink-0 w-full min-h-[620px] lg:h-[1080px] pt-[28px] pb-[64px] lg:py-0 ${animationsActive ? "" : "hero-anims-paused"}`}
-    >
-      <HeroBackground />
-      {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-[20px] lg:px-[88px] w-full lg:absolute lg:top-[16px] lg:h-[496px]">
-        <div className="mb-[18px] lg:mb-[26px] flex justify-center max-w-full shrink-0 min-h-[40px] lg:min-h-[36px]">
-          <HeroTopTrustindex />
-        </div>
-        <h1
-          className="font-['DM_Sans',sans-serif] font-medium text-[44px] lg:text-[80px] w-full lg:max-w-[1264px]"
-          style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}
-        >
-          {/* Design spec capitalizes "Without" — HERO_CONTENT.headlineMain (live-site manifest, lowercase "without") is correct as a record of the live site but not used for this specific render */}
-          <span className="block text-white"><RevealWords text="Trade Without" /> <HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
-          <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
-        </h1>
-        <div className="h-[28px] lg:h-[44px] shrink-0" />
-        <motion.div
+      <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.62, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-row gap-[10px] lg:gap-[14px] items-stretch lg:items-center shrink-0 w-full max-w-[460px] lg:max-w-none lg:w-auto"
+          className={`flex flex-row gap-[10px] lg:gap-[14px] items-stretch lg:items-center shrink-0 w-full max-w-[460px] lg:max-w-none lg:w-auto ${left ? "" : ""}`}
         >
           {/* Two equal pills: primary with an arrow orb, secondary glass with a play orb. */}
           <HeroCta
@@ -1519,6 +1491,82 @@ function Hero() {
             <span className="font-['Inter:Medium',sans-serif] font-medium text-[14.5px] lg:text-[16px] text-[#e8ebf2] whitespace-nowrap">View rewards</span>
           </HeroCta>
         </motion.div>
+  );
+}
+
+function Hero() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [animationsActive, setAnimationsActive] = useState(true);
+
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => setAnimationsActive(!!entries[0]?.isIntersecting),
+      { rootMargin: `${HERO_ANIMATIONS_ACTIVE_MARGIN_PX}px 0px ${HERO_ANIMATIONS_ACTIVE_MARGIN_PX}px 0px` },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  if (HERO_VIDEO_ENABLED) {
+    return (
+      <div ref={heroRef} className={`bg-[#03060d] relative overflow-hidden shrink-0 w-full ${animationsActive ? "" : "hero-anims-paused"}`}>
+        <HeroBackground />
+        <div className="relative z-10 mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-[34px] px-[20px] pb-[36px] pt-[28px] lg:grid-cols-[1fr_1.1fr] lg:gap-[56px] lg:px-[56px] lg:py-[84px]">
+          <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
+            <div className="mb-[18px] flex max-w-full shrink-0 justify-center lg:mb-[26px] lg:justify-start min-h-[40px] lg:min-h-[36px]">
+              <HeroTopTrustindex />
+            </div>
+            <h1 className="w-full font-['DM_Sans',sans-serif] text-[42px] font-medium lg:text-[60px] xl:text-[68px]" style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}>
+              <span className="block text-white"><RevealWords text="Trade Without" /> <HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
+              <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
+            </h1>
+            <p className="mt-[18px] max-w-[460px] text-[15px] leading-[1.5] text-[#a6b4d0] lg:text-[16.5px]">
+              Real traders, paid live on our calls. <span className="font-semibold text-white">Unedited.</span>
+            </p>
+            <div className="h-[26px] shrink-0 lg:h-[34px]" />
+            <HeroCtaRow />
+            <p className="mt-[20px] flex flex-wrap items-center justify-center gap-x-[18px] gap-y-[6px] text-[12.5px] text-[#8fa0c4] lg:justify-start">
+              <span><span className="text-[#4ade80]">&#10003;</span> Paid in 24-48h</span>
+              <span><span className="text-[#4ade80]">&#10003;</span> Since 2024</span>
+            </p>
+            <div className="mt-[18px] flex max-w-full shrink-0 justify-center lg:hidden">
+              <HeroTrustindexGate />
+            </div>
+          </div>
+          <HeroVideoProof />
+        </div>
+        <div className="relative z-10 flex justify-center pb-[30px] lg:hidden">
+          <div className={TRUST_STRIP_BOX_CLASSES} style={{ background: "rgba(255,255,255,0.05)" }}>
+            <TrustStripContent />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={heroRef}
+      className={`bg-[#03060d] relative flex flex-col items-center overflow-hidden shrink-0 w-full min-h-[620px] lg:h-[1080px] pt-[28px] pb-[64px] lg:py-0 ${animationsActive ? "" : "hero-anims-paused"}`}
+    >
+      <HeroBackground />
+      {/* Content — centered; on desktop pinned into the upper band per spec (top 130, h 496) */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center px-[20px] lg:px-[88px] w-full lg:absolute lg:top-[16px] lg:h-[496px]">
+        <div className="mb-[18px] lg:mb-[26px] flex justify-center max-w-full shrink-0 min-h-[40px] lg:min-h-[36px]">
+          <HeroTopTrustindex />
+        </div>
+        <h1
+          className="font-['DM_Sans',sans-serif] font-medium text-[44px] lg:text-[80px] w-full lg:max-w-[1264px]"
+          style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}
+        >
+          {/* Design spec capitalizes "Without" — HERO_CONTENT.headlineMain (live-site manifest, lowercase "without") is correct as a record of the live site but not used for this specific render */}
+          <span className="block text-white"><RevealWords text="Trade Without" /> <HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
+          <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
+        </h1>
+        <div className="h-[28px] lg:h-[44px] shrink-0" />
+        <HeroCtaRow />
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

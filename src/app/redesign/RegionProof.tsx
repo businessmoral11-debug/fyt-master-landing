@@ -187,17 +187,18 @@ function withCertificate(p: PublicPayout): ProofItem {
 }
 
 /** The last 30 days of payouts (newest first). Loads page 1, then only as many more pages as the window needs. */
-async function loadWindowPayouts(): Promise<PublicPayout[]> {
-  const cutoff = Date.now() - WINDOW_DAYS * DAY;
+const MAX_PAGES = 12;
+
+/** Every payout in the public feed (newest first). The 30-day numbers are cut from this list. */
+async function loadAllPayouts(): Promise<PublicPayout[]> {
   const first = await fetchFeaturedPayouts(1, 100);
   const rows: PublicPayout[] = [...first.data];
-  const pages = first.meta?.pagination?.totalPages ?? 1;
-  const oldest = rows.length ? Date.parse(rows[rows.length - 1].createdAt ?? "") : 0;
-  if (pages > 1 && Number.isFinite(oldest) && oldest > cutoff) {
-    const more = await Promise.all(Array.from({ length: Math.min(pages, 8) - 1 }, (_, i) => fetchFeaturedPayouts(i + 2, 100).catch(() => null)));
+  const pages = Math.min(first.meta?.pagination?.totalPages ?? 1, MAX_PAGES);
+  if (pages > 1) {
+    const more = await Promise.all(Array.from({ length: pages - 1 }, (_, i) => fetchFeaturedPayouts(i + 2, 100).catch(() => null)));
     for (const r of more) if (r) rows.push(...r.data);
   }
-  return rows.filter((p) => Number(p.amount) > 0 && p.createdAt && Date.parse(p.createdAt) >= cutoff);
+  return rows.filter((p) => Number(p.amount) > 0 && p.createdAt && Number.isFinite(Date.parse(p.createdAt)));
 }
 
 /** Springs a number to its new value (same feel as the pricing price). */
@@ -464,11 +465,41 @@ function FeedRow({ p, active, running, onPick, className = "" }: { p: ProofItem;
   );
 }
 
+/* ------------------------- all-time strip (top) ------------------------- */
+
+function LifetimeStrip({ loading, total, count, latest }: { loading: boolean; total: number; count: number; latest: string | null }) {
+  const cells: { label: string; node: ReactNode; live?: boolean }[] = [
+    { label: "Paid out so far", node: loading ? "-" : <SpringNumber value={Math.round(total)} format={(n) => money(Math.round(n))} /> },
+    { label: "Payouts sent", node: loading ? "-" : <SpringNumber value={count} format={(n) => Math.round(n).toLocaleString("en-US")} /> },
+    { label: "Last payout", node: loading || !latest ? "-" : relTime(latest), live: true },
+  ];
+  return (
+    <div className="grid grid-cols-1 overflow-hidden rounded-[22px] sm:grid-cols-3" style={{ background: "linear-gradient(180deg,#ffffff,#f4f8ff)", border: `1px solid ${C.borderLight}`, boxShadow: "0 40px 80px -52px rgba(30,64,175,0.55)" }}>
+      {cells.map((c, i) => (
+        <div key={c.label} className="flex flex-col gap-[8px] px-[22px] py-[18px] sm:py-[22px]" style={i ? { borderTop: `1px solid ${C.borderLight}` } : undefined}>
+          <span className="flex items-center gap-[8px] text-[10.5px] font-semibold uppercase tracking-[0.13em]" style={{ color: C.mutedLight }}>
+            {c.live && (
+              <span className="relative flex size-[8px]">
+                <span className="fyt-rd-ping absolute inset-0 rounded-full bg-[#22c55e]" />
+                <span className="relative size-[8px] rounded-full bg-[#22c55e]" />
+              </span>
+            )}
+            {c.label}
+          </span>
+          <span className="tabular text-[34px] font-semibold leading-none tracking-[-0.035em] sm:text-[38px]" style={{ color: C.textLight }}>
+            {c.node}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* -------------------------------- section -------------------------------- */
 
 export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
   const [visitor, setVisitor] = useState<{ code: string | null; region: RegionId | null }>({ code: null, region: null });
-  const [rows, setRows] = useState<ProofItem[]>([]);
+  const [allRows, setAllRows] = useState<ProofItem[]>([]);
   const [state, setState] = useState<"loading" | "ready" | "empty">("loading");
   const [worldwide, setWorldwide] = useState(false);
   const [pick, setPick] = useState(0);
@@ -479,11 +510,11 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
   useEffect(() => {
     setVisitor(detectVisitor());
     let cancelled = false;
-    loadWindowPayouts()
+    loadAllPayouts()
       .then((list) => {
         if (cancelled) return;
         const items = list.map(withCertificate);
-        setRows(items);
+        setAllRows(items);
         setState(items.length ? "ready" : "empty");
       })
       .catch(() => {
@@ -493,6 +524,21 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
       cancelled = true;
     };
   }, []);
+
+  const rows = useMemo(() => {
+    const cutoff = Date.now() - WINDOW_DAYS * DAY;
+    return allRows.filter((p) => Date.parse(p.createdAt ?? "") >= cutoff);
+  }, [allRows]);
+  const lifetime = useMemo(() => {
+    let total = 0;
+    let latest = 0;
+    for (const p of allRows) {
+      total += Number(p.amount) || 0;
+      const t = Date.parse(p.createdAt ?? "");
+      if (t > latest) latest = t;
+    }
+    return { total, count: allRows.length, latest: latest ? new Date(latest).toISOString() : null };
+  }, [allRows]);
 
   const countryRows = useMemo(() => (visitor.code ? rows.filter((p) => (p.countryCode ?? "").toUpperCase() === visitor.code) : []), [rows, visitor.code]);
   const regionRows = useMemo(() => (visitor.region ? rows.filter((p) => regionOf(p.countryCode) === visitor.region) : []), [rows, visitor.region]);
@@ -528,7 +574,8 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
 
   return (
     <Section tone="light" id="live-payouts">
-      <div className="relative grid grid-cols-1 items-center gap-[40px] lg:grid-cols-12 lg:gap-[56px]">
+      <LifetimeStrip loading={loading} total={lifetime.total} count={lifetime.count} latest={lifetime.latest} />
+      <div className="relative mt-[28px] grid grid-cols-1 items-center gap-[40px] lg:grid-cols-12 lg:gap-[56px]">
         <div className="flex min-w-0 flex-col gap-[22px] lg:col-span-5 xl:col-span-4">
           <Eyebrow tone="light">Live rewards</Eyebrow>
           <h2 className="text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] [text-wrap:balance] sm:text-[42px] lg:text-[40px] xl:text-[42px] min-[1400px]:text-[46px]" style={{ color: C.textLight }}>

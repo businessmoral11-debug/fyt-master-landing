@@ -15,7 +15,7 @@ describe("redesigned below-the-fold", () => {
 
   it("renders every section in the original order", () => {
     const composition = read("./RedesignBelowFold.tsx");
-    const order = ["<FeaturedIn />", "<ProveYourExpertise />", "<ProofInNumbers />", "<LivePayouts />", "<ChallengePricing />", "<Testimonials />", "<HowItWorks />", "<Comparison />", "<ProductShowcase />", "<ClosingCta />", "<Faq />", "<Footer />"];
+    const order = ["<FeaturedIn />", "<ProveYourExpertise />", "<LivePayouts />", "<ProofInNumbers />", "<ChallengePricing />", "<Testimonials />", "<HowItWorks />", "<Comparison />", "<ProductShowcase />", "<ClosingCta />", "<Faq />", "<Footer />"];
     let last = -1;
     for (const tag of order) {
       const at = composition.indexOf(tag);
