@@ -13,7 +13,7 @@ for (const cc of ["IN", "DE"]) {
   try {
     await page.goto(`${URL}?halloween=0&country=${cc}`, { waitUntil: "domcontentloaded", timeout: 60000 });
     await page.waitForTimeout(2500);
-    for (let i = 0; i < 6; i++) { await page.evaluate(() => document.getElementById("live-payouts")?.scrollIntoView()); await page.mouse.wheel(0, 120 * i); await page.waitForTimeout(500); }
+    for (let i = 0; i < 6; i++) { await page.evaluate(() => document.getElementById("live-payouts")?.scrollIntoView()); await page.evaluate((y) => window.scrollBy(0, y), 120 * i); await page.waitForTimeout(500); }
     await page.evaluate(() => document.getElementById("live-payouts")?.scrollIntoView());
     for (let k = 0; k < 3; k++) {
       await page.waitForTimeout(3500);
