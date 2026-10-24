@@ -25,6 +25,11 @@ async function run(browser, name, opts) {
     await page.screenshot({ path: `ci-out/${name}-result.png` });
     const dbg = await page.evaluate(() => { const el = document.querySelector("#plan-finder .fyt-pf-in"); if (!el) return "no el"; const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); const kids = Array.from(el.querySelectorAll("*")).slice(0, 4).map((k) => { const c = getComputedStyle(k); return [k.tagName, c.opacity, c.visibility, c.color].join("/"); }); return JSON.stringify({ op: cs.opacity, an: cs.animationName, st: cs.animationPlayState, h: r.height, top: r.top, anims: el.getAnimations().map((x) => x.playState + ":" + x.currentTime), kids, zoomed: document.documentElement.className }); });
     log.push(`[${name}] DEBUG ${dbg}`);
+    const top = await page.evaluate(() => { const el = document.querySelector("#plan-finder .fyt-pf-in"); const r = el.getBoundingClientRect(); const pts = [0.2, 0.5, 0.8].map((f) => { const y = r.top + r.height * f; const e = document.elementFromPoint(r.left + r.width / 2, Math.min(y, innerHeight - 5)); return [Math.round(y), e ? e.tagName + "." + String(e.className).slice(0, 60) : null]; }); return JSON.stringify({ vh: innerHeight, sy: scrollY, pts }); });
+    log.push(`[${name}] TOP ${top}`);
+    await page.evaluate(() => window.scrollBy(0, 1)); await page.waitForTimeout(500);
+    await page.screenshot({ path: `ci-out/${name}-result-nudged.png` });
+    try { await page.locator("#plan-finder .fyt-pf-in").screenshot({ path: `ci-out/${name}-result-el.png` }); } catch (e) { log.push("el shot fail " + e); }
     const res = await page.evaluate(() => document.getElementById("plan-finder").innerText.replace(/\n/g, " | ").slice(0, 300));
     log.push(`[${name}] result ${res}`);
     const href = await page.evaluate(() => Array.from(document.querySelectorAll("#plan-finder a")).map((a) => a.href));
