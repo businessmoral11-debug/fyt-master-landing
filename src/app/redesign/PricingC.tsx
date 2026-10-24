@@ -901,88 +901,6 @@ function scrollToTable() {
   document.getElementById("challenge")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-const EXIT_KEY = "fyt_hw_exit_v1";
-
-/** Desktop exit intent, once per session: "Don't leave the vault open". */
-function VaultExitPopup() {
-  const reduce = useReducedMotion();
-  const [show, setShow] = useState(false);
-  const parts = useCountdown(HALLOWEEN_END);
-  useEffect(() => {
-    if (typeof window === "undefined" || window.matchMedia?.("(pointer: coarse)").matches) return;
-    let seen = false;
-    try {
-      seen = window.sessionStorage.getItem(EXIT_KEY) === "1";
-    } catch {
-      // ignore
-    }
-    if (seen) return;
-    const armedAt = Date.now() + 8000;
-    const onOut = (e: MouseEvent) => {
-      if (e.relatedTarget || e.clientY > 8 || Date.now() < armedAt) return;
-      try {
-        window.sessionStorage.setItem(EXIT_KEY, "1");
-      } catch {
-        // ignore
-      }
-      document.removeEventListener("mouseout", onOut);
-      setShow(true);
-    };
-    document.addEventListener("mouseout", onOut);
-    return () => document.removeEventListener("mouseout", onOut);
-  }, []);
-  useEffect(() => {
-    if (!show) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setShow(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [show]);
-  if (typeof document === "undefined") return null;
-  return createPortal(
-    <AnimatePresence>
-      {show && (
-        <motion.div className="fyt-rd fixed inset-0 z-[2147483100] flex items-center justify-center p-[16px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Halloween offer">
-          <button type="button" aria-label="Close" onClick={() => setShow(false)} className="absolute inset-0 cursor-default border-0 p-0" style={{ background: "rgba(3,6,13,0.78)", backdropFilter: "blur(8px)" }} />
-          <motion.div
-            className="relative w-full max-w-[420px] overflow-hidden rounded-[28px] px-[24px] pb-[24px] pt-[30px] text-center text-white"
-            style={{ background: "radial-gradient(120% 70% at 50% 0%, #1f3f9e 0%, #0b1638 55%, #060c1d 100%)", border: "1px solid rgba(147,197,253,0.35)", boxShadow: "0 60px 120px -40px rgba(37,99,235,0.7), inset 0 1px 0 rgba(255,255,255,0.15)" }}
-            initial={reduce ? false : { scale: 0.94, y: 18 }}
-            animate={{ scale: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: EASE }}
-          >
-            <button type="button" onClick={() => setShow(false)} aria-label="Close" className="absolute right-[12px] top-[12px] flex size-[34px] cursor-pointer items-center justify-center rounded-full border-0" style={{ background: "rgba(255,255,255,0.08)" }}>
-              <Svg d="M6 6l12 12M18 6L6 18" size={14} color="#fff" w={2.2} />
-            </button>
-            <div className="mx-auto mb-[16px] flex justify-center"><VaultDial open={false} /></div>
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: EMBER_SOFT }}>Wait, the vault is still open</span>
-            <h3 className="m-0 mt-[8px] text-[27px] font-semibold leading-[1.12] tracking-[-0.03em]">Don't leave your treats behind.</h3>
-            <p className="m-0 mt-[10px] text-[14.5px]" style={{ color: SOFT }}>45% off + BOGO instantly + any 2 treats of your choice.</p>
-            <p className="m-0 mt-[14px] text-[13px] text-[#fed7aa]">
-              Closes in <b className="tabular text-white">{parts.map(([v, u]) => `${v}${u}`).join(" ")}</b>
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setShow(false);
-                window.setTimeout(scrollToTable, 250);
-              }}
-              className="mt-[18px] flex h-[56px] w-full cursor-pointer items-center justify-center gap-[8px] rounded-[18px] border-0 text-[16px] font-bold text-white"
-              style={{ background: BLUE, boxShadow: "0 18px 36px -14px rgba(37,99,235,0.95)" }}
-            >
-              Keep my treats
-              <Svg d="M5 12h14M13 6l6 6-6 6" size={16} color="#fff" w={2.6} />
-            </button>
-            <button type="button" onClick={() => setShow(false)} className="mt-[10px] cursor-pointer border-0 bg-transparent text-[13px]" style={{ color: MUTED }}>
-              Maybe later
-            </button>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>,
-    document.body,
-  );
-}
-
 const BAT = "M12 14c-1.2-2.4-3.4-3.4-6-3 1 .8 1.4 1.8 1.2 3-1.4-.9-3.3-1-5.2-.2 2.3.6 3.8 2 4.4 4 1.6-1.4 3.6-1.8 5.6-.8 2-1 4-.6 5.6.8.6-2 2.1-3.4 4.4-4-1.9-.8-3.8-.7-5.2.2-.2-1.2.2-2.2 1.2-3-2.6-.4-4.8.6-6 3Z";
 
 /** Quiet Halloween layer behind the pricing section: moon, a few bats, rising embers, low fog. */
@@ -1354,7 +1272,6 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
             </div>
           </motion.div>
       </div>
-      {p.halloween && <VaultExitPopup />}
       <AnimatePresence>{sheet && <TreatSheet p={p} onClose={() => setSheet(false)} />}</AnimatePresence>
     </section>
   );

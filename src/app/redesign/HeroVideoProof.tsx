@@ -51,14 +51,30 @@ function shuffle<T>(list: T[]): T[] {
   return a;
 }
 
+const ASIA_REGIONS: RegionId[] = ["south-asia", "southeast-asia", "east-asia", "middle-east"];
+
+/**
+ * Order: same country, then same region. After that the visitor's side of the
+ * world decides: Asian visitors see other Asian traders next, everyone else
+ * (Europe, Americas, Africa, Oceania) sees the non-Asian traders next
+ * (USA, South Africa, Kenya, New Zealand, Germany) and Asian ones last.
+ */
 function buildDeck(videos: TestimonialVideo[], v: Visitor): { order: number[]; scope: string } {
   const all = videos.map((_, i) => i);
   const cc = (i: number) => VIDEO_COUNTRY[videos[i].name];
+  const isAsia = (i: number) => ASIA_REGIONS.includes(regionOf(cc(i)) as RegionId);
   const sameCountry = v.code ? all.filter((i) => cc(i) === v.code) : [];
   const sameRegion = v.region ? all.filter((i) => !sameCountry.includes(i) && regionOf(cc(i)) === v.region) : [];
-  const rest = all.filter((i) => !sameCountry.includes(i) && !sameRegion.includes(i));
+  const left = all.filter((i) => !sameCountry.includes(i) && !sameRegion.includes(i));
+  let near: number[] = [];
+  let far: number[] = left;
+  if (v.region) {
+    const visitorAsia = ASIA_REGIONS.includes(v.region);
+    near = left.filter((i) => isAsia(i) === visitorAsia);
+    far = left.filter((i) => isAsia(i) !== visitorAsia);
+  }
   const scope = sameCountry.length && v.code ? `from ${countryPlain(v.code)}` : sameRegion.length && v.region ? `from ${REGION_NAME[v.region]}` : "worldwide";
-  return { order: [...shuffle(sameCountry), ...shuffle(sameRegion), ...shuffle(rest)], scope };
+  return { order: [...shuffle(sameCountry), ...shuffle(sameRegion), ...shuffle(near), ...shuffle(far)], scope };
 }
 
 function PlayIcon({ size = 22 }: { size?: number }) {
