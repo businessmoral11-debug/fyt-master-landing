@@ -1,7 +1,7 @@
 // TEMPORARY: plan finder flow + section order.
 import { chromium, webkit, devices } from "playwright";
 import { writeFileSync } from "node:fs";
-const URL = "https://fyt-master-landing-5erwtzoju-bm-med.vercel.app/";
+const URL = "https://fyt-master-landing-9v1dbu2ua-bm-med.vercel.app/";
 const log = [];
 async function run(browser, name, opts) {
   const ctx = await browser.newContext({ ...opts, timezoneId: "Europe/London" });
@@ -16,12 +16,12 @@ async function run(browser, name, opts) {
     const order = await page.evaluate(() => Array.from(document.querySelectorAll("section[id], section")).slice(0, 14).map((s) => s.id || (s.querySelector("h2")?.textContent || "").slice(0, 25)));
     log.push(`[${name}] order ${JSON.stringify(order)}`);
     await page.evaluate(() => document.getElementById("plan-finder")?.scrollIntoView({ block: "center" }));
-    await page.waitForTimeout(800);
+    await page.waitForTimeout(1600);
     await page.screenshot({ path: `ci-out/${name}-q1.png` });
-    await page.click("text=One simple target"); await page.waitForTimeout(500);
+    await page.click("text=One simple target"); await page.waitForTimeout(1600);
     await page.screenshot({ path: `ci-out/${name}-q2.png` });
-    await page.click("#plan-finder button:has-text('$50K')"); await page.waitForTimeout(500);
-    await page.click("#plan-finder button:has-text('MatchTrader')"); await page.waitForTimeout(800);
+    await page.click("#plan-finder button:has-text('$50K')"); await page.waitForTimeout(1600);
+    await page.click("#plan-finder button:has-text('MatchTrader')"); await page.waitForTimeout(1600);
     await page.screenshot({ path: `ci-out/${name}-result.png` });
     const res = await page.evaluate(() => document.getElementById("plan-finder").innerText.replace(/\n/g, " | ").slice(0, 300));
     log.push(`[${name}] result ${res}`);
