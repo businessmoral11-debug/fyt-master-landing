@@ -1,10 +1,34 @@
-// TEMPORARY: contact sheet of trader video posters.
-import { chromium } from "playwright";
-const items = [["Devon", "https://fundingyourtrades.com/wp-content/uploads/2026/08/6079921074356295115.jpg"], ["Waqas", "https://fundingyourtrades.com/wp-content/uploads/2025/12/waqas.jpg"], ["Taufiq Sayed", "https://fundingyourtrades.com/wp-content/uploads/2026/08/6079921074356295116.jpg"], ["Damien", "https://fundingyourtrades.com/wp-content/uploads/2025/12/damien.jpg"], ["Kush", "https://fundingyourtrades.com/wp-content/uploads/2026/08/6079921074356295117.jpg"], ["Nicolas", "https://fundingyourtrades.com/wp-content/uploads/2026/06/6181506534194483764.jpg"], ["Edmund", "https://fundingyourtrades.com/wp-content/uploads/2025/12/edmund.jpg"], ["Nadir", "https://fundingyourtrades.com/wp-content/uploads/2026/06/6181506534194483765.jpg"], ["Katherine", "https://fundingyourtrades.com/wp-content/uploads/2026/01/photo_6311796192479743598_y.jpg"], ["Rohit", "https://fundingyourtrades.com/wp-content/uploads/2026/06/6181506534194483766.jpg"], ["Abigail", "https://fundingyourtrades.com/wp-content/uploads/2026/03/IMG_8135.jpg"], ["Shubham", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636965.jpg"], ["Bharath", "https://fundingyourtrades.com/wp-content/uploads/2026/01/6328118554263228298.jpg"], ["Emad", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636968.jpg"], ["Gabriel", "https://fundingyourtrades.com/wp-content/uploads/2025/12/Gabriel.jpg"], ["Ibrahim", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636967.jpg"], ["Anisha", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636970.jpg"], ["Charls", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6104640861707636969.jpg"], ["Dylan", "https://fundingyourtrades.com/wp-content/uploads/2026/05/6066483156774227824.jpg"]];
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1500, height: 1100 } });
-const html = "<body style='margin:0;background:#111;color:#fff;font:14px sans-serif'><div style='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px'>" + items.map(([n,u]) => "<div><div style='padding:2px'>" + n + "</div><img src='" + u + "' style='width:100%;height:230px;object-fit:cover'></div>").join("") + "</div></body>";
-await page.setContent(html, { waitUntil: "networkidle", timeout: 60000 });
-await page.waitForTimeout(3000);
-await page.screenshot({ path: "ci-out/posters.png", fullPage: true });
-await browser.close();
+// TEMPORARY: verify hero video wall per country on the region-proof preview.
+import { chromium, webkit, devices } from "playwright";
+const BASE = "https://fyt-master-landing-git-region-proof-bm-med.vercel.app/";
+const out = [];
+async function run(kind, label, ctxOpts, cc) {
+  const b = await (kind === "webkit" ? webkit : chromium).launch();
+  const ctx = await b.newContext(ctxOpts);
+  const page = await ctx.newPage();
+  const errs = [];
+  page.on("pageerror", (e) => errs.push(String(e)));
+  page.on("console", (m) => m.type() === "error" && !/klaviyo|trustindex|favicon/i.test(m.text()) && errs.push(m.text()));
+  await page.goto(BASE + (cc ? "?country=" + cc : ""), { waitUntil: "load", timeout: 60000 });
+  await page.waitForTimeout(3500);
+  const info = await page.evaluate(() => {
+    const btn = document.querySelector('button[aria-label^="Play video:"]');
+    const scope = [...document.querySelectorAll("span")].find((s) => /^Funded traders /.test(s.textContent || ""));
+    const thumbs = [...document.querySelectorAll('button[aria-label^="Show video:"]')].map((t) => t.getAttribute("aria-label").replace("Show video: ", ""));
+    return { main: btn?.getAttribute("aria-label"), scope: scope?.textContent, thumbs };
+  });
+  out.push(`${label} ${cc || "none"}: ${JSON.stringify(info)} errs=${JSON.stringify(errs)}`);
+  const root = page.locator('button[aria-label^="Play video:"]').locator("xpath=ancestor::div[contains(@class,'relative w-full')][1]");
+  try { await root.screenshot({ path: `ci-out/hero-${label}-${cc || "none"}.png` }); } catch (e) { out.push("shot fail " + e.message); }
+  if (label === "desk") await page.screenshot({ path: `ci-out/full-${cc || "none"}.png` });
+  if (cc === "IN") {
+    const order = await page.evaluate(() => [...document.querySelectorAll("section, [id]")].map((e) => e.id).filter(Boolean).join(","));
+    out.push("ids " + order);
+  }
+  await b.close();
+}
+for (const cc of ["IN", "US", "GB", "BR", "AE"]) await run("chromium", "desk", { viewport: { width: 1440, height: 1000 } }, cc);
+await run("chromium", "desk", { viewport: { width: 1100, height: 900 } }, "IN");
+for (const cc of ["IN", "US"]) await run("webkit", "phone", { ...devices["iPhone 14"] }, cc);
+await run("chromium", "desk", { viewport: { width: 1440, height: 1000 } }, null);
+console.log(out.join("\n"));
