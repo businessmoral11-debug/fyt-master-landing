@@ -1,7 +1,7 @@
 // TEMPORARY: plan finder flow + section order.
 import { chromium, webkit, devices } from "playwright";
 import { writeFileSync } from "node:fs";
-const URL = "https://fyt-master-landing-9v1dbu2ua-bm-med.vercel.app/";
+const URL = "https://fyt-master-landing-omta6jp7w-bm-med.vercel.app/";
 const log = [];
 async function run(browser, name, opts) {
   const ctx = await browser.newContext({ ...opts, timezoneId: "Europe/London" });
