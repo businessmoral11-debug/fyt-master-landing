@@ -294,3 +294,7 @@ html.fyt-zoomed *::after {
 .fyt-hv-progress { animation: fyt-hv-fill 6.5s linear forwards; }
 @keyframes fyt-hv-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (prefers-reduced-motion: reduce) { .fyt-hv-progress { animation: none; transform: scaleX(1); } }
+
+.fyt-pf-in { animation: fyt-pf-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes fyt-pf-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .fyt-pf-in { animation: none; } }

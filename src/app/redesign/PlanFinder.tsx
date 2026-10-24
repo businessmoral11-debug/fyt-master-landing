@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { PLATFORM_OPTIONS, STEP_LABELS, STEP_SIZES, checkoutUrl, fmtSize, getEntry, type PlatformId, type StepId } from "@/app/data/pricing";
 import { SELECT_PLAN_EVENT, selectPlanInPricing } from "@/app/data/savedPlan";
-import { C, EASE, Eyebrow, Section } from "./ui";
+import { C, Eyebrow, Section } from "./ui";
 
 /* ------------------------------------------------------------------ */
 /* "Find my challenge": 3 taps (goal, size, platform) -> best match.   */
@@ -85,9 +84,9 @@ export function PlanFinder() {
         </div>
 
         <div className="rounded-[26px] p-[18px] sm:p-[28px]" style={{ background: "linear-gradient(180deg, rgba(37,99,235,0.14), rgba(255,255,255,0.02))", border: "1px solid rgba(148,178,255,0.2)", boxShadow: "0 50px 100px -56px rgba(37,99,235,0.8)" }}>
-          <AnimatePresence mode="wait" initial={false}>
+          <>
             {stage < 3 ? (
-              <motion.div key={`q${stage}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2, ease: EASE }} className="flex flex-col gap-[16px]">
+              <div key={`q${stage}`} className="fyt-pf-in flex flex-col gap-[16px]">
                 <div className="flex items-center justify-between gap-[12px]">
                   <Dots at={stage} />
                   {stage > 0 && (
@@ -114,13 +113,13 @@ export function PlanFinder() {
                     ))}
                   {stage === 2 && PLATFORM_OPTIONS.map((o) => <Choice key={o.id} title={o.label} onClick={() => pickPlatform(o.id)} />)}
                 </div>
-              </motion.div>
+              </div>
             ) : (
               entry &&
               a.step &&
               a.size &&
               a.platform && (
-                <motion.div key="result" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25, ease: EASE }} className="flex flex-col gap-[18px]">
+                <div key="result" className="fyt-pf-in flex flex-col gap-[18px]">
                   <div className="flex items-center justify-between gap-[12px]">
                     <span className="rounded-full px-[11px] py-[5px] text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#86efac]" style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)" }}>
                       Your best match
@@ -165,10 +164,10 @@ export function PlanFinder() {
                       See it in the table
                     </button>
                   </div>
-                </motion.div>
+                </div>
               )
             )}
-          </AnimatePresence>
+          </>
         </div>
       </div>
     </Section>
