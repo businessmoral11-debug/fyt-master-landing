@@ -23,6 +23,8 @@ async function run(browser, name, opts) {
     await page.click("#plan-finder button:has-text('$50K')"); await page.waitForTimeout(1600);
     await page.click("#plan-finder button:has-text('MatchTrader')"); await page.waitForTimeout(1600);
     await page.screenshot({ path: `ci-out/${name}-result.png` });
+    const dbg = await page.evaluate(() => { const el = document.querySelector("#plan-finder .fyt-pf-in"); if (!el) return "no el"; const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); const kids = Array.from(el.querySelectorAll("*")).slice(0, 4).map((k) => { const c = getComputedStyle(k); return [k.tagName, c.opacity, c.visibility, c.color].join("/"); }); return JSON.stringify({ op: cs.opacity, an: cs.animationName, st: cs.animationPlayState, h: r.height, top: r.top, anims: el.getAnimations().map((x) => x.playState + ":" + x.currentTime), kids, zoomed: document.documentElement.className }); });
+    log.push(`[${name}] DEBUG ${dbg}`);
     const res = await page.evaluate(() => document.getElementById("plan-finder").innerText.replace(/\n/g, " | ").slice(0, 300));
     log.push(`[${name}] result ${res}`);
     const href = await page.evaluate(() => Array.from(document.querySelectorAll("#plan-finder a")).map((a) => a.href));
