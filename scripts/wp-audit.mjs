@@ -1,7 +1,7 @@
 // TEMPORARY: hero video wall + rewards section screenshots.
 import { chromium, webkit, devices } from "playwright";
 import { writeFileSync } from "node:fs";
-const URL = "https://fyt-master-landing-k2d7hwbcp-bm-med.vercel.app/";
+const URL = "https://fyt-master-landing-gu1hdyiw8-bm-med.vercel.app/";
 const log = [];
 async function shot(browser, name, ctxOpts) {
   const ctx = await browser.newContext({ ...ctxOpts, timezoneId: "Europe/London" });
@@ -11,7 +11,7 @@ async function shot(browser, name, ctxOpts) {
   page.on("pageerror", (e) => errs.push(e.message.slice(0, 90)));
   try {
     await page.goto(`${URL}?country=IN`, { waitUntil: "domcontentloaded", timeout: 60000 });
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(6500);
     await page.screenshot({ path: `ci-out/${name}-hero.png` });
     const h1 = await page.evaluate(() => ({ heroH: document.querySelector("h1")?.closest("div.relative")?.getBoundingClientRect().height, overflowX: document.documentElement.scrollWidth - innerWidth, thumbs: document.querySelectorAll("button[aria-label^='Show video']").length, order: Array.from(document.querySelectorAll("button[aria-label^='Show video'], button[aria-label^='Play video']")).map((b) => b.getAttribute("aria-label").replace(/^.*: /, "")) }));
     log.push(`[${name}] hero ${JSON.stringify(h1)} errors=${JSON.stringify([...new Set(errs)])}`);
