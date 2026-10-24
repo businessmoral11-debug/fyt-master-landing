@@ -360,6 +360,7 @@ function CertificateStage({ item }: { item: ProofItem | undefined }) {
   const [failed, setFailed] = useState<string | null>(null);
   const cert = item?.cert;
   const link = cert?.certificateUrl || item?.certificateUrl || item?.explorerUrl || undefined;
+  const certLink = cert?.certificateUrl || item?.certificateUrl || undefined;
   const f = item ? countryFlagUrl(item.countryCode) : null;
   const showImage = !!cert && failed !== cert.certificateId;
   const ready = !!cert && loaded === cert.certificateId;
@@ -404,6 +405,20 @@ function CertificateStage({ item }: { item: ProofItem | undefined }) {
             </span>
           </span>
           <span className="tabular fyt-gradient-text shrink-0 text-[28px] font-semibold tracking-[-0.03em]">{formatPayoutAmount(item.amount)}</span>
+        </div>
+      )}
+      {item && (certLink || item.explorerUrl) && (
+        <div className="grid grid-cols-2 gap-[10px]">
+          {certLink && (
+            <a href={certLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-[8px] rounded-[14px] px-[12px] py-[12px] text-[13.5px] font-semibold text-white no-underline transition-transform duration-300 hover:-translate-y-[2px]" style={{ background: "linear-gradient(180deg,#4f8cff,#2563eb)", boxShadow: "0 12px 26px -14px rgba(37,99,235,0.9)" }}>
+              <Check size={14} color="#fff" /> View certificate
+            </a>
+          )}
+          {item.explorerUrl && (
+            <a href={item.explorerUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-[8px] rounded-[14px] px-[12px] py-[12px] text-[13.5px] font-semibold text-[#1d4ed8] no-underline transition-transform duration-300 hover:-translate-y-[2px]" style={{ background: "#fff", border: "1px solid rgba(37,99,235,0.28)" }}>
+              <Globe size={14} color="#1d4ed8" /> View transaction
+            </a>
+          )}
         </div>
       )}
     </div>
