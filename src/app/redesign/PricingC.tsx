@@ -1399,52 +1399,7 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
 
 type LayoutProps = { p: Pick; heading?: ReactNode; compare: boolean; setCompare: (f: (v: boolean) => boolean) => void; openSheet: () => void };
 
-/* ======================= Phone pricing layouts (options 1, 2, 3) ======================= */
-
-type MLayout = "current" | "1" | "2" | "3";
-
-function readMLayout(): MLayout {
-  if (typeof window === "undefined") return "current";
-  const v = new URLSearchParams(window.location.search).get("mlayout");
-  return v === "1" || v === "2" || v === "3" || v === "current" ? v : "current";
-}
-
-/** Temporary: flip between the phone options while comparing. Removed once one is chosen. */
-function MobileSwitcher({ value, onChange }: { value: MLayout; onChange: (v: MLayout) => void }) {
-  const items: { id: MLayout; label: string }[] = [{ id: "current", label: "Old" }, { id: "1", label: "1" }, { id: "2", label: "2" }, { id: "3", label: "3" }];
-  return (
-    <div className="fixed right-[10px] top-[108px] z-[2147482990] flex gap-[3px] rounded-full p-[3px] lg:hidden" style={{ background: "rgba(8,14,32,0.92)", border: "1px solid rgba(148,178,255,0.3)" }} role="group" aria-label="Phone pricing layout">
-      {items.map((it) => (
-        <button key={it.id} type="button" aria-pressed={value === it.id} onClick={() => onChange(it.id)} className="h-[30px] min-w-[34px] cursor-pointer rounded-full border-0 px-[6px] text-[11.5px] font-bold text-white" style={{ background: value === it.id ? BLUE : "transparent" }}>
-          {it.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function useBottomOffset(): number {
-  const [b, setB] = useState(0);
-  useEffect(() => {
-    const m = () => {
-      const el = document.getElementById("noyona_mobile_bottom_disclaimer");
-      let off = 0;
-      if (el) {
-        const r = el.getBoundingClientRect();
-        if (getComputedStyle(el).display !== "none" && r.height > 0 && r.top > window.innerHeight * 0.5) off = Math.round(window.innerHeight - r.top);
-      }
-      setB(off);
-    };
-    m();
-    const id = window.setInterval(m, 1000);
-    window.addEventListener("resize", m);
-    return () => {
-      window.clearInterval(id);
-      window.removeEventListener("resize", m);
-    };
-  }, []);
-  return b;
-}
+/* ======================= Phone pricing layout ======================= */
 
 function TrustLine() {
   return (
@@ -1526,7 +1481,34 @@ function MobileShell({ heading, p, children }: { heading?: ReactNode; p: Pick; c
   );
 }
 
-/* ---------- Phone 2: same page, decluttered ---------- */
+
+/** What the visitor picked, so nobody has to scroll back up to check. */
+function AccountHead({ p }: { p: Pick }) {
+  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
+  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
+  return (
+    <div className="flex shrink-0 flex-col gap-[10px]">
+      <div className="flex items-end justify-between gap-[10px]">
+        <div className="flex min-w-0 flex-col gap-[4px]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Your account</span>
+          <Roll value={fmtSize(p.size)} className="text-[30px] font-bold leading-none tracking-[-0.025em] text-white" />
+        </div>
+        <span className="flex h-[32px] shrink-0 items-center gap-[6px] rounded-full px-[11px] text-[12px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(148,178,255,0.18)" }}>
+          <img src={plat.logo} alt="" className={`${p.platform === "platform-5" ? "h-[17px]" : "h-[15px]"} w-auto`} />
+          {plat.label}
+        </span>
+      </div>
+      <div className="grid grid-cols-3 overflow-hidden rounded-[14px]" style={{ border: `1px solid ${LINE}`, background: "rgba(255,255,255,0.03)" }}>
+        {([["Model", p.step], ["Type", type], ["Platform", plat.label]] as const).map(([l, v], i) => (
+          <span key={l} className="flex min-w-0 flex-col items-center gap-[2px] px-[6px] py-[9px]" style={{ borderLeft: i ? `1px solid ${LINE}` : "none" }}>
+            <span className="text-[9.5px] font-semibold uppercase tracking-[0.12em]" style={{ color: MUTED }}>{l}</span>
+            <span className="max-w-full truncate text-[13px] font-bold text-white">{v}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function MobileTwo({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
   return (
@@ -1536,180 +1518,13 @@ function MobileTwo({ p, heading, compare, setCompare, openSheet }: LayoutProps) 
         <WhatsIncluded p={p} />
       </div>
       <div className="flex flex-col gap-[14px] rounded-[24px] p-[16px]" style={{ ...CARD_STYLE, boxShadow: "none" }}>
+        <AccountHead p={p} />
+        <Hairline />
         <PriceRow p={p} />
         {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
         <BuyButton p={p} onNeedTreats={openSheet} wide />
         <CodeLine p={p} />
         <TrustLine />
-      </div>
-    </MobileShell>
-  );
-}
-
-/* ---------- Phone 1: choices only, buy bar floats at the bottom ---------- */
-
-function StickyBuyBar({ p, on, onNeedTreats }: { p: Pick; on: boolean; onNeedTreats: () => void }) {
-  const reduce = useReducedMotion();
-  const bottom = useBottomOffset();
-  const nudged = useRef(false);
-  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
-  useEffect(() => {
-    document.body.classList.toggle("fyt-buybar", on);
-    return () => document.body.classList.remove("fyt-buybar");
-  }, [on]);
-  return createPortal(
-    <AnimatePresence>
-      {on && (
-        <motion.div
-          initial={reduce ? false : { y: 90, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={reduce ? { opacity: 0 } : { y: 90, opacity: 0 }}
-          transition={{ duration: 0.35, ease: EASE }}
-          className="fixed inset-x-[10px] z-[2147482900] flex items-center justify-between gap-[10px] rounded-[20px] py-[9px] pl-[16px] pr-[9px] lg:hidden"
-          style={{ bottom: `calc(env(safe-area-inset-bottom, 0px) + ${bottom + 10}px)`, background: "rgba(7,12,28,0.94)", border: "1px solid rgba(96,165,250,0.45)", boxShadow: "0 24px 50px -16px rgba(0,0,0,0.85), 0 0 0 1px rgba(0,0,0,0.4)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)" }}
-        >
-          <span className="flex min-w-0 flex-col gap-[2px]">
-            <span className="flex items-baseline gap-[7px]">
-              <Roll value={money(p.price)} className="text-[22px] font-bold leading-none tracking-[-0.02em] text-white" />
-              <s className="text-[12px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
-            </span>
-            <span className="truncate text-[11px]" style={{ color: MUTED }}>{fmtSize(p.size)} · {p.step} · {type}</span>
-          </span>
-          <a
-            href={p.co.href}
-            onClick={(e) => {
-              if (p.halloween && p.treats.length < TREAT_PICKS && !nudged.current) {
-                e.preventDefault();
-                nudged.current = true;
-                onNeedTreats();
-              }
-            }}
-            className="flex h-[48px] shrink-0 items-center gap-[8px] rounded-[14px] px-[18px] text-[15px] font-bold text-white no-underline"
-            style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 12px 24px -12px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)" }}
-          >
-            Get funded
-            <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#fff" w={2.6} />
-          </a>
-        </motion.div>
-      )}
-    </AnimatePresence>,
-    document.body,
-  );
-}
-
-function MobileOne({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver((e) => setOn(!!e[0]?.isIntersecting), { threshold: 0.12 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  return (
-    <div ref={ref}>
-      <MobileShell heading={heading} p={p}>
-        <div className="flex flex-col gap-[18px] rounded-[24px] p-[16px]" style={CARD_STYLE}>
-          <MobileChoices p={p} compare={compare} setCompare={setCompare} />
-          <WhatsIncluded p={p} />
-          {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
-          <CodeLine p={p} />
-          <TrustLine />
-        </div>
-        <div className="h-[84px]" aria-hidden="true" />
-      </MobileShell>
-      <StickyBuyBar p={p} on={on} onNeedTreats={openSheet} />
-    </div>
-  );
-}
-
-/* ---------- Phone 3: one step at a time ---------- */
-
-function MobileThree({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
-  const [idx, setIdx] = useState(0);
-  const reduce = useReducedMotion();
-  useEffect(() => {
-    const on = () => setIdx(3);
-    window.addEventListener(SELECT_PLAN_EVENT, on);
-    return () => window.removeEventListener(SELECT_PLAN_EVENT, on);
-  }, []);
-  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
-  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
-  const titles = ["Model", "Size", "Type", "Review"];
-  let body: ReactNode;
-  if (idx === 0) {
-    body = (
-      <>
-        <Label>Choose your model</Label>
-        <ModelRow p={p} />
-        <p className="m-0 text-center text-[13px]" style={{ color: MUTED }}>{MODEL_COPY[p.step].line}</p>
-      </>
-    );
-  } else if (idx === 1) {
-    body = (
-      <>
-        <Label>Account size</Label>
-        <SizeTrack p={p} />
-        <PriceRow p={p} />
-        <SpecStrip p={p} compact />
-      </>
-    );
-  } else if (idx === 2) {
-    body = (
-      <>
-        <TypeBlock p={p} compare={compare} setCompare={setCompare} />
-        <div className="flex flex-col gap-[10px]">
-          <Label>Platform</Label>
-          <PlatformSeg p={p} />
-        </div>
-      </>
-    );
-  } else {
-    const rows: [string, string, number][] = [["Model", p.step, 0], ["Size", fmtSize(p.size), 1], ["Type", type, 2], ["Platform", plat.label, 2]];
-    body = (
-      <>
-        <div className="flex flex-col overflow-hidden rounded-[16px]" style={{ border: `1px solid ${LINE}` }}>
-          {rows.map(([l, v, k], i) => (
-            <button key={l} type="button" onClick={() => setIdx(k)} className="flex h-[44px] cursor-pointer items-center justify-between border-0 bg-transparent px-[14px] text-left text-white" style={{ borderTop: i ? `1px solid ${LINE}` : "none" }}>
-              <span className="text-[12px] font-semibold uppercase tracking-[0.12em]" style={{ color: MUTED }}>{l}</span>
-              <span className="flex items-center gap-[8px] text-[14.5px] font-bold">{v}<span className="text-[11px] font-semibold text-[#93c5fd]">Change</span></span>
-            </button>
-          ))}
-        </div>
-        <WhatsIncluded p={p} />
-        {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
-        <PriceRow p={p} />
-        <BuyButton p={p} onNeedTreats={openSheet} wide />
-        <CodeLine p={p} />
-      </>
-    );
-  }
-  return (
-    <MobileShell heading={heading} p={p}>
-      <div className="flex min-h-[430px] flex-col gap-[16px] rounded-[24px] p-[16px]" style={CARD_STYLE}>
-        <div className="flex items-center gap-[6px]">
-          {titles.map((t, k) => (
-            <button key={t} type="button" onClick={() => setIdx(k)} aria-label={`Step ${k + 1}: ${t}`} aria-current={k === idx ? "step" : undefined} className="flex flex-1 cursor-pointer flex-col items-center gap-[5px] border-0 bg-transparent p-0">
-              <span className="h-[4px] w-full rounded-full transition-colors duration-300" style={{ background: k <= idx ? "#60a5fa" : "rgba(148,178,255,0.18)" }} />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: k === idx ? "#bfdbfe" : MUTED }}>{t}</span>
-            </button>
-          ))}
-        </div>
-        <motion.div key={idx} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: EASE }} className="flex flex-1 flex-col gap-[16px]">
-          {body}
-        </motion.div>
-        <div className="flex items-center justify-between gap-[10px]">
-          <button type="button" onClick={() => setIdx((k) => Math.max(0, k - 1))} disabled={idx === 0} className="h-[48px] cursor-pointer rounded-[14px] px-[20px] text-[14px] font-semibold text-[#dbe4f5] disabled:cursor-default disabled:opacity-0" style={{ background: "rgba(255,255,255,0.06)", border: `1px solid ${LINE}` }}>
-            Back
-          </button>
-          {idx < 3 && (
-            <button type="button" onClick={() => setIdx((k) => Math.min(3, k + 1))} className="flex h-[48px] flex-1 cursor-pointer items-center justify-center gap-[8px] rounded-[14px] border-0 text-[15px] font-bold text-white" style={{ background: BLUE, boxShadow: "0 16px 32px -14px rgba(37,99,235,0.95)" }}>
-              Continue
-              <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#fff" w={2.6} />
-            </button>
-          )}
-        </div>
       </div>
     </MobileShell>
   );
@@ -1750,96 +1565,12 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
   }, [setStep, setPlan, setPlatform, setI]);
 
   const desktop = useDesktop();
-  const [mlayout, setMlayout] = useState<MLayout>(readMLayout);
-  const [showMSwitch] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mlayout") !== null);
-  const changeM = (v: MLayout) => {
-    setMlayout(v);
-    try {
-      const u = new URL(window.location.href);
-      u.searchParams.set("mlayout", v);
-      window.history.replaceState(null, "", u.toString());
-    } catch {
-      // The address bar is only a convenience.
-    }
-  };
   const lp: LayoutProps = { p, heading, compare, setCompare, openSheet: () => setSheet(true) };
-  const current = (
-      <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-[18px] px-[16px] pb-[64px] pt-[56px] lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-[48px] lg:px-[40px] lg:pb-[110px] lg:pt-[110px]">
-        <div className={`flex flex-col gap-[18px] lg:self-start ${p.halloween ? "" : "lg:sticky lg:top-[140px]"}`}>
-          {heading ?? <DefaultHeading />}
-          {p.halloween ? <VaultCard p={p} /> : <OfferSwitch p={p} />}
-          <ModelTabs p={p} />
-        </div>
-
-        {/* Same card stays mounted when the model changes, so the page never jumps. */}
-          <motion.div
-            initial={false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: EASE }}
-            className="relative overflow-hidden rounded-[26px]"
-            style={{ border: "1px solid rgba(96,165,250,0.6)", background: "linear-gradient(180deg, rgba(37,99,235,0.2) 0%, rgba(10,18,40,0.92) 45%)", boxShadow: "0 50px 100px -50px rgba(37,99,235,0.95)" }}
-          >
-            <span aria-hidden="true" className="pointer-events-none absolute -right-[70px] -top-[80px] size-[240px] rounded-full" style={{ background: "radial-gradient(circle, rgba(96,165,250,0.35), transparent 65%)" }} />
-            {p.halloween && <span aria-hidden="true" className="pointer-events-none absolute inset-x-[12%] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(255,138,61,0.85), transparent)" }} />}
-            <div className="relative flex flex-col gap-[18px] p-[16px] sm:p-[22px] lg:gap-[20px] lg:p-[28px]">
-
-              <div className="flex flex-col gap-[10px]">
-                <Label>Account size</Label>
-                <SizeTrack p={p} />
-              </div>
-
-              <Hairline />
-
-              <div className="flex flex-col gap-[10px]">
-                <Label
-                  right={
-                    <button type="button" aria-expanded={compare} onClick={() => setCompare((v) => !v)} className="flex cursor-pointer items-center gap-[6px] rounded-full border-0 px-[10px] py-[5px] text-[12px] font-semibold text-[#bfdbfe]" style={{ background: compare ? "rgba(59,130,246,0.25)" : "rgba(255,255,255,0.06)" }}>
-                      <Svg d="M7 7h11l-3-3M17 17H6l3 3" size={12} color="#bfdbfe" w={2.2} />
-                      {compare ? "Hide" : "Compare"}
-                    </button>
-                  }
-                >
-                  Type
-                </Label>
-                <TypeCards p={p} />
-                <AnimatePresence initial={false}>
-                  {compare && (
-                    <motion.div key="cmp" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }} className="overflow-hidden">
-                      <CompareTable p={p} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              <Hairline />
-
-              <div className="flex flex-col gap-[10px]">
-                <Label>Platform</Label>
-                <PlatformSeg p={p} />
-              </div>
-
-              <SpecStrip p={p} />
-              <PerkChips p={p} />
-
-              <Hairline />
-
-              <OrderSummary p={p} />
-              {p.halloween && <VaultSummary p={p} onPick={() => setSheet(true)} />}
-              <BuyButton p={p} onNeedTreats={() => setSheet(true)} />
-              <CodeLine p={p} />
-              <TrustRow />
-              <PayMarks />
-            </div>
-          </motion.div>
-      </div>
-  );
-
   return (
     <section id="challenge" className="fyt-rd relative w-full shrink-0 scroll-mt-[120px] overflow-clip" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, #03060d 70%)`, color: "#eef0f6" }}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       {p.halloween && <HalloweenDecor />}
-      {desktop ? <VariantA {...lp} /> : mlayout === "1" ? <MobileOne {...lp} /> : mlayout === "2" ? <MobileTwo {...lp} /> : mlayout === "3" ? <MobileThree {...lp} /> : current}
-      {showMSwitch && !desktop && <MobileSwitcher value={mlayout} onChange={changeM} />}
+      {desktop ? <VariantA {...lp} /> : <MobileTwo {...lp} />}
       <AnimatePresence>{sheet && <TreatSheet p={p} onClose={() => setSheet(false)} />}</AnimatePresence>
     </section>
   );
