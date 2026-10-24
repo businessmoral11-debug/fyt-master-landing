@@ -1178,7 +1178,7 @@ function BuyButton({ p, onNeedTreats }: { p: Pick; onNeedTreats: () => void }) {
 /* Only desktop (lg and up). Phones keep the original layout. Open with ?layout=a, b or c. */
 
 type Variant = "current" | "a" | "b" | "c";
-const STICKY_TOP = 128;
+const STICKY_TOP = 196;
 const CARD_STYLE = { border: "1px solid rgba(96,165,250,0.6)", background: "linear-gradient(180deg, rgba(37,99,235,0.2) 0%, rgba(10,18,40,0.92) 45%)", boxShadow: "0 50px 100px -50px rgba(37,99,235,0.95)" } as const;
 
 function readVariant(): Variant {
@@ -1252,11 +1252,11 @@ function CompareToggle({ compare, setCompare }: { compare: boolean; setCompare: 
   );
 }
 
-function TypeBlock({ p, compare, setCompare }: { p: Pick; compare: boolean; setCompare: (f: (v: boolean) => boolean) => void }) {
+function TypeBlock({ p, compare, setCompare, n }: { p: Pick; compare: boolean; setCompare: (f: (v: boolean) => boolean) => void; n?: number }) {
   const reduce = useReducedMotion();
   return (
     <div className="flex flex-col gap-[10px]">
-      <Label right={<CompareToggle compare={compare} setCompare={setCompare} />}>Type</Label>
+      <Label n={n} right={<CompareToggle compare={compare} setCompare={setCompare} />}>Type</Label>
       <TypeCards p={p} />
       <AnimatePresence initial={false}>
         {compare && (
@@ -1278,7 +1278,7 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
       <div className="grid grid-cols-[minmax(0,430px)_minmax(0,1fr)] items-start gap-[44px]">
         <div className="sticky flex flex-col gap-[14px] overflow-y-auto pb-[4px] [scrollbar-width:none]" style={{ top: STICKY_TOP, maxHeight: `calc(100vh - ${STICKY_TOP + 16}px)` }}>
           <OfferBlock p={p} />
-          <div className="relative flex flex-col gap-[16px] overflow-hidden rounded-[26px] p-[22px]" style={CARD_STYLE}>
+          <div className="relative flex flex-col gap-[16px] overflow-hidden rounded-[26px] p-[22px]" style={{ ...CARD_STYLE, boxShadow: "none" }}>
             <OrderSummary p={p} />
             <SpecStrip p={p} />
             {p.halloween && <VaultSummary p={p} onPick={openSheet} />}
@@ -1298,10 +1298,7 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
             <SizeTrack p={p} />
           </div>
           <Hairline />
-          <div className="flex flex-col gap-[10px]">
-            <Label n={3}>Type</Label>
-            <TypeBlock p={p} compare={compare} setCompare={setCompare} />
-          </div>
+          <TypeBlock n={3} p={p} compare={compare} setCompare={setCompare} />
           <Hairline />
           <div className="flex flex-col gap-[10px]">
             <Label n={4}>Platform</Label>
@@ -1354,6 +1351,8 @@ function StepPanel({ p, idx, compare, setCompare, openSheet }: Omit<LayoutProps,
       <>
         <Label>Choose your model</Label>
         <ModelTabs p={p} />
+        <SpecStrip p={p} />
+        <PerkChips p={p} />
       </>
     );
   } else if (idx === 1) {
@@ -1435,11 +1434,11 @@ function VariantB(props: LayoutProps) {
   return (
     <div className="relative mx-auto grid w-full max-w-[1180px] grid-cols-[minmax(0,420px)_minmax(0,1fr)] items-start gap-[48px] px-[40px] pb-[110px] pt-[100px]">
       <div className="sticky flex flex-col gap-[18px] overflow-y-auto pb-[4px] [scrollbar-width:none]" style={{ top: STICKY_TOP, maxHeight: `calc(100vh - ${STICKY_TOP + 16}px)` }}>
-        {heading ?? <DefaultHeading />}
+        <div className="[&_h2]:text-[40px]">{heading ?? <DefaultHeading />}</div>
         <OfferBlock p={p} />
         <StepList p={p} idx={idx} onGo={setIdx} />
       </div>
-      <div className="relative flex min-h-[600px] flex-col gap-[20px] overflow-hidden rounded-[26px] p-[28px]" style={CARD_STYLE}>
+      <div className="relative flex min-h-[580px] flex-col gap-[20px] overflow-hidden rounded-[26px] p-[28px]" style={CARD_STYLE}>
         <ProgressBars idx={idx} />
         <div className="flex-1">
           <StepPanel {...props} idx={idx} />
@@ -1506,7 +1505,7 @@ function VariantC(props: LayoutProps) {
     <div ref={wrap} className="relative mx-auto w-full max-w-[1180px] px-[40px] pb-[60px] pt-[40px]" style={{ height: "calc(100vh + 150px + 150vh)" }}>
       <div ref={inner} className="sticky grid grid-cols-[minmax(0,420px)_minmax(0,1fr)] items-start gap-[48px]" style={{ top: STICKY_TOP, height: `calc(100vh - ${STICKY_TOP + 20}px)`, minHeight: 560 }}>
         <div className="flex max-h-full flex-col gap-[16px] overflow-y-auto pb-[4px] [scrollbar-width:none]">
-          {heading ?? <DefaultHeading />}
+          <div className="[&_h2]:text-[40px]">{heading ?? <DefaultHeading />}</div>
           <OfferBlock p={p} />
           <StepList p={p} idx={idx} onGo={go} />
         </div>
