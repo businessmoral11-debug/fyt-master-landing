@@ -169,11 +169,30 @@ export function PlanFinder() {
   const idx = QUESTIONS.findIndex((q) => !picked[q.key]);
   const done = idx === -1;
 
+  // Visible after the hero, hidden while the pricing table is on screen (it would cover the buy button).
   useEffect(() => {
-    const on = () => setShown(window.scrollY > 520);
+    let pastHero = false;
+    let inPricing = false;
+    const sync = () => setShown(pastHero && !inPricing);
+    const on = () => {
+      pastHero = Math.max(window.scrollY, window.pageYOffset, document.documentElement.scrollTop) > 520;
+      sync();
+    };
     on();
     window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
+    let io: IntersectionObserver | undefined;
+    const table = document.getElementById("challenge");
+    if (table && typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver((e) => {
+        inPricing = !!e[0]?.isIntersecting;
+        sync();
+      });
+      io.observe(table);
+    }
+    return () => {
+      window.removeEventListener("scroll", on);
+      io?.disconnect();
+    };
   }, []);
 
   const close = useCallback(() => setOpen(false), []);
