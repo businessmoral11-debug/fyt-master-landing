@@ -1,15 +1,25 @@
-import { chromium, webkit, devices } from "playwright";
+import { webkit, devices } from "playwright";
+const B = "https://fyt-master-landing-git-mobile-pricing-bm-med.vercel.app/";
+await new Promise((r) => setTimeout(r, 150000));
 const out = [];
-for (const [k, n, o] of [[chromium, "desk", { viewport: { width: 1280, height: 700 } }], [webkit, "phone", { ...devices["iPhone 14"] }]]) {
-  const b = await k.launch(); const p = await (await b.newContext(o)).newPage();
+const b = await webkit.launch();
+for (const m of ["1", "2", "3"]) {
+  const ctx = await b.newContext({ ...devices["iPhone 14"] });
+  const p = await ctx.newPage();
   const errs = []; p.on("pageerror", (e) => errs.push(String(e)));
-  await p.goto("https://fundingyourtrades.com/?country=IN&nocache=" + Date.now(), { waitUntil: "load", timeout: 60000 });
-  await p.waitForTimeout(4000);
-  const heroVideo = await p.evaluate(() => document.querySelector('button[aria-label^="Play video:"]')?.getAttribute("aria-label") || null);
-  await p.waitForSelector("#challenge", { timeout: 30000 }).catch(() => {});
-  const info = await p.evaluate(() => ({ heroVideo: document.querySelector('button[aria-label^="Play video:"]')?.getAttribute("aria-label") || null, scope: [...document.querySelectorAll("span")].find((s) => /^Funded traders /.test(s.textContent || ""))?.textContent || null, vaultBar: /Haunted Vault/i.test(document.body.innerText), challenge: !!document.getElementById("challenge"), exitPopup: /Don't leave your treats/.test(document.body.innerText) }));
-  out.push(`${n}: ${JSON.stringify(info)} errs ${JSON.stringify(errs)}`);
-  await p.screenshot({ path: `ci-out/live-${n}.png` });
-  await b.close();
+  await p.goto(B + "?country=IN&mlayout=" + m, { waitUntil: "load", timeout: 60000 });
+  await p.waitForSelector("#challenge"); await p.waitForTimeout(1500);
+  const y0 = await p.evaluate(() => document.getElementById("challenge").getBoundingClientRect().top + scrollY);
+  const at = async (n, y) => { await p.evaluate((yy) => scrollTo({ top: yy, behavior: "instant" }), y); await p.waitForTimeout(900); await p.screenshot({ path: `ci-out/m${m}-${n}.png` }); };
+  await at("a", y0 + 40);
+  await at("b", y0 + 560);
+  if (m !== "3") await at("c", y0 + 1000);
+  if (m === "3") {
+    for (const k of [1, 2, 3]) { await p.getByRole("button", { name: "Continue" }).click().catch(() => {}); await p.waitForTimeout(500); await p.screenshot({ path: `ci-out/m3-step${k + 1}.png` }); }
+  }
+  const h = await p.evaluate(() => document.getElementById("challenge").offsetHeight);
+  out.push(`m${m}: section height ${h} errs ${JSON.stringify(errs)}`);
+  await ctx.close();
 }
 console.log(out.join("\n"));
+await b.close();
