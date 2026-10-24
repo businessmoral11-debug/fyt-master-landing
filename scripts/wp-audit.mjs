@@ -1,31 +1,24 @@
-import { chromium, webkit, devices } from "playwright";
-const B = "https://fyt-master-landing-git-region-proof-bm-med.vercel.app/?country=IN";
+import { chromium } from "playwright";
+const B = "https://fyt-master-landing-git-region-proof-bm-med.vercel.app/";
 await new Promise((r) => setTimeout(r, 140000));
 const out = [];
-for (const [k, name, o] of [[webkit, "iphone", { ...devices["iPhone 14"] }], [chromium, "pixel", { ...devices["Pixel 7"] }], [chromium, "desk", { viewport: { width: 1440, height: 900 } }]]) {
-  const b = await k.launch(); const p = await (await b.newContext(o)).newPage();
-  await p.goto(B, { waitUntil: "load", timeout: 60000 }); await p.waitForTimeout(3000);
-  for (const y of [0, 1500]) {
-    await p.evaluate((yy) => scrollTo({ top: yy, behavior: "instant" }), y); await p.waitForTimeout(600);
-    const before = await p.evaluate(() => Math.round(scrollY));
-    await p.evaluate(() => document.querySelector('button[aria-label^="Play video:"]').click());
-    await p.waitForSelector('button[aria-label="Close video"]'); await p.waitForTimeout(800);
-    await p.click('button[aria-label="Close video"]'); await p.waitForTimeout(900);
-    const after = await p.evaluate(() => Math.round(scrollY));
-    out.push(`${name} start ${y}: before ${before} after ${after}`);
+const b = await chromium.launch();
+for (const [w, h, dis] of [[1280, 660, false], [1440, 900, true]]) {
+  const p = await (await b.newContext({ viewport: { width: w, height: h } })).newPage();
+  const errs = [];
+  p.on("pageerror", (e) => errs.push(String(e)));
+  await p.goto(B + "?country=IN&layout=a", { waitUntil: "load", timeout: 60000 });
+  await p.waitForSelector("#challenge");
+  if (!dis) { await p.evaluate(() => document.getElementById("noyona_desktop_top_disclaimer")?.remove()); }
+  await p.waitForTimeout(1500);
+  const y0 = await p.evaluate(() => document.getElementById("challenge").getBoundingClientRect().top + scrollY);
+  const tops = [];
+  for (const d of [100, 250, 400]) {
+    await p.evaluate((y) => scrollTo({ top: y, behavior: "instant" }), y0 + d); await p.waitForTimeout(700);
+    await p.screenshot({ path: `ci-out/${w}-a-${d}.png` });
+    tops.push(await p.evaluate(() => { const e = [...document.querySelectorAll("a")].find((x) => /Get funded/.test(x.textContent || "") && x.getBoundingClientRect().width > 250); return e ? Math.round(e.getBoundingClientRect().top) : null; }));
   }
-  // deck stats: how often Gabriel appears across 40 loads
-  await b.close();
-}
-{
-  const b = await chromium.launch(); const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
-  let g = 0, lastPos = [];
-  for (let i = 0; i < 30; i++) {
-    await p.goto(B + "&r=" + i, { waitUntil: "domcontentloaded" }); await p.waitForTimeout(1200);
-    const names = await p.evaluate(() => [document.querySelector('button[aria-label^="Play video:"]')?.getAttribute("aria-label"), ...[...document.querySelectorAll('button[aria-label^="Show video:"]')].map((t) => t.getAttribute("aria-label"))].join("|"));
-    if (/Gabriel/.test(names)) g++;
-  }
-  out.push("Gabriel in first 5 (30 loads, IN): " + g);
-  await b.close();
+  out.push(`${w}x${h} wide button top at scroll 100/250/400: ${JSON.stringify(tops)} errs ${JSON.stringify(errs)}`);
 }
 console.log(out.join("\n"));
+await b.close();
