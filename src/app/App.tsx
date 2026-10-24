@@ -1515,19 +1515,20 @@ function Hero() {
         <HeroBackground />
         <div className="relative z-10 mx-auto grid w-full max-w-[1320px] grid-cols-1 items-center gap-[34px] px-[20px] pb-[36px] pt-[28px] lg:grid-cols-[1fr_1.1fr] lg:gap-[56px] lg:px-[56px] lg:py-[84px]">
           <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
-            <div className="mb-[18px] flex max-w-full shrink-0 justify-center lg:mb-[26px] lg:justify-start min-h-[40px] lg:min-h-[36px]">
+            <div className="mb-[14px] flex max-w-full shrink-0 justify-center lg:mb-[26px] lg:justify-start min-h-[40px] lg:min-h-[36px]">
               <HeroTopTrustindex />
             </div>
-            <h1 className="w-full font-['DM_Sans',sans-serif] text-[42px] font-medium lg:text-[60px] xl:text-[68px]" style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}>
-              <span className="block text-white"><RevealWords text="Trade Without" /> <HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
+            <h1 className="w-full font-['DM_Sans',sans-serif] text-[36px] font-medium lg:text-[58px] xl:text-[66px]" style={{ lineHeight: "104%", letterSpacing: "-0.025em", textShadow: "0px 2px 36px rgba(0,0,0,0.45)" }}>
+              <span className="block text-white"><RevealWords text="Trade Without" /></span>
+              <span className="block text-white"><HiddenWord delayIndex={2} /> <RevealWords text="Rules." start={3} /></span>
               <span className="block text-[#60a5fa]" style={{ textShadow: "0 0 28px rgba(96,165,250,0.08)" }}><RevealWords text={HERO_CONTENT.headlineBlue} /></span>
             </h1>
-            <p className="mt-[18px] max-w-[460px] text-[15px] leading-[1.5] text-[#a6b4d0] lg:text-[16.5px]">
+            <p className="mt-[14px] lg:mt-[18px] max-w-[460px] text-[14px] leading-[1.5] text-[#a6b4d0] lg:text-[16.5px]">
               Real traders, paid live on our calls. <span className="font-semibold text-white">Unedited.</span>
             </p>
-            <div className="h-[26px] shrink-0 lg:h-[34px]" />
+            <div className="h-[20px] shrink-0 lg:h-[34px]" />
             <HeroCtaRow />
-            <p className="mt-[20px] flex flex-wrap items-center justify-center gap-x-[18px] gap-y-[6px] text-[12.5px] text-[#8fa0c4] lg:justify-start">
+            <p className="mt-[20px] hidden flex-wrap items-center justify-center gap-x-[18px] gap-y-[6px] text-[12.5px] text-[#8fa0c4] lg:flex lg:justify-start">
               <span><span className="text-[#4ade80]">&#10003;</span> Paid in 24-48h</span>
               <span><span className="text-[#4ade80]">&#10003;</span> Since 2024</span>
             </p>
