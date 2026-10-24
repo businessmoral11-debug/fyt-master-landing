@@ -171,14 +171,12 @@ const CSS = `
   height: 36px; padding: 0 20px; border-radius: 999px;
   background: linear-gradient(180deg, var(--fyt-hw-orange-1), var(--fyt-hw-orange-2));
   box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 10px rgba(236,106,29,.35);
-  animation: fyt-hw-heartbeat 2s ease-in-out infinite;
-  will-change: transform;
 }
 .fyt-hw-timer::before { /* pulsing outer glow (opacity-only) */
   content: ""; position: absolute; inset: -5px; border-radius: inherit; z-index: -1;
   background: radial-gradient(closest-side, rgba(255,140,50,.85), rgba(255,120,30,0));
   filter: blur(4px);
-  animation: fyt-hw-glow 2s ease-in-out infinite;
+  opacity: .4;
 }
 .fyt-hw-timer-body {
   display: inline-flex; align-items: baseline; gap: 7px;
@@ -187,7 +185,7 @@ const CSS = `
   text-shadow: 0 1px 1px rgba(120,40,0,.35);
 }
 .fyt-hw-num { display: inline-block; min-width: 1.15em; text-align: right; transform-origin: 50% 0; }
-.fyt-hw-num.fyt-hw-tick { animation: fyt-hw-flip .42s cubic-bezier(.2,.8,.3,1.3); }
+.fyt-hw-num.fyt-hw-tick { animation: none; }
 .fyt-hw-timer.fyt-hw-ended { background: linear-gradient(180deg, #5b6178, #3a3f52); animation: none; }
 .fyt-hw-timer.fyt-hw-ended::before { display: none; }
 
