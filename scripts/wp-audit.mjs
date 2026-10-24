@@ -12,19 +12,19 @@ async function run(browser, name, opts, answers) {
   try {
     await page.goto(URL + "?country=IN", { waitUntil: "domcontentloaded", timeout: 60000 });
     await page.waitForTimeout(2500);
-    await page.evaluate(() => window.scrollTo(0, 1500));
-    await page.waitForTimeout(1200);
+    for (let i = 0; i < 12; i++) { await page.evaluate(() => window.scrollBy(0, 160)); await page.waitForTimeout(250); }
+    await page.waitForTimeout(800);
     await page.screenshot({ path: "ci-out/" + name + "-pill.png" });
     await page.click("button[aria-label^='Find my best fit']");
     await page.waitForTimeout(700);
     await page.screenshot({ path: "ci-out/" + name + "-q1.png" });
-    for (const a of answers) { await page.click("[role=dialog] button:has-text('" + a + "')"); await page.waitForTimeout(450); }
+    for (const a of answers) { await page.click("[role=dialog][aria-label='Find my best fit'] button:has-text('" + a + "')"); await page.waitForTimeout(450); }
     await page.waitForTimeout(700);
-    log.push("[" + name + "] result " + (await page.evaluate(() => document.querySelector("[role=dialog]").innerText.replace(/\n/g, " | ").slice(0, 400))));
-    await page.locator("[role=dialog] > div").screenshot({ path: "ci-out/" + name + "-result.png" });
-    await page.click("[role=dialog] button:has-text('Get my account')");
+    log.push("[" + name + "] result " + (await page.evaluate(() => document.querySelector("[role=dialog][aria-label='Find my best fit']").innerText.replace(/\n/g, " | ").slice(0, 400))));
+    await page.locator("[role=dialog][aria-label='Find my best fit'] > div").screenshot({ path: "ci-out/" + name + "-result.png" });
+    await page.click("[role=dialog][aria-label='Find my best fit'] button:has-text('Get my account')");
     await page.waitForTimeout(2200);
-    log.push("[" + name + "] after go: dialog open=" + (await page.evaluate(() => !!document.querySelector("[role=dialog]"))) + " table: " + (await page.evaluate(() => { const s = document.getElementById("challenge"); const on = Array.from(s.querySelectorAll("[aria-pressed=true]")).map((b) => b.textContent.trim().replace(/\s+/g, " ").slice(0, 28)); return JSON.stringify(on); })));
+    log.push("[" + name + "] after go: dialog open=" + (await page.evaluate(() => !!document.querySelector("[role=dialog][aria-label='Find my best fit']"))) + " table: " + (await page.evaluate(() => { const s = document.getElementById("challenge"); const on = Array.from(s.querySelectorAll("[aria-pressed=true]")).map((b) => b.textContent.trim().replace(/\s+/g, " ").slice(0, 28)); return JSON.stringify(on); })));
     await page.screenshot({ path: "ci-out/" + name + "-table.png" });
   } catch (e) { log.push("[" + name + "] ERR " + String(e).slice(0, 300)); }
   log.push("[" + name + "] errors " + JSON.stringify([...new Set(errs)]));
