@@ -1408,6 +1408,15 @@ function TrustLine() {
   );
 }
 
+function BonusRow() {
+  return (
+    <div className="flex shrink-0 items-center gap-[10px] rounded-[14px] px-[12px] py-[9px]" style={{ background: "linear-gradient(90deg, rgba(34,197,94,0.16), rgba(34,197,94,0.05))", border: "1px solid rgba(34,197,94,0.35)" }}>
+      <span className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-[#22c55e]"><Svg d="M12 8v13M4 12v8h16v-8M3 8h18v4H3zM12 8c-1-3-5-4-5-1.5S10 8 12 8zM12 8c1-3 5-4 5-1.5S14 8 12 8z" size={14} color="#04210f" w={2.2} /></span>
+      <span className="text-[13.5px] font-bold text-white">+ 1 free account <span className="text-[#86efac]">instantly</span></span>
+    </div>
+  );
+}
+
 function PriceRow({ p }: { p: Pick }) {
   return (
     <div className="flex shrink-0 items-end justify-between gap-[10px]">
@@ -1491,10 +1500,6 @@ function AccountHead({ p }: { p: Pick }) {
           <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Your account</span>
           <Roll value={fmtSize(p.size)} className="text-[30px] font-bold leading-none tracking-[-0.025em] text-white" />
         </div>
-        <span className="flex h-[32px] shrink-0 items-center gap-[6px] rounded-full px-[11px] text-[12px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(148,178,255,0.18)" }}>
-          <img src={plat.logo} alt="" className={`${p.platform === "platform-5" ? "h-[17px]" : "h-[15px]"} w-auto`} />
-          {plat.label}
-        </span>
       </div>
       <div className="grid grid-cols-3 overflow-hidden rounded-[14px]" style={{ border: `1px solid ${LINE}`, background: "rgba(255,255,255,0.03)" }}>
         {([["Model", p.step], ["Type", type], ["Platform", plat.label]] as const).map(([l, v], i) => (
@@ -1548,6 +1553,7 @@ function MobileTwo({ p, heading, compare, setCompare, openSheet }: LayoutProps) 
         <AccountHead p={p} />
         <Hairline />
         <PriceRow p={p} />
+        <BonusRow />
         {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
         <BuyButton p={p} onNeedTreats={openSheet} wide />
         <CodeLine p={p} />
