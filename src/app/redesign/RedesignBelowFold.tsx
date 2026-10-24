@@ -15,8 +15,8 @@ export function BelowFold() {
     <>
       <ScrollProgressBar />
       <FeaturedIn />
-      <ProveYourExpertise />
       <LivePayouts />
+      <ProveYourExpertise />
       <PlanFinder />
       <ChallengePricing />
       <ProofInNumbers />
