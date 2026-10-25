@@ -107,8 +107,12 @@ function Flag({ code, w = 20 }: { code: string | undefined; w?: number }) {
   return <img src={url} alt="" width={w} height={Math.round(w * 0.7)} className="shrink-0 rounded-[3px] object-cover" style={{ width: w, height: Math.round(w * 0.7) }} />;
 }
 
+/** Left out of the hero video wall only (they still show in the testimonials section). */
+const HERO_HIDDEN = new Set(["Katherine"]);
+const HERO_VIDEOS = TESTIMONIAL_VIDEOS.filter((v) => !HERO_HIDDEN.has(v.name));
+
 export function HeroVideoProof() {
-  const videos = TESTIMONIAL_VIDEOS;
+  const videos = HERO_VIDEOS;
   const reduce = useReducedMotion();
   const visitorRef = useRef<Visitor>({ code: null, region: null });
   const [deck, setDeck] = useState<{ order: number[]; scope: string }>(() => {
