@@ -144,7 +144,7 @@ export async function lookupIpCountry(): Promise<string | null> {
 }
 
 const NAME_THE: Record<string, string> = { US: "the USA", GB: "the UK", AE: "the UAE", NL: "the Netherlands", PH: "the Philippines" };
-const NAME_PLAIN: Record<string, string> = { US: "USA", GB: "UK", AE: "UAE", CZ: "Czechia" };
+const NAME_PLAIN: Record<string, string> = { US: "USA", GB: "UK", AE: "UAE", CZ: "Czechia", HK: "Hong Kong", MO: "Macau" };
 
 export function countryPlain(code: string): string {
   if (NAME_PLAIN[code]) return NAME_PLAIN[code];
