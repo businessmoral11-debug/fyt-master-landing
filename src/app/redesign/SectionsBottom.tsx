@@ -7,7 +7,7 @@ import imgDashboardMockup from "@/assets/images/dashboard_floating_3d_v2.webp";
 import imgMatchTraderLogo from "@/assets/live-site/platform-logos/match-trader.png";
 import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5.png";
 import { FAQ_ITEMS, FOOTER_COLUMNS, FOOTER_LINKS, HERO_CONTENT } from "@/app/data/liveSiteContent";
-import { openIntercomMessenger } from "@/app/intercom";
+import { openFytChat } from "@/app/fytChat";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import {
   COMPARISON_ROWS,
@@ -427,7 +427,7 @@ export function ProductShowcase() {
               const tileStyle = { background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.16)" } as const;
               if (action === "intercom")
                 return (
-                  <button key={label} type="button" onClick={() => void openIntercomMessenger()} aria-label="Open live chat" className={`${cls} cursor-pointer`} style={tileStyle}>
+                  <button key={label} type="button" onClick={() => openFytChat()} aria-label="Open live chat" className={`${cls} cursor-pointer`} style={tileStyle}>
                     {content}
                   </button>
                 );
@@ -446,7 +446,7 @@ export function ProductShowcase() {
           </div>
           <button
             type="button"
-            onClick={() => void openIntercomMessenger()}
+            onClick={() => openFytChat()}
             className="group relative mt-auto inline-flex w-full cursor-pointer items-center justify-center gap-[8px] rounded-full border-0 bg-white px-[22px] py-[13px] text-[14px] font-semibold text-[#1d4ed8] transition-[translate] duration-300 hover:-translate-y-[2px] sm:w-fit sm:self-start"
           >
             Chat with us

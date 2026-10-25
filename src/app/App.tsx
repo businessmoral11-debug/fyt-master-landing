@@ -23,7 +23,7 @@ import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_DE
 import { HalloweenPromoBar } from "@/app/HalloweenPromoBar";
 import { HALLOWEEN_OFF, HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
-import { bootIntercom, toggleIntercomMessenger, subscribeIntercomVisibility } from "@/app/intercom";
+import { loadFytChat } from "@/app/fytChat";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import { HeroVideoProof } from "@/app/redesign/HeroVideoProof";
 import { DesktopTopDisclaimer, MobileBottomDisclaimer } from "@/app/TradingDisclaimer";
@@ -1626,58 +1626,6 @@ function DiscordLauncher() {
   );
 }
 
-function IntercomLauncher() {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => subscribeIntercomVisibility(setOpen), []);
-
-  return createPortal(
-    <button
-      type="button"
-      id="intercom-chat-button"
-      aria-label={open ? "Close Intercom Messenger" : "Open Intercom Messenger"}
-      aria-expanded={open}
-      onClick={() => {
-        void toggleIntercomMessenger();
-      }}
-      className="fyt-intercom-launcher fixed z-[2147483000] flex items-center justify-center border-0 cursor-pointer p-0 overflow-hidden"
-      style={{
-        right: "max(20px, env(safe-area-inset-right, 0px))",
-        bottom: "max(20px, env(safe-area-inset-bottom, 0px))",
-        width: 48,
-        height: 48,
-        borderRadius: "50%",
-        background: "#006CFF",
-        boxShadow: "0 4px 16px rgba(0, 108, 255, 0.45)",
-      }}
-    >
-      <span
-        className="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-200"
-        style={{ opacity: open ? 0 : 1, color: "#0B1220" }}
-        aria-hidden={open}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 32" width="22" height="24" fill="currentColor" style={{ display: "block", maxWidth: 22, maxHeight: 24 }}>
-          <path d="M28 32s-4.714-1.855-8.527-3.34H3.437C1.54 28.66 0 27.026 0 25.013V3.644C0 1.633 1.54 0 3.437 0h21.125c1.898 0 3.437 1.632 3.437 3.645v18.404H28V32zm-4.139-11.982a.88.88 0 00-1.292-.105c-.03.026-3.015 2.681-8.57 2.681-5.486 0-8.517-2.636-8.571-2.684a.88.88 0 00-1.29.107 1.01 1.01 0 00-.219.708.992.992 0 00.318.664c.142.128 3.537 3.15 9.762 3.15 6.226 0 9.621-3.022 9.763-3.15a.992.992 0 00.317-.664 1.01 1.01 0 00-.218-.707z" />
-        </svg>
-      </span>
-      <span
-        className="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-200"
-        style={{ opacity: open ? 1 : 0, color: "#ffffff" }}
-        aria-hidden={!open}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block", maxWidth: 20, maxHeight: 20 }}>
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M18.601 8.39897C18.269 8.06702 17.7309 8.06702 17.3989 8.39897L12 13.7979L6.60099 8.39897C6.26904 8.06702 5.73086 8.06702 5.39891 8.39897C5.06696 8.73091 5.06696 9.2691 5.39891 9.60105L11.3989 15.601C11.7309 15.933 12.269 15.933 12.601 15.601L18.601 9.60105C18.9329 9.2691 18.9329 8.73091 18.601 8.39897Z"
-            fill="currentColor"
-          />
-        </svg>
-      </span>
-    </button>,
-    document.body,
-  );
-}
 
 /**
  * Fixed header + a spacer that reserves its full (expanded) height in the page.
@@ -1717,7 +1665,10 @@ function SiteHeader({ children }: { children: ReactNode }) {
 export default function App() {
   useEffect(prefetchBelowFoldChunks, []);
   useEffect(() => {
-    void bootIntercom();
+    // FYT Support chat: load after the page has painted so it never slows the hero.
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(loadFytChat, { timeout: 2500 });
+    else window.setTimeout(loadFytChat, 1200);
   }, []);
   return (
     <div className="bg-[#070810] content-stretch flex flex-col items-start relative w-full min-h-screen">
@@ -1735,7 +1686,6 @@ export default function App() {
         </Suspense>
       </BelowFoldErrorBoundary>
       <DiscordLauncher />
-      <IntercomLauncher />
       <MobileBottomDisclaimer />
     </div>
   );

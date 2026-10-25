@@ -788,21 +788,17 @@ describe("ProductShowcase Trusted Support Team card (spec v4 blue container)", (
     expect(gridBody).toContain('bg-white rounded-full px-[20px] py-[12px]');
     expect(gridBody).toContain('style={{ color: SUPPORT_CARD_ACCENT_BLUE }}>Chat with us');
     expect(gridBody).toContain('stroke={SUPPORT_CARD_ACCENT_BLUE} strokeWidth="1.6"');
-    expect(gridBody).toContain("onClick={openIntercomMessenger}");
+    expect(gridBody).toContain("onClick={() => openFytChat()}");
   });
 
-  it("boots the real Intercom messenger from a bottom-right custom launcher", () => {
+  it("loads the FYT Support chat once, after paint, instead of Intercom", () => {
     const app = read("./App.tsx");
-    expect(app).toContain('id="intercom-chat-button"');
-    expect(app).toContain("fyt-intercom-launcher");
-    expect(app).not.toContain("intercom-lightweight-app-launcher");
-    expect(app).toContain("<IntercomLauncher />");
-    expect(app).toContain("bootIntercom");
-    expect(app).toContain("toggleIntercomMessenger");
-    const intercom = read("./intercom.ts");
-    expect(intercom).toContain("widget.intercom.io/widget/");
-    expect(intercom).toContain("hide_default_launcher: true");
-    expect(intercom).not.toContain("custom_launcher_selector");
+    expect(app).toContain("loadFytChat");
+    expect(app).not.toContain("<IntercomLauncher />");
+    expect(app).not.toContain("bootIntercom");
+    const chat = read("./fytChat.ts");
+    expect(chat).toContain("https://emailsplatform.fundingyourtrades.com/w/chat.js");
+    expect(chat).toContain("__fytChatOpen");
   });
 
   it("renders a floating Discord invite button at the bottom-left", () => {

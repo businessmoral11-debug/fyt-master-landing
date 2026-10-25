@@ -18,7 +18,7 @@ import { STEP_PLANS, STEP_SIZES, getEntry, checkoutUrl, fmtSize, planFlag, PLATF
 import { ALT_PROMO_CODE, ALT_PROMO_DEAL, ALT_PROMO_LABEL } from "@/app/data/promoBanner";
 import { pushViewItem } from "@/app/tracking/gtm";
 import { HERO_CONTENT, KEY_METRICS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS, TRUSTINDEX_WIDGET } from "@/app/data/liveSiteContent";
-import { openIntercomMessenger } from "@/app/intercom";
+import { openFytChat } from "@/app/fytChat";
 import { onHeavySceneNavPause, isHeavySceneNavPauseActive, pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import { isScrollSettled } from "@/app/three/scrollActivity";
 const loadGlobe = () => import("@/app/globe");
@@ -3998,7 +3998,7 @@ function ProductShowcase() {
                         <button
                           key={label}
                           type="button"
-                          onClick={() => { void openIntercomMessenger(); }}
+                          onClick={() => { openFytChat(); }}
                           aria-label="Open live chat"
                           className={`${itemClass} bg-transparent border-0 p-0 cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95`}
                         >
@@ -4032,7 +4032,7 @@ function ProductShowcase() {
                 whileTap={{ scale: 0.96 }}
                 transition={{ type: "spring", stiffness: 400, damping: 22 }}
                 className="group relative inline-flex items-center gap-[8px] bg-white rounded-full px-[20px] py-[12px] whitespace-nowrap shrink-0 self-center overflow-hidden cursor-pointer border-0"
-                onClick={openIntercomMessenger}
+                onClick={() => openFytChat()}
               >
                 {!prefersReducedMotion && (
                   <motion.span
