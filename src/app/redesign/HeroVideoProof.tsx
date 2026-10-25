@@ -65,7 +65,7 @@ const ASIA_REGIONS: RegionId[] = ["south-asia", "southeast-asia", "east-asia", "
  * (Europe, Americas, Africa, Oceania) sees the non-Asian traders next
  * (USA, South Africa, Kenya, New Zealand, Germany) and Asian ones last.
  */
-function buildDeck(videos: TestimonialVideo[], v: Visitor): { order: number[]; scope: string } {
+function buildDeck(videos: TestimonialVideo[], v: Visitor): { order: number[]; scope: string; scopes: string[] } {
   const low = videos.map((_, i) => i).filter((i) => LOW_PRIORITY.has(videos[i].name));
   const all = videos.map((_, i) => i).filter((i) => !low.includes(i));
   const cc = (i: number) => VIDEO_COUNTRY[videos[i].name];
@@ -80,9 +80,12 @@ function buildDeck(videos: TestimonialVideo[], v: Visitor): { order: number[]; s
     near = left.filter((i) => isAsia(i) === visitorAsia);
     far = left.filter((i) => isAsia(i) !== visitorAsia);
   }
-  const scope = sameCountry.length && v.code ? `from ${countryPlain(v.code)}` : sameRegion.length && v.region ? `from ${REGION_NAME[v.region]}` : "worldwide";
+  const label = (i: number) =>
+    sameCountry.includes(i) && v.code ? `from ${countryPlain(v.code)}` : sameRegion.includes(i) && v.region ? `from ${REGION_NAME[v.region]}` : "worldwide";
   const tail = Math.random() < LOW_SHOW_CHANCE ? shuffle(low) : [];
-  return { order: [...shuffle(sameCountry), ...shuffle(sameRegion), ...shuffle(near), ...shuffle(far), ...tail], scope };
+  const order = [...shuffle(sameCountry), ...shuffle(sameRegion), ...shuffle(near), ...shuffle(far), ...tail];
+  const scopes = order.map(label);
+  return { order, scope: scopes[0] ?? "worldwide", scopes };
 }
 
 function PlayIcon({ size = 22 }: { size?: number }) {
@@ -115,7 +118,7 @@ export function HeroVideoProof() {
   const videos = HERO_VIDEOS;
   const reduce = useReducedMotion();
   const visitorRef = useRef<Visitor>({ code: null, region: null });
-  const [deck, setDeck] = useState<{ order: number[]; scope: string }>(() => {
+  const [deck, setDeck] = useState<{ order: number[]; scope: string; scopes: string[] }>(() => {
     visitorRef.current = detectVisitor();
     return buildDeck(videos, visitorRef.current);
   });
@@ -187,7 +190,7 @@ export function HeroVideoProof() {
             <span className="fyt-rd-ping-gated absolute inset-0 rounded-full bg-[#22c55e]" />
             <span className="relative size-[7px] rounded-full bg-[#22c55e]" />
           </span>
-          <span className="truncate">Funded traders {deck.scope}</span>
+          <span className="truncate">Funded traders {deck.scopes[deck.order.length ? pos : 0] ?? deck.scope}</span>
         </span>
         <button
           type="button"
