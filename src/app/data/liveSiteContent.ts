@@ -95,7 +95,7 @@ export const PLATFORMS_SECTION = {
     title: "Match-Trader",
     body: "MatchTrader is a fast-rising platform known for its intuitive user interface and powerful functionalities. Designed to streamline your trading experience",
   },
-  testAccountHref: "https://intercom.help/funding-your-trades/en/articles/12850361-test-accounts",
+  testAccountHref: "https://fundingyourtrades.com/faq/test-accounts/",
 } as const;
 
 export const TRADER_FEEDBACK = {

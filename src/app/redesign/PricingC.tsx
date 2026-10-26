@@ -298,7 +298,7 @@ function CompareTable({ p }: { p: Pick }) {
         ["Hedging when funded", { t: "Allowed", good: true }, { t: "Challenge only", good: false }],
         ["Fee refunded with", { t: "2nd payout" }, { t: "1st payout", good: true }],
       ];
-  const href = instant ? "https://intercom.help/funding-your-trades/en/articles/14890800-instant-funding-models-compared" : "https://intercom.help/funding-your-trades/en/articles/13374417-fyt-classic-vs-fyt-prime";
+  const href = instant ? "https://fundingyourtrades.com/faq/instant-funding-models-compared/" : "https://fundingyourtrades.com/faq/fyt-classic-vs-fyt-prime/";
   const mark = (c: Cell) =>
     c.good === undefined ? null : c.good ? (
       <span className="flex size-[16px] shrink-0 items-center justify-center rounded-full bg-[#22c55e]"><Svg d={IC.check} size={9} color="#04210f" w={3.4} /></span>

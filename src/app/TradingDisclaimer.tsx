@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 /** New key so a prior test dismiss doesn't keep the bar hidden after this fix. */
 const DISCLAIMER_STORAGE_KEY = "fyt_disclaimer_dismissed_v2";
-const FAQ_HREF = "https://intercom.help/funding-your-trades/en/";
+const FAQ_HREF = "https://fundingyourtrades.com/faq/";
 
 const DISCLAIMER_COPY = (
   <>

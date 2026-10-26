@@ -157,7 +157,7 @@ describe("PLATFORMS_SECTION", () => {
       "MatchTrader is a fast-rising platform known for its intuitive user interface and powerful functionalities. Designed to streamline your trading experience"
     );
     expect(PLATFORMS_SECTION.testAccountHref).toBe(
-      "https://intercom.help/funding-your-trades/en/articles/12850361-test-accounts"
+      "https://fundingyourtrades.com/faq/test-accounts/"
     );
   });
 });
@@ -244,7 +244,7 @@ describe("FOOTER_LINKS", () => {
       { label: "Affiliate Registration", href: "https://fundingyourtrades.com/affiliate-registration/" },
       { label: "Affiliate Login", href: "https://fundingyourtrades.com/affiliate-account/" },
       { label: "Affiliate Reset Password", href: "https://fundingyourtrades.com/affiliate-reset-password/" },
-      { label: "FAQ", href: "https://intercom.help/funding-your-trades/en/" },
+      { label: "FAQ", href: "https://fundingyourtrades.com/faq/" },
       { label: "Contact Us", href: "https://fundingyourtrades.com/contact/" },
       { label: "Terms of Services", href: "https://fundingyourtrades.com/terms-of-services/" },
       { label: "Privacy Policy", href: "https://fundingyourtrades.com/privacy-policy/" },
@@ -315,7 +315,7 @@ describe("NAV_LINKS", () => {
           { label: "Reset Password", href: "https://fundingyourtrades.com/affiliate-reset-password/" },
         ],
       },
-      { type: "link", label: "FAQ", href: "https://intercom.help/funding-your-trades/en/" },
+      { type: "link", label: "FAQ", href: "https://fundingyourtrades.com/faq/" },
       { type: "link", label: "Contact Us", href: "https://fundingyourtrades.com/contact/" },
     ]);
     expect(NAV_LINKS.login).toEqual({ label: "Login/Sign up", href: "https://app.fundingyourtrades.com/" });
@@ -336,7 +336,7 @@ describe("FOOTER_COLUMNS", () => {
       {
         heading: "COMPANY",
         items: [
-          { label: "FAQ", href: "https://intercom.help/funding-your-trades/en/" },
+          { label: "FAQ", href: "https://fundingyourtrades.com/faq/" },
           { label: "Affiliate", href: "https://fundingyourtrades.com/affiliate-registration/" },
           { label: "Contact", href: "https://fundingyourtrades.com/contact/" },
         ],

@@ -1544,8 +1544,8 @@ function WhyChoiceBullets({ bullets }: { bullets: [PanelIconKind, string][] }) {
   );
 }
 
-const PLAN_COMPARE_CLASSIC_URL = "https://intercom.help/funding-your-trades/en/articles/13374417-fyt-classic-vs-fyt-prime";
-const PLAN_COMPARE_INSTANT_URL = "https://intercom.help/funding-your-trades/en/articles/14890800-instant-funding-models-compared";
+const PLAN_COMPARE_CLASSIC_URL = "https://fundingyourtrades.com/faq/fyt-classic-vs-fyt-prime/";
+const PLAN_COMPARE_INSTANT_URL = "https://fundingyourtrades.com/faq/instant-funding-models-compared/";
 
 function planCompareCopy(step: StepId): { href: string; label: string; ariaLabel: string } {
   if (step === "Instant") {
@@ -4154,7 +4154,7 @@ function Faq() {
             </motion.div>
           </Accordion.Root>
           <a
-            href="https://intercom.help/funding-your-trades/en/"
+            href="https://fundingyourtrades.com/faq/"
             target="_blank"
             rel="noopener noreferrer"
             className="cta-shine mt-[36px] flex items-center gap-[10px] px-[32px] py-[16px] rounded-[999px] shrink-0 no-underline transition-shadow duration-300 hover:shadow-[0_12px_45px_-8px_rgba(59,130,246,0.65)]"
