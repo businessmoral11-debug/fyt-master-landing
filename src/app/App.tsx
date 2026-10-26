@@ -26,6 +26,7 @@ import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { loadFytChat } from "@/app/fytChat";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import { HeroVideoProof } from "@/app/redesign/HeroVideoProof";
+import { getHeroVariant } from "@/app/redesign/heroVariant";
 import { DesktopTopDisclaimer, MobileBottomDisclaimer } from "@/app/TradingDisclaimer";
 const loadGlobe = () => import("@/app/globe");
 const loadRecentVerifiedRewards = () => import("@/app/recentVerifiedRewards");
@@ -650,6 +651,7 @@ function HalloweenBannerDecor({ animate }: { animate: boolean }) {
 /** Halloween uses its own animated bar; otherwise the regular promo banner. */
 function PromoSlot() {
   const { compact } = useContext(HeaderModeContext);
+  if (getHeroVariant()) return <Suspense fallback={null}><CalmPromoBar /></Suspense>;
   return isHalloweenLive() ? <HalloweenPromoBar compact={compact} /> : <PromoBanner />;
 }
 
@@ -1509,6 +1511,25 @@ function Hero() {
     return () => observer.disconnect();
   }, []);
 
+  const heroVariant = getHeroVariant();
+  if (heroVariant) {
+    return (
+      <div ref={heroRef}>
+        <Suspense fallback={<div className="min-h-[760px] bg-[#03060d]" />}>
+          <HeroVariants
+            variant={heroVariant}
+            price={heroFromPrice()}
+            strip={
+              <div className={TRUST_STRIP_BOX_CLASSES} style={{ background: "rgba(255,255,255,0.05)" }}>
+                <TrustStripContent />
+              </div>
+            }
+          />
+        </Suspense>
+      </div>
+    );
+  }
+
   if (HERO_VIDEO_ENABLED) {
     return (
       <div ref={heroRef} className={`bg-[#03060d] relative overflow-hidden shrink-0 w-full ${animationsActive ? "" : "hero-anims-paused"}`}>
@@ -1584,6 +1605,9 @@ function Hero() {
   );
 }
 
+
+const HeroVariants = lazy(() => import("@/app/redesign/HeroVariants"));
+const CalmPromoBar = lazy(() => import("@/app/redesign/HeroVariants").then((m) => ({ default: m.CalmPromoBar })));
 
 const BelowFold = lazy(() => import("@/app/redesign/RedesignBelowFold").then((m) => ({ default: m.BelowFold })));
 
