@@ -60,6 +60,7 @@ const RULES_INSTANT_PRIME: Rules = { profit: "4%", maxDaily: "3%", maxOverall: "
 export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>> = {
   "1-Step": {
     classic: build(RULES_1STEP, [
+      { size: 5000, mt: [67, 40.2, 1216], p5: [73, 43.8, 12383] },
       { size: 10000, mt: [114, 68.4, 1217], p5: [124, 74.4, 12379] },
       { size: 25000, mt: [219, 131.4, 1218], p5: [229, 137.4, 12381] },
       { size: 50000, mt: [309, 185.4, 1219], p5: [319, 191.4, 12382] },
@@ -67,6 +68,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
       { size: 200000, mt: [909, 545.4, 1221], p5: [919, 551.4, 12380] },
     ]),
     prime: build(RULES_1STEP, [
+      { size: 5000, mt: [67, 40.2, 21272], p5: [77, 46.2, 21273] },
       { size: 10000, mt: [114, 68.4, 21264], p5: [124, 74.4, 21265] },
       { size: 25000, mt: [219, 131.4, 21268], p5: [229, 137.4, 21269] },
       { size: 50000, mt: [309, 185.4, 21270], p5: [319, 191.4, 21271] },
@@ -76,6 +78,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
   },
   "2-Step": {
     classic: build(RULES_2STEP, [
+      { size: 5000, mt: [40, 24, 1235], p5: [43, 25.8, 12371], split: "95/5" },
       { size: 10000, mt: [95, 57, 1234], p5: [105, 63, 12367], split: "95/5" },
       { size: 25000, mt: [199, 119.4, 1233], p5: [209, 125.4, 12369] },
       { size: 50000, mt: [279, 167.4, 1232], p5: [289, 173.4, 12370] },
@@ -83,6 +86,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
       { size: 200000, mt: [809, 485.4, 1230], p5: [819, 491.4, 12368] },
     ]),
     prime: build(RULES_2STEP, [
+      { size: 5000, mt: [40, 24, 20981], p5: [43, 25.8, 20975], split: "95/5" },
       { size: 10000, mt: [95, 52.25, 20980], p5: [105, 57.75, 20974], split: "95/5" },
       { size: 25000, mt: [199, 109.45, 20979], p5: [209, 114.95, 20973] },
       { size: 50000, mt: [279, 153.45, 20978], p5: [289, 158.95, 20972] },
@@ -127,8 +131,8 @@ export const PLATFORM_OPTIONS: PlatformOption[] = [
 ];
 
 export const STEP_SIZES: Record<StepId, number[]> = {
-  "1-Step": [10000, 25000, 50000, 100000, 200000],
-  "2-Step": [10000, 25000, 50000, 100000, 200000],
+  "1-Step": [5000, 10000, 25000, 50000, 100000, 200000],
+  "2-Step": [5000, 10000, 25000, 50000, 100000, 200000],
   "Instant": [5000, 10000, 25000, 50000, 100000],
 };
 

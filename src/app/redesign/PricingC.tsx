@@ -65,7 +65,7 @@ function usePick() {
   const [step, setStepRaw] = useState<StepId>("2-Step");
   const [planRaw, setPlan] = useState<PlanId>("prime");
   const [platform, setPlatform] = useState<PlatformId>("match-trader");
-  const [i, setI] = useState(3);
+  const [i, setI] = useState(4); // 100K on the challenges (5K is first)
   const [giftAt, setGiftAt] = useState<number | null>(() => (typeof window === "undefined" ? null : readGift()));
   const giftValid = giftAt !== null && Date.now() < giftAt + GIFT_MS;
   const [offerRaw, setOffer] = useState<OfferId>(() => (giftValid ? "welcome" : "launch"));

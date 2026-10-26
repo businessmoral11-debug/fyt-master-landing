@@ -19,8 +19,8 @@ const PLATFORMS: PlatformId[] = ["match-trader", "platform-5"];
 
 describe("STEP_SIZES / STEP_PLANS", () => {
   it("uses the correct step-dependent sizes", () => {
-    expect(STEP_SIZES["1-Step"]).toEqual([10000, 25000, 50000, 100000, 200000]);
-    expect(STEP_SIZES["2-Step"]).toEqual([10000, 25000, 50000, 100000, 200000]);
+    expect(STEP_SIZES["1-Step"]).toEqual([5000, 10000, 25000, 50000, 100000, 200000]);
+    expect(STEP_SIZES["2-Step"]).toEqual([5000, 10000, 25000, 50000, 100000, 200000]);
     expect(STEP_SIZES["Instant"]).toEqual([5000, 10000, 25000, 50000, 100000]);
   });
 
