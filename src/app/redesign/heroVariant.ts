@@ -10,3 +10,16 @@ export function getHeroVariant(): HeroVariant | null {
     return null;
   }
 }
+
+/** Which alternative trader-video block to preview inside the live hero (?video=d|g). */
+export type VideoAlt = "d" | "g";
+
+export function getVideoAlt(): VideoAlt | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const v = new URLSearchParams(window.location.search).get("video")?.toLowerCase();
+    return v === "d" || v === "g" ? v : null;
+  } catch {
+    return null;
+  }
+}

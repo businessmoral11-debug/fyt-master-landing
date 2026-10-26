@@ -26,7 +26,7 @@ import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { loadFytChat } from "@/app/fytChat";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
 import { HeroVideoProof } from "@/app/redesign/HeroVideoProof";
-import { getHeroVariant } from "@/app/redesign/heroVariant";
+import { getHeroVariant, getVideoAlt } from "@/app/redesign/heroVariant";
 import { DesktopTopDisclaimer, MobileBottomDisclaimer } from "@/app/TradingDisclaimer";
 const loadGlobe = () => import("@/app/globe");
 const loadRecentVerifiedRewards = () => import("@/app/recentVerifiedRewards");
@@ -1512,6 +1512,7 @@ function Hero() {
   }, []);
 
   const heroVariant = getHeroVariant();
+  const videoAlt = getVideoAlt();
   if (heroVariant) {
     return (
       <div ref={heroRef}>
@@ -1554,7 +1555,13 @@ function Hero() {
               <HeroTrustindexGate />
             </div>
           </div>
-          <HeroVideoProof />
+          {videoAlt ? (
+            <Suspense fallback={<div className="aspect-[16/10] w-full" />}>
+              <HeroVideoAlt variant={videoAlt} />
+            </Suspense>
+          ) : (
+            <HeroVideoProof />
+          )}
         </div>
         <div className="relative z-10 flex justify-center pb-[30px] lg:hidden">
           <div className={TRUST_STRIP_BOX_CLASSES} style={{ background: "rgba(255,255,255,0.05)" }}>
@@ -1606,6 +1613,7 @@ function Hero() {
 }
 
 
+const HeroVideoAlt = lazy(() => import("@/app/redesign/HeroVideoAlt"));
 const HeroVariants = lazy(() => import("@/app/redesign/HeroVariants"));
 const CalmPromoBar = lazy(() => import("@/app/redesign/HeroVariants").then((m) => ({ default: m.CalmPromoBar })));
 
