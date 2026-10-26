@@ -18,7 +18,7 @@ const ROTATE_MS = 6500;
 const THUMBS = 4;
 
 /** Country of each trader video (read from the video posters). */
-const VIDEO_COUNTRY: Record<string, string> = {
+export const VIDEO_COUNTRY: Record<string, string> = {
   Devon: "ZA",
   Waqas: "PK",
   "Taufiq Sayed": "IN",
@@ -88,7 +88,7 @@ function buildDeck(videos: TestimonialVideo[], v: Visitor): { order: number[]; s
   return { order, scope: scopes[0] ?? "worldwide", scopes };
 }
 
-function PlayIcon({ size = 22 }: { size?: number }) {
+export function PlayIcon({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M8 5.2v13.6a1 1 0 0 0 1.52.85l11-6.8a1 1 0 0 0 0-1.7l-11-6.8A1 1 0 0 0 8 5.2Z" />
@@ -104,7 +104,7 @@ function ShuffleIcon() {
   );
 }
 
-function Flag({ code, w = 20 }: { code: string | undefined; w?: number }) {
+export function Flag({ code, w = 20 }: { code: string | undefined; w?: number }) {
   const url = code ? countryFlagUrl(code) : null;
   if (!url) return null;
   return <img src={url} alt="" width={w} height={Math.round(w * 0.7)} className="shrink-0 rounded-[3px] object-cover" style={{ width: w, height: Math.round(w * 0.7) }} />;
@@ -112,7 +112,7 @@ function Flag({ code, w = 20 }: { code: string | undefined; w?: number }) {
 
 /** Left out of the hero video wall only (they still show in the testimonials section). */
 const HERO_HIDDEN = new Set(["Katherine"]);
-const HERO_VIDEOS = TESTIMONIAL_VIDEOS.filter((v) => !HERO_HIDDEN.has(v.name));
+export const HERO_VIDEOS = TESTIMONIAL_VIDEOS.filter((v) => !HERO_HIDDEN.has(v.name));
 
 export function HeroVideoProof() {
   const videos = HERO_VIDEOS;
@@ -285,4 +285,94 @@ export function HeroVideoProof() {
       <Suspense fallback={null}>{open && <VideoLightbox source={testimonialVideoSource(open)} onClose={closeVideo} />}</Suspense>
     </div>
   );
+}
+
+/**
+ * Shared deck for the alternative hero layouts (?hero=e|f|g|h). Same visitor logic
+ * as the live video wall (own country, then region, then the rest), but it
+ * rotates quietly: no progress bar, and it pauses on hover and off screen.
+ */
+export function useHeroDeck(rotateMs = ROTATE_MS) {
+  const videos = HERO_VIDEOS;
+  const reduce = useReducedMotion();
+  const visitorRef = useRef<Visitor>({ code: null, region: null });
+  const [deck, setDeck] = useState<{ order: number[]; scope: string; scopes: string[] }>(() => {
+    visitorRef.current = detectVisitor();
+    return buildDeck(videos, visitorRef.current);
+  });
+  const n = deck.order.length;
+  const [pos, setPos] = useState(0);
+  const [auto, setAuto] = useState(true);
+  const [hover, setHover] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [open, setOpen] = useState<TestimonialVideo | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const touched = useRef(false);
+
+  useEffect(() => {
+    const manual = /^[a-z]{2}$/i.test(new URLSearchParams(window.location.search).get("country") ?? "");
+    if (manual) return;
+    let cancelled = false;
+    lookupIpCountry().then((cc) => {
+      if (cancelled || !cc || touched.current || cc === visitorRef.current.code) return;
+      visitorRef.current = { code: cc, region: regionOf(cc) ?? visitorRef.current.region };
+      setDeck(buildDeck(videos, visitorRef.current));
+      setPos(0);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [videos]);
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver((e) => setVisible(!!e[0]?.isIntersecting), { rootMargin: "80px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const running = auto && visible && !hover && !open && !reduce && n > 1;
+  const next = useCallback(() => {
+    setPos((p) => {
+      if (p + 1 < n) return p + 1;
+      setDeck(buildDeck(videos, visitorRef.current));
+      return 0;
+    });
+  }, [n, videos]);
+  useEffect(() => {
+    if (!running) return;
+    const t = window.setTimeout(next, rotateMs);
+    return () => window.clearTimeout(t);
+  }, [running, pos, deck, next, rotateMs]);
+
+  const go = useCallback((at: number) => {
+    touched.current = true;
+    setAuto(false);
+    setPos(((at % n) + n) % n);
+  }, [n]);
+  const shuffleDeck = useCallback(() => {
+    touched.current = true;
+    setDeck(buildDeck(videos, visitorRef.current));
+    setPos(0);
+  }, [videos]);
+  const video = (at: number) => videos[deck.order[((at % n) + n) % n]];
+  const current = video(pos);
+  /** One entry per country, in deck order, with the first position that country appears at. */
+  const countries: { code: string; at: number }[] = [];
+  deck.order.forEach((vi, at) => {
+    const code = VIDEO_COUNTRY[videos[vi].name];
+    if (code && !countries.some((c) => c.code === code)) countries.push({ code, at });
+  });
+
+  return {
+    n, pos, current, video, countries, go, next, shuffleDeck, open, setOpen, rootRef, setHover,
+    code: VIDEO_COUNTRY[current.name] as string | undefined,
+    scope: deck.scopes[pos] ?? deck.scope,
+    closeVideo: () => setOpen(null),
+  };
+}
+
+export function HeroLightbox({ video, onClose }: { video: TestimonialVideo | null; onClose: () => void }) {
+  return <Suspense fallback={null}>{video && <VideoLightbox source={testimonialVideoSource(video)} onClose={onClose} />}</Suspense>;
 }

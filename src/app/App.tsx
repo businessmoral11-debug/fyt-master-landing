@@ -25,7 +25,7 @@ import { HALLOWEEN_OFF, HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHOR
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { loadFytChat } from "@/app/fytChat";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
-import { HeroVideoProof } from "@/app/redesign/HeroVideoProof";
+import HeroVideoAlt from "@/app/redesign/HeroVideoAlt";
 import { DesktopTopDisclaimer, MobileBottomDisclaimer } from "@/app/TradingDisclaimer";
 const loadGlobe = () => import("@/app/globe");
 const loadRecentVerifiedRewards = () => import("@/app/recentVerifiedRewards");
@@ -1533,7 +1533,7 @@ function Hero() {
               <HeroTrustindexGate />
             </div>
           </div>
-          <HeroVideoProof />
+          <HeroVideoAlt variant="d" />
         </div>
         <div className="relative z-10 flex justify-center pb-[30px] lg:hidden">
           <div className={TRUST_STRIP_BOX_CLASSES} style={{ background: "rgba(255,255,255,0.05)" }}>
