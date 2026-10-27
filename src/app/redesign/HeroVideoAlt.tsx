@@ -19,6 +19,7 @@ type Deck = ReturnType<typeof useHeroDeck>;
 const PAYOUT: Record<string, string> = {
   Shubham: "$1,009",
   Rohit: "$2,271",
+  Hiren: "$1,089",
   "Taufiq Sayed": "$1,215",
   Kush: "$709",
   Anisha: "$2,200+",

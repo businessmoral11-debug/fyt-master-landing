@@ -60,6 +60,7 @@ export const TESTIMONIAL_VIDEOS: TestimonialVideo[] = [
   { name: "Dylan", caption: "This funding experience completely changed the way I trade and scale accounts.", videoUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/05/FYT-Dylan.mp4", posterUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/05/6066483156774227824.jpg" },
   { name: "Anaas", caption: "Live payout during the interview, proof that payouts really move.", videoUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Anaas-Morocco.mp4", posterUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/IMG_3308.jpeg" },
   { name: "Wong", caption: "This funding experience completely changed the way I trade and scale accounts.", videoUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Trader-video-2025-10-b.mp4", posterUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/IMG_3309.jpeg" },
+  { name: "Hiren", caption: "Live payout during the interview, proof that payouts really move.", videoUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Trader-video-2026-10-c.mp4", posterUrl: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Hiren-India-poster.jpg" },
 ];
 
 export type TestimonialSlideItem =
