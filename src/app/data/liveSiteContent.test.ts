@@ -264,9 +264,9 @@ describe("FOOTER_LINKS", () => {
 });
 
 describe("VIDEO_URLS", () => {
-  it("has exactly 1 hero + 18 testimonial + 3 misc hotlinked URLs, all https on fundingyourtrades.com", () => {
+  it("has exactly 1 hero + 19 testimonial + 3 misc hotlinked URLs, all https on fundingyourtrades.com", () => {
     expect(Object.keys(VIDEO_URLS.hero)).toHaveLength(1);
-    expect(Object.keys(VIDEO_URLS.testimonials)).toHaveLength(18);
+    expect(Object.keys(VIDEO_URLS.testimonials)).toHaveLength(19);
     expect(Object.keys(VIDEO_URLS.misc)).toHaveLength(3);
 
     const all = [
@@ -274,7 +274,7 @@ describe("VIDEO_URLS", () => {
       ...Object.values(VIDEO_URLS.testimonials),
       ...Object.values(VIDEO_URLS.misc),
     ];
-    expect(all).toHaveLength(24);
+    expect(all).toHaveLength(25);
     for (const url of all) {
       expect(url).toMatch(/^https:\/\/fundingyourtrades\.com\/wp-content\/uploads\/.+\.mp4$/);
     }

@@ -41,6 +41,7 @@ export const VIDEO_COUNTRY: Record<string, string> = {
   Anaas: "MA",
   "Wong": "HK",
   Hiren: "IN",
+  Roy: "ID",
 };
 
 type Visitor = { code: string | null; region: RegionId | null };
