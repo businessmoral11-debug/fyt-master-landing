@@ -169,8 +169,8 @@ const CSS = `
   position: relative; flex: none;
   display: inline-flex; align-items: center;
   height: 36px; padding: 0 20px; border-radius: 999px;
-  background: linear-gradient(180deg, var(--fyt-hw-orange-1), var(--fyt-hw-orange-2));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 10px rgba(236,106,29,.35);
+  background: linear-gradient(180deg, #ff6a2b, #e2380f);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 2px 12px rgba(226,56,15,.45);
 }
 .fyt-hw-timer::before { /* pulsing outer glow (opacity-only) */
   content: ""; position: absolute; inset: -5px; border-radius: inherit; z-index: -1;
@@ -411,7 +411,6 @@ export function HalloweenPromoBar({ compact = false }: { compact?: boolean }) {
 
         <div className="fyt-hw-timer" role="timer" aria-live="off">
           <span className="fyt-hw-timer-body">
-            <span className="fyt-hw-seg"><span className="fyt-hw-num" data-unit="d">9</span>D</span>
             <span className="fyt-hw-seg"><span className="fyt-hw-num" data-unit="h">00</span>H</span>
             <span className="fyt-hw-seg"><span className="fyt-hw-num" data-unit="m">00</span>M</span>
             <span className="fyt-hw-seg"><span className="fyt-hw-num" data-unit="s">00</span>S</span>

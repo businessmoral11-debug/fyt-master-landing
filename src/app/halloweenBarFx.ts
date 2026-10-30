@@ -58,10 +58,10 @@ export function initHalloweenBar(bar: any, cfg: any): () => void {
       if (tickHandle) clearTimeout(tickHandle);
       return false;
     }
-    var d = Math.floor(diff / 86400), h = Math.floor(diff % 86400 / 3600),
-        m = Math.floor(diff % 3600 / 60), s = diff % 60;
-    setNum('d', String(d)); setNum('h', pad(h)); setNum('m', pad(m)); setNum('s', pad(s));
-    timer.setAttribute('aria-label', d + ' days ' + h + ' hours ' + m + ' minutes left');
+    // Hours only (e.g. 31H 05M 10S): reads more urgent than days.
+    var h = Math.floor(diff / 3600), m = Math.floor(diff % 3600 / 60), s = diff % 60;
+    setNum('h', pad(h)); setNum('m', pad(m)); setNum('s', pad(s));
+    timer.setAttribute('aria-label', h + ' hours ' + m + ' minutes left');
     return true;
   }
   (function loop() {                          // aligned to the start of each second
