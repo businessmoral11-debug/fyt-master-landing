@@ -12,7 +12,7 @@
 import { PROMO_DEADLINE } from "./promoBanner";
 
 export const HALLOWEEN_START = PROMO_DEADLINE;
-export const HALLOWEEN_END = "2026-11-01T07:59:59+05:30"; // extended 8 hours (was 31 Oct 23:59 IST)
+export const HALLOWEEN_END = "2026-11-01T17:59:59+05:30"; // extended again +10h (was 1 Nov 07:59 IST; originally 31 Oct 23:59 IST)
 export const HALLOWEEN_CODE = "FYTWEEN";
 export const HALLOWEEN_OFF = 0.45;
 
