@@ -131,13 +131,7 @@ function useCountdown(deadline: string = PROMO_DEADLINE): [string, string][] {
   }, []);
   const left = Math.max(0, new Date(deadline).getTime() - now);
   const pad = (n: number) => String(n).padStart(2, "0");
-  // Long offers (Halloween) read better in days: 9d 21h 49m.
-  if (left >= 48 * 36e5)
-    return [
-      [String(Math.floor(left / 864e5)), "d"],
-      [pad(Math.floor(left / 36e5) % 24), "h"],
-      [pad(Math.floor(left / 6e4) % 60), "m"],
-    ];
+  // Always in hours (76h 12m 05s): reads more urgent than days.
   return [
     [pad(Math.floor(left / 36e5)), "h"],
     [pad(Math.floor(left / 6e4) % 60), "m"],
