@@ -1607,7 +1607,7 @@ function DiscordLauncher() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Join FYT on Discord"
-      className="fixed z-[2147482990] flex items-center justify-center no-underline transition-transform duration-200 hover:scale-105 active:scale-95"
+      className="fixed z-[2147482990] hidden md:flex items-center justify-center no-underline transition-transform duration-200 hover:scale-105 active:scale-95"
       style={{
         left: "max(20px, env(safe-area-inset-left, 0px))",
         bottom: "max(20px, env(safe-area-inset-bottom, 0px))",
