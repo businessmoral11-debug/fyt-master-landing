@@ -316,6 +316,21 @@ const CSS = `
   .fyt-hw-offer { gap: 7px; }
 }
 @media (max-width: 380px) { .fyt-hw-headline { font-size: 11px; } }
+/* "Extended on demand" badge: visible on every screen size */
+.fyt-hw-ext {
+  display: inline-flex; align-items: center; gap: 6px; flex: none;
+  height: 25px; padding: 0 11px; border-radius: 999px;
+  font-family: 'Inter:Bold', Inter, system-ui, sans-serif; font-weight: 800; font-size: 11.5px; letter-spacing: .08em; white-space: nowrap;
+  color: #fff; background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px rgba(255,190,140,.55);
+}
+.fyt-hw-ext-dot { width: 6px; height: 6px; border-radius: 50%; background: #ff7a2f; box-shadow: 0 0 8px #ff7a2f; }
+.fyt-hw-ext-short { display: none; }
+@media (max-width: 640px) {
+  .fyt-hw-ext { height: 21px; padding: 0 8px; font-size: 9.5px; gap: 5px; letter-spacing: .06em; }
+  .fyt-hw-ext-long { display: none; }
+  .fyt-hw-ext-short { display: inline; }
+}
+@media (max-width: 767px) { .fyt-hw-bar.fyt-hw-compact .fyt-hw-ext { display: none; } }
 `;
 
 const WEB_PATHS = (
@@ -396,6 +411,8 @@ export function HalloweenPromoBar({ compact = false }: { compact?: boolean }) {
           <span className="fyt-hw-divider" aria-hidden="true" />
           <span className="fyt-hw-sub">{stage}</span>
         </div>
+
+        <span className="fyt-hw-ext"><span className="fyt-hw-ext-dot" aria-hidden="true" /><span className="fyt-hw-ext-long">EXTENDED ON DEMAND</span><span className="fyt-hw-ext-short">EXTENDED</span></span>
 
         <button type="button" className="fyt-hw-code" aria-label={`Copy coupon code ${HALLOWEEN_CODE}`}>
           <span className="fyt-hw-code-lbl">CODE</span>
