@@ -1260,7 +1260,6 @@ function HeroCta({
 }
 
 const HERO_TRUSTINDEX_LOADER_SRC = "https://cdn.trustindex.io/loader.js?e7ec0f57824081211c46a9bf46f";
-const HERO_TRUSTINDEX_REVIEW_LABEL = "3K+ reviews";
 const HERO_TRUSTINDEX_RATING = "4.5";
 let heroTrustindexScriptInjected = false;
 
@@ -1294,11 +1293,8 @@ const HeroTrustindexWidget = memo(function HeroTrustindexWidget() {
       for (const el of strongs) {
         const text = el.textContent || "";
         if (/reviews/i.test(text)) {
-          const node = el as HTMLElement;
-          node.textContent = HERO_TRUSTINDEX_REVIEW_LABEL;
-          node.style.fontSize = "14px";
-          node.style.fontWeight = "600";
-          node.style.letterSpacing = "0.01em";
+          // Show only "Excellent | 4.5 | stars | Trustindex": hide the review count.
+          (el as HTMLElement).style.setProperty("display", "none", "important");
           patchedReviews = true;
         } else if (/^\d\.\d$/.test(text.trim())) {
           (el as HTMLElement).textContent = HERO_TRUSTINDEX_RATING;
@@ -1351,15 +1347,10 @@ const HeroTrustindexMobileWidget = memo(function HeroTrustindexMobileWidget() {
         if (/^\d\.\d$/.test((strong.textContent || "").trim())) {
           strong.textContent = HERO_TRUSTINDEX_RATING;
         }
+        // Mark as patched (no review count is shown, just rating, stars and logo).
         const span = document.createElement("span");
         span.className = "fyt-ti-review-count";
-        span.style.fontSize = "13px";
-        span.style.fontWeight = "600";
-        span.style.color = "#000000";
-        span.style.marginLeft = "4px";
-        span.style.letterSpacing = "0.01em";
-        span.style.whiteSpace = "nowrap";
-        span.textContent = `| ${HERO_TRUSTINDEX_REVIEW_LABEL}`;
+        span.hidden = true;
         strong.after(span);
         const style = document.createElement("style");
         style.textContent = `.ti-widget[data-pid="789d2d278999828b52568075d8b"] .ti-header strong{font-size:13px;font-weight:600}.ti-widget[data-pid="789d2d278999828b52568075d8b"] .ti-header{padding:8px 10px}.ti-widget[data-pid="789d2d278999828b52568075d8b"] .fyt-ti-review-count{font-size:13px;font-weight:600}`;
