@@ -1261,6 +1261,28 @@ function HeroCta({
 
 const HERO_TRUSTINDEX_LOADER_SRC = "https://cdn.trustindex.io/loader.js?e7ec0f57824081211c46a9bf46f";
 const HERO_TRUSTINDEX_RATING = "4.5";
+
+/** 4.5 green stars (last one half), placed right after the rating. Hides the widget's own stars. */
+function addFytStars(widget: Element, after: Element) {
+  if (widget.querySelector(".fyt-ti-stars")) return;
+  const g = "#00b67a";
+  const off = "#d1d5db";
+  const star = "M8 1.6l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.4l-3.8 2 .7-4.3-3.1-3 4.3-.6L8 1.6Z";
+  const wrap = document.createElement("span");
+  wrap.className = "fyt-ti-stars";
+  wrap.setAttribute("aria-label", "4.5 out of 5 stars");
+  wrap.style.cssText = "display:inline-flex;align-items:center;gap:1px;margin:0 6px;vertical-align:middle;line-height:0";
+  let html = "";
+  for (let i = 0; i < 5; i++) {
+    const fill = i < 4 ? g : "url(#fytTiHalf)";
+    html += `<svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true">${i === 4 ? `<defs><linearGradient id="fytTiHalf"><stop offset="50%" stop-color="${g}"/><stop offset="50%" stop-color="${off}"/></linearGradient></defs>` : ""}<path fill="${fill}" d="${star}"/></svg>`;
+  }
+  wrap.innerHTML = html;
+  after.after(wrap);
+  const css = document.createElement("style");
+  css.textContent = ".ti-widget .ti-stars,.ti-widget .ti-star{display:none!important}";
+  widget.prepend(css);
+}
 let heroTrustindexScriptInjected = false;
 
 const HeroTrustindexWidget = memo(function HeroTrustindexWidget() {
@@ -1298,6 +1320,8 @@ const HeroTrustindexWidget = memo(function HeroTrustindexWidget() {
           patchedReviews = true;
         } else if (/^\d\.\d$/.test(text.trim())) {
           (el as HTMLElement).textContent = HERO_TRUSTINDEX_RATING;
+          const w = el.closest(".ti-widget");
+          if (w) addFytStars(w, el);
         }
       }
       if (patchedReviews) {
@@ -1347,6 +1371,7 @@ const HeroTrustindexMobileWidget = memo(function HeroTrustindexMobileWidget() {
         if (/^\d\.\d$/.test((strong.textContent || "").trim())) {
           strong.textContent = HERO_TRUSTINDEX_RATING;
         }
+        addFytStars(widget, strong);
         // Mark as patched (no review count is shown, just rating, stars and logo).
         const span = document.createElement("span");
         span.className = "fyt-ti-review-count";
