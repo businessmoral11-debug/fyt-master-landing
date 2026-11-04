@@ -54,14 +54,17 @@ export const DIWALI_SLIM_CSS = `
   #fyt-dw-bar .fyt-dw-l1 svg,#fyt-dw-bar .fyt-dw-l4 svg{width:11px;height:20px}
   #fyt-dw-bar .fyt-dw-close{top:12px;right:6px;margin-top:0}
   #fyt-dw-bar .fyt-dw-rangoli{width:80px;height:80px;margin-top:-40px}
-  /* scrolled: one thin row (like the Halloween bar) */
+  /* scrolled: one thin row (like the Halloween bar): title over offer, then days / hours / mins */
   #fyt-dw-bar.fyt-dw-compact .fyt-dw-inner{flex-wrap:nowrap;gap:8px;padding:4px 34px 9px 10px;justify-content:space-between}
-  #fyt-dw-bar.fyt-dw-compact .fyt-dw-msg{flex:1 1 auto;min-width:0;justify-content:flex-start}
-  #fyt-dw-bar.fyt-dw-compact .fyt-dw-eyebrow,#fyt-dw-bar.fyt-dw-compact .fyt-dw-ticket,#fyt-dw-bar.fyt-dw-compact .fyt-dw-lantern,#fyt-dw-bar.fyt-dw-compact .fyt-dw-tile[data-u="d"]{display:none}
-  #fyt-dw-bar.fyt-dw-compact .fyt-dw-head{font-size:11.5px}
-  #fyt-dw-bar.fyt-dw-compact .fyt-dw-tile{width:25px;height:21px;border-radius:5px}
-  #fyt-dw-bar.fyt-dw-compact .fyt-dw-num{font-size:11px}
-  #fyt-dw-bar.fyt-dw-compact .fyt-dw-lbl{display:none}
-  #fyt-dw-bar.fyt-dw-compact .fyt-dw-close{top:6px}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-msg{flex:1 1 auto;min-width:0;justify-content:flex-start;padding:0}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-text{flex-direction:column;align-items:flex-start;gap:1px}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-eyebrow{display:inline-block;align-self:flex-start;font-size:8.5px;letter-spacing:.18em}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-ticket,#fyt-dw-bar.fyt-dw-compact .fyt-dw-lantern,#fyt-dw-bar.fyt-dw-compact .fyt-dw-tile[data-u="s"]{display:none}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-head{font-size:11px;font-weight:700}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-tiles{gap:3px}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-tile{width:27px;height:27px;border-radius:5px}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-num{font-size:11.5px}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-lbl{display:block;font-size:5.5px;margin-top:2px;letter-spacing:.08em}
+  #fyt-dw-bar.fyt-dw-compact .fyt-dw-close{top:7px}
 }
 `;

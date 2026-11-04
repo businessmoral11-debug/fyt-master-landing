@@ -1263,14 +1263,20 @@ function OfferBar({ p, small = false }: { p: Pick; small?: boolean }) {
 }
 
 
-/** Diwali Special card: 45% off, the bonus accounts for the chosen size, the code and the countdown. */
+/** Diwali Special card: 45% off, your account plus the free bonus accounts drawn as chips, the code and the countdown. */
 function DiwaliOfferCard({ p, small = false }: { p: Pick; small?: boolean }) {
-  const parts = useCountdown(DIWALI_END).slice(0, 3);
+  const hours = parseInt(useCountdown(DIWALI_END)[0][0], 10) || 0;
+  const mins = useCountdown(DIWALI_END)[1][0];
+  const time: [string, string][] = [[String(Math.floor(hours / 24)).padStart(2, "0"), "Days"], [String(hours % 24).padStart(2, "0"), "Hrs"], [mins, "Mins"]];
   const bonus = diwaliBonus(p.size);
+  const total = bonus + 1;
   const GOLD = "#f0be5a";
+  const GOLD_SOFT = "#ffd98a";
+  const label = fmtSize(p.size);
   return (
-    <div className={`relative shrink-0 overflow-hidden rounded-[22px] ${small ? "p-[16px]" : "p-[20px]"}`} style={{ background: "radial-gradient(420px 220px at 100% 0%, rgba(240,190,90,0.18), transparent 70%), linear-gradient(160deg, #0c2a6e 0%, #06122e 75%)", boxShadow: "0 0 0 1px rgba(240,190,90,0.45), 0 24px 50px -24px rgba(0,0,0,0.7)" }}>
-      <svg aria-hidden="true" className="pointer-events-none absolute -right-[26px] -top-[26px]" width="130" height="130" viewBox="0 0 100 100" fill="none" stroke={GOLD} strokeWidth="1.1" style={{ opacity: 0.55 }}>
+    <div className={`relative shrink-0 overflow-hidden rounded-[24px] ${small ? "p-[16px]" : "p-[20px]"}`} style={{ background: "radial-gradient(460px 240px at 100% 0%, rgba(240,190,90,0.2), transparent 70%), radial-gradient(300px 160px at 0% 100%, rgba(37,99,235,0.28), transparent 70%), linear-gradient(165deg, #0d2f7a 0%, #071a45 55%, #040c22 100%)", boxShadow: "0 0 0 1px rgba(240,190,90,0.5), inset 0 1px 0 rgba(255,236,190,0.25), 0 26px 54px -26px rgba(0,0,0,0.75)" }}>
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-[18px] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #f0be5a, transparent)" }} />
+      <svg aria-hidden="true" className="pointer-events-none absolute -right-[34px] -top-[34px]" width="150" height="150" viewBox="0 0 100 100" fill="none" stroke={GOLD} strokeWidth="1" style={{ opacity: 0.5 }}>
         <circle cx="50" cy="50" r="48" />
         <circle cx="50" cy="50" r="44" strokeDasharray="1.5 3.2" />
         {Array.from({ length: 16 }, (_, k) => <ellipse key={k} cx="50" cy="19" rx="5.5" ry="13" transform={`rotate(${k * 22.5} 50 50)`} />)}
@@ -1278,31 +1284,46 @@ function DiwaliOfferCard({ p, small = false }: { p: Pick; small?: boolean }) {
         <circle cx="50" cy="50" r="5" fill={GOLD} />
         <circle cx="50" cy="50" r="10" />
       </svg>
-      <div className="relative flex flex-col gap-[3px]">
-        <span className="text-[10.5px] font-semibold uppercase tracking-[0.24em]" style={{ color: GOLD }}>Diwali Special</span>
-        <span className="flex items-baseline gap-[8px]">
-          <span className={`font-light leading-none tracking-[-0.03em] ${small ? "text-[46px]" : "text-[56px]"}`} style={{ background: "linear-gradient(180deg,#fff1c9,#e9a93a)", WebkitBackgroundClip: "text", color: "transparent" }}>45%</span>
-          <span className="text-[20px] italic" style={{ color: "#ffd98a", fontFamily: "Georgia, 'Times New Roman', serif" }}>off</span>
-        </span>
+      <div className="relative flex items-center gap-[8px]">
+        <svg aria-hidden="true" width="22" height="20" viewBox="0 0 22 20">
+          <path d="M11 11C7 7 9.5 3 11 0C12.5 3 15 7 11 11Z" fill="#ffb347" />
+          <path d="M1 10Q11 22 21 10Q11 12.5 1 10Z" fill="#c2410c" />
+          <path d="M1 10Q11 12.5 21 10Q11 8.5 1 10Z" fill="#fdba74" />
+        </svg>
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.26em]" style={{ color: GOLD }}>Diwali Special</span>
       </div>
-      <div className="relative mt-[14px] grid grid-cols-2 gap-[8px]">
-        {[{ k: "5K and 10K", n: 2, on: bonus === 1 }, { k: "25K and above", n: 3, on: bonus === 2 }].map((b) => (
-          <div key={b.k} className="rounded-[14px] px-[12px] py-[10px]" style={b.on ? { background: "linear-gradient(180deg, rgba(240,190,90,0.2), rgba(240,190,90,0.05))", boxShadow: `0 0 0 1px ${GOLD}` } : { background: "rgba(255,255,255,0.04)", boxShadow: "0 0 0 1px rgba(240,190,90,0.25)", opacity: 0.8 }}>
-            <span className="block text-[9.5px] font-medium uppercase tracking-[0.16em] text-white/70">{b.k}</span>
-            <span className="mt-[3px] block whitespace-nowrap text-[18px] font-light text-white">Buy <b className="font-semibold" style={{ color: "#ffd98a" }}>1</b> Get <b className="font-semibold" style={{ color: "#ffd98a" }}>{b.n}</b></span>
-          </div>
-        ))}
+      <div className="relative mt-[6px] flex items-end gap-[10px]">
+        <span className={`font-extralight leading-[0.9] tracking-[-0.04em] ${small ? "text-[58px]" : "text-[70px]"}`} style={{ background: "linear-gradient(180deg,#fff6dc 0%,#f4c46a 55%,#d9962b 100%)", WebkitBackgroundClip: "text", color: "transparent" }}>45%</span>
+        <span className="pb-[6px] text-[22px] italic leading-none" style={{ color: GOLD_SOFT, fontFamily: "Georgia, 'Times New Roman', serif" }}>off</span>
+        <span className="ml-auto pb-[8px] text-right text-[11px] font-medium leading-[1.25] text-white/70">on every<br />account size</span>
       </div>
-      <div className="relative mt-[14px] flex items-center justify-between gap-[10px]">
-        <span className="flex items-center gap-[6px] rounded-full px-[13px] py-[7px] text-[12px] font-semibold tracking-[0.14em] text-[#2a1500]" style={{ background: "linear-gradient(180deg,#f8d684,#d9962b)" }}>
+      <div className="relative mt-[16px] flex items-stretch gap-[7px]" aria-label={`Buy 1 get ${total}: you pay for one ${label} account and get ${bonus} free`}>
+        {Array.from({ length: total }, (_, k) =>
+          k === 0 ? (
+            <div key={k} className="flex min-w-0 flex-1 flex-col items-center justify-center rounded-[14px] py-[10px]" style={{ background: "linear-gradient(160deg,#3b6cf0,#1c3b9c)", boxShadow: "0 0 0 1px rgba(191,219,254,0.45), inset 0 1px 0 rgba(255,255,255,0.3)" }}>
+              <span className="text-[8.5px] font-semibold uppercase tracking-[0.18em] text-[#dbeafe]">You buy</span>
+              <span className="mt-[3px] text-[20px] font-semibold leading-none text-white">{label}</span>
+            </div>
+          ) : (
+            <div key={k} className="relative flex min-w-0 flex-1 flex-col items-center justify-center rounded-[14px] py-[10px]" style={{ background: "linear-gradient(180deg, rgba(240,190,90,0.18), rgba(240,190,90,0.04))", border: `1px dashed ${GOLD}` }}>
+              <span className="text-[8.5px] font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Free</span>
+              <span className="mt-[3px] text-[20px] font-semibold leading-none" style={{ color: GOLD_SOFT }}>{label}</span>
+            </div>
+          ),
+        )}
+      </div>
+      <div className="relative mt-[8px] text-center text-[11.5px] font-medium text-white/65">Buy 1 Get {total}, bonus accounts are the same size</div>
+      <div className="relative mt-[16px] flex items-center justify-between gap-[10px]">
+        <span className="flex items-center gap-[7px] rounded-[10px] py-[7px] pl-[10px] pr-[12px] text-[13px] font-bold tracking-[0.12em] text-[#2a1500]" style={{ background: "linear-gradient(135deg,#ffe7a6,#f5b942 55%,#e08e1c)", boxShadow: "0 6px 18px -6px rgba(245,158,11,0.6), inset 0 1px 0 rgba(255,255,255,0.6)" }}>
+          <Svg d={IC.tag} size={13} color="#7a3b00" w={2.2} />
           {DIWALI_CODE}
           <Svg d={IC.check} size={12} color="#14532d" w={3} />
         </span>
         <span className="flex items-center gap-[4px]" role="timer" aria-label="Time left">
-          {parts.map(([v, u]) => (
-            <span key={u} className="tabular rounded-[8px] px-[7px] py-[4px] text-[13px] font-medium text-[#ffe3a8]" style={{ background: "rgba(240,190,90,0.12)", border: "1px solid rgba(240,190,90,0.4)" }}>
-              {v}
-              <span className="ml-[1px] text-[10px] opacity-80">{u}</span>
+          {time.map(([v, u]) => (
+            <span key={u} className="flex w-[36px] flex-col items-center rounded-[9px] py-[4px]" style={{ background: "rgba(4,10,28,0.6)", border: "1px solid rgba(240,190,90,0.4)" }}>
+              <span className="tabular text-[14px] font-semibold leading-none text-white">{v}</span>
+              <span className="mt-[3px] text-[7px] font-semibold uppercase leading-none tracking-[0.1em]" style={{ color: GOLD }}>{u}</span>
             </span>
           ))}
         </span>
