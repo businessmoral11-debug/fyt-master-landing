@@ -1295,7 +1295,10 @@ function DiwaliOfferCard({ p, small = false }: { p: Pick; small?: boolean }) {
       <div className="relative mt-[6px] flex items-end gap-[10px]">
         <span className={`font-extralight leading-[0.9] tracking-[-0.04em] ${small ? "text-[58px]" : "text-[70px]"}`} style={{ background: "linear-gradient(180deg,#fff6dc 0%,#f4c46a 55%,#d9962b 100%)", WebkitBackgroundClip: "text", color: "transparent" }}>45%</span>
         <span className="pb-[6px] text-[22px] italic leading-none" style={{ color: GOLD_SOFT, fontFamily: "Georgia, 'Times New Roman', serif" }}>off</span>
-        <span className="ml-auto pb-[8px] text-right text-[11px] font-medium leading-[1.25] text-white/70">on every<br />account size</span>
+        <span className="ml-auto flex flex-col gap-[4px] pb-[8px] text-right text-[10.5px] leading-[1.15]">
+          <span style={{ color: bonus === 2 ? GOLD_SOFT : "rgba(255,255,255,0.45)", fontWeight: bonus === 2 ? 700 : 500 }}>25K and above · Buy 1 Get 3</span>
+          <span style={{ color: bonus === 1 ? GOLD_SOFT : "rgba(255,255,255,0.45)", fontWeight: bonus === 1 ? 700 : 500 }}>5K and 10K · Buy 1 Get 2</span>
+        </span>
       </div>
       <div className="relative mt-[16px] flex items-stretch gap-[7px]" aria-label={`Buy 1 get ${total}: you pay for one ${label} account and get ${bonus} free`}>
         {Array.from({ length: total }, (_, k) =>
@@ -1425,6 +1428,7 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
               </span>
             </div>
             <SpecStrip p={p} compact />
+            {p.offer === "diwali" && <DiwaliSummary p={p} />}
             {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
             <Hairline />
             <div className="flex shrink-0 items-end justify-between gap-[10px]">
@@ -1473,6 +1477,36 @@ function TrustLine() {
     <p className="m-0 shrink-0 text-center text-[11.5px]" style={{ color: MUTED }}>
       <span className="text-[#00b67a]">★</span> <b className="text-[#c7d2e6]">4.5/5</b> · 3K+ reviews · Rewards in 24-48h
     </p>
+  );
+}
+
+/** Order summary for Diwali: how many free accounts, drawn as chips for the chosen size. */
+function DiwaliSummary({ p }: { p: Pick }) {
+  const bonus = diwaliBonus(p.size);
+  const label = fmtSize(p.size);
+  const GOLD = "#f0be5a";
+  return (
+    <div className="flex shrink-0 flex-col gap-[8px]" aria-label={`You get ${bonus + 1} ${label} accounts, ${bonus} free`}>
+      <div className="flex items-center gap-[10px] rounded-[14px] px-[12px] py-[9px]" style={{ background: "linear-gradient(90deg, rgba(34,197,94,0.16), rgba(34,197,94,0.05))", border: "1px solid rgba(34,197,94,0.35)" }}>
+        <span className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-[#22c55e]"><Svg d="M12 8v13M4 12v8h16v-8M3 8h18v4H3zM12 8c-1-3-5-4-5-1.5S10 8 12 8zM12 8c1-3 5-4 5-1.5S14 8 12 8z" size={14} color="#04210f" w={2.2} /></span>
+        <span className="text-[13.5px] font-bold text-white">+ {bonus} free account{bonus > 1 ? "s" : ""} <span className="text-[#86efac]">instantly</span></span>
+      </div>
+      <div className="flex items-stretch gap-[6px]">
+        {Array.from({ length: bonus + 1 }, (_, k) =>
+          k === 0 ? (
+            <div key={k} className="flex min-w-0 flex-1 flex-col items-center justify-center rounded-[12px] py-[7px]" style={{ background: "linear-gradient(160deg,#3b6cf0,#1c3b9c)", boxShadow: "0 0 0 1px rgba(191,219,254,0.4)" }}>
+              <span className="text-[8px] font-semibold uppercase tracking-[0.16em] text-[#dbeafe]">You buy</span>
+              <span className="mt-[2px] text-[16px] font-semibold leading-none text-white">{label}</span>
+            </div>
+          ) : (
+            <div key={k} className="flex min-w-0 flex-1 flex-col items-center justify-center rounded-[12px] py-[7px]" style={{ background: "linear-gradient(180deg, rgba(240,190,90,0.18), rgba(240,190,90,0.04))", border: `1px dashed ${GOLD}` }}>
+              <span className="text-[8px] font-bold uppercase tracking-[0.16em]" style={{ color: GOLD }}>Free bonus</span>
+              <span className="mt-[2px] text-[16px] font-semibold leading-none" style={{ color: "#ffd98a" }}>{label}</span>
+            </div>
+          ),
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -1621,7 +1655,7 @@ function MobileTwo({ p, heading, compare, setCompare, openSheet }: LayoutProps) 
         <AccountHead p={p} />
         <Hairline />
         <PriceRow p={p} />
-        <BonusRow />
+        {p.offer === "diwali" ? <DiwaliSummary p={p} /> : <BonusRow />}
         {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
         <BuyButton p={p} onNeedTreats={openSheet} wide />
         <CodeLine p={p} />
