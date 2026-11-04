@@ -7,7 +7,7 @@
  * the end of Halloween night (IST).
  *
  * Preview: add ?halloween=1 to any URL to see it early (or ?halloween=0 to hide it).
- * Vercel preview links show it by default.
+ * Vercel preview links no longer show it by default (Diwali does); use ?halloween=1.
  */
 import { PROMO_DEADLINE } from "./promoBanner";
 
@@ -43,7 +43,6 @@ function previewFlag(): boolean | null {
     const q = new URLSearchParams(window.location.search).get("halloween");
     if (q === "1") return true;
     if (q === "0") return false;
-    if (/\.vercel\.app$/i.test(window.location.hostname)) return true;
   } catch {
     // Ignore and fall back to the dates.
   }

@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/rea
 import { PROMO_BENEFITS, PROMO_CARD_EXTRAS, PROMO_CARD_HEADLINE, PROMO_CODE, PROMO_DEADLINE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, formatHoursLeft } from "@/app/data/promoBanner";
 import { countryFlagUrl, fetchFeaturedPayouts, formatPayoutAmount, type PublicPayout } from "@/app/api/rewardsApi";
 import { pauseHeavyScenesForNav } from "@/app/three/scenePause";
+import { DIWALI_DEAL_LINE, DIWALI_DEAL_SHORT, DIWALI_END, isDiwaliLive } from "@/app/data/diwali";
 import { HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, isHalloweenLive } from "@/app/data/halloween";
 import { EASE } from "./ui";
 
@@ -200,8 +201,9 @@ export function FloatingCta() {
   const [show, setShow] = useState(false);
   const reduce = useReducedMotion();
   const hw = isHalloweenLive();
-  const dealCompact = hw ? HALLOWEEN_DEAL_SHORT : DEAL_COMPACT;
-  const left = formatHoursLeft(hw ? HALLOWEEN_END : PROMO_DEADLINE, useNow(show));
+  const dw = !hw && isDiwaliLive();
+  const dealCompact = hw ? HALLOWEEN_DEAL_SHORT : dw ? DIWALI_DEAL_SHORT : DEAL_COMPACT;
+  const left = formatHoursLeft(hw ? HALLOWEEN_END : dw ? DIWALI_END : PROMO_DEADLINE, useNow(show));
   useEffect(() => {
     let raf = 0;
     const check = () => {
@@ -247,7 +249,7 @@ export function FloatingCta() {
             background: "linear-gradient(180deg, #4f8cff 0%, #2563eb 100%)",
             boxShadow: "0 18px 40px -12px rgba(37,99,235,0.8), 0 0 0 1px rgba(191,219,254,0.35), inset 0 1px 0 rgba(255,255,255,0.35)",
           }}
-          aria-label={`Claim offer: ${hw ? HALLOWEEN_DEAL_LINE : PROMO_DEAL_LINE}`}
+          aria-label={`Claim offer: ${hw ? HALLOWEEN_DEAL_LINE : dw ? DIWALI_DEAL_LINE : PROMO_DEAL_LINE}`}
         >
           {/* Phones: two compact lines. Desktop: offer chip + action + timer on one line. */}
           <span className="flex min-w-0 flex-col leading-none sm:hidden">

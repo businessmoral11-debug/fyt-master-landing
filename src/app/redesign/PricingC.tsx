@@ -11,6 +11,7 @@ import imgPlatform5Logo from "@/assets/live-site/platform-logos/platform-5-clear
 import { STEP_PLANS, STEP_SIZES, checkoutUrl, fmtSize, getEntry, type PlanId, type PlatformId, type StepId } from "@/app/data/pricing";
 import { ALT_PROMO_CODE, PROMO_CODE, PROMO_DEADLINE } from "@/app/data/promoBanner";
 import { SELECT_PLAN_EVENT, writeSavedPlan, type SavedPlan } from "@/app/data/savedPlan";
+import { DIWALI_CODE, DIWALI_END, DIWALI_OFF, diwaliBonus, isDiwaliLive } from "@/app/data/diwali";
 import { HALLOWEEN_CODE, HALLOWEEN_END, HALLOWEEN_OFF, TREATS, TREAT_PICKS, halloweenStage, isHalloweenLive, withHalloween, type TreatId } from "@/app/data/halloween";
 
 const STEPS: StepId[] = ["1-Step", "2-Step", "Instant"];
@@ -27,11 +28,12 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 /* ------------------------------ offers ----------------------------------- */
 
-type OfferId = "launch" | "welcome" | "halloween";
+type OfferId = "launch" | "welcome" | "halloween" | "diwali";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
   launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+ 1 free account instantly", "+ 5% cashback"], who: "1 free account · 5% cashback" },
   welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ 1 free account instantly", "+ 5% instant cashback"], who: "Welcome gift" },
   halloween: { off: HALLOWEEN_OFF, code: HALLOWEEN_CODE, title: "45% OFF", extras: ["+ 1 free account instantly", "+ any 2 treats"], who: "Haunted Vault" },
+  diwali: { off: DIWALI_OFF, code: DIWALI_CODE, title: "45% OFF", extras: ["+ bonus accounts instantly"], who: "Diwali Special" },
 };
 const EMBER = "#ff8a3d";
 const EMBER_SOFT = "#ffb47a";
@@ -70,7 +72,8 @@ function usePick() {
   const giftValid = giftAt !== null && Date.now() < giftAt + GIFT_MS;
   const [offerRaw, setOffer] = useState<OfferId>(() => (giftValid ? "welcome" : "launch"));
   const halloween = isHalloweenLive();
-  const offer: OfferId = halloween ? "halloween" : offerRaw === "welcome" && giftValid ? "welcome" : "launch";
+  const diwali = !halloween && isDiwaliLive();
+  const offer: OfferId = halloween ? "halloween" : diwali ? "diwali" : offerRaw === "welcome" && giftValid ? "welcome" : "launch";
   const [treats, setTreatsRaw] = useState<TreatId[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -1259,6 +1262,55 @@ function OfferBar({ p, small = false }: { p: Pick; small?: boolean }) {
   );
 }
 
+
+/** Diwali Special card: 45% off, the bonus accounts for the chosen size, the code and the countdown. */
+function DiwaliOfferCard({ p, small = false }: { p: Pick; small?: boolean }) {
+  const parts = useCountdown(DIWALI_END).slice(0, 3);
+  const bonus = diwaliBonus(p.size);
+  const GOLD = "#f0be5a";
+  return (
+    <div className={`relative shrink-0 overflow-hidden rounded-[22px] ${small ? "p-[16px]" : "p-[20px]"}`} style={{ background: "radial-gradient(420px 220px at 100% 0%, rgba(240,190,90,0.18), transparent 70%), linear-gradient(160deg, #0c2a6e 0%, #06122e 75%)", boxShadow: "0 0 0 1px rgba(240,190,90,0.45), 0 24px 50px -24px rgba(0,0,0,0.7)" }}>
+      <svg aria-hidden="true" className="pointer-events-none absolute -right-[26px] -top-[26px]" width="130" height="130" viewBox="0 0 100 100" fill="none" stroke={GOLD} strokeWidth="1.1" style={{ opacity: 0.55 }}>
+        <circle cx="50" cy="50" r="48" />
+        <circle cx="50" cy="50" r="44" strokeDasharray="1.5 3.2" />
+        {Array.from({ length: 16 }, (_, k) => <ellipse key={k} cx="50" cy="19" rx="5.5" ry="13" transform={`rotate(${k * 22.5} 50 50)`} />)}
+        {Array.from({ length: 8 }, (_, k) => <ellipse key={"i" + k} cx="50" cy="33" rx="3.6" ry="8" transform={`rotate(${k * 45} 50 50)`} />)}
+        <circle cx="50" cy="50" r="5" fill={GOLD} />
+        <circle cx="50" cy="50" r="10" />
+      </svg>
+      <div className="relative flex flex-col gap-[3px]">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.24em]" style={{ color: GOLD }}>Diwali Special</span>
+        <span className="flex items-baseline gap-[8px]">
+          <span className={`font-light leading-none tracking-[-0.03em] ${small ? "text-[46px]" : "text-[56px]"}`} style={{ background: "linear-gradient(180deg,#fff1c9,#e9a93a)", WebkitBackgroundClip: "text", color: "transparent" }}>45%</span>
+          <span className="text-[20px] italic" style={{ color: "#ffd98a", fontFamily: "Georgia, 'Times New Roman', serif" }}>off</span>
+        </span>
+      </div>
+      <div className="relative mt-[14px] grid grid-cols-2 gap-[8px]">
+        {[{ k: "5K and 10K", n: 2, on: bonus === 1 }, { k: "25K and above", n: 3, on: bonus === 2 }].map((b) => (
+          <div key={b.k} className="rounded-[14px] px-[12px] py-[10px]" style={b.on ? { background: "linear-gradient(180deg, rgba(240,190,90,0.2), rgba(240,190,90,0.05))", boxShadow: `0 0 0 1px ${GOLD}` } : { background: "rgba(255,255,255,0.04)", boxShadow: "0 0 0 1px rgba(240,190,90,0.25)", opacity: 0.8 }}>
+            <span className="block text-[9.5px] font-medium uppercase tracking-[0.16em] text-white/70">{b.k}</span>
+            <span className="mt-[3px] block whitespace-nowrap text-[18px] font-light text-white">Buy <b className="font-semibold" style={{ color: "#ffd98a" }}>1</b> Get <b className="font-semibold" style={{ color: "#ffd98a" }}>{b.n}</b></span>
+          </div>
+        ))}
+      </div>
+      <div className="relative mt-[14px] flex items-center justify-between gap-[10px]">
+        <span className="flex items-center gap-[6px] rounded-full px-[13px] py-[7px] text-[12px] font-semibold tracking-[0.14em] text-[#2a1500]" style={{ background: "linear-gradient(180deg,#f8d684,#d9962b)" }}>
+          {DIWALI_CODE}
+          <Svg d={IC.check} size={12} color="#14532d" w={3} />
+        </span>
+        <span className="flex items-center gap-[4px]" role="timer" aria-label="Time left">
+          {parts.map(([v, u]) => (
+            <span key={u} className="tabular rounded-[8px] px-[7px] py-[4px] text-[13px] font-medium text-[#ffe3a8]" style={{ background: "rgba(240,190,90,0.12)", border: "1px solid rgba(240,190,90,0.4)" }}>
+              {v}
+              <span className="ml-[1px] text-[10px] opacity-80">{u}</span>
+            </span>
+          ))}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /** The two free treats as two even slots: tap to pick, tap again to change. */
 function TreatSlots({ p, onPick }: { p: Pick; onPick: () => void }) {
   const names = p.treats.map((id) => TREATS.find((t) => t.id === id)?.name ?? id);
@@ -1336,7 +1388,7 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
       <div className="mb-[34px]">{heading ?? <DefaultHeading />}</div>
       <div className="grid grid-cols-[minmax(0,420px)_minmax(0,1fr)] items-start gap-[40px]">
         <div className="sticky flex flex-col gap-[12px] overflow-y-auto [scrollbar-width:none] [&>*]:shrink-0" style={{ top, maxHeight: `calc(100vh - ${top + 16}px)` }}>
-          {p.halloween ? <OfferBar p={p} /> : <OfferSwitch p={p} />}
+          {p.offer === "diwali" ? <DiwaliOfferCard p={p} /> : p.halloween ? <OfferBar p={p} /> : <OfferSwitch p={p} />}
           <div className="relative flex flex-col gap-[14px] rounded-[24px] p-[18px]" style={{ ...CARD_STYLE, boxShadow: "none" }}>
             <div className="flex items-center justify-between gap-[10px]">
               <div className="flex min-w-0 flex-col gap-[3px]">
@@ -1477,7 +1529,7 @@ function MobileShell({ heading, p, children }: { heading?: ReactNode; p: Pick; c
   return (
     <div className="relative mx-auto flex w-full max-w-[560px] flex-col gap-[16px] px-[16px] pb-[64px] pt-[52px]">
       {heading ?? <DefaultHeading />}
-      {p.halloween ? <OfferBar p={p} small /> : <OfferSwitch p={p} />}
+      {p.offer === "diwali" ? <DiwaliOfferCard p={p} small /> : p.halloween ? <OfferBar p={p} small /> : <OfferSwitch p={p} />}
       {children}
     </div>
   );

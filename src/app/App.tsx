@@ -21,6 +21,8 @@ import { heroSweepCss } from "@/app/motion/heroSweep";
 import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ_ITEMS } from "@/app/data/liveSiteContent";
 import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
 import { HalloweenPromoBar } from "@/app/HalloweenPromoBar";
+import { DiwaliPromoBar } from "@/app/diwali/DiwaliPromoBar";
+import { DIWALI_OFF, isDiwaliLive } from "@/app/data/diwali";
 import { HALLOWEEN_OFF, HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
 import { loadFytChat } from "@/app/fytChat";
@@ -605,7 +607,7 @@ function PromoCountdownPill({ compact = false, pulse, deadline = PROMO_DEADLINE,
 
 /** Lowest starting price across the three models (Prime, MatchTrader, smallest size) with today's offer. */
 function heroFromPrice(): number {
-  const off = isHalloweenLive() ? HALLOWEEN_OFF : 0.4;
+  const off = isHalloweenLive() ? HALLOWEEN_OFF : isDiwaliLive() ? DIWALI_OFF : 0.4;
   const prices = (Object.keys(STEP_SIZES) as StepId[]).map((st) => getEntry(st, "prime", "match-trader", STEP_SIZES[st][0])?.priceOld ?? Infinity);
   return Math.round(Math.min(...prices) * (1 - off));
 }
@@ -650,7 +652,9 @@ function HalloweenBannerDecor({ animate }: { animate: boolean }) {
 /** Halloween uses its own animated bar; otherwise the regular promo banner. */
 function PromoSlot() {
   const { compact } = useContext(HeaderModeContext);
-  return isHalloweenLive() ? <HalloweenPromoBar compact={compact} /> : <PromoBanner />;
+  if (isHalloweenLive()) return <HalloweenPromoBar compact={compact} />;
+  if (isDiwaliLive()) return <DiwaliPromoBar />;
+  return <PromoBanner />;
 }
 
 function PromoBanner() {
