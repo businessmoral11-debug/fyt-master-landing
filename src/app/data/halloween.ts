@@ -12,7 +12,7 @@
 import { PROMO_DEADLINE } from "./promoBanner";
 
 export const HALLOWEEN_START = PROMO_DEADLINE;
-export const HALLOWEEN_END = "2026-11-04T23:59:59+05:30"; // extended on demand to 4 Nov 23:59 IST
+export const HALLOWEEN_END = "2026-11-05T09:59:59+05:30"; // extended on demand: +10 hours, to 5 Nov 9:59 AM IST
 export const HALLOWEEN_CODE = "FYTWEEN";
 export const HALLOWEEN_OFF = 0.45;
 
@@ -70,7 +70,7 @@ export function halloweenStage(now: number = Date.now()): HalloweenStage {
 export const STAGE_LABEL: Record<HalloweenStage, string> = {
   open: "Extended on demand",
   final48: "Extended on demand",
-  tonight: "Last chance, ends tonight",
+  tonight: "Last chance, extended on demand",
 };
 
 export const HALLOWEEN_DEAL_LINE = "45% off + BOGO Instantly + Pick Any 2 Treats";
