@@ -653,7 +653,7 @@ function HalloweenBannerDecor({ animate }: { animate: boolean }) {
 function PromoSlot() {
   const { compact } = useContext(HeaderModeContext);
   if (isHalloweenLive()) return <HalloweenPromoBar compact={compact} />;
-  if (isDiwaliLive()) return <DiwaliPromoBar />;
+  if (isDiwaliLive()) return <DiwaliPromoBar compact={compact} />;
   return <PromoBanner />;
 }
 
