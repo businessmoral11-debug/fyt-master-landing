@@ -43,6 +43,8 @@ function previewFlag(): boolean | null {
     const q = new URLSearchParams(window.location.search).get("halloween");
     if (q === "1") return true;
     if (q === "0") return false;
+    // Vercel previews of the Diwali branch show Diwali, not Halloween (use ?halloween=1 to see Halloween).
+    if (/\.vercel\.app$/i.test(window.location.hostname)) return false;
   } catch {
     // Ignore and fall back to the dates.
   }
