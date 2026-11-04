@@ -1263,20 +1263,21 @@ function OfferBar({ p, small = false }: { p: Pick; small?: boolean }) {
 }
 
 
-/** Diwali Special card: 45% off, your account plus the free bonus accounts drawn as chips, the code and the countdown. */
+/** Diwali Special card: 45% off, the two tiers (the chosen size lights up), the code and the countdown. */
 function DiwaliOfferCard({ p, small = false }: { p: Pick; small?: boolean }) {
-  const hours = parseInt(useCountdown(DIWALI_END)[0][0], 10) || 0;
-  const mins = useCountdown(DIWALI_END)[1][0];
-  const time: [string, string][] = [[String(Math.floor(hours / 24)).padStart(2, "0"), "Days"], [String(hours % 24).padStart(2, "0"), "Hrs"], [mins, "Mins"]];
+  const left = useCountdown(DIWALI_END);
+  const hours = parseInt(left[0][0], 10) || 0;
+  const time: [string, string][] = [[String(Math.floor(hours / 24)).padStart(2, "0"), "Days"], [String(hours % 24).padStart(2, "0"), "Hrs"], [left[1][0], "Mins"]];
   const bonus = diwaliBonus(p.size);
-  const total = bonus + 1;
   const GOLD = "#f0be5a";
-  const GOLD_SOFT = "#ffd98a";
-  const label = fmtSize(p.size);
+  const tiers = [
+    { k: "5K and 10K", n: 2, on: bonus === 1 },
+    { k: "25K and above", n: 3, on: bonus === 2 },
+  ];
   return (
-    <div className={`relative shrink-0 overflow-hidden rounded-[24px] ${small ? "p-[16px]" : "p-[20px]"}`} style={{ background: "radial-gradient(460px 240px at 100% 0%, rgba(240,190,90,0.2), transparent 70%), radial-gradient(300px 160px at 0% 100%, rgba(37,99,235,0.28), transparent 70%), linear-gradient(165deg, #0d2f7a 0%, #071a45 55%, #040c22 100%)", boxShadow: "0 0 0 1px rgba(240,190,90,0.5), inset 0 1px 0 rgba(255,236,190,0.25), 0 26px 54px -26px rgba(0,0,0,0.75)" }}>
+    <div className={`relative shrink-0 overflow-hidden rounded-[24px] ${small ? "p-[16px]" : "p-[20px]"}`} style={{ background: "radial-gradient(460px 240px at 100% 0%, rgba(240,190,90,0.16), transparent 70%), radial-gradient(300px 160px at 0% 100%, rgba(37,99,235,0.28), transparent 70%), linear-gradient(165deg, #0d2f7a 0%, #071a45 55%, #040c22 100%)", boxShadow: "0 0 0 1px rgba(240,190,90,0.5), inset 0 1px 0 rgba(255,236,190,0.25), 0 26px 54px -26px rgba(0,0,0,0.75)" }}>
       <span aria-hidden="true" className="pointer-events-none absolute inset-x-[18px] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #f0be5a, transparent)" }} />
-      <svg aria-hidden="true" className="pointer-events-none absolute -right-[34px] -top-[34px]" width="150" height="150" viewBox="0 0 100 100" fill="none" stroke={GOLD} strokeWidth="1" style={{ opacity: 0.5 }}>
+      <svg aria-hidden="true" className="pointer-events-none absolute -right-[46px] -top-[46px] z-0" width="150" height="150" viewBox="0 0 100 100" fill="none" stroke={GOLD} strokeWidth="1" style={{ opacity: 0.28 }}>
         <circle cx="50" cy="50" r="48" />
         <circle cx="50" cy="50" r="44" strokeDasharray="1.5 3.2" />
         {Array.from({ length: 16 }, (_, k) => <ellipse key={k} cx="50" cy="19" rx="5.5" ry="13" transform={`rotate(${k * 22.5} 50 50)`} />)}
@@ -1284,7 +1285,7 @@ function DiwaliOfferCard({ p, small = false }: { p: Pick; small?: boolean }) {
         <circle cx="50" cy="50" r="5" fill={GOLD} />
         <circle cx="50" cy="50" r="10" />
       </svg>
-      <div className="relative flex items-center gap-[8px]">
+      <div className="relative z-[1] flex items-center gap-[8px]">
         <svg aria-hidden="true" width="22" height="20" viewBox="0 0 22 20">
           <path d="M11 11C7 7 9.5 3 11 0C12.5 3 15 7 11 11Z" fill="#ffb347" />
           <path d="M1 10Q11 22 21 10Q11 12.5 1 10Z" fill="#c2410c" />
@@ -1292,31 +1293,19 @@ function DiwaliOfferCard({ p, small = false }: { p: Pick; small?: boolean }) {
         </svg>
         <span className="text-[10.5px] font-semibold uppercase tracking-[0.26em]" style={{ color: GOLD }}>Diwali Special</span>
       </div>
-      <div className="relative mt-[6px] flex items-end gap-[10px]">
+      <div className="relative z-[1] mt-[6px] flex items-end gap-[10px]">
         <span className={`font-extralight leading-[0.9] tracking-[-0.04em] ${small ? "text-[58px]" : "text-[70px]"}`} style={{ background: "linear-gradient(180deg,#fff6dc 0%,#f4c46a 55%,#d9962b 100%)", WebkitBackgroundClip: "text", color: "transparent" }}>45%</span>
-        <span className="pb-[6px] text-[22px] italic leading-none" style={{ color: GOLD_SOFT, fontFamily: "Georgia, 'Times New Roman', serif" }}>off</span>
-        <span className="ml-auto flex flex-col gap-[4px] pb-[8px] text-right text-[10.5px] leading-[1.15]">
-          <span style={{ color: bonus === 2 ? GOLD_SOFT : "rgba(255,255,255,0.45)", fontWeight: bonus === 2 ? 700 : 500 }}>25K and above · Buy 1 Get 3</span>
-          <span style={{ color: bonus === 1 ? GOLD_SOFT : "rgba(255,255,255,0.45)", fontWeight: bonus === 1 ? 700 : 500 }}>5K and 10K · Buy 1 Get 2</span>
-        </span>
+        <span className="pb-[6px] text-[22px] italic leading-none" style={{ color: "#ffd98a", fontFamily: "Georgia, 'Times New Roman', serif" }}>off</span>
       </div>
-      <div className="relative mt-[16px] flex items-stretch gap-[7px]" aria-label={`Buy 1 get ${total}: you pay for one ${label} account and get ${bonus} free`}>
-        {Array.from({ length: total }, (_, k) =>
-          k === 0 ? (
-            <div key={k} className="flex min-w-0 flex-1 flex-col items-center justify-center rounded-[14px] py-[10px]" style={{ background: "linear-gradient(160deg,#3b6cf0,#1c3b9c)", boxShadow: "0 0 0 1px rgba(191,219,254,0.45), inset 0 1px 0 rgba(255,255,255,0.3)" }}>
-              <span className="text-[8.5px] font-semibold uppercase tracking-[0.18em] text-[#dbeafe]">You buy</span>
-              <span className="mt-[3px] text-[20px] font-semibold leading-none text-white">{label}</span>
-            </div>
-          ) : (
-            <div key={k} className="relative flex min-w-0 flex-1 flex-col items-center justify-center rounded-[14px] py-[10px]" style={{ background: "linear-gradient(180deg, rgba(240,190,90,0.18), rgba(240,190,90,0.04))", border: `1px dashed ${GOLD}` }}>
-              <span className="text-[8.5px] font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Free</span>
-              <span className="mt-[3px] text-[20px] font-semibold leading-none" style={{ color: GOLD_SOFT }}>{label}</span>
-            </div>
-          ),
-        )}
+      <div className="relative z-[1] mt-[16px] grid grid-cols-2 gap-[8px]" role="group" aria-label="Free accounts by size">
+        {tiers.map((t) => (
+          <div key={t.k} className="flex flex-col items-center justify-center rounded-[14px] px-[8px] py-[10px] text-center" style={t.on ? { background: "linear-gradient(135deg,#ffe7a6,#f5b942 55%,#e08e1c)", boxShadow: "0 10px 24px -10px rgba(245,158,11,0.7), inset 0 1px 0 rgba(255,255,255,0.6)", color: "#2a1500" } : { background: "rgba(255,255,255,0.04)", boxShadow: "inset 0 0 0 1px rgba(240,190,90,0.22)", color: "rgba(255,255,255,0.55)" }}>
+            <span className="whitespace-nowrap text-[17px] font-semibold leading-none tracking-[-0.01em]">Buy 1 Get {t.n}</span>
+            <span className="mt-[5px] whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.12em]" style={{ opacity: t.on ? 0.75 : 0.8 }}>{t.k}</span>
+          </div>
+        ))}
       </div>
-      <div className="relative mt-[8px] text-center text-[11.5px] font-medium text-white/65">Buy 1 Get {total}, bonus accounts are the same size</div>
-      <div className="relative mt-[16px] flex items-center justify-between gap-[10px]">
+      <div className="relative z-[1] mt-[14px] flex items-center justify-between gap-[10px]">
         <span className="flex items-center gap-[7px] rounded-[10px] py-[7px] pl-[10px] pr-[12px] text-[13px] font-bold tracking-[0.12em] text-[#2a1500]" style={{ background: "linear-gradient(135deg,#ffe7a6,#f5b942 55%,#e08e1c)", boxShadow: "0 6px 18px -6px rgba(245,158,11,0.6), inset 0 1px 0 rgba(255,255,255,0.6)" }}>
           <Svg d={IC.tag} size={13} color="#7a3b00" w={2.2} />
           {DIWALI_CODE}
@@ -1616,35 +1605,9 @@ function AccountHead({ p }: { p: Pick }) {
 }
 
 function MobileTwo({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
-  // "What's included" is open while the visitor is picking, and folds away on its own once the
-  // price card comes up the screen. Scrolling back up to the picker opens it again.
+  // "What's included" starts open and stays as the visitor leaves it: only the arrow opens or closes it.
   const [open, setOpen] = useState(true);
   const buyRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    let raf = 0;
-    let zone: "pick" | "price" = "pick";
-    const check = () => {
-      raf = 0;
-      const el = buyRef.current;
-      if (!el) return;
-      const top = el.getBoundingClientRect().top;
-      const vh = window.innerHeight;
-      const next = top < vh * 0.62 ? "price" : top > vh * 0.9 ? "pick" : zone;
-      if (next !== zone) {
-        zone = next;
-        setOpen(next === "pick");
-      }
-    };
-    const on = () => { if (!raf) raf = requestAnimationFrame(check); };
-    window.addEventListener("scroll", on, { passive: true });
-    window.addEventListener("resize", on);
-    check();
-    return () => {
-      window.removeEventListener("scroll", on);
-      window.removeEventListener("resize", on);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
   return (
     <MobileShell heading={heading} p={p}>
       <div className="flex flex-col gap-[18px] rounded-[24px] p-[16px]" style={CARD_STYLE}>
