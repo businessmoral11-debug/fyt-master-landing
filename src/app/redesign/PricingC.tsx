@@ -1761,7 +1761,7 @@ function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps
         </div>
         <div className="relative flex items-center justify-between gap-[16px] text-[11.5px]">
           <span style={{ color: MUTED }}><span className="text-[#00b67a]">★</span> <b className="text-[#c7d2e6]">4.5/5</b> · 3K+ reviews · Rewards in 24-48h</span>
-          <PayMarks />
+          <div className="origin-right scale-[0.78]"><PayMarks /></div>
         </div>
       </div>
     </div>
