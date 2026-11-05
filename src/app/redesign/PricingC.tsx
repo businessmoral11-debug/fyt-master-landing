@@ -1602,42 +1602,153 @@ function VariantBar({ p, heading, compare, setCompare, openSheet }: LayoutProps)
   );
 }
 
-/* C: one calm centred card. Choices, price and Buy in a single flow. Nothing sticky. */
-function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
-  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
-  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
+/* C: compact centred card for a normal 100% desktop screen. Choices, price and Buy in one flow, Diwali theme. */
+function CompactDiwaliHead({ p }: { p: Pick }) {
+  const left = useCountdown(DIWALI_END);
+  const hours = parseInt(left[0][0], 10) || 0;
   const bonus = diwaliBonus(p.size);
+  const GOLD = "#f0be5a";
   return (
-    <div className="relative mx-auto w-full max-w-[940px] px-[40px] pb-[110px] pt-[90px]">
-      <div className="mb-[26px]">{heading ?? <DefaultHeading />}</div>
-      <div className="mb-[14px]"><OfferTop p={p} /></div>
-      <div className="relative flex flex-col gap-[20px] overflow-hidden rounded-[26px] p-[30px]" style={CARD_STYLE}>
-        <div className="grid grid-cols-2 gap-[28px]">
-          <div className="flex flex-col gap-[6px]"><Label n={1}>Model</Label><ModelRow p={p} /></div>
-          <div className="flex flex-col gap-[10px]"><Label n={4}>Platform</Label><PlatformSeg p={p} /></div>
+    <div className="relative flex flex-wrap items-center justify-between gap-x-[14px] gap-y-[6px] rounded-[16px] px-[16px] py-[10px]" style={{ background: "linear-gradient(90deg, rgba(240,190,90,0.16), rgba(240,190,90,0.04) 60%, rgba(240,190,90,0.10))", border: "1px solid rgba(240,190,90,0.4)" }}>
+      <div className="flex items-center gap-[10px]">
+        <svg aria-hidden="true" width="22" height="20" viewBox="0 0 22 20"><path d="M11 11C7 7 9.5 3 11 0C12.5 3 15 7 11 11Z" fill="#ffb347" /><path d="M1 10Q11 22 21 10Q11 12.5 1 10Z" fill="#c2410c" /><path d="M1 10Q11 12.5 21 10Q11 8.5 1 10Z" fill="#fdba74" /></svg>
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.24em]" style={{ color: GOLD }}>Diwali Special</span>
+        <span className="text-[15px] font-normal text-white">45% off <span style={{ color: "#ffd98a" }}>+ {bonus} free account{bonus > 1 ? "s" : ""}</span></span>
+      </div>
+      <div className="flex items-center gap-[10px]">
+        <span className="rounded-full px-[10px] py-[3px] text-[11px] font-semibold tracking-[0.12em]" style={{ background: GOLD, color: "#2a1500" }}>{DIWALI_CODE}</span>
+        <span className="text-[12px] tabular-nums text-[#ffe3a8]">Ends in {Math.floor(hours / 24)}d {hours % 24}h {left[1][0]}m</span>
+      </div>
+    </div>
+  );
+}
+
+function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
+  const reduce = useReducedMotion();
+  const bonus = diwaliBonus(p.size);
+  const label = fmtSize(p.size);
+  const GOLD = "#f0be5a";
+  const diwali = p.offer === "diwali";
+  return (
+    <div className="relative mx-auto w-full max-w-[900px] px-[32px] pb-[70px] pt-[56px]">
+      <div className="mb-[16px] flex items-end justify-between gap-[16px]">
+        {heading ?? (
+          <h2 className="m-0 text-[32px] font-semibold leading-[1.05] tracking-[-0.03em] text-[#eef0f6]">Get funded <span className="fyt-gradient-text">your way.</span></h2>
+        )}
+      </div>
+      <div className="relative flex flex-col gap-[14px] overflow-hidden rounded-[24px] p-[20px]" style={{ ...CARD_STYLE, border: diwali ? "1px solid rgba(240,190,90,0.38)" : CARD_STYLE.border, boxShadow: "0 40px 90px -50px rgba(37,99,235,0.9)" }}>
+        {diwali && <span aria-hidden="true" className="pointer-events-none absolute inset-x-[24px] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #f0be5a, transparent)" }} />}
+        {diwali && (
+          <svg aria-hidden="true" className="pointer-events-none absolute -right-[60px] -top-[60px]" width="190" height="190" viewBox="0 0 100 100" fill="none" stroke={GOLD} strokeWidth="0.9" style={{ opacity: 0.14 }}>
+            <circle cx="50" cy="50" r="48" /><circle cx="50" cy="50" r="44" strokeDasharray="1.5 3.2" />
+            {Array.from({ length: 16 }, (_, k) => <ellipse key={k} cx="50" cy="19" rx="5.5" ry="13" transform={`rotate(${k * 22.5} 50 50)`} />)}
+            {Array.from({ length: 8 }, (_, k) => <ellipse key={"i" + k} cx="50" cy="33" rx="3.6" ry="8" transform={`rotate(${k * 45} 50 50)`} />)}
+            <circle cx="50" cy="50" r="5" fill={GOLD} />
+          </svg>
+        )}
+        {diwali ? <CompactDiwaliHead p={p} /> : <OfferTop p={p} />}
+
+        <div className="relative grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-[18px]">
+          <div className="flex flex-col gap-[7px]">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#7fa8ff]">1 · Model</span>
+            <div className="grid grid-cols-3 gap-[8px]" role="tablist" aria-label="Challenge model">
+              {STEPS.map((m) => {
+                const on = m === p.step;
+                const fromOld = getEntry(m, "prime", "match-trader", STEP_SIZES[m][0])?.priceOld ?? 0;
+                return (
+                  <button key={m} type="button" role="tab" aria-selected={on} onClick={() => p.setStep(m)} className="relative flex h-[50px] cursor-pointer flex-col items-center justify-center rounded-[13px] text-white transition-colors" style={{ border: `1.5px solid ${on ? "rgba(96,165,250,0.85)" : "rgba(148,178,255,0.16)"}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.28), rgba(30,64,175,0.14))" : "rgba(255,255,255,0.03)" }}>
+                    {m === "Instant" && <span className="absolute -top-[8px] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-[7px] py-[1px] text-[8.5px] font-bold uppercase tracking-[0.1em] text-[#1f1300]" style={{ background: "linear-gradient(135deg,#fde68a,#f59e0b)" }}>Popular</span>}
+                    <span className="text-[14px] font-semibold leading-tight">{m}</span>
+                    <span className="text-[11px]" style={{ color: MUTED }}>from <b className="font-semibold text-[#93c5fd]">{money(Math.round(offerPrice(fromOld, p.offer)))}</b></span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="flex flex-col gap-[7px]">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#7fa8ff]">4 · Platform</span>
+            <div className="grid grid-cols-2 gap-[8px]">
+              {PLATFORMS.map((x) => {
+                const on = x.id === p.platform;
+                return (
+                  <button key={x.id} type="button" aria-pressed={on} onClick={() => p.setPlatform(x.id)} className="flex h-[50px] cursor-pointer items-center justify-center gap-[7px] rounded-[13px] text-[12.5px] font-semibold transition-colors" style={{ border: `1.5px solid ${on ? "rgba(96,165,250,0.85)" : "rgba(148,178,255,0.16)"}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.28), rgba(30,64,175,0.14))" : "rgba(255,255,255,0.03)", color: on ? "#fff" : SOFT }}>
+                    <img src={x.logo} alt="" className="h-[17px] w-auto" style={{ opacity: on ? 1 : 0.7 }} />
+                    <span>{x.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
-        <Hairline />
-        <div className="flex flex-col gap-[10px]"><Label n={2}>Account size</Label><SizeTrack p={p} /></div>
-        <Hairline />
-        <TypeBlock n={3} p={p} compare={compare} setCompare={setCompare} />
-        <Hairline />
-        {p.offer === "diwali" && <DiwaliSummary p={p} />}
+
+        <div className="relative flex flex-col gap-[7px]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#7fa8ff]">2 · Account size</span>
+          <div className="relative grid rounded-full p-[3px]" style={{ gridTemplateColumns: `repeat(${p.sizes.length}, minmax(0,1fr))`, background: "rgba(255,255,255,0.04)", border: `1px solid ${LINE}` }}>
+            <span aria-hidden="true" className="absolute bottom-[3px] top-[3px] rounded-full transition-[left] duration-300" style={{ left: `calc(3px + ${Math.min(p.i, p.sizes.length - 1)} * (100% - 6px) / ${p.sizes.length})`, width: `calc((100% - 6px) / ${p.sizes.length})`, background: BLUE, boxShadow: "0 8px 20px -10px rgba(37,99,235,0.9)" }} />
+            {p.sizes.map((z, j) => {
+              const on = j === Math.min(p.i, p.sizes.length - 1);
+              return <button key={z} type="button" aria-pressed={on} onClick={() => p.setI(j)} className="relative z-[1] h-[36px] cursor-pointer rounded-full border-0 bg-transparent text-[13.5px] font-semibold transition-colors" style={{ color: on ? "#fff" : SOFT }}>{fmtSize(z)}</button>;
+            })}
+          </div>
+        </div>
+
+        <div className="relative flex flex-col gap-[7px]">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#7fa8ff]">3 · Type</span>
+            <CompareToggle compare={compare} setCompare={setCompare} />
+          </div>
+          <div className="grid grid-cols-2 gap-[8px]">
+            {p.plans.map((x) => {
+              const on = x.id === p.plan;
+              const note = TYPE_NOTE[`${p.step === "Instant" ? "i" : "c"}-${x.id}`] ?? "";
+              return (
+                <button key={x.id} type="button" aria-pressed={on} onClick={() => p.setPlan(x.id)} className="flex h-[44px] cursor-pointer items-center justify-between gap-[8px] rounded-[13px] px-[14px] text-left text-white transition-colors" style={{ border: `1.5px solid ${on ? "#60a5fa" : LINE}`, background: on ? "linear-gradient(180deg, rgba(59,130,246,0.26), rgba(30,64,175,0.12))" : "rgba(255,255,255,0.03)" }}>
+                  <span className="flex items-baseline gap-[8px]">
+                    <span className="text-[14px] font-semibold">{x.label}</span>
+                    {note && <span className="text-[11px] font-medium" style={{ color: x.id === "prime" ? "#86efac" : "#93c5fd" }}>{note}</span>}
+                  </span>
+                  <span className="size-[14px] shrink-0 rounded-full" style={{ border: `2px solid ${on ? "#60a5fa" : "#5b6478"}`, background: on ? "#60a5fa" : "transparent", boxShadow: on ? "inset 0 0 0 2px #0b1430" : "none" }} />
+                </button>
+              );
+            })}
+          </div>
+          <AnimatePresence initial={false}>
+            {compare && (
+              <motion.div key="cmp" initial={reduce ? false : { height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }} className="overflow-hidden">
+                <CompareTable p={p} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
-        <div className="flex flex-wrap items-center justify-between gap-[20px]">
-          <div className="flex min-w-0 flex-col gap-[2px]">
-            <span className="text-[12px] text-[#9fb0d4]">{fmtSize(p.size)} · {p.step} · {type} · {plat.label}</span>
-            {p.offer === "diwali" && <span className="text-[12.5px] font-medium text-[#86efac]">+ {bonus} free account{bonus > 1 ? "s" : ""} instantly</span>}
+        <div className="relative h-px w-full" style={{ background: LINE }} />
+
+        <div className="relative flex items-center justify-between gap-[16px]">
+          <div className="flex min-w-0 flex-col gap-[6px]">
+            {diwali ? (
+              <>
+                <span className="text-[12.5px] font-medium text-[#86efac]">+ {bonus} free account{bonus > 1 ? "s" : ""} instantly</span>
+                <div className="flex items-center gap-[5px]">
+                  <span className="rounded-[9px] px-[10px] py-[4px] text-[11.5px] font-semibold text-white" style={{ background: "linear-gradient(160deg,#3b6cf0,#1c3b9c)" }}>You buy {label}</span>
+                  {Array.from({ length: bonus }, (_, k) => <span key={k} className="rounded-[9px] px-[10px] py-[4px] text-[11.5px] font-semibold" style={{ background: "rgba(240,190,90,0.12)", border: `1px dashed ${GOLD}`, color: "#ffd98a" }}>Free {label}</span>)}
+                </div>
+              </>
+            ) : (
+              <span className="text-[12px] text-[#9fb0d4]">{label} · {p.step}</span>
+            )}
           </div>
           <span className="flex items-baseline gap-[8px]">
-            <Roll value={money(p.price)} className="text-[34px] font-semibold leading-none tracking-[-0.025em] text-white" />
-            <s className="text-[14px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+            <Roll value={money(p.price)} className="text-[30px] font-semibold leading-none tracking-[-0.025em] text-white" />
+            <s className="text-[13px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
           </span>
           <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
-          <div className="w-[240px]"><BuyButton p={p} onNeedTreats={openSheet} wide /></div>
+          <div className="w-[210px] shrink-0"><BuyButton p={p} onNeedTreats={openSheet} wide /></div>
         </div>
-        <CodeLine p={p} />
-        <TrustRow />
-        <PayMarks />
+        <div className="relative flex items-center justify-between gap-[16px] text-[11.5px]">
+          <span style={{ color: MUTED }}><span className="text-[#00b67a]">★</span> <b className="text-[#c7d2e6]">4.5/5</b> · 3K+ reviews · Rewards in 24-48h</span>
+          <PayMarks />
+        </div>
       </div>
     </div>
   );
@@ -1858,7 +1969,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
     <section id="challenge" className="fyt-rd relative w-full shrink-0 scroll-mt-[120px] overflow-clip" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, #03060d 70%)`, color: "#eef0f6" }}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       {p.halloween && <HalloweenDecor />}
-      {desktop ? (layoutParam() === "a" ? <VariantFit {...lp} /> : layoutParam() === "b" ? <VariantBar {...lp} /> : layoutParam() === "c" ? <VariantCard {...lp} /> : <VariantA {...lp} />) : <MobileTwo {...lp} />}
+      {desktop ? (layoutParam() === "old" ? <VariantA {...lp} /> : layoutParam() === "a" ? <VariantFit {...lp} /> : layoutParam() === "b" ? <VariantBar {...lp} /> : <VariantCard {...lp} />) : <MobileTwo {...lp} />}
       <AnimatePresence>{sheet && <TreatSheet p={p} onClose={() => setSheet(false)} />}</AnimatePresence>
     </section>
   );
