@@ -1721,6 +1721,20 @@ function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps
           </AnimatePresence>
         </div>
 
+        <div className="relative flex flex-col gap-[7px]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#7fa8ff]">Rules and what is included</span>
+          <SpecStrip p={p} compact />
+          <div className="flex flex-wrap gap-[6px]">
+            {perks(p).map((k) => (
+              <span key={k.label} className="flex h-[26px] items-center gap-[5px] rounded-full px-[10px] text-[11.5px] font-medium text-[#dbe4f5]" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(148,178,255,0.12)" }}>
+                <Svg d={k.d} size={12} color="#4ade80" w={2} />
+                {k.label}
+                {k.challengeOnly && <span style={{ color: MUTED }}>· challenge</span>}
+              </span>
+            ))}
+          </div>
+        </div>
+
         {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
         <div className="relative h-px w-full" style={{ background: LINE }} />
 
