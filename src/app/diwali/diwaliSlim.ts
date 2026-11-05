@@ -44,4 +44,22 @@ export const DIWALI_SLIM_CSS = `
   #fyt-dw-bar.fyt-dw-thin .fyt-dw-num{font-size:11.5px}
   #fyt-dw-bar.fyt-dw-thin .fyt-dw-lbl{font-size:5.5px}
 }
+@media (max-width:640px){
+  /* top of the page on phones: tighter than the original so the banner covers less */
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-inner{padding:5px 10px 11px;gap:4px 6px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-msg{padding:0 34px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-text{gap:1px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-eyebrow{font-size:9px;letter-spacing:.24em;gap:5px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-eyebrow::before,#fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-eyebrow::after{width:12px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-head{font-size:clamp(12.5px,3.6vw,15px)}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-ticket{height:34px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-code{font-size:14px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-copyico{width:12px;height:12px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-tile{width:30px;height:34px;border-radius:6px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-num{font-size:14px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-lbl{font-size:6.5px;margin-top:2px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-cta{height:34px;padding:0 14px;font-size:12.5px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-lights{height:11px}
+  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-bulb{top:4px;width:4px;height:6px}
+}
 `;
