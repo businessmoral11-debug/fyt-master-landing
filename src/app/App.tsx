@@ -653,7 +653,7 @@ function HalloweenBannerDecor({ animate }: { animate: boolean }) {
 function PromoSlot() {
   const { compact } = useContext(HeaderModeContext);
   if (isHalloweenLive()) return <HalloweenPromoBar compact={compact} />;
-  if (isDiwaliLive()) return <DiwaliPromoBar compact={compact} />;
+  if (isDiwaliLive()) return <DiwaliPromoBar />;
   return <PromoBanner />;
 }
 
@@ -1663,7 +1663,8 @@ function SiteHeader({ children }: { children: ReactNode }) {
     const el = ref.current;
     if (!el) return;
     const measure = () => {
-      if (!compactRef.current) setSpacer(el.offsetHeight);
+      // Keep the spacer at the top-of-page height so the page doesn't jump when the Diwali bar folds thin on scroll.
+      if (!compactRef.current && window.scrollY < 40) setSpacer(el.offsetHeight);
     };
     measure();
     if (typeof ResizeObserver === "undefined") return;

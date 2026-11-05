@@ -6,8 +6,8 @@ import { DIWALI_SLIM_CSS } from "./diwaliSlim";
 
 const FONT_ID = "fyt-dw-fonts";
 
-/** Diwali Special bar above the menu. Self-contained: own styles, countdown, copy button and lights. */
-export function DiwaliPromoBar({ compact = false }: { compact?: boolean }) {
+/** Diwali Special bar above the menu. Stays with the header; folds to one thin row once the page is scrolled. */
+export function DiwaliPromoBar() {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = host.current;
@@ -27,23 +27,38 @@ export function DiwaliPromoBar({ compact = false }: { compact?: boolean }) {
           rollingDays: null,
           couponCode: DIWALI_CODE,
           headline: "Diwali Special: 45% Off + Buy 1 Get 3 Instantly",
+          highlights: ["45% Off", "Buy 1 Get 3"],
           ctaText: "Claim Offer",
+          ctaTextShort: "Claim",
           ctaUrl: "#challenge",
           ctaNewTab: false,
+          soonHours: 24,
+          soonText: "Ending soon",
           whenEnded: "hide",
           endedText: "Offer ended",
           sticky: false,
-          showClose: true,
+          stickyMode: "sticky",
+          zIndex: 40,
           fireworks: true,
         })
       : undefined;
+    // thin when scrolled (desktop and phone)
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        bar?.classList.toggle("fyt-dw-thin", window.scrollY > 40);
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    bar?.classList.toggle("fyt-dw-thin", window.scrollY > 40);
     return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
       stop?.();
       el.innerHTML = "";
     };
   }, []);
-  useEffect(() => {
-    host.current?.querySelector("#fyt-dw-bar")?.classList.toggle("fyt-dw-compact", compact);
-  }, [compact]);
   return <div ref={host} style={{ minHeight: 46 }} />;
 }
