@@ -1457,6 +1457,196 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
   );
 }
 
+/* ======================= Desktop layout tests (?layout=a|b|c) ======================= */
+
+function DiwaliStrip({ p }: { p: Pick }) {
+  const left = useCountdown(DIWALI_END);
+  const hours = parseInt(left[0][0], 10) || 0;
+  const bonus = diwaliBonus(p.size);
+  const GOLD = "#f0be5a";
+  return (
+    <div className="relative flex shrink-0 flex-wrap items-center justify-between gap-x-[14px] gap-y-[6px] overflow-hidden rounded-[16px] px-[16px] py-[11px]" style={{ background: "linear-gradient(160deg,#0c2a6e,#06122e)", border: "1px solid rgba(240,190,90,0.5)" }}>
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-[16px] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #f0be5a, transparent)" }} />
+      <div className="flex min-w-0 flex-col gap-[2px]">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: GOLD }}>Diwali Special</span>
+        <span className="text-[15px] font-normal text-white">45% off <span style={{ color: "#ffd98a" }}>+ {bonus} free account{bonus > 1 ? "s" : ""}</span></span>
+      </div>
+      <div className="flex items-center gap-[10px]">
+        <span className="rounded-full px-[10px] py-[3px] text-[11px] font-semibold tracking-[0.12em]" style={{ background: GOLD, color: "#2a1500" }}>{DIWALI_CODE}</span>
+        <span className="text-[11.5px] tabular-nums text-[#cdd8f2]">{Math.floor(hours / 24)}d {hours % 24}h {left[1][0]}m</span>
+      </div>
+    </div>
+  );
+}
+
+function AccountCard({ p, openSheet }: { p: Pick; openSheet: () => void }) {
+  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
+  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
+  return (
+    <div className="relative flex flex-col gap-[14px] rounded-[24px] p-[18px]" style={{ ...CARD_STYLE, boxShadow: "none" }}>
+      <div className="flex items-center justify-between gap-[10px]">
+        <div className="flex min-w-0 flex-col gap-[3px]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#93c5fd]">Your account</span>
+          <span className="flex items-baseline gap-[8px] whitespace-nowrap">
+            <Roll value={fmtSize(p.size)} className="text-[24px] font-bold leading-none tracking-[-0.02em] text-white" />
+            <span className="text-[13px] font-semibold text-[#dbe4f5]">{p.step} · {type}</span>
+          </span>
+        </div>
+        <span className="flex h-[30px] shrink-0 items-center gap-[6px] rounded-full px-[10px] text-[11.5px] font-semibold text-white" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(148,178,255,0.18)" }}>
+          <img src={plat.logo} alt="" className={`${p.platform === "platform-5" ? "h-[16px]" : "h-[14px]"} w-auto`} />
+          {plat.label}
+        </span>
+      </div>
+      <SpecStrip p={p} compact />
+      {p.offer === "diwali" && <DiwaliSummary p={p} />}
+      {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
+      <Hairline />
+      <div className="flex shrink-0 items-end justify-between gap-[10px]">
+        <span className="flex items-baseline gap-[8px]">
+          <Roll value={money(p.price)} className="text-[32px] font-bold leading-none tracking-[-0.025em] text-white" />
+          <s className="text-[14px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+        </span>
+        <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
+      </div>
+      <BuyButton p={p} onNeedTreats={openSheet} wide />
+      <CodeLine p={p} />
+    </div>
+  );
+}
+
+function OfferTop({ p }: { p: Pick }) {
+  return p.offer === "diwali" ? <DiwaliStrip p={p} /> : p.halloween ? <OfferBar p={p} /> : <OfferSwitch p={p} />;
+}
+
+/* A: everything fits on one screen. Choices on the left, a slim sticky price card on the right. Nothing scrolls inside a box. */
+function VariantFit({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
+  const top = useStickyTop();
+  return (
+    <div className="relative mx-auto w-full max-w-[1180px] px-[40px] pb-[90px] pt-[90px]">
+      <div className="mb-[26px]">{heading ?? <DefaultHeading />}</div>
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,370px)] items-start gap-[28px]">
+        <div className="relative flex flex-col gap-[18px] overflow-hidden rounded-[26px] p-[24px]" style={CARD_STYLE}>
+          <div className="flex flex-col gap-[6px]"><Label n={1}>Model</Label><ModelRow p={p} /></div>
+          <Hairline />
+          <div className="flex flex-col gap-[10px]"><Label n={2}>Account size</Label><SizeTrack p={p} /></div>
+          <Hairline />
+          <TypeBlock n={3} p={p} compare={compare} setCompare={setCompare} />
+          <Hairline />
+          <div className="flex flex-col gap-[10px]"><Label n={4}>Platform</Label><PlatformSeg p={p} /></div>
+          <PerkChips p={p} />
+          <TrustRow />
+          <PayMarks />
+        </div>
+        <div className="flex flex-col gap-[12px] self-start" style={{ position: "sticky", top }}>
+          <OfferTop p={p} />
+          <AccountCard p={p} openSheet={openSheet} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* B: offer card + choices scroll normally. A slim Buy bar stays at the bottom while the section is on screen. */
+function VariantBar({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setShow(e.isIntersecting), { rootMargin: "-120px 0px -90px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
+  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
+  const bonus = diwaliBonus(p.size);
+  return (
+    <div ref={rootRef} className="relative mx-auto w-full max-w-[1180px] px-[40px] pb-[120px] pt-[90px]">
+      <div className="mb-[26px]">{heading ?? <DefaultHeading />}</div>
+      <div className="grid grid-cols-[minmax(0,400px)_minmax(0,1fr)] items-start gap-[28px]">
+        <div className="flex flex-col gap-[12px]">
+          {p.offer === "diwali" ? <DiwaliOfferCard p={p} /> : p.halloween ? <OfferBar p={p} /> : <OfferSwitch p={p} />}
+          {p.offer === "diwali" && <DiwaliSummary p={p} />}
+        </div>
+        <div className="relative flex flex-col gap-[18px] overflow-hidden rounded-[26px] p-[24px]" style={CARD_STYLE}>
+          <div className="flex flex-col gap-[6px]"><Label n={1}>Model</Label><ModelRow p={p} /></div>
+          <Hairline />
+          <div className="flex flex-col gap-[10px]"><Label n={2}>Account size</Label><SizeTrack p={p} /></div>
+          <Hairline />
+          <TypeBlock n={3} p={p} compare={compare} setCompare={setCompare} />
+          <Hairline />
+          <div className="flex flex-col gap-[10px]"><Label n={4}>Platform</Label><PlatformSeg p={p} /></div>
+          <PerkChips p={p} />
+          <TrustRow />
+          <PayMarks />
+        </div>
+      </div>
+      {typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-x-0 bottom-0 z-[60] transition-transform duration-300" style={{ transform: show ? "translateY(0)" : "translateY(110%)", background: "rgba(5,11,28,0.94)", backdropFilter: "blur(10px)", borderTop: "1px solid rgba(148,178,255,0.22)" }} aria-hidden={!show}>
+          <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-[24px] px-[40px] py-[12px]">
+            <div className="flex min-w-0 flex-col gap-[2px]">
+              <span className="truncate text-[12px] text-[#9fb0d4]">{fmtSize(p.size)} · {p.step} · {type} · {plat.label}</span>
+              {p.offer === "diwali" && <span className="text-[12.5px] font-medium text-[#86efac]">+ {bonus} free account{bonus > 1 ? "s" : ""} instantly</span>}
+            </div>
+            <span className="flex items-baseline gap-[8px]">
+              <Roll value={money(p.price)} className="text-[30px] font-semibold leading-none tracking-[-0.02em] text-white" />
+              <s className="text-[13px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+            </span>
+            <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
+            <div className="w-[240px]"><BuyButton p={p} onNeedTreats={openSheet} wide /></div>
+          </div>
+        </div>,
+        document.body,
+      )}
+    </div>
+  );
+}
+
+/* C: one calm centred card. Choices, price and Buy in a single flow. Nothing sticky. */
+function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
+  const plat = PLATFORMS.find((x) => x.id === p.platform)!;
+  const type = p.plans.find((x) => x.id === p.plan)?.label ?? "";
+  const bonus = diwaliBonus(p.size);
+  return (
+    <div className="relative mx-auto w-full max-w-[940px] px-[40px] pb-[110px] pt-[90px]">
+      <div className="mb-[26px]">{heading ?? <DefaultHeading />}</div>
+      <div className="mb-[14px]"><OfferTop p={p} /></div>
+      <div className="relative flex flex-col gap-[20px] overflow-hidden rounded-[26px] p-[30px]" style={CARD_STYLE}>
+        <div className="grid grid-cols-2 gap-[28px]">
+          <div className="flex flex-col gap-[6px]"><Label n={1}>Model</Label><ModelRow p={p} /></div>
+          <div className="flex flex-col gap-[10px]"><Label n={4}>Platform</Label><PlatformSeg p={p} /></div>
+        </div>
+        <Hairline />
+        <div className="flex flex-col gap-[10px]"><Label n={2}>Account size</Label><SizeTrack p={p} /></div>
+        <Hairline />
+        <TypeBlock n={3} p={p} compare={compare} setCompare={setCompare} />
+        <Hairline />
+        {p.offer === "diwali" && <DiwaliSummary p={p} />}
+        {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
+        <div className="flex flex-wrap items-center justify-between gap-[20px]">
+          <div className="flex min-w-0 flex-col gap-[2px]">
+            <span className="text-[12px] text-[#9fb0d4]">{fmtSize(p.size)} · {p.step} · {type} · {plat.label}</span>
+            {p.offer === "diwali" && <span className="text-[12.5px] font-medium text-[#86efac]">+ {bonus} free account{bonus > 1 ? "s" : ""} instantly</span>}
+          </div>
+          <span className="flex items-baseline gap-[8px]">
+            <Roll value={money(p.price)} className="text-[34px] font-semibold leading-none tracking-[-0.025em] text-white" />
+            <s className="text-[14px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+          </span>
+          <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
+          <div className="w-[240px]"><BuyButton p={p} onNeedTreats={openSheet} wide /></div>
+        </div>
+        <CodeLine p={p} />
+        <TrustRow />
+        <PayMarks />
+      </div>
+    </div>
+  );
+}
+
+function layoutParam(): string {
+  try { return new URLSearchParams(window.location.search).get("layout") ?? ""; } catch { return ""; }
+}
+
 type LayoutProps = { p: Pick; heading?: ReactNode; compare: boolean; setCompare: (f: (v: boolean) => boolean) => void; openSheet: () => void };
 
 /* ======================= Phone pricing layout ======================= */
@@ -1668,7 +1858,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
     <section id="challenge" className="fyt-rd relative w-full shrink-0 scroll-mt-[120px] overflow-clip" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, #03060d 70%)`, color: "#eef0f6" }}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       {p.halloween && <HalloweenDecor />}
-      {desktop ? <VariantA {...lp} /> : <MobileTwo {...lp} />}
+      {desktop ? (layoutParam() === "a" ? <VariantFit {...lp} /> : layoutParam() === "b" ? <VariantBar {...lp} /> : layoutParam() === "c" ? <VariantCard {...lp} /> : <VariantA {...lp} />) : <MobileTwo {...lp} />}
       <AnimatePresence>{sheet && <TreatSheet p={p} onClose={() => setSheet(false)} />}</AnimatePresence>
     </section>
   );
