@@ -47,14 +47,13 @@ export function GiftStrip() {
   const c = useGiftClock();
   if (!c) return null;
   return (
-    <div className="relative flex w-full items-center justify-center gap-[10px] px-[12px] py-[5px] sm:gap-[14px]" style={{ background: "linear-gradient(90deg,#071636,#0d2a66 50%,#071636)", borderBottom: "1px solid rgba(240,190,90,0.4)" }}>
-      <GiftIcon size={17} />
+    <div className="relative flex w-full items-center justify-center gap-[10px] px-[12px] py-[4px] sm:gap-[12px]" style={{ background: "linear-gradient(90deg,#071636,#0d2a66 50%,#071636)", borderBottom: "1px solid rgba(240,190,90,0.4)" }}>
+      <GiftIcon size={15} />
       <span className="hidden text-[10.5px] font-semibold uppercase tracking-[0.2em] sm:inline" style={{ color: GOLD }}>Special Diwali gift by FYT</span>
       <span className="text-[12.5px] font-light text-[#eef0f6] sm:text-[13.5px]">
         <span className="sm:hidden">Surprise gift with every purchase</span>
         <span className="hidden sm:inline">Every purchase today gets a surprise gift</span>
       </span>
-      <Clock c={c} />
     </div>
   );
 }
@@ -72,7 +71,10 @@ export function GiftLine() {
           <span className="text-[13px] font-light text-[#eef0f6]">Every purchase today gets a surprise gift</span>
         </div>
       </div>
-      <Clock c={c} big />
+      <div className="flex items-center gap-[8px]">
+        <span className="text-[10px] font-medium uppercase tracking-[0.16em] text-[#aab3c8]">Gift ends in</span>
+        <Clock c={c} big />
+      </div>
     </div>
   );
 }
