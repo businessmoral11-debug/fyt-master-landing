@@ -22,6 +22,7 @@ import { HERO_CONTENT, KEY_METRICS, NAV_LINKS, FOOTER_COLUMNS, FOOTER_LINKS, FAQ
 import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
 import { HalloweenPromoBar } from "@/app/HalloweenPromoBar";
 import { DiwaliPromoBar } from "@/app/diwali/DiwaliPromoBar";
+import { GiftStrip } from "@/app/diwali/GiftStrip";
 import { DIWALI_OFF, isDiwaliLive } from "@/app/data/diwali";
 import { HALLOWEEN_OFF, HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
@@ -653,7 +654,7 @@ function HalloweenBannerDecor({ animate }: { animate: boolean }) {
 function PromoSlot() {
   const { compact } = useContext(HeaderModeContext);
   if (isHalloweenLive()) return <HalloweenPromoBar compact={compact} />;
-  if (isDiwaliLive()) return <DiwaliPromoBar />;
+  if (isDiwaliLive()) return (<><DiwaliPromoBar /><GiftStrip /></>);
   return <PromoBanner />;
 }
 

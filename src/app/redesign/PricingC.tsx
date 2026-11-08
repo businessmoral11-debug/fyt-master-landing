@@ -12,6 +12,7 @@ import { STEP_PLANS, STEP_SIZES, checkoutUrl, fmtSize, getEntry, type PlanId, ty
 import { ALT_PROMO_CODE, PROMO_CODE, PROMO_DEADLINE } from "@/app/data/promoBanner";
 import { SELECT_PLAN_EVENT, writeSavedPlan, type SavedPlan } from "@/app/data/savedPlan";
 import { DIWALI_CODE, DIWALI_END, DIWALI_OFF, diwaliBonus, isDiwaliLive } from "@/app/data/diwali";
+import { GiftLine } from "@/app/diwali/GiftStrip";
 import { HALLOWEEN_CODE, HALLOWEEN_END, HALLOWEEN_OFF, TREATS, TREAT_PICKS, halloweenStage, isHalloweenLive, withHalloween, type TreatId } from "@/app/data/halloween";
 
 const STEPS: StepId[] = ["1-Step", "2-Step", "Instant"];
@@ -1647,6 +1648,7 @@ function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps
           </svg>
         )}
         {diwali ? <CompactDiwaliHead p={p} /> : <OfferTop p={p} />}
+        {diwali && <GiftLine />}
 
         <div className="relative grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-[18px]">
           <div className="flex flex-col gap-[7px]">
@@ -1889,6 +1891,7 @@ function MobileShell({ heading, p, children }: { heading?: ReactNode; p: Pick; c
     <div className="relative mx-auto flex w-full max-w-[560px] flex-col gap-[16px] px-[16px] pb-[64px] pt-[52px]">
       {heading ?? <DefaultHeading />}
       {p.offer === "diwali" ? <DiwaliOfferCard p={p} small /> : p.halloween ? <OfferBar p={p} small /> : <OfferSwitch p={p} />}
+      {p.offer === "diwali" && <GiftLine />}
       {children}
     </div>
   );
