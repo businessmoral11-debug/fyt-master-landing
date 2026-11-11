@@ -70,6 +70,7 @@ export function mountDiwaliBar(bar: HTMLElement, CONFIG: DwConfig): () => void {
     end = first + CONFIG.rollingDays * 864e5;
   } else end = new Date(CONFIG.endDate).getTime();
   var tiles = {}; ['d','h','m','s'].forEach(function(u){ tiles[u] = bar.querySelector('.fyt-dw-tile[data-u="' + u + '"]'); });
+  if (tiles.d) tiles.d.style.display = 'none';
   var prev = {}, lastMin = -1, timerId = null, srT = $('.fyt-dw-timesr'), endsEl = $('.fyt-dw-ends'), endsTxt = endsEl.textContent;
   var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
   function tick(){
@@ -77,14 +78,14 @@ export function mountDiwaliBar(bar: HTMLElement, CONFIG: DwConfig): () => void {
     if (!(left > 0)) { endOffer(); return; }
     var soon = left <= CONFIG.soonHours * 36e5;
     if (soon !== bar.classList.contains('fyt-dw-soon')) { bar.classList.toggle('fyt-dw-soon', soon); endsEl.textContent = soon ? CONFIG.soonText : endsTxt; }
-    var s = Math.floor(left / 1000), v = { d: Math.floor(s / 86400), h: Math.floor(s % 86400 / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 };
+    var s = Math.floor(left / 1000), v = { d: 0, h: Math.floor(s / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 }; /* hours only (41h, not 1 day 17h) */
     for (var u in v) if (prev[u] !== v[u]) {
       var t = tiles[u]; t.querySelector('.fyt-dw-num').textContent = pad(v[u]);
       if (!reduce && prev[u] !== undefined) { t.classList.remove('fyt-dw-flipping'); void t.offsetWidth; t.classList.add('fyt-dw-flipping'); }
       prev[u] = v[u];
     }
     var totalMin = Math.floor(s / 60);
-    if (totalMin !== lastMin) { lastMin = totalMin; srT.textContent = (soon ? CONFIG.soonText + '. ' : '') + 'Offer ends in ' + v.d + ' days, ' + v.h + ' hours, ' + v.m + ' minutes'; }
+    if (totalMin !== lastMin) { lastMin = totalMin; srT.textContent = (soon ? CONFIG.soonText + '. ' : '') + 'Offer ends in ' + v.h + ' hours, ' + v.m + ' minutes'; }
   }
   function endOffer(){
     if (timerId) clearInterval(timerId); timerId = null;

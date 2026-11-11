@@ -1268,7 +1268,7 @@ function OfferBar({ p, small = false }: { p: Pick; small?: boolean }) {
 function DiwaliOfferCard({ p, small = false }: { p: Pick; small?: boolean }) {
   const left = useCountdown(DIWALI_END);
   const hours = parseInt(left[0][0], 10) || 0;
-  const time: [string, string][] = [[String(Math.floor(hours / 24)).padStart(2, "0"), "Days"], [String(hours % 24).padStart(2, "0"), "Hrs"], [left[1][0], "Mins"]];
+  const time: [string, string][] = [[String(hours).padStart(2, "0"), "Hrs"], [left[1][0], "Mins"], [left[2][0], "Secs"]];
   const bonus = diwaliBonus(p.size);
   const GOLD = "#f0be5a";
   const tiers = [
@@ -1474,7 +1474,7 @@ function DiwaliStrip({ p }: { p: Pick }) {
       </div>
       <div className="flex items-center gap-[10px]">
         <span className="rounded-full px-[10px] py-[3px] text-[11px] font-semibold tracking-[0.12em]" style={{ background: GOLD, color: "#2a1500" }}>{DIWALI_CODE}</span>
-        <span className="text-[11.5px] tabular-nums text-[#cdd8f2]">{Math.floor(hours / 24)}d {hours % 24}h {left[1][0]}m</span>
+        <span className="text-[11.5px] tabular-nums text-[#cdd8f2]">{hours}h {left[1][0]}m</span>
       </div>
     </div>
   );
@@ -1618,7 +1618,7 @@ function CompactDiwaliHead({ p }: { p: Pick }) {
       </div>
       <div className="flex items-center gap-[10px]">
         <span className="rounded-full px-[10px] py-[3px] text-[11px] font-semibold tracking-[0.12em]" style={{ background: GOLD, color: "#2a1500" }}>{DIWALI_CODE}</span>
-        <span className="text-[12px] tabular-nums text-[#ffe3a8]">Ends in {Math.floor(hours / 24)}d {hours % 24}h {left[1][0]}m</span>
+        <span className="text-[12px] tabular-nums text-[#ffe3a8]">Ends in {hours}h {left[1][0]}m</span>
       </div>
     </div>
   );

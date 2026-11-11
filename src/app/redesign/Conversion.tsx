@@ -260,7 +260,7 @@ export function FloatingCta() {
           <span className="hidden whitespace-nowrap text-[15px] font-semibold text-white sm:inline">Claim Offer</span>
           {!left.expired && (
             <span className="tabular hidden whitespace-nowrap rounded-full px-[10px] py-[5px] text-[12px] font-semibold text-white sm:inline-flex" style={{ background: "rgba(3,6,13,0.28)" }}>
-              Ends in {Number(left.hh) >= 24 ? `${Math.floor(Number(left.hh) / 24)}d ${String(Number(left.hh) % 24).padStart(2, "0")}` : left.hh}:{left.mm}:{left.ss}
+              Ends in {left.hh}:{left.mm}:{left.ss}
             </span>
           )}
           <span aria-hidden="true" className="flex size-[30px] shrink-0 items-center justify-center rounded-full bg-white sm:size-auto sm:bg-transparent">
