@@ -14,6 +14,12 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 const KLAVIYO_COMPANY_ID = "XqPQLC";
 const KLAVIYO_LIST_ID = "TZ9Hd5"; // "news letter subscribers" -> Welcome Series (live)
+/**
+ * FYT Email (the new platform). Paste the public form ID of the "Website pop-up (Private Giveaway)"
+ * form here. While it is empty the pop-up keeps sending to Klaviyo, so nothing breaks before the switch.
+ */
+const FYT_EMAIL_BASE = "https://emailsplatform.fundingyourtrades.com";
+const FYT_EMAIL_FORM_ID = "";
 const SEEN_KEY = "fyt_giveaway_seen_v1";
 const DONE_KEY = "fyt_giveaway_done_v1";
 const REPEAT_MS = 7 * 24 * 60 * 60 * 1000;
@@ -28,7 +34,23 @@ function store(key: string, value?: string): string | null {
   }
 }
 
+async function subscribeFytEmail(email: string, name: string): Promise<boolean> {
+  try {
+    const r = await fetch(`${FYT_EMAIL_BASE}/f/${FYT_EMAIL_FORM_ID}/submit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, step: 0, values: { email, ...(name ? { first_name: name } : {}) } }),
+    });
+    if (!r.ok) return false;
+    const j = await r.json().catch(() => ({ ok: false }));
+    return !!j.ok;
+  } catch {
+    return false;
+  }
+}
+
 async function subscribe(email: string, name: string): Promise<boolean> {
+  if (FYT_EMAIL_FORM_ID) return subscribeFytEmail(email, name);
   const body = {
     data: {
       type: "subscription",
