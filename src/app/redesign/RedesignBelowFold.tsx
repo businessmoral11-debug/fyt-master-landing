@@ -3,7 +3,6 @@ import { ProveYourExpertise } from "./ProveExpertise";
 import { ChallengePricing } from "./PricingC";
 import { ClosingCta, Comparison, Faq, Footer, HowItWorks, ProductShowcase } from "./SectionsBottom";
 import { ScrollProgressBar } from "./ui";
-import { GiveawayPopup } from "./GiveawayPopup";
 
 /**
  * Redesigned landing page below the hero. Same content, data, links and
@@ -26,7 +25,6 @@ export function BelowFold() {
       <ClosingCta />
       <Faq />
       <Footer />
-      <GiveawayPopup />
     </>
   );
 }
