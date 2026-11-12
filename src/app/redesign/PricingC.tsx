@@ -64,11 +64,15 @@ function offerCheckout(productId: number, o: OfferId): { href: string; auto: boo
 
 /* ------------------------------ shared state ----------------------------- */
 
+/** Featured pick: 200K 1-Step Prime pre-selected until this time, then back to 2-Step 100K. */
+const FEATURE_200K_END = Date.parse("2026-11-13T20:00:00+05:30");
+
 function usePick() {
-  const [step, setStepRaw] = useState<StepId>("2-Step");
+  const feature200k = typeof window !== "undefined" && Date.now() < FEATURE_200K_END;
+  const [step, setStepRaw] = useState<StepId>(feature200k ? "1-Step" : "2-Step");
   const [planRaw, setPlan] = useState<PlanId>("prime");
   const [platform, setPlatform] = useState<PlatformId>("match-trader");
-  const [i, setI] = useState(4); // 100K on the challenges (5K is first)
+  const [i, setI] = useState(feature200k ? 5 : 4); // 200K (featured) or 100K on the challenges (5K is first)
   const [giftAt, setGiftAt] = useState<number | null>(() => (typeof window === "undefined" ? null : readGift()));
   const giftValid = giftAt !== null && Date.now() < giftAt + GIFT_MS;
   const [offerRaw, setOffer] = useState<OfferId>(() => (giftValid ? "welcome" : "launch"));
