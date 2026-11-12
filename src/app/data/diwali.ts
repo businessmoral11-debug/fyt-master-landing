@@ -3,12 +3,12 @@
  * 45% off on every size. 25K and above: Buy 1 Get 3 (2 free bonus accounts).
  * 5K and 10K: Buy 1 Get 2 (1 free bonus account).
  *
- * Switches itself on when Halloween ends and off at 6 AM on 13 Nov, so nothing needs deploying.
+ * Switches itself on when Halloween ends and off at 10 AM on 13 Nov, so nothing needs deploying.
  * Preview: add ?diwali=1 to any URL to see it early (or ?diwali=0 to hide it).
  * Vercel preview links show it by default.
  */
 export const DIWALI_START = "2026-11-05T10:00:00+05:30"; // the moment Halloween ends (HALLOWEEN_END is 9:59:59)
-export const DIWALI_END = "2026-11-13T05:59:59+05:30"; // extended by 6 hours (was 12 Nov 23:59:59)
+export const DIWALI_END = "2026-11-13T09:59:59+05:30"; // extended again by 4 hours (6 AM to 10 AM on 13 Nov)
 export const DIWALI_CODE = "DIWALI45";
 export const DIWALI_OFF = 0.45;
 export const DIWALI_DEAL_LINE = "45% off + Buy 1 Get 3 Instantly";
