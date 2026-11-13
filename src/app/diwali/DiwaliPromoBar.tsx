@@ -26,7 +26,7 @@ export function DiwaliPromoBar() {
           endDate: DIWALI_END,
           rollingDays: null,
           couponCode: DIWALI_CODE,
-          headline: "Diwali Special: 45% Off + Buy 1 Get 3 Instantly",
+          headline: "Diwali Special Extended: 45% Off + Buy 1 Get 3 Instantly",
           highlights: ["45% Off", "Buy 1 Get 3"],
           ctaText: "Claim Offer",
           ctaTextShort: "Claim",

@@ -1296,7 +1296,7 @@ function DiwaliOfferCard({ p, small = false }: { p: Pick; small?: boolean }) {
           <path d="M1 10Q11 22 21 10Q11 12.5 1 10Z" fill="#c2410c" />
           <path d="M1 10Q11 12.5 21 10Q11 8.5 1 10Z" fill="#fdba74" />
         </svg>
-        <span className="text-[10.5px] font-semibold uppercase tracking-[0.26em]" style={{ color: GOLD }}>Diwali Special</span>
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.26em]" style={{ color: GOLD }}>Diwali Special Extended</span>
       </div>
       <div className="relative z-[1] mt-[6px] flex items-end gap-[10px]">
         <span className={`font-extralight leading-[0.9] tracking-[-0.04em] ${small ? "text-[58px]" : "text-[70px]"}`} style={{ background: "linear-gradient(180deg,#fff6dc 0%,#f4c46a 55%,#d9962b 100%)", WebkitBackgroundClip: "text", color: "transparent" }}>45%</span>
@@ -1473,7 +1473,7 @@ function DiwaliStrip({ p }: { p: Pick }) {
     <div className="relative flex shrink-0 flex-wrap items-center justify-between gap-x-[14px] gap-y-[6px] overflow-hidden rounded-[16px] px-[16px] py-[11px]" style={{ background: "linear-gradient(160deg,#0c2a6e,#06122e)", border: "1px solid rgba(240,190,90,0.5)" }}>
       <span aria-hidden="true" className="pointer-events-none absolute inset-x-[16px] top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #f0be5a, transparent)" }} />
       <div className="flex min-w-0 flex-col gap-[2px]">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: GOLD }}>Diwali Special</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: GOLD }}>Diwali Special Extended</span>
         <span className="text-[15px] font-normal text-white">45% off <span style={{ color: "#ffd98a" }}>+ {bonus} free account{bonus > 1 ? "s" : ""}</span></span>
       </div>
       <div className="flex items-center gap-[10px]">
@@ -1617,7 +1617,7 @@ function CompactDiwaliHead({ p }: { p: Pick }) {
     <div className="relative flex flex-wrap items-center justify-between gap-x-[14px] gap-y-[6px] rounded-[16px] px-[16px] py-[10px]" style={{ background: "linear-gradient(90deg, rgba(240,190,90,0.16), rgba(240,190,90,0.04) 60%, rgba(240,190,90,0.10))", border: "1px solid rgba(240,190,90,0.4)" }}>
       <div className="flex items-center gap-[10px]">
         <svg aria-hidden="true" width="22" height="20" viewBox="0 0 22 20"><path d="M11 11C7 7 9.5 3 11 0C12.5 3 15 7 11 11Z" fill="#ffb347" /><path d="M1 10Q11 22 21 10Q11 12.5 1 10Z" fill="#c2410c" /><path d="M1 10Q11 12.5 21 10Q11 8.5 1 10Z" fill="#fdba74" /></svg>
-        <span className="text-[10.5px] font-semibold uppercase tracking-[0.24em]" style={{ color: GOLD }}>Diwali Special</span>
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.24em]" style={{ color: GOLD }}>Diwali Special Extended</span>
         <span className="text-[15px] font-normal text-white">45% off <span style={{ color: "#ffd98a" }}>+ {bonus} free account{bonus > 1 ? "s" : ""}</span></span>
       </div>
       <div className="flex items-center gap-[10px]">
