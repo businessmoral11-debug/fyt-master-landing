@@ -131,7 +131,7 @@ export function PricingTrustLine() {
         </span>
         <span className="font-['DM_Sans',sans-serif] text-[12px] font-semibold text-[#111827]">4.5/5 Trust Index Rating</span>
       </span>
-      <span className="font-['DM_Sans',sans-serif] text-[12px] text-[#6B7280]">Trusted by 21,500+ traders worldwide</span>
+      <span className="font-['DM_Sans',sans-serif] text-[12px] text-[#6B7280]">Trusted by 30,200+ traders worldwide</span>
     </div>
   );
 }

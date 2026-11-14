@@ -638,7 +638,7 @@ describe("How It Works CTA: real link instead of no-op placeholder", () => {
 });
 
 describe("Testimonials CTA: real link instead of a dead div", () => {
-  it("'Join 21,500+ Traders' is a real anchor to the pricing section, not a non-interactive div", () => {
+  it("'Join 30,200+ Traders' is a real anchor to the pricing section, not a non-interactive div", () => {
     const app = read("./BelowFold.tsx");
     const testimonialsBody = sliceToNextFunction(app, "function Testimonials()");
     expect(testimonialsBody).toContain('<a href="#challenge" className="bg-[#3b82f6] flex items-center justify-center px-[32px] py-[14px] rounded-[8px] shrink-0 no-underline">');

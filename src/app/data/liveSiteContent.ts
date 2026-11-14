@@ -35,9 +35,9 @@ export const FAQ_ITEMS = [
 ] as const;
 
 export const KEY_METRICS = [
-  { value: "$3.5M+", label: "In Rewards" },
-  { value: "21,500+", label: "FYT Traders" },
-  { value: "105+", label: "Countries" },
+  { value: "$4.2M+", label: "In Rewards" },
+  { value: "30,200+", label: "FYT Traders" },
+  { value: "115+", label: "Countries" },
 ] as const;
 
 export const LIVE_PAYOUTS_CONTENT = {
@@ -62,7 +62,7 @@ export const FEATURES_GRID = {
 export const PAYOUT_STATISTICS = [
   { value: "Up to 100% Split", label: "Paid up to 100% reward splits" },
   { value: "105 Minutes", label: "Average Reward Speed" },
-  { value: "$3.5M+", label: "Reward Paid Out" },
+  { value: "$4.2M+", label: "Reward Paid Out" },
 ] as const;
 
 export const VERIFICATION_SECTION = {

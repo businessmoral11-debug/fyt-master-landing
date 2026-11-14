@@ -35,7 +35,7 @@ describe("redesigned below-the-fold", () => {
       "View Live Rewards",
       "Check More Rewards",
       "Real experiences, verified rewards and transparent feedback from our traders.",
-      "Join 21,500+ Traders",
+      "Join 30,200+ Traders",
       "How It Works",
       "From choosing your account to receiving your reward, every step is clear.",
       "Explore the FYT process",
@@ -54,7 +54,7 @@ describe("redesigned below-the-fold", () => {
       "with FYT.",
       "Become our Next Success Story!",
       "Go to FAQs",
-      "A simulated-capital prop firm rewarding disciplined traders across 105+ countries.",
+      "A simulated-capital prop firm rewarding disciplined traders across 115+ countries.",
       "© 2026 Funding Your Trades. All rights reserved.",
     ]) {
       expect(all, text).toContain(text);

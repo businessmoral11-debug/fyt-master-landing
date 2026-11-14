@@ -595,7 +595,7 @@ export function Footer() {
           <div className="flex flex-col gap-[18px] lg:col-span-5">
             <img src={imgFytLogo} alt="Funding Your Trades" loading="lazy" decoding="async" className="h-auto w-[190px]" />
             <p className="max-w-[320px] text-[15px] leading-[1.7]" style={{ color: C.mutedDark }}>
-              A simulated-capital prop firm rewarding disciplined traders across 105+ countries.
+              A simulated-capital prop firm rewarding disciplined traders across 115+ countries.
             </p>
             <div className="flex items-center gap-[10px]">
               {SOCIAL_ORDER.map((label) => (

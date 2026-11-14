@@ -73,9 +73,9 @@ describe("FAQ_ITEMS", () => {
 describe("KEY_METRICS", () => {
   it("matches verified live copy", () => {
     expect(KEY_METRICS).toEqual([
-      { value: "$3.5M+", label: "In Rewards" },
-      { value: "21,500+", label: "FYT Traders" },
-      { value: "105+", label: "Countries" },
+      { value: "$4.2M+", label: "In Rewards" },
+      { value: "30,200+", label: "FYT Traders" },
+      { value: "115+", label: "Countries" },
     ]);
   });
 });
@@ -110,7 +110,7 @@ describe("PAYOUT_STATISTICS", () => {
     expect(PAYOUT_STATISTICS).toEqual([
       { value: "Up to 100% Split", label: "Paid up to 100% reward splits" },
       { value: "105 Minutes", label: "Average Reward Speed" },
-      { value: "$3.5M+", label: "Reward Paid Out" },
+      { value: "$4.2M+", label: "Reward Paid Out" },
     ]);
   });
 });

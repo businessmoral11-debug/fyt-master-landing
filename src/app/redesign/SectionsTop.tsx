@@ -394,7 +394,7 @@ export function Testimonials() {
             Trust
           </Eyebrow>
           <h2 ref={trustRef} className={`max-w-[760px] text-[32px] font-semibold leading-[1.06] tracking-[-0.035em] sm:text-[40px] lg:text-[54px] ${trustShimmer}`} style={{ color: C.textLight }}>
-            <WordsReveal text="Trusted by" /> <WordsReveal text="21,500+" wordClassName="fyt-gradient-text" delay={0.1} />{" "}
+            <WordsReveal text="Trusted by" /> <WordsReveal text="30,200+" wordClassName="fyt-gradient-text" delay={0.1} />{" "}
             <WordsReveal text="satisfied clients worldwide." delay={0.2} />
           </h2>
           <Reveal delay={0.2}>
@@ -416,7 +416,7 @@ export function Testimonials() {
       <div className="relative flex justify-center px-[20px] pb-[72px] pt-[36px] lg:pb-[120px] lg:pt-[48px]">
         <Reveal>
           <Pill href="#challenge" onClick={() => pauseHeavyScenesForNav()}>
-            Join 21,500+ Traders
+            Join 30,200+ Traders
           </Pill>
         </Reveal>
       </div>

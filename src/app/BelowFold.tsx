@@ -3176,7 +3176,7 @@ function Testimonials() {
             initial={prefersReducedMotion ? false : "hidden"}
             animate={revealed ? "show" : "hidden"}
           >
-            <h2 className="font-['DM_Sans',sans-serif] font-medium leading-[1.1] text-[#0b0c11] text-[32px] lg:text-[52px] text-center tracking-[-0.936px] w-full lg:w-[700px]">Trusted by 21,500+ satisfied clients worldwide.</h2>
+            <h2 className="font-['DM_Sans',sans-serif] font-medium leading-[1.1] text-[#0b0c11] text-[32px] lg:text-[52px] text-center tracking-[-0.936px] w-full lg:w-[700px]">Trusted by 30,200+ satisfied clients worldwide.</h2>
             <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.6] text-[#6b7280] text-[15px] lg:text-[18px] text-center w-full lg:w-[560px]">Real experiences, verified rewards and transparent feedback from our traders.</p>
           </motion.div>
           <TestimonialsRevealContext.Provider value={revealed}>
@@ -3198,7 +3198,7 @@ function Testimonials() {
         <div className="content-stretch flex flex-col items-center px-[20px] pb-[48px] pt-[40px] lg:px-[88px] lg:pb-[120px] lg:pt-[64px] relative w-full">
           <motion.div variants={TESTIMONIAL_CTA_REVEAL} initial={prefersReducedMotion ? false : "hidden"} animate={revealed ? "show" : "hidden"}>
             <a href="#challenge" onClick={() => pauseHeavyScenesForNav()} className="bg-[#3b82f6] flex items-center justify-center px-[32px] py-[14px] rounded-[8px] shrink-0 no-underline">
-              <p className="font-['Inter:Medium',sans-serif] font-medium text-[16px] leading-[19px] text-white whitespace-nowrap">Join 21,500+ Traders</p>
+              <p className="font-['Inter:Medium',sans-serif] font-medium text-[16px] leading-[19px] text-white whitespace-nowrap">Join 30,200+ Traders</p>
             </a>
           </motion.div>
         </div>
@@ -4252,7 +4252,7 @@ function Footer() {
                 />
                 <img alt="" loading="lazy" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgImg10801} />
               </div>
-              <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.6] not-italic relative shrink-0 text-[#9da2b4] text-[14px] w-[280px]">A simulated-capital prop firm rewarding disciplined traders across 105+ countries.</p>
+              <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.6] not-italic relative shrink-0 text-[#9da2b4] text-[14px] w-[280px]">A simulated-capital prop firm rewarding disciplined traders across 115+ countries.</p>
             </motion.div>
             {FOOTER_COLUMNS.map(({ heading, items }) => (
               <motion.div key={heading} variants={FOOTER_COLUMN_REVEAL} className="content-stretch flex flex-[1_0_0] flex-col items-start min-w-px overflow-clip relative">

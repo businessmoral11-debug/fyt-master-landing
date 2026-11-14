@@ -976,7 +976,7 @@ function TrustStripContent() {
     <>
       <p className="font-['Inter:Regular',sans-serif] font-normal text-[13px] leading-[1.4] text-[#a6acbe] text-center">
         Trusted by{" "}
-        <span className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#60a5fa]">21,500+</span>{" "}
+        <span className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#60a5fa]">30,200+</span>{" "}
         traders worldwide
       </p>
       <div className="flex items-center" aria-hidden="true">
