@@ -8,7 +8,7 @@
  * Vercel preview links show it by default.
  */
 export const DIWALI_START = "2026-11-05T10:00:00+05:30"; // the moment Halloween ends (HALLOWEEN_END is 9:59:59)
-export const DIWALI_END = "2026-11-16T00:15:00+05:30"; // front end: extended by 6 more hours to 16 Nov 12:15 AM IST (backend coupon runs to 16 Nov 12 PM IST)
+export const DIWALI_END = "2026-11-16T09:45:00+05:30"; // front end: ends 16 Nov 9:45 AM IST (= 15 Nov 11:15 PM EST, matches FAQ; coupon runs to 16 Nov 12 PM IST)
 export const DIWALI_CODE = "DIWALI45";
 export const DIWALI_OFF = 0.45;
 export const DIWALI_DEAL_LINE = "45% off + Buy 1 Get 3 Instantly";
