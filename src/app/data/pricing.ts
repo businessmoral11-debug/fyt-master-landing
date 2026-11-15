@@ -35,8 +35,8 @@ interface Row {
 
 type PlatformTable = Record<PlatformId, Record<number, PricingEntry>>;
 
-/** Display sale price: 40% off the list price (NEWDASH). */
-export const SALE_DISCOUNT_FRACTION = 0.4;
+/** Display sale price: 35% off the list price (BOGO35). */
+export const SALE_DISCOUNT_FRACTION = 0.35;
 
 export function salePrice(priceOld: number): number {
   return Math.round(priceOld * (1 - SALE_DISCOUNT_FRACTION) * 100) / 100;
@@ -160,7 +160,7 @@ export function getEntry(step: StepId, plan: PlanId, platform: PlatformId, size:
 // Instant Prime SKUs use plain add-to-cart (checkout-link is unreliable for those products).
 const CHECKOUT_LINK_BASE = "https://fundingyourtrades.com/checkout-link/?products=";
 const CHECKOUT_ADD_TO_CART_BASE = "https://fundingyourtrades.com/checkout/?add-to-cart=";
-export const CHECKOUT_COUPON_CODE = "NEWDASH";
+export const CHECKOUT_COUPON_CODE = "BOGO35";
 
 const INSTANT_PRIME_PRODUCT_IDS = new Set<number>([
   22214, 22213, 22212, 22211, 22210,

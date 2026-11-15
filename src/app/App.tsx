@@ -608,7 +608,7 @@ function PromoCountdownPill({ compact = false, pulse, deadline = PROMO_DEADLINE,
 
 /** Lowest starting price across the three models (Prime, MatchTrader, smallest size) with today's offer. */
 function heroFromPrice(): number {
-  const off = isHalloweenLive() ? HALLOWEEN_OFF : isDiwaliLive() ? DIWALI_OFF : 0.4;
+  const off = isHalloweenLive() ? HALLOWEEN_OFF : isDiwaliLive() ? DIWALI_OFF : 0.35;
   const prices = (Object.keys(STEP_SIZES) as StepId[]).map((st) => getEntry(st, "prime", "match-trader", STEP_SIZES[st][0])?.priceOld ?? Infinity);
   return Math.round(Math.min(...prices) * (1 - off));
 }

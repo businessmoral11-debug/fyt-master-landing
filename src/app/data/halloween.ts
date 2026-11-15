@@ -9,9 +9,8 @@
  * Preview: add ?halloween=1 to any URL to see it early (or ?halloween=0 to hide it).
  * Vercel preview links no longer show it by default (Diwali does); use ?halloween=1.
  */
-import { PROMO_DEADLINE } from "./promoBanner";
 
-export const HALLOWEEN_START = PROMO_DEADLINE;
+export const HALLOWEEN_START = "2026-10-22T07:59:59+05:30"; // when the Dashboard Launch Offer ended
 export const HALLOWEEN_END = "2026-11-05T09:59:59+05:30"; // extended on demand: +10 hours, to 5 Nov 9:59 AM IST
 export const HALLOWEEN_CODE = "FYTWEEN";
 export const HALLOWEEN_OFF = 0.45;

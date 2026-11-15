@@ -1,6 +1,6 @@
 /**
  * Challenge pricing (model stack): pick 1-Step / 2-Step / Instant at the top,
- * then size, type and platform in one card. Launch (NEWDASH) or new-trader
+ * then size, type and platform in one card. BOGO35 or new-trader
  * (WELCOME45) offer, applied automatically through the checkout link.
  */
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -31,7 +31,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 type OfferId = "launch" | "welcome" | "halloween" | "diwali";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
-  launch: { off: 0.4, code: PROMO_CODE, title: "40% OFF", extras: ["+ 1 free account instantly", "+ 5% cashback"], who: "1 free account · 5% cashback" },
+  launch: { off: 0.35, code: PROMO_CODE, title: "35% OFF", extras: ["+ 1 free account instantly", "+ free drawdown reset", "+ first payout on demand"], who: "Buy 1 Get 1 · Free reset" },
   welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ 1 free account instantly", "+ 5% instant cashback"], who: "Welcome gift" },
   halloween: { off: HALLOWEEN_OFF, code: HALLOWEEN_CODE, title: "45% OFF", extras: ["+ 1 free account instantly", "+ any 2 treats"], who: "Haunted Vault" },
   diwali: { off: DIWALI_OFF, code: DIWALI_CODE, title: "45% OFF", extras: ["+ bonus accounts instantly"], who: "Diwali Special" },
@@ -1765,6 +1765,13 @@ function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps
           <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
           <div className="w-[210px] shrink-0"><BuyButton p={p} onNeedTreats={openSheet} wide /></div>
         </div>
+        {p.offer === "launch" && (
+          <div className="relative flex items-center gap-[10px] rounded-[12px] px-[12px] py-[8px] text-[12.5px]" style={{ background: "linear-gradient(90deg, rgba(34,197,94,0.14), rgba(34,197,94,0.03))", border: "1px solid rgba(34,197,94,0.3)" }}>
+            <Svg d="M12 8v13M4 12v8h16v-8M3 8h18v4H3zM12 8c-1-3-5-4-5-1.5S10 8 12 8zM12 8c1-3 5-4 5-1.5S14 8 12 8z" size={14} color="#86efac" w={2} />
+            <span className="font-semibold text-white">+ 1 free account <span className="text-[#86efac]">instantly</span></span>
+            <span className="text-[#bbf7d0]">· Free drawdown reset · First payout on demand</span>
+          </div>
+        )}
         <div className="relative flex items-center justify-between gap-[16px] text-[11.5px]">
           <span style={{ color: MUTED }}><span className="text-[#00b67a]">★</span> <b className="text-[#c7d2e6]">4.5/5</b> · 3K+ reviews · Rewards in 24-48h</span>
           <div className="origin-right scale-[0.78]"><PayMarks /></div>
@@ -1824,7 +1831,10 @@ function BonusRow() {
   return (
     <div className="flex shrink-0 items-center gap-[10px] rounded-[14px] px-[12px] py-[9px]" style={{ background: "linear-gradient(90deg, rgba(34,197,94,0.16), rgba(34,197,94,0.05))", border: "1px solid rgba(34,197,94,0.35)" }}>
       <span className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-[#22c55e]"><Svg d="M12 8v13M4 12v8h16v-8M3 8h18v4H3zM12 8c-1-3-5-4-5-1.5S10 8 12 8zM12 8c1-3 5-4 5-1.5S14 8 12 8z" size={14} color="#04210f" w={2.2} /></span>
-      <span className="text-[13.5px] font-bold text-white">+ 1 free account <span className="text-[#86efac]">instantly</span></span>
+      <span className="flex min-w-0 flex-col leading-tight">
+        <span className="text-[13.5px] font-bold text-white">+ 1 free account <span className="text-[#86efac]">instantly</span></span>
+        <span className="mt-[2px] text-[11px] font-medium text-[#bbf7d0]">Free drawdown reset · First payout on demand</span>
+      </span>
     </div>
   );
 }

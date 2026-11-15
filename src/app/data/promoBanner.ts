@@ -11,25 +11,25 @@ export interface PromoItem {
 
 /** Top-banner benefit lines (deal line is separate so mobile can stack cleanly). */
 export const PROMO_BENEFITS = [
-  "First Reward on Demand",
+  "First Payout on Demand",
   "Free Drawdown Reset",
 ] as const;
 
 /** Deal line shown after benefits on the top banner. */
-export const PROMO_DEAL_LINE = "Dashboard Launch Offer: 40% off + Buy 1 Get 2 Instantly + 5% Instant Cashback";
+export const PROMO_DEAL_LINE = "BOGO Offer: 35% off + Buy 1 Get 1 Free";
 
 /** Short deal (no "Dashboard Launch Offer:" label) for the phone banner and floating button. */
-export const PROMO_DEAL_SHORT = "40% off + Buy 1 Get 2 Instantly";
+export const PROMO_DEAL_SHORT = "35% off + Buy 1 Get 1 Free";
 
 /** Offer card next to the pricing table: one big headline plus two short extras. */
-export const PROMO_CARD_HEADLINE = "40% off";
-export const PROMO_CARD_EXTRAS = ["1 Bonus Account Instantly", "5% Instant Cashback"] as const;
+export const PROMO_CARD_HEADLINE = "35% off";
+export const PROMO_CARD_EXTRAS = ["1 Bonus Account Instantly", "Free Drawdown Reset"] as const;
 
 /** Full banner copy order: deal first, then benefits. */
 export const PROMO_BANNER_ITEMS = [PROMO_DEAL_LINE, ...PROMO_BENEFITS] as const;
 
 /** Promo code shown in the top-banner CODE pill (also used at checkout). */
-export const PROMO_CODE = "NEWDASH";
+export const PROMO_CODE = "BOGO35";
 
 /** Alternate welcome offer shown on the pricing card (manual code entry). */
 export const ALT_PROMO_LABEL = "For new traders";
@@ -38,11 +38,11 @@ export const ALT_PROMO_CODE = "WELCOME45";
 
 /** Kept for pricing-panel badge / coupon references. */
 export const PROMO_ITEMS: PromoItem[] = [
-  { kind: "code", label: "Dashboard Launch Offer", text: "40% off + Buy 1 Get 2 Instantly + 5% Instant Cashback", code: PROMO_CODE },
+  { kind: "code", label: "BOGO Offer", text: "35% off + Buy 1 Get 1 Free + Free Drawdown Reset + First Payout on Demand", code: PROMO_CODE },
 ];
 
-/** Dashboard Launch Offer (NEWDASH) ends Thursday 22 Oct 2026, 07:59:59 IST (extended by one day, then 2 hours, then 6 more hours). */
-export const PROMO_DEADLINE = "2026-10-22T07:59:59+05:30";
+/** BOGO35 offer: starts when Diwali ends (16 Nov 9:45 AM IST). Front-end countdown shows 48 hours: ends 18 Nov 9:45 AM IST. */
+export const PROMO_DEADLINE = "2026-11-18T09:45:00+05:30";
 
 /** Spots left (not shown while the countdown runs; kept for switching back). Updated by hand from real sales. */
 export const PROMO_SPOTS_LEFT = 247;
