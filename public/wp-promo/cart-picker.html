@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>FYT Trading Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        * {
+            font-family: 'Poppins', Arial, sans-serif !important;
+        }
+
+        /* ── ROW / GROUP ── */
+        .fyt-group {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 10px !important;
+            margin-bottom: 14px !important;
+            width: 100% !important
+        }
+
+        /* ── BUTTONS ── */
+        .fyt-btn {
+            position: relative !important;
+            flex: 1 1 calc(33.33% - 10px) !important;
+            min-width: 90px !important;
+            padding: 13px 10px !important;
+            border-radius: 14px !important;
+            border: 1.5px solid #d6d8ff !important;
+            background: #fff !important;
+            color: #393be7 !important;
+            font-family: 'Inter', Arial, sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            text-align: center !important;
+            box-shadow: 0 1px 4px rgba(57, 59, 231, 0.06) !important;
+        }
+
+        .fyt-btn:hover {
+            background: #f0f1ff !important;
+            border-color: #393be7 !important;
+            transform: translateY(-1px) !important
+        }
+
+        .fyt-btn.active {
+            background: #393be7 !important;
+            color: #fff !important;
+            border-color: #393be7 !important;
+            box-shadow: 0 4px 16px rgba(57, 59, 231, 0.28) !important
+        }
+
+        /* amount buttons slightly shorter */
+        .fyt-btn.amt {
+            padding: 11px 10px !important;
+            font-size: 14px !important
+        }
+
+        /* ── BADGE ── */
+        .fyt-badge {
+            position: absolute !important;
+            top: -9px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            background: linear-gradient(90deg, #ff6b35, #f7931e) !important;
+            color: #fff !important;
+            font-size: 9px !important;
+            font-weight: 800 !important;
+            padding: 3px 10px !important;
+            border-radius: 999px !important;
+            white-space: nowrap !important;
+            letter-spacing: 0.06em !important;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.35) !important;
+            animation: badgePulse 2s ease-in-out infinite !important;
+            pointer-events: none !important;
+        }
+
+        @keyframes badgePulse {
+
+            0%,
+            100% {
+                box-shadow: 0 2px 8px rgba(255, 107, 53, 0.35) !important
+            }
+
+            50% {
+                box-shadow: 0 4px 14px rgba(255, 107, 53, 0.55) !important
+            }
+        }
+
+        /* ── SECTION LABEL ── */
+        .fyt-label {
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.1em !important;
+            text-transform: uppercase !important;
+            color: #888 !important;
+            margin-bottom: 8px !important;
+            text-align: center !important;
+        }
+
+        /* ── CARD ── */
+        .fyt-card {
+            background: #f7f8ff !important;
+            border-radius: 18px !important;
+            padding: 28px 24px 24px !important;
+            text-align: center !important;
+            border: 1.5px solid #e8eaff !important;
+            margin-top: 4px !important;
+        }
+
+        /* platform row inside card */
+        .fyt-platform-row {
+            display: flex !important;
+            gap: 8px !important;
+            justify-content: center !important;
+            margin-bottom: 20px !important
+        }
+
+        .fyt-plat-pill {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            padding: 7px 16px !important;
+            border-radius: 999px !important;
+            border: 1.5px solid #d6d8ff !important;
+            background: #fff !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #555 !important;
+            cursor: pointer !important;
+            transition: all 0.2s !important;
+        }
+
+        .fyt-plat-pill img {
+            width: 18px !important;
+            height: 18px !important;
+            border-radius: 50% !important;
+            object-fit: contain !important
+        }
+
+        .fyt-plat-pill:hover {
+            border-color: #393be7 !important;
+            color: #393be7 !important
+        }
+
+        .fyt-plat-pill.active {
+            background: #393be7 !important;
+            color: #fff !important;
+            border-color: #393be7 !important;
+            box-shadow: 0 3px 12px rgba(57, 59, 231, 0.22) !important
+        }
+
+        /* type badge inside card */
+        .fyt-type-chip {
+            display: inline-block !important;
+            background: #eef0ff !important;
+            color: #393be7 !important;
+            border-radius: 999px !important;
+            padding: 4px 14px !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            margin-bottom: 14px !important;
+        }
+
+        /* acct size */
+        .fyt-acct {
+            font-size: 13px !important;
+            color: #888 !important;
+            margin-bottom: 16px !important
+        }
+
+        .fyt-acct strong {
+            color: #1a1a2e !important;
+            font-weight: 700 !important
+        }
+
+        /* PRICE */
+
+        .fyt-price-row {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
+            margin-bottom: 8px !important;
+        }
+
+        .fyt-price-old {
+            font-size: 20px !important;
+            font-weight: 600 !important;
+            color: #bbb !important;
+            text-decoration: line-through !important;
+        }
+
+        .fyt-price-new {
+            font-size: 52px !important;
+            font-weight: 800 !important;
+            color: #1a1a2e !important;
+            line-height: 1 !important;
+            letter-spacing: -0.03em !important;
+        }
+
+        .fyt-price-meta {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 10px !important;
+            flex-wrap: wrap !important;
+            margin-bottom: 10px !important
+        }
+
+        .fyt-refund {
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            color: #22c47a !important;
+            background: #e8faf2 !important;
+            border-radius: 999px !important;
+            padding: 3px 12px !important;
+            letter-spacing: 0.06em !important
+        }
+
+        .fyt-coupon {
+            font-size: 12px !important;
+            color: #888 !important;
+            font-weight: 500 !important
+        }
+
+        .fyt-coupon strong {
+            color: #f7931e !important
+        }
+
+        .fyt-coupon-code {
+            text-align: center !important;
+            font-size: 12px !important;
+            color: #888 !important;
+            margin-bottom: 4px !important;
+        }
+
+        .fyt-coupon-code strong {
+            color: #393be7 !important;
+            font-weight: 700 !important;
+        }
+
+        /* savings pill */
+        .fyt-savings {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            background: #fff3e8 !important;
+            border: 1px solid #ffd6a8 !important;
+            border-radius: 999px !important;
+            padding: 5px 14px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            color: #e07020 !important;
+            margin-bottom: 20px !important;
+        }
+
+        /* CTA */
+        .fyt-cta {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 10px !important;
+            width: 100% !important;
+            padding: 17px 24px !important;
+            background: #393be7 !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 999px !important;
+            font-family: 'Inter', Arial, sans-serif !important;
+            font-size: 17px !important;
+            font-weight: 800 !important;
+            cursor: pointer !important;
+            letter-spacing: 0.01em !important;
+            box-shadow: 0 6px 20px rgba(57, 59, 231, 0.28) !important;
+            transition: all 0.25s !important;
+            animation: ctaPulse 2.2s ease-in-out infinite !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+
+        .fyt-cta::after {
+            content: '' !important;
+            position: absolute !important;
+            inset: 0 !important;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent) !important;
+            transform: translateX(-100%) !important;
+            transition: transform 0.6s !important;
+        }
+
+        .fyt-cta:hover::after {
+            transform: translateX(100%) !important
+        }
+
+        .fyt-cta:hover {
+            background: #2a2cb8 !important;
+            box-shadow: 0 10px 28px rgba(57, 59, 231, 0.4) !important;
+            animation-play-state: paused !important;
+            transform: translateY(-2px) !important
+        }
+
+        @keyframes ctaPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 6px 20px rgba(57, 59, 231, 0.28) !important
+            }
+
+            50% {
+                box-shadow: 0 8px 28px rgba(57, 59, 231, 0.44) !important
+            }
+        }
+
+        /* CTA play icon circle */
+        .fyt-cta-icon {
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            background: rgba(255, 255, 255, 0.22) !important;
+            display: grid !important;
+            place-items: center !important;
+            flex-shrink: 0 !important;
+            font-size: 16px !important;
+        }
+
+        /* empty */
+        .fyt-empty {
+            padding: 32px !important;
+            color: #aaa !important;
+            font-size: 14px !important;
+            text-align: center !important
+        }
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:600px) {
+            .fyt-btn {
+                font-size: 13px !important;
+                padding: 11px 6px !important
+            }
+
+            .fyt-price-new {
+                font-size: 40px !important
+            }
+
+            .fyt-cta {
+                font-size: 15px !important;
+                padding: 15px 18px !important
+            }
+
+            .fyt-card {
+                padding: 20px 14px 18px !important
+            }
+        }
+
+        @media(max-width:400px) {
+            .fyt-btn {
+                flex: 1 1 calc(50% - 8px) !important;
+                font-size: 12px !important
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="fyt-root"></div>
+
+    <script>
+        // ─────────────────────────────────────────────
+        // ALL PLAN DATA (synced with the main widget's PRODUCTS_CONFIG)
+        // "fyt"        = Classic  → used for 1-STEP + 2-STEP + INSTANT Plus
+        // "fyt-pro"    = Pro/Prime → 2-STEP Prime, INSTANT Prime
+        // "fyt-prime"  = Prime (no consistency) → 1-STEP only
+        // ─────────────────────────────────────────────
+
+        // PLANS_40: 40% off version, coupon "40% off + A Bonus Account", priceNew = round(priceOld * 0.60, 2)
+
+        const PLANS = {
+            fyt: {
+                "match-trader": {
+                    "1-STEP": {
+                        10000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 114, priceNew: 68.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1217" },
+                        25000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 219, priceNew: 131.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1218" },
+                        50000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 309, priceNew: 185.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1219" },
+                        100000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 505, priceNew: 303, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1220" },
+                        200000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 909, priceNew: 545.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1221" }
+                    },
+                    "2-STEP": {
+                        10000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "95/5", priceOld: 95, priceNew: 57, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1234" },
+                        25000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 199, priceNew: 119.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1233" },
+                        50000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 279, priceNew: 167.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1232" },
+                        100000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 459, priceNew: 275.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1231" },
+                        200000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 809, priceNew: 485.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=1230" }
+                    },
+                    "INSTANT-PLUS": {
+                        5000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 109, priceNew: 65.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20619" },
+                        10000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 209, priceNew: 125.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20613" },
+                        25000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 239, priceNew: 143.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20615" },
+                        50000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 469, priceNew: 281.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20617" },
+                        100000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 939, priceNew: 563.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20621" }
+                    }
+                },
+                "platform-5": {
+                    "1-STEP": {
+                        10000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 124, priceNew: 74.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12379" },
+                        25000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 229, priceNew: 137.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12381" },
+                        50000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 319, priceNew: 191.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12382" },
+                        100000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 515, priceNew: 309, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12378" },
+                        200000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 919, priceNew: 551.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12380" }
+                    },
+                    "2-STEP": {
+                        10000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "95/5", priceOld: 105, priceNew: 63, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12367" },
+                        25000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 209, priceNew: 125.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12369" },
+                        50000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 289, priceNew: 173.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12370" },
+                        100000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 469, priceNew: 281.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12366" },
+                        200000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 819, priceNew: 491.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=12368" }
+                    },
+                    "INSTANT-PLUS": {
+                        5000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 119, priceNew: 71.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20620" },
+                        10000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 219, priceNew: 131.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20614" },
+                        25000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 249, priceNew: 149.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20616" },
+                        50000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 479, priceNew: 287.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20618" },
+                        100000: { maxOverall: "4%", maxDaily: "4%", time: "None", minDays: "10", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "N/A", priceOld: 949, priceNew: 569.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20622" }
+                    }
+                }
+            },
+            "fyt-pro": {
+                "match-trader": {
+                    "2-STEP": {
+                        10000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "95/5", priceOld: 95, priceNew: 57, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20980" },
+                        25000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 199, priceNew: 119.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20979" },
+                        50000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 279, priceNew: 167.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20978" },
+                        100000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 459, priceNew: 275.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20977" },
+                        200000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 809, priceNew: 485.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20976" }
+                    },
+                    INSTANT: {
+                        5000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 129, priceNew: 77.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22214" },
+                        10000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 239, priceNew: 143.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22213" },
+                        25000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 309, priceNew: 185.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22212" },
+                        50000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 599, priceNew: 359.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22211" },
+                        100000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 1009, priceNew: 605.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22210" }
+                    }
+                },
+                "platform-5": {
+                    "2-STEP": {
+                        10000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "95/5", priceOld: 105, priceNew: 63, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20974" },
+                        25000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 209, priceNew: 125.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20973" },
+                        50000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 289, priceNew: 173.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20972" },
+                        100000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 469, priceNew: 281.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20971" },
+                        200000: { share: "18%", p1: "10%", p2: "6%", maxDaily: "6%", maxOverall: "10%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 819, priceNew: 491.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=20970" }
+                    },
+                    INSTANT: {
+                        5000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 129, priceNew: 77.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22209" },
+                        10000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 239, priceNew: 143.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22206" },
+                        25000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 309, priceNew: 185.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22207" },
+                        50000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 599, priceNew: 359.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22208" },
+                        100000: { maxOverall: "6%", maxDaily: "3%", time: "None", minDays: "5", split: "Up to 90%", payout: "Bi-weekly", leverage: "YES", profit: "4%", priceOld: 1009, priceNew: 605.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=22205" }
+                    }
+                }
+            },
+            "fyt-prime": {
+                "match-trader": {
+                    "1-STEP": {
+                        10000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 114, priceNew: 68.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21264" },
+                        25000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 219, priceNew: 131.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21268" },
+                        50000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 309, priceNew: 185.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21270" },
+                        100000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 505, priceNew: 303, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21262" },
+                        200000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 909, priceNew: 545.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21266" }
+                    }
+                },
+                "platform-5": {
+                    "1-STEP": {
+                        10000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 124, priceNew: 74.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21265" },
+                        25000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 229, priceNew: 137.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21269" },
+                        50000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 319, priceNew: 191.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21271" },
+                        100000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 515, priceNew: 309, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21263" },
+                        200000: { share: "18%", p1: "10%", p2: "N/A", maxDaily: "4%", maxOverall: "6%", time: "None", minDays: "None", split: "Up to 100%", priceOld: 919, priceNew: 551.4, coupon: "40% off + A Bonus Account", url: "https://fundingyourtrades.com/checkout/?add-to-cart=21267" }
+                    }
+                }
+            }
+        };
+
+        const COUPON_CODE = "DIWALI45";
+
+        // ─────────────────────────────────────────────
+        // STATE
+        // ─────────────────────────────────────────────
+        const S = {
+            globalType: "2-STEP",   // "1-STEP" | "2-STEP" | "INSTANT"
+            product: "fyt",      // "fyt" | "fyt-pro" | "fyt-prime" (fyt-prime only valid for 1-STEP)
+            platform: "match-trader",
+            amount: 100000
+        };
+
+        const AMOUNTS_EVAL = [10000, 25000, 50000, 100000, 200000];
+        const AMOUNTS_INSTANT = [5000, 10000, 25000, 50000, 100000];
+
+        function realType() {
+            if (S.globalType === "1-STEP") return "1-STEP";
+            if (S.globalType === "2-STEP") return "2-STEP";
+            if (S.globalType === "INSTANT") return S.product === "fyt-pro" ? "INSTANT" : "INSTANT-PLUS";
+        }
+
+        function amounts() {
+            return S.globalType === "INSTANT" ? AMOUNTS_INSTANT : AMOUNTS_EVAL;
+        }
+
+        // Diwali (DIWALI45, 45% off) until 16 Nov 9:45 AM IST (15 Nov 11:15 PM EST).
+        // Then BOGO35: 35% off + 1 free bonus account + free drawdown reset + first payout on demand.
+        // BOGO_END: set a date to end it, e.g. new Date("2026-11-30T23:59:59+05:30").getTime(); 0 = no end.
+        const DIWALI_END = new Date("2026-11-15T23:15:00-05:00").getTime();
+        const BOGO_END = 0;
+        function data() {
+            const r = PLANS[S.product]?.[S.platform]?.[realType()]?.[S.amount] || null;
+            if (!r) return null;
+            const now = Date.now();
+            if (now < DIWALI_END) {
+                const bonus = S.amount >= 25000 ? 2 : 1;
+                return Object.assign({}, r, {
+                    code: "DIWALI45",
+                    url: (r.url || "") + (r.url ? "&coupon=DIWALI45" : ""),
+                    priceNew: Math.round(r.priceOld * 0.55 * 100) / 100,
+                    coupon: "45% off + " + bonus + " Bonus Account" + (bonus > 1 ? "s" : "")
+                });
+            }
+            if (!BOGO_END || now < BOGO_END) {
+                return Object.assign({}, r, {
+                    code: "BOGO35",
+                    url: (r.url || "") + (r.url ? "&coupon=BOGO35" : ""),
+                    priceNew: Math.round(r.priceOld * 0.65 * 100) / 100,
+                    coupon: "35% off + 1 Bonus Account + Free Drawdown Reset + First Payout on Demand"
+                });
+            }
+            return Object.assign({}, r, { priceNew: r.priceOld, coupon: "", code: "" });
+        }
+
+        function typeName() {
+            const rt = realType();
+            if (rt === "1-STEP") return S.product === "fyt-prime" ? "1-Step Prime" : "1-Step";
+            if (rt === "2-STEP") return "2-Step Pro";
+            if (rt === "INSTANT") return "Instant Prime";
+            if (rt === "INSTANT-PLUS") return "Instant Plus";
+            return rt;
+        }
+
+        function isInstant() { return S.globalType === "INSTANT"; }
+
+        // ─────────────────────────────────────────────
+        // RENDER
+        // ─────────────────────────────────────────────
+        function render() {
+            const root = document.getElementById("fyt-root");
+            const amts = amounts();
+            const d = data();
+            const isInst = isInstant();
+            const isOneStep = S.globalType === "1-STEP";
+
+            // ── FYT Type toggle: which two products are shown, and their labels ──
+            const prod1 = "fyt";
+            const prod2 = isOneStep ? "fyt-prime" : "fyt-pro";
+            const prod1Label = isInst ? "Plus" : "Classic";
+            const prod2Label = "Prime";
+            const prod1Badge = "";
+            const prod2Badge = '<span class="fyt-badge" style="background:linear-gradient(90deg,#9b59b6,#6c3483)">No Consistency</span>';
+
+            const ctaText = isInst ? "Get Funded Now" : "Start Challenge";
+
+            // compare link
+            let compareHref, compareText;
+            if (isOneStep) {
+                compareHref = "https://intercom.help/funding-your-trades/en/articles/15693748-1-step-vs-1-step-pro";
+                compareText = "Compare Classic vs Prime →";
+            } else if (isInst) {
+                compareHref = "https://intercom.help/funding-your-trades/en/articles/14890800-instant-funding-models-compared";
+                compareText = "Compare Plus vs Prime →";
+            } else {
+                compareHref = "https://intercom.help/funding-your-trades/en/articles/13374417-fyt-classic-vs-fyt-prime";
+                compareText = "Compare Classic vs Prime →";
+            }
+
+            root.innerHTML = `
+    <!-- ROW 1: Challenge Type -->
+  
+    <div class="fyt-group" id="g-type">
+      <button class="fyt-btn${S.globalType === '1-STEP' ? ' active' : ''}" data-type="1-STEP">
+       
+        1-STEP
+      </button>
+      <button class="fyt-btn${S.globalType === '2-STEP' ? ' active' : ''}" data-type="2-STEP">
+        <span class="fyt-badge">Best Seller</span>
+        2-STEP
+      </button>
+      <button class="fyt-btn${S.globalType === 'INSTANT' ? ' active' : ''}" data-type="INSTANT">
+        <span class="fyt-badge">New</span>
+        INSTANT
+      </button>
+    </div>
+
+    <!-- ROW 2: Classic / Prime -->
+    <div class="fyt-label">${isInst ? "Instant Type" : "FYT Type"}</div>
+    <div class="fyt-group" id="g-product">
+      <button class="fyt-btn${S.product === prod1 ? ' active' : ''}" data-prod="${prod1}">
+        ${prod1Badge}
+        ${prod1Label}
+      </button>
+      <button class="fyt-btn${S.product === prod2 ? ' active' : ''}" data-prod="${prod2}">
+        ${prod2Badge}
+        ${prod2Label}
+      </button>
+    </div>
+    <div style="text-align:center;margin:-6px 0 14px;font-size:12px">
+      <a href="${compareHref}" target="_blank" style="color:#393be7;font-weight:600;text-decoration:none">${compareText}</a>
+    </div>
+
+    <!-- ROW 3: Amount -->
+    <div class="fyt-label">Account Size</div>
+    <div class="fyt-group" id="g-amt">
+      ${amts.map(a => `
+        <button class="fyt-btn amt${a === S.amount ? ' active' : ''}" data-amt="${a}">
+          $${a >= 1000 ? (a / 1000) + 'K' : a}
+        </button>
+      `).join("")}
+    </div>
+
+    <!-- CARD -->
+    <div class="fyt-card">
+
+      <!-- Platform toggle inside card -->
+      <div class="fyt-platform-row">
+        <button class="fyt-plat-pill${S.platform === 'match-trader' ? ' active' : ''}" data-plat="match-trader">
+          <img src="https://fundingyourtrades.com/wp-content/uploads/2026/02/unnamed.png" alt="" onerror="this.style.display='none'"/>
+          Match Trader
+        </button>
+        <button class="fyt-plat-pill${S.platform === 'platform-5' ? ' active' : ''}" data-plat="platform-5">
+          <img src="https://fundingyourtrades.com/wp-content/uploads/2026/01/IMG_7010.png" alt="" onerror="this.style.display='none'"/>
+          Platform 5
+        </button>
+      </div>
+
+      ${d ? `
+        <!-- type chip -->
+     <div class="fyt-type-chip">${typeName()}</div>
+
+        <!-- account size -->
+        <div class="fyt-acct">Account Size: <strong>$${Number(S.amount).toLocaleString()}</strong></div>
+
+        <!-- price -->
+    <div class="fyt-price-row">
+  ${d.priceNew < d.priceOld ? `<div class="fyt-price-old">$${d.priceOld.toFixed(2)}</div>` : ""}
+  <div class="fyt-price-new">$${d.priceNew.toFixed(2)}</div>
+</div>
+
+        <div class="fyt-price-meta">
+          ${!isInst ? '<span class="fyt-refund">✓ Refundable</span>' : ""}
+          ${d.coupon ? `<span class="fyt-coupon">( <strong>${d.coupon}</strong> )</span>` : ""}
+        </div>
+
+        ${d.coupon ? `<div class="fyt-coupon-code">Code <strong>${d.code}</strong> Applied</div>` : ""}
+
+        <!-- savings -->
+        <div style="margin-bottom:18px">
+          
+        </div>
+
+        <!-- CTA -->
+        <button class="fyt-cta" id="fyt-cta-btn" data-url="${d.url || ""}">
+          <span class="fyt-cta-icon">▶</span>
+          ${ctaText}
+        </button>
+      ` : `<div class="fyt-empty">No plan available for this combination.<br/>Please try a different selection.</div>`}
+
+    </div>
+  `;
+
+            // ── EVENTS ──
+            document.getElementById("g-type").querySelectorAll("[data-type]").forEach(b => {
+                b.addEventListener("click", () => {
+                    S.globalType = b.dataset.type;
+                    // Default product per tab: 1-STEP → Classic, 2-STEP → Classic, INSTANT → Prime
+                    if (S.globalType === "1-STEP") {
+                        if (S.product !== "fyt" && S.product !== "fyt-prime") S.product = "fyt";
+                    } else if (S.globalType === "2-STEP") {
+                        if (S.product !== "fyt" && S.product !== "fyt-pro") S.product = "fyt";
+                    } else if (S.globalType === "INSTANT") {
+                        S.product = "fyt-pro";
+                    }
+                    fixAmount();
+                    render();
+                });
+            });
+
+            document.getElementById("g-product").querySelectorAll("[data-prod]").forEach(b => {
+                b.addEventListener("click", () => {
+                    S.product = b.dataset.prod;
+                    fixAmount();
+                    render();
+                });
+            });
+
+            document.getElementById("g-amt").querySelectorAll("[data-amt]").forEach(b => {
+                b.addEventListener("click", () => {
+                    S.amount = Number(b.dataset.amt);
+                    render();
+                });
+            });
+
+            document.querySelectorAll("[data-plat]").forEach(b => {
+                b.addEventListener("click", () => {
+                    S.platform = b.dataset.plat;
+                    render();
+                });
+            });
+
+            const ctaBtn = document.getElementById("fyt-cta-btn");
+            if (ctaBtn) ctaBtn.addEventListener("click", () => { if (ctaBtn.dataset.url) window.location.href = ctaBtn.dataset.url; });
+        }
+
+        function fixAmount() {
+            const amts = amounts();
+            if (!amts.includes(S.amount)) S.amount = amts[Math.min(3, amts.length - 1)];
+        }
+
+        render();
+    </script>
+</body>
+
+</html>
