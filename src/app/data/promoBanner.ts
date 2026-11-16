@@ -41,8 +41,8 @@ export const PROMO_ITEMS: PromoItem[] = [
   { kind: "code", label: "BOGO Offer", text: "35% off + Buy 1 Get 1 Free + Free Drawdown Reset + First Payout on Demand", code: PROMO_CODE },
 ];
 
-/** BOGO35 offer: starts when Diwali ends (16 Nov 9:45 AM IST). Front-end countdown shows 48 hours: ends 18 Nov 9:45 AM IST. */
-export const PROMO_DEADLINE = "2026-11-18T09:45:00+05:30";
+/** BOGO35 offer (live since 16 Nov 9:45 AM IST, coupon has no end). Front-end countdown: 100 hours from 16 Nov 4:20 PM IST. */
+export const PROMO_DEADLINE = "2026-11-20T20:20:00+05:30";
 
 /** Spots left (not shown while the countdown runs; kept for switching back). Updated by hand from real sales. */
 export const PROMO_SPOTS_LEFT = 247;
