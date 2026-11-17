@@ -1619,7 +1619,7 @@ class BelowFoldErrorBoundary extends Component<{ children: ReactNode }, { hasErr
   }
 }
 
-const DISCORD_INVITE_URL = "https://discord.gg/fundingyourtrades";
+const DISCORD_INVITE_URL = "https://discord.gg/6NYNSAwxeZ";
 
 function DiscordLauncher() {
   return createPortal(

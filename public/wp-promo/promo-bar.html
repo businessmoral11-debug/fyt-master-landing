@@ -758,3 +758,20 @@
   tick(); t = setInterval(tick, 1000);
 })();
 </script>
+
+<!-- ===================== Site-wide: point every Discord link to the current invite ===================== -->
+<script>
+(function(){
+  var NEW = 'https://discord.gg/6NYNSAwxeZ';
+  function fix(root){
+    var links = (root || document).querySelectorAll('a[href*="discord.gg/"],a[href*="discord.com/invite/"]');
+    for (var i = 0; i < links.length; i++) { if (links[i].href !== NEW) links[i].href = NEW; }
+  }
+  fix();
+  if (window.MutationObserver) {
+    var mo = new MutationObserver(function(){ fix(); });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+    setTimeout(function(){ mo.disconnect(); }, 15000);
+  }
+})();
+</script>
