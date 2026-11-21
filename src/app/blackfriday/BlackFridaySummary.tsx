@@ -31,7 +31,7 @@ export function BlackFridaySummary({ sizeLabel }: { sizeLabel: string }) {
           </div>
         ))}
       </div>
-      <div className="fyt-bf-sum-give"><b>1 entry</b> in today's $100K funded account giveaway</div>
+      <div className="fyt-bf-sum-give"><b>1 entry</b> in today's 100K funded account giveaway</div>
     </div>
   );
 }

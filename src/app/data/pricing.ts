@@ -115,7 +115,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
     ]),
     // fyt-pro INSTANT (Prime) — product IDs from live PRODUCTS_CONFIG; sale = 40% off
     prime: build(RULES_INSTANT_PRIME, [
-      { size: 5000, mt: [129, 70.95, 22214], p5: [129, 70.95, 22209] },
+      { size: 5000, mt: [128, 70.95, 22214], p5: [128, 70.95, 22209] }, // -1 so the Black Friday price reads 69
       { size: 10000, mt: [239, 131.45, 22213], p5: [239, 131.45, 22206] },
       { size: 25000, mt: [309, 169.95, 22212], p5: [309, 169.95, 22207] },
       { size: 50000, mt: [599, 329.45, 22211], p5: [599, 329.45, 22208] },
