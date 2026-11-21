@@ -1,0 +1,1306 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Black Friday checkout preview</title><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"><style>html,body{overflow-x:hidden}body{margin:0;background:#06102a}.pv-tag{position:fixed;left:50%;transform:translateX(-50%);top:6px;z-index:99999;background:#ffb800;color:#1a1000;font:600 11px/1 Poppins,sans-serif;letter-spacing:.12em;padding:6px 12px;border-radius:999px;pointer-events:none}</style><script>(function(){var f=window.fetch;window.fetch=function(u,o){if(String(u).indexOf("/__preview__")===0){return Promise.resolve(new Response(JSON.stringify({success:false,data:{message:"Preview only. No order is created and no code is checked here."}}),{headers:{"Content-Type":"application/json"}}));}return f.apply(this,arguments);};})();</script></head><body><div class="pv-tag">PREVIEW · NOT LIVE</div><script>
+(function(){
+  document.documentElement.classList.add('fyt-co-active');
+  if(document.body) document.body.classList.add('fyt-co-active');
+  else document.addEventListener('DOMContentLoaded', function(){ document.body.classList.add('fyt-co-active'); });
+  function hideCheckoutOverlays(){
+    document.querySelectorAll('#fyt-dw-bar,#fyt-dw-host,#fyt4wrap,.fyt4-summer-bg,.discord-float,.noyona_mobile_bottom_disclaimer').forEach(function(el){
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('pointer-events','none','important');
+    });
+    if(window.matchMedia('(min-width:901px)').matches){
+      document.querySelectorAll(
+        '.elementor-location-header,header.site-header,#masthead,.site-header,#site-header,.header-main'
+      ).forEach(function(el){
+        if(el.closest('#fyt-custom-checkout') || el.closest('#fyt-co-logo-bar')) return;
+        el.style.setProperty('display','none','important');
+        el.style.setProperty('visibility','hidden','important');
+        el.style.setProperty('height','0','important');
+        el.style.setProperty('overflow','hidden','important');
+        el.style.setProperty('pointer-events','none','important');
+      });
+    }
+    try{ if(window.Intercom) Intercom('update',{hide_default_launcher:true}); }catch(e){}
+  }
+  hideCheckoutOverlays();
+  document.addEventListener('DOMContentLoaded', hideCheckoutOverlays);
+  setTimeout(hideCheckoutOverlays, 50);
+  setTimeout(hideCheckoutOverlays, 500);
+  setTimeout(hideCheckoutOverlays, 2000);
+
+  /* Support = the FYT live chat (bottom right). No Discord on the checkout. */
+  var FYT_CHAT_SRC='https://emailsplatform.fundingyourtrades.com/w/chat.js';
+  function fytChatHost(){
+    var kids=document.body?document.body.children:[];
+    for(var i=0;i<kids.length;i++){ var r=kids[i].shadowRoot; if(r&&r.getElementById&&r.getElementById('b')) return kids[i]; }
+    return null;
+  }
+  function openSupportChat(e){
+    if(e) e.preventDefault();
+    var h=fytChatHost();
+    if(h){ h.shadowRoot.getElementById('b').click(); return; }
+    if(!document.querySelector('script[src="'+FYT_CHAT_SRC+'"]')){
+      var s=document.createElement('script'); s.src=FYT_CHAT_SRC; s.async=true; document.body.appendChild(s);
+    }
+    var n=0, t=setInterval(function(){
+      var h2=fytChatHost();
+      if(h2){ clearInterval(t); h2.shadowRoot.getElementById('b').click(); }
+      else if(++n>40) clearInterval(t);
+    },150);
+  }
+  window.fytCoOpenChat=openSupportChat;
+
+  /* Phones: keep the live chat bubble just above the sticky Pay bar. */
+  var fytLiftLast=-1;
+  function liftChat(){
+    var host=fytChatHost(); if(!host) return;
+    var bar=document.querySelector('.fyt-co-mobile-sticky'), off=0;
+    if(bar){
+      var cs=getComputedStyle(bar);
+      if(cs.display!=='none' && cs.visibility!=='hidden' && bar.offsetHeight){
+        off=Math.round(window.innerHeight-bar.getBoundingClientRect().top);
+        if(off<0||off>window.innerHeight*0.5) off=0;
+      }
+    }
+    var bottom=off?off+14:20;
+    if(bottom===fytLiftLast) return;
+    fytLiftLast=bottom;
+    host.style.setProperty('bottom',bottom+'px','important');
+    var st=host.shadowRoot.getElementById('fyt-co-lift');
+    if(!st){ st=document.createElement('style'); st.id='fyt-co-lift'; host.shadowRoot.appendChild(st); }
+    st.textContent='@media(max-width:520px){.g.n{bottom:'+(bottom+66)+'px!important}}';
+  }
+  function bootLift(){
+    liftChat();
+    if(window.MutationObserver) new MutationObserver(liftChat).observe(document.body,{childList:true});
+    window.addEventListener('resize',liftChat,{passive:true});
+    window.addEventListener('scroll',liftChat,{passive:true});
+    var n=0, t=setInterval(function(){ liftChat(); if(++n>30) clearInterval(t); },500);
+  }
+  if(document.body) bootLift(); else document.addEventListener('DOMContentLoaded',bootLift);
+
+  function mountSupportFab(){
+    if(document.getElementById('fyt-co-support')) return;
+    var btn=document.createElement('button');
+    btn.id='fyt-co-support';
+    btn.type='button';
+    btn.setAttribute('aria-label','Chat with support');
+    btn.title='Chat with support';
+    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+    btn.addEventListener('click', openSupportChat);
+    document.body.appendChild(btn);
+  }
+  // The extra support button is no longer added: the FYT live chat is the only button.
+})();
+</script>
+<div id="fyt-co-logo-bar" class="fyt-co-logo-bar">
+  <a href="https://fundingyourtrades.com/" aria-label="FundingYourTrades">
+    <img src="https://fundingyourtrades.com/wp-content/uploads/2026/02/IMG_1080-1-1024x266-1.webp" alt="FundingYourTrades" width="1024" height="266" decoding="async" fetchpriority="high">
+  </a>
+</div>
+<div id="fyt-custom-checkout">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+:root{
+  --navy:#04122E;--navy-2:#081A3D;--blue:#4A7DFF;--blue-dim:#2E58C8;--ink:#0F172A;
+  --muted:#64748B;--line:#E7EBF3;--green:#0FA968;--green-bg:#EAFBF3;--card:#FFFFFF;--radius:14px;
+}
+/* Hide site-wide promo banner + conflicting bottom widgets on this checkout page */
+#fyt-dw-bar,#fyt-dw-host,#fyt4wrap,.fyt4-summer-bg{display:none!important;height:0!important;opacity:0!important;pointer-events:none!important;visibility:hidden!important;overflow:hidden!important;margin:0!important;padding:0!important;}
+body.fyt-co-active .discord-float,
+body.fyt-co-active .noyona_mobile_bottom_disclaimer,
+body.fyt-co-active .elementor-location-footer,
+body.fyt-co-active .intercom-lightweight-app-launcher,
+body.fyt-co-active .intercom-launcher,
+body.fyt-co-active .intercom-launcher-frame,
+body.fyt-co-active iframe[name="intercom-launcher-frame"]{
+  display:none!important;visibility:hidden!important;pointer-events:none!important;opacity:0!important;
+}
+/* Desktop checkout: hide site header, show centered logo bar only */
+@media (min-width:901px){
+  body.fyt-co-active .elementor-location-header,
+  body.fyt-co-active header.site-header,
+  body.fyt-co-active #masthead,
+  body.fyt-co-active .site-header,
+  body.fyt-co-active #site-header,
+  body.fyt-co-active .header-main,
+  body.fyt-co-active .elementor-sticky--active.elementor-location-header{
+    display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;
+    overflow:hidden!important;pointer-events:none!important;opacity:0!important;margin:0!important;padding:0!important;
+  }
+  body.fyt-co-active #fyt-co-logo-bar{
+    display:flex!important;align-items:center;justify-content:center;
+    position:fixed;top:0;left:0;right:0;z-index:2147482000;
+    padding:18px 24px;background:#04122E;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+  }
+  body.fyt-co-active #fyt-co-logo-bar a{display:flex;align-items:center;justify-content:center;line-height:0;}
+  body.fyt-co-active #fyt-co-logo-bar img{height:44px;width:auto;max-width:min(280px,42vw);display:block;object-fit:contain;}
+  body.fyt-co-active #fyt-custom-checkout{padding-top:96px;}
+}
+@media (max-width:900px){
+  body.fyt-co-active #fyt-co-logo-bar{display:none!important;}
+}
+/* Custom support FAB — bottom-right (desktop) / above sticky bar (mobile) */
+#fyt-co-support{
+  position:fixed;bottom:28px;right:20px;top:auto;z-index:2147482990;
+  width:52px;height:52px;border:0;border-radius:50%;cursor:pointer;
+  background:linear-gradient(145deg,#4A7DFF,#2E58C8);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 28px rgba(46,88,200,.45);transition:transform .2s ease,box-shadow .2s ease;
+}
+#fyt-co-support:hover{transform:scale(1.06);box-shadow:0 14px 32px rgba(46,88,200,.55);}
+#fyt-co-support:focus-visible{outline:2px solid #fff;outline-offset:3px;}
+#fyt-co-support svg{width:24px;height:24px;display:block;}
+@media (max-width:900px){
+  #fyt-co-support{top:auto;bottom:calc(88px + env(safe-area-inset-bottom,0px));right:14px;width:48px;height:48px;}
+}
+#fyt-custom-checkout,#fyt-custom-checkout *{box-sizing:border-box;}
+#fyt-custom-checkout{
+  background:
+    radial-gradient(1100px 500px at 12% -10%, rgba(74,125,255,.18), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(74,125,255,.10), transparent 55%),
+    var(--navy);
+  font-family:'Poppins',system-ui,sans-serif;color:var(--ink);padding:100px 0 40px;margin:0 -8px;
+}
+#fyt-custom-checkout .topbar{display:none!important;}
+#fyt-custom-checkout .hero{padding:10px 20px 24px;text-align:center;}
+#fyt-custom-checkout .hero h1{margin:0 auto;color:#fff;font-weight:600;font-size:clamp(24px,2.2vw,32px);line-height:1.25;max-width:none;white-space:nowrap;}
+#fyt-custom-checkout .hero h1 b{font-weight:800;background:linear-gradient(90deg,#7FA3FF,#4A7DFF);-webkit-background-clip:text;background-clip:text;color:transparent;}
+#fyt-custom-checkout .layout{max-width:900px;margin:0 auto;padding:0 20px 60px;}
+#fyt-custom-checkout .card{background:var(--card);border-radius:var(--radius);box-shadow:0 20px 50px -25px rgba(0,0,0,.55);}
+#fyt-custom-checkout .step{padding:24px 26px;}
+#fyt-custom-checkout .step + .step{border-top:1px solid var(--line);}
+#fyt-custom-checkout .step-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+#fyt-custom-checkout .step-title{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;}
+#fyt-custom-checkout .step-num{width:21px;height:21px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex:0 0 auto;}
+#fyt-custom-checkout .secured-badge{display:flex;align-items:center;gap:5px;color:#0B7A4C;background:var(--green-bg);border:1px solid #C2EBD8;border-radius:999px;padding:4px 9px;font-size:10px;font-weight:700;white-space:nowrap;}
+#fyt-custom-checkout .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:14px;}
+#fyt-custom-checkout .summary-grid > div{padding:10px 12px;border-right:1px solid var(--line);}
+#fyt-custom-checkout .summary-grid > div:last-child{border-right:none;}
+#fyt-custom-checkout .sg-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;}
+#fyt-custom-checkout .sg-value{font-weight:700;font-size:12.5px;}
+#fyt-custom-checkout .usp-list{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px;}
+#fyt-custom-checkout .usp-item{display:flex;align-items:flex-start;gap:6px;font-size:11.5px;color:#475569;line-height:1.35;}
+#fyt-custom-checkout .usp-item svg{color:var(--green);flex:0 0 auto;margin-top:1px;}
+#fyt-custom-checkout .sb-line{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;}
+#fyt-custom-checkout .sb-line.muted{color:var(--muted);}
+#fyt-custom-checkout .sb-line.discount{color:var(--green);}
+#fyt-custom-checkout .sb-pm-summary{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:2px 0 8px;min-width:0;
+}
+#fyt-custom-checkout .sb-pm-summary .sb-pm-label{
+  flex:1;min-width:0;font-size:12px;font-weight:600;line-height:1.35;color:var(--navy,#04122E);
+}
+#fyt-custom-checkout .sb-change-pm{
+  flex:0 0 auto;border:1px solid #C7D5F5;background:#F0F4FF;color:var(--blue-dim,#2E58C8);
+  font-family:inherit;font-size:10px;font-weight:700;line-height:1;padding:5px 8px;border-radius:999px;cursor:pointer;
+  white-space:nowrap;
+}
+#fyt-custom-checkout .sb-change-pm:hover{background:#E4EDFF;}
+#fyt-custom-checkout .sb-divider{border:none;border-top:1px solid var(--line);margin:6px 0;}
+#fyt-custom-checkout .sb-total{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:14px;margin:8px 0 4px;}
+#fyt-custom-checkout .sb-total span:last-child{font-size:23px;color:var(--navy);font-family:'JetBrains Mono',monospace;}
+#fyt-custom-checkout .save-chip{color:#0B7A4C;background:var(--green-bg);border-radius:8px;padding:4px 9px;font-size:10.5px;font-weight:700;}
+#fyt-custom-checkout .save-row{display:flex;justify-content:flex-end;margin-bottom:14px;}
+#fyt-custom-checkout .hw-vault{margin:0 0 14px;padding:12px 14px;border-radius:10px;background:linear-gradient(135deg,#0b1a4d,#1d3fa8);color:#fff;border:1px solid rgba(255,138,61,.55);}
+#fyt-custom-checkout .hw-vault-head{display:flex;flex-direction:column;gap:2px;margin-bottom:8px;}
+#fyt-custom-checkout .hw-vault-head b{font-size:15px;color:#fff;}
+#fyt-custom-checkout .hw-vault-tag{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#ffb47a;}
+#fyt-custom-checkout .hw-vault-label{font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#bfdbfe;margin-bottom:6px;}
+#fyt-custom-checkout .hw-vault-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
+#fyt-custom-checkout .hw-vault-list li{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;background:rgba(255,255,255,.08);border-radius:8px;padding:7px 10px;}
+#fyt-custom-checkout .hw-check{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#ff8a3d;color:#1a0a00;font-size:11px;flex-shrink:0;}
+#fyt-custom-checkout .hw-vault-empty{font-size:12.5px;color:#dbeafe;}
+#fyt-custom-checkout .hw-vault-empty a{color:#ffb47a;text-decoration:underline;}
+#fyt-custom-checkout .promo-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+#fyt-custom-checkout .promo{background:var(--green-bg);border:1px solid #BEEFD9;border-radius:10px;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+#fyt-custom-checkout .promo b{color:var(--green);font-size:13px;display:block;}
+#fyt-custom-checkout .promo span{color:#0B7A4C;font-size:11.5px;}
+#fyt-custom-checkout .promo a{font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer;}
+#fyt-custom-checkout .promo .promo-kind{display:inline-block;margin-top:2px;font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;opacity:.85;}
+#fyt-custom-checkout .coupon-toggle{display:block;font-size:12px;color:var(--blue-dim);font-weight:600;cursor:pointer;text-decoration:none;}
+#fyt-custom-checkout .coupon-toggle span{text-decoration:underline;}
+#fyt-custom-checkout .coupon-box{display:none;gap:8px;margin-top:8px;}
+#fyt-custom-checkout .coupon-box.is-open{display:flex!important;}
+#fyt-custom-checkout .coupon-box input{flex:1;padding:9px 11px;border-radius:9px;border:1.5px solid var(--line);font-family:inherit;font-size:13px;color:var(--ink);background:#fff;text-transform:uppercase;}
+#fyt-custom-checkout .coupon-box input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,125,255,.15);}
+#fyt-custom-checkout .coupon-box button{padding:9px 16px;border-radius:9px;border:none;background:var(--navy);color:#fff;font-family:inherit;font-weight:600;font-size:12.5px;cursor:pointer;white-space:nowrap;}
+#fyt-custom-checkout .coupon-msg{font-size:11.5px;margin-top:6px;min-height:14px;}
+#fyt-custom-checkout .coupon-msg.err{color:#DC2626;}
+#fyt-custom-checkout .fyt-co-err{background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0;display:none;}
+#fyt-custom-checkout .opt-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+#fyt-custom-checkout .opt{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;transition:.15s;position:relative;}
+#fyt-custom-checkout .opt:hover{border-color:#C7D4EE;}
+#fyt-custom-checkout .opt.sel{border-color:var(--blue);background:#F5F8FF;}
+#fyt-custom-checkout .opt-top{display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap;}
+#fyt-custom-checkout .radio{width:17px;height:17px;border-radius:50%;border:2px solid #CBD5E1;position:relative;flex:0 0 auto;}
+#fyt-custom-checkout .opt.sel .radio,#fyt-custom-checkout .pm.sel .radio{border-color:var(--blue);}
+#fyt-custom-checkout .opt.sel .radio::after,#fyt-custom-checkout .pm.sel .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--blue);}
+#fyt-custom-checkout .opt-name{font-weight:600;font-size:13.5px;}
+#fyt-custom-checkout .badge{background:#EAF0FF;color:var(--blue-dim);font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;}
+#fyt-custom-checkout .opt-price{font-weight:700;font-size:18px;}
+#fyt-custom-checkout .addon-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+#fyt-custom-checkout .addon{border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;text-align:left;transition:.15s;position:relative;}
+#fyt-custom-checkout .addon:hover{border-color:#C7D4EE;}
+#fyt-custom-checkout .addon.sel{border-color:var(--blue);background:#F5F8FF;}
+#fyt-custom-checkout .addon .chk{position:absolute;top:11px;right:11px;width:15px;height:15px;border-radius:4px;border:1.5px solid #CBD5E1;}
+#fyt-custom-checkout .addon.sel .chk{background:var(--blue);border-color:var(--blue);}
+#fyt-custom-checkout .addon.sel .chk::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;}
+#fyt-custom-checkout .addon svg{color:var(--blue);margin-bottom:8px;}
+#fyt-custom-checkout .addon b{display:block;font-size:12.5px;margin-bottom:3px;line-height:1.35;padding-right:18px;}
+#fyt-custom-checkout .addon .delta{font-size:11.5px;color:var(--blue-dim);font-weight:700;}
+#fyt-custom-checkout .addon .delta.save{color:var(--green);}
+#fyt-custom-checkout .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+#fyt-custom-checkout .field label{display:block;font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:5px;}
+#fyt-custom-checkout .field input,#fyt-custom-checkout .field select{width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid var(--line);font-family:inherit;font-size:13.5px;color:var(--ink);background:#fff;}
+#fyt-custom-checkout .field input:focus,#fyt-custom-checkout .field select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,125,255,.15);}
+#fyt-custom-checkout .edit-cart{
+  display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--blue-dim);
+  text-decoration:none;padding:4px 9px;border-radius:999px;border:1px solid #D7E2F5;background:#F7F9FD;white-space:nowrap;
+}
+#fyt-custom-checkout .edit-cart:hover{background:#EEF3FC;border-color:#C5D4F0;}
+#fyt-custom-checkout .edit-cart svg{flex:0 0 auto;}
+#fyt-custom-checkout .newsletter{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:2px;}
+#fyt-custom-checkout .disclosure{margin-top:12px;padding:11px 12px;border-radius:10px;border:1px solid #D9E2F4;background:#F8FAFD;color:#5A677C;font-size:10.5px;line-height:1.55;}
+#fyt-custom-checkout .pm{border:1.5px solid var(--line);border-radius:10px;padding:12px 13px;margin-bottom:9px;cursor:pointer;transition:.15s;}
+#fyt-custom-checkout .pm.sel{border-color:var(--blue);background:#F5F8FF;}
+#fyt-custom-checkout .device-pick{margin:0 0 14px;}
+#fyt-custom-checkout .device-pick-label{font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:7px;}
+#fyt-custom-checkout .device-opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;outline:none;border-radius:12px;}
+#fyt-custom-checkout .device-opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:12px;padding:12px 13px;cursor:pointer;background:#fff;font-family:inherit;text-align:left;transition:.15s;width:100%;}
+#fyt-custom-checkout .device-opt:hover{border-color:#C7D4F5;}
+#fyt-custom-checkout .device-opt.sel{border-color:var(--blue);background:#F5F8FF;}
+#fyt-custom-checkout .device-opt .radio{margin:0;}
+#fyt-custom-checkout .device-opt.sel .radio{border-color:var(--blue);}
+#fyt-custom-checkout .device-opt.sel .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--blue);}
+#fyt-custom-checkout .device-opt svg{flex:0 0 auto;color:var(--navy);}
+#fyt-custom-checkout .device-opt b{display:block;font-size:13px;color:var(--ink);line-height:1.25;}
+#fyt-custom-checkout .device-opt small{display:block;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3;}
+#fyt-custom-checkout .device-opts.fyt-invalid .device-opt{border-color:#F87171;}
+@media (max-width:480px){#fyt-custom-checkout .device-opts{grid-template-columns:1fr;}}
+#fyt-custom-checkout .pm-top{display:flex;align-items:center;gap:9px;}
+#fyt-custom-checkout .pm-top b{font-size:13px;flex:1;}
+#fyt-custom-checkout .pm-icons{display:flex;gap:6px;margin-top:9px;margin-left:26px;flex-wrap:wrap;}
+#fyt-custom-checkout .pm-icons span{font-size:9px;font-weight:800;padding:4px 7px;border-radius:6px;border:1px solid var(--line);letter-spacing:.02em;line-height:1;display:flex;align-items:center;justify-content:center;min-width:32px;height:19px;}
+#fyt-custom-checkout .ic-visa{background:#1A1F71;color:#fff;font-style:italic;}
+#fyt-custom-checkout .ic-mc{background:#fff;border-color:var(--line);position:relative;padding-left:14px !important;}
+#fyt-custom-checkout .ic-mc::before{content:"";position:absolute;left:6px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:#EB001B;}
+#fyt-custom-checkout .ic-mc::after{content:"";position:absolute;left:11px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:#F79E1B;mix-blend-mode:multiply;}
+#fyt-custom-checkout .ic-amex{background:#006FCF;color:#fff;}
+#fyt-custom-checkout .ic-gpay{background:#fff;color:#5F6368;}
+#fyt-custom-checkout .ic-usdt{background:#26A17B;color:#fff;}
+#fyt-custom-checkout .ic-btc{background:#F7931A;color:#fff;}
+#fyt-custom-checkout .ic-eth{background:#3C3C3D;color:#fff;}
+#fyt-custom-checkout .ic-more{background:#0F172A0d;color:var(--muted);border:1px solid var(--line);font-weight:700;}
+#fyt-custom-checkout .card-panel{margin-top:11px;margin-left:26px;padding:13px;border-radius:10px;background:#F8FAFC;border:1px solid var(--line);}
+#fyt-custom-checkout .card-panel .field-row{margin-bottom:9px;}
+#fyt-custom-checkout .card-panel .field-row:last-child{margin-bottom:0;}
+#fyt-custom-checkout .crypto-note{margin-top:11px;margin-left:26px;padding:13px;border-radius:10px;background:#F8FAFC;border:1px solid var(--line);font-size:11.5px;color:var(--muted);line-height:1.5;}
+#fyt-custom-checkout .crypto-note b{display:block;color:var(--ink);font-size:12px;margin-bottom:2px;}
+#fyt-custom-checkout .agree{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);margin-bottom:14px;letter-spacing:normal;word-spacing:normal;}
+#fyt-custom-checkout .agree span{letter-spacing:normal;word-spacing:normal;line-height:1.45;}
+#fyt-custom-checkout .agree a{color:var(--blue-dim);font-weight:600;text-decoration:none;}
+#fyt-custom-checkout .pay-btn,#fyt-custom-checkout .pay-btn span,#fyt-custom-checkout #btnAmt{color:#fff!important;-webkit-text-fill-color:#fff!important;}
+#fyt-custom-checkout .pay-btn{
+  width:100%;padding:15px;border:none;border-radius:11px;background:linear-gradient(90deg,#4A7DFF,#3A6BF0);
+  font-family:inherit;font-weight:700;font-size:14.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 14px 30px -12px rgba(74,125,255,.65);transition:.15s transform;
+}
+#fyt-custom-checkout .pay-btn:hover{transform:translateY(-1px);}
+#fyt-custom-checkout .pay-btn[disabled]{opacity:.65;cursor:not-allowed;transform:none!important;}
+#fyt-custom-checkout .pay-sub{text-align:center;font-size:11px;color:var(--muted);margin-top:9px;line-height:1.5;}
+#fyt-custom-checkout .support-row{margin-top:16px;padding:11px 12px;border-radius:10px;background:#F6F8FC;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11px;color:var(--muted);}
+#fyt-custom-checkout .support-row a{color:var(--blue-dim);font-weight:700;text-decoration:none;white-space:nowrap;}
+#fyt-custom-checkout .trust{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);}
+#fyt-custom-checkout .trust-item{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:8px 3px;border-radius:10px;}
+#fyt-custom-checkout .trust-ic{width:27px;height:27px;border-radius:50%;background:#EAF0FF;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+#fyt-custom-checkout .trust-item span{font-size:9.5px;color:var(--muted);font-weight:600;line-height:1.25;}
+#fyt-custom-checkout .trust svg{color:var(--blue);}
+#fyt-custom-checkout .field input.fyt-invalid,#fyt-custom-checkout .field select.fyt-invalid{
+  border-color:#DC2626!important;box-shadow:0 0 0 3px rgba(220,38,38,.15)!important;
+}
+#fyt-custom-checkout .amount-tick{transition:opacity .18s;}
+#fyt-custom-checkout .mobile-sticky,
+.fyt-co-mobile-sticky{
+  display:none;position:fixed;left:0;right:0;bottom:0;z-index:2147483640;
+  padding:10px 14px 10px;
+  background:#ffffff;border-top:1px solid var(--line,#E7EBF3);
+  box-shadow:0 -10px 28px rgba(15,23,42,.15);backdrop-filter:blur(12px);
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;pointer-events:auto;
+}
+.fyt-co-mobile-sticky::after{
+  content:"";position:absolute;left:0;right:0;top:100%;height:120px;
+  background:#ffffff;pointer-events:none;
+}
+#fyt-custom-checkout .mobile-sticky-inner,
+.fyt-co-mobile-sticky .mobile-sticky-inner{max-width:900px;margin:auto;display:flex;align-items:center;gap:10px;}
+#fyt-custom-checkout .sticky-price,
+.fyt-co-mobile-sticky .sticky-price{min-width:70px;flex:0 0 auto;}
+#fyt-custom-checkout .sticky-price span,
+.fyt-co-mobile-sticky .sticky-price span{display:block;color:var(--muted,#64748B);font-size:10px;line-height:1.2;}
+#fyt-custom-checkout .sticky-price b,
+.fyt-co-mobile-sticky .sticky-price b{font-family:'JetBrains Mono',monospace;color:var(--navy,#04122E);font-size:14px;line-height:1.2;}
+#fyt-custom-checkout #payStep.fyt-co-pay-highlight{box-shadow:0 0 0 3px rgba(74,125,255,.28);border-radius:var(--radius);}
+#fyt-custom-checkout .sticky-btn,
+.fyt-co-mobile-sticky .sticky-btn{
+  flex:1;min-width:0;min-height:48px;border:0;border-radius:11px;color:#fff;font-family:inherit;font-weight:700;
+  font-size:12.5px;line-height:1.25;padding:10px 12px;
+  background:linear-gradient(90deg,#4A7DFF,#3465E4);cursor:pointer;pointer-events:auto;position:relative;z-index:2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+@media (max-width:480px){
+  .fyt-co-mobile-sticky .mobile-sticky-inner{gap:8px;}
+  .fyt-co-mobile-sticky .sticky-price{min-width:64px;}
+  .fyt-co-mobile-sticky .sticky-price span{font-size:9px;}
+  .fyt-co-mobile-sticky .sticky-price b{font-size:13px;}
+  .fyt-co-mobile-sticky .sticky-btn{font-size:12px;padding:10px 10px;}
+  #fyt-custom-checkout .sb-pm-summary .sb-pm-label{font-size:11px;}
+}
+@media (max-width:900px){
+  #fyt-custom-checkout .hero h1{white-space:normal;font-size:clamp(20px,5.2vw,26px);max-width:20em;}
+  #fyt-custom-checkout .hero h1 b{display:block;}
+}
+@media (max-width:680px){
+  #fyt-custom-checkout .hero{padding-left:18px;padding-right:18px;}
+}
+@media (max-width:480px){
+  #fyt-custom-checkout .summary-grid{grid-template-columns:repeat(2,1fr);}
+  #fyt-custom-checkout .summary-grid>div:nth-child(2){border-right:none;}
+  #fyt-custom-checkout .usp-list,#fyt-custom-checkout .opt-row,#fyt-custom-checkout .field-row{grid-template-columns:1fr;}
+  #fyt-custom-checkout .addon-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  #fyt-custom-checkout .addon{padding:11px 10px;}
+  #fyt-custom-checkout .addon b{font-size:11.5px;padding-right:16px;}
+  #fyt-custom-checkout .addon .delta{font-size:11px;}
+}
+@media (max-width:900px){
+  #fyt-custom-checkout .desktop-purchase{display:none;}
+  #fyt-custom-checkout .mobile-sticky,
+  .fyt-co-mobile-sticky{display:block;}
+  #fyt-custom-checkout{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px));}
+
+}
+/* ---------- Black Friday bundle box ---------- */
+#fyt-custom-checkout #bfBox{margin:14px 0 4px;border-radius:18px;padding:16px;color:#fff;position:relative;overflow:hidden;background:radial-gradient(420px 160px at 85% -20%,rgba(47,107,255,.75),transparent 70%),linear-gradient(160deg,#081233,#020308);border:1px solid rgba(110,160,255,.5);box-shadow:0 14px 34px rgba(7,20,60,.28)}
+#fyt-custom-checkout #bfBox *{box-sizing:border-box}
+#fyt-custom-checkout .bf-top{display:flex;justify-content:space-between;align-items:center}
+#fyt-custom-checkout .bf-tag{font-size:10px;letter-spacing:.3em;color:#9cc8ff;font-weight:500}
+#fyt-custom-checkout .bf-pct{font-size:12px;font-weight:700;color:#1a1000;border-radius:999px;padding:5px 11px;background:linear-gradient(100deg,#ffb800,#ffe08a 50%,#ffb800);transition:transform .25s}
+#fyt-custom-checkout .bf-pct.pop{transform:scale(1.14)}
+#fyt-custom-checkout .bf-main{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:12px}
+#fyt-custom-checkout .bf-you{font-size:11px;letter-spacing:.24em;color:#9cc8ff;font-weight:400}
+#fyt-custom-checkout .bf-n{font-size:46px;line-height:1;font-weight:300;letter-spacing:-.04em;margin-top:4px}
+#fyt-custom-checkout .bf-n{white-space:nowrap}
+#fyt-custom-checkout .bf-n small{font-size:15px;letter-spacing:0;font-weight:400;color:#cdd6ea;margin-left:6px}
+#fyt-custom-checkout .bf-n em{font-style:normal}
+@media (max-width:520px){#fyt-custom-checkout .bf-n em{display:none}#fyt-custom-checkout .bf-up{font-size:12.5px;padding:11px 12px}}
+#fyt-custom-checkout .bf-step{display:flex;align-items:center;gap:0;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(255,255,255,.06);flex:none}
+#fyt-custom-checkout .bf-step button{width:38px;height:40px;border:0;background:transparent;color:#fff;font-size:20px;font-weight:300;cursor:pointer;line-height:1;padding:0}
+#fyt-custom-checkout .bf-step button:disabled{opacity:.28;cursor:default}
+#fyt-custom-checkout .bf-step span{min-width:44px;text-align:center;font-size:11px;color:#9cc8ff;line-height:1.1}
+#fyt-custom-checkout .bf-step span b{display:block;font-size:18px;color:#fff;font-weight:600}
+#fyt-custom-checkout .bf-cards{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+#fyt-custom-checkout .bf-c{height:38px;min-width:0;flex:0 0 calc(20% - 5px);max-width:74px;border-radius:9px;padding:5px 7px;display:flex;flex-direction:column;justify-content:space-between;font-size:7.5px;letter-spacing:.14em;font-weight:700;border:1px solid rgba(255,255,255,.3);animation:bf-in .35s ease both}
+#fyt-custom-checkout .bf-c b{font-size:12px;letter-spacing:0;font-weight:500}
+#fyt-custom-checkout .bf-c.p{background:linear-gradient(135deg,#1b4fe0,#5aa2ff)}
+#fyt-custom-checkout .bf-c.f{background:linear-gradient(135deg,#ffe2a0,#e8982a);color:#3a2200}
+@keyframes bf-in{from{opacity:0;transform:translateY(6px) scale(.92)}to{opacity:1;transform:none}}
+#fyt-custom-checkout .bf-sub{margin-top:9px;font-size:12.5px;color:#cdd6ea;font-weight:400}
+#fyt-custom-checkout .bf-sub b{color:#fff;font-weight:600}
+#fyt-custom-checkout .bf-sub i{font-style:normal;color:#ffd98a;font-weight:600}
+#fyt-custom-checkout .bf-up{margin-top:13px;width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;border-radius:13px;padding:12px 14px;cursor:pointer;color:#ffe9bd;font-size:13px;font-weight:400;background:linear-gradient(90deg,rgba(240,169,58,.24),rgba(240,169,58,.06));border:1px solid rgba(240,180,76,.6);font-family:inherit}
+#fyt-custom-checkout .bf-up b{color:#fff;font-weight:600}
+#fyt-custom-checkout .bf-up u{text-decoration:none;flex:none;background:#fff;color:#3a2200;font-weight:700;font-size:12px;border-radius:999px;padding:7px 13px}
+#fyt-custom-checkout .bf-max{margin-top:13px;border-radius:13px;padding:11px 14px;font-size:13px;font-weight:600;color:#ffe2a0;border:1px solid rgba(240,180,76,.6);background:rgba(240,169,58,.12);text-align:center}
+#fyt-custom-checkout .bf-give{margin-top:10px;font-size:12px;color:#cdd6ea;display:flex;gap:7px;align-items:center}
+#fyt-custom-checkout .bf-give i{font-style:normal;color:#f0b44c}
+@media (prefers-reduced-motion:reduce){#fyt-custom-checkout .bf-c{animation:none}}
+</style>
+
+<div class="hero"><h1>You're one step away from <b>getting funded</b></h1></div>
+<div class="layout">
+  <div class="card">
+
+    <div class="step">
+      <div class="step-head">
+        <div class="step-title"><span class="step-num">1</span> Your Order</div>
+        <a class="edit-cart" href="https://fundingyourtrades.com/cart/">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.5L21 8H7"/></svg>
+          Edit cart
+        </a>
+      </div>
+      <div class="summary-grid">
+        <div><div class="sg-label">Challenge</div><div class="sg-value" id="sgChallenge">—</div></div>
+        <div><div class="sg-label">Account Size</div><div class="sg-value" id="sgSize">—</div></div>
+        <div><div class="sg-label">Platform</div><div class="sg-value" id="sgPlatform">—</div></div>
+        <div><div class="sg-label">Account Type</div><div class="sg-value" id="sgAccount">—</div></div>
+      </div>
+                        <div id="bfBox" style="display:none"></div>
+      <div class="device-pick" id="devicePick" style="display:none">
+        <div class="device-pick-label">Which device will you trade on? *</div>
+        <div class="device-opts" id="deviceOpts" tabindex="-1" role="radiogroup" aria-label="Your trading device">
+          <button type="button" class="device-opt" data-device="android" role="radio" aria-checked="false">
+            <div class="radio"></div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+            <span><b>Android / Windows</b><small>Web or Windows app</small></span>
+          </button>
+          <button type="button" class="device-opt" data-device="ios" role="radio" aria-checked="false">
+            <div class="radio"></div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg>
+            <span><b>iPhone / Mac</b><small>Web or iOS / Mac app</small></span>
+          </button>
+        </div>
+      </div>
+      <div class="usp-list" id="uspList"></div>
+      <hr class="sb-divider">
+      <div class="sb-line muted"><span>Original Price</span><span id="lineOriginal">$0.00</span></div>
+      <div class="sb-line discount" id="discountLine" style="display:none"><span id="discountLabel">Discount</span><span id="lineDiscount">−$0.00</span></div>
+      <div class="sb-line discount" id="cryptoLine" style="display:none"><span id="cryptoLineLabel">Crypto Pay Discount +5% off</span><span id="lineCrypto">−$0.00</span></div>
+      <div class="sb-line" id="addonLine" style="display:none"><span id="addonLabel">Add-ons</span><span id="addonAmt"></span></div>
+      <hr class="sb-divider">
+      <div class="sb-pm-summary" id="sbPmRow">
+        <span class="sb-pm-label" id="sbPmLabel">Pay with Card</span>
+        <button type="button" class="sb-change-pm" id="sbChangePm" aria-label="Change payment method">Change</button>
+      </div>
+      <div class="sb-total"><span>Total</span><span class="amount-tick" id="totalAmt">$0.00</span></div>
+      <div class="save-row"><span class="save-chip" id="saveChip">Save $0.00</span></div>
+      <div class="promo-list" id="promoList"></div>
+      <a id="showCouponToggle" class="coupon-toggle" href="javascript:void(0)">Have another coupon? <span>Apply it here</span></a>
+      <div class="coupon-box" id="couponBox"><input type="text" id="couponInput" placeholder="Enter coupon code" autocomplete="off"><button type="button" id="applyCoupon">Apply</button></div>
+      <div class="coupon-msg" id="couponMsg"></div>
+    </div>
+
+    <div class="step" id="upgradeStep">
+      <div class="step-head"><div class="step-title"><span class="step-num">2</span> Upgrade Your Account</div></div>
+      <div class="opt-row" id="accountOpts"></div>
+    </div>
+
+    <div class="step" id="addonsStep">
+      <div class="step-head"><div class="step-title"><span class="step-num">3</span> Add-Ons</div></div>
+      <div class="addon-grid" id="addonGrid"></div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-title"><span class="step-num">4</span> Billing Details</div></div>
+      <div class="field-row">
+        <div class="field"><label>First Name *</label><input id="coFirst" name="fn" autocomplete="given-name" placeholder="Enter first name" value=""></div>
+        <div class="field"><label>Last Name *</label><input id="coLast" name="ln" autocomplete="family-name" placeholder="Enter last name" value=""></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Email Address *</label><input id="coEmail" name="email" type="email" autocomplete="email" placeholder="Enter your email address" value=""></div>
+        <div class="field"><label>Phone Number *</label><input id="coPhone" name="phone" type="tel" autocomplete="tel" placeholder="Enter phone number (optional)" value=""></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Country *</label><select id="coCountry"><option value="">Select your country</option><option value="IN" >India</option><option value="US" >United States</option><option value="GB" >United Kingdom</option><option value="AE" >United Arab Emirates</option><option value="NG" >Nigeria</option><option value="ZA" >South Africa</option><option value="PK" >Pakistan</option><option value="DE" >Germany</option><option value="FR" >France</option><option value="BR" >Brazil</option></select></div>
+        <div class="field"><label>Address *</label><input id="coAddress" autocomplete="address-line1" placeholder="House number and street name" value=""></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>City *</label><input id="coCity" name="ct" autocomplete="address-level2" placeholder="Enter city" value=""></div>
+        <div class="field"><label>State / Province *</label><input id="coState" name="st" autocomplete="address-level1" placeholder="Enter state" value=""></div>
+      </div>
+      <label class="newsletter"><input type="checkbox" id="coNews" checked> Subscribe to our newsletter for updates and offers</label>
+      <div class="disclosure">You are purchasing access to a simulated trading evaluation. This is a one-time service fee, not a deposit or investment. Account access is provided after successful payment verification.</div>
+    </div>
+
+    <div class="step" id="payStep">
+      <div class="step-head"><div class="step-title"><span class="step-num">5</span> Payment Method</div></div>
+      <div id="payMethods">
+      <div class="pm sel" data-pm="card">
+        <div class="pm-top"><div class="radio"></div><b>Pay with Card</b></div>
+        <div class="pm-icons"><span class="ic-visa">VISA</span><span class="ic-mc"></span><span class="ic-amex">AMEX</span><span class="ic-gpay"><b>G</b>&nbsp;Pay</span></div>
+        <div class="card-panel" id="cardPanel">
+          <div class="crypto-note" style="margin:0;margin-left:0;padding:0;border:0;background:transparent;">
+            <b>Secure card checkout</b>
+            You'll enter card details on the secure payment page after clicking Complete Purchase.
+          </div>
+        </div>
+      </div>
+      <div class="pm" data-pm="crypto" >
+        <div class="pm-top"><div class="radio"></div><b>Pay with crypto (+5% off)</b></div>
+        <div class="pm-icons"><span class="ic-usdt">USDT</span><span class="ic-btc">BTC</span><span class="ic-eth">ETH</span><span class="ic-more">+300</span></div>
+        <div class="crypto-note" id="cryptoPanel" style="display:none">
+          <b>Continue to the secure crypto gateway</b>
+          You'll select your preferred cryptocurrency and network on the next screen.
+        </div>
+      </div>
+      <div class="pm" data-pm="cod" style="display:none">
+        <div class="pm-top"><div class="radio"></div><b>Cash on Delivery (COD)</b></div>
+        <div class="crypto-note" id="codPanel" style="display:none">
+          <b>Pay when your account is ready</b>
+          Place the order now and complete payment via cash on delivery as instructed after checkout.
+        </div>
+      </div>
+      </div>
+      <div class="crypto-note" id="freePayNote" style="display:none;margin:0">
+        <b>No payment required</b>
+        Your 100% free coupon covers this order. Complete checkout to activate your account — you won't be sent to a payment page.
+      </div>
+    </div>
+
+    <div class="step">
+      <label class="agree"><input type="checkbox" id="coAgree"> <span>I agree to the <a href="/terms/" target="_blank">Terms &amp; Conditions</a> and <a href="/privacy-policy/" target="_blank">Privacy Policy</a>.</span></label>
+      <div class="fyt-co-err" id="coError"></div>
+      <div class="desktop-purchase">
+        <button class="pay-btn" type="button" id="payBtn">Pay Securely &amp; Get 2 Accounts <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></button>
+        <div class="pay-sub">Your account will be activated and details emailed instantly after payment.</div>
+      </div>
+      <div class="support-row"><span>Questions before payment?</span><a href="#" onclick="if(window.fytCoOpenChat){window.fytCoOpenChat(event);}return false;">Chat with support</a></div>
+      <div class="trust">
+        <div class="trust-item"><div class="trust-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><span>Secure Payment</span></div>
+        <div class="trust-item"><div class="trust-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><span>21,500+ Traders</span></div>
+        <div class="trust-item"><div class="trust-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div><span>24/7 Support</span></div>
+        <div class="trust-item"><div class="trust-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 3v6c0 5-3.4 8.7-8 11-4.6-2.3-8-6-8-11V5l8-3z"/></svg></div><span>Reward Guarantee</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-sticky" role="region" aria-label="Mobile checkout action">
+  <div class="mobile-sticky-inner">
+    <div class="sticky-price">
+      <span>Total amount</span>
+      <b id="stickyAmount">$0.00</b>
+    </div>
+    <button class="sticky-btn" id="mobilePayBtn" type="button">Pay Securely &amp; Get 2 Accounts</button>
+  </div>
+</div>
+
+<script>
+window.FYT_CO = {
+  ajax: "/__preview__",
+  nonce: "preview",
+  askDevice: true,
+  p5OnlyCountries: ["CY","MY","MX","BS","PK","AE","TR"],
+  p5OnlyVisitor: false,
+  catalog: [{"id":1216,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"1-STEP","size":5000,"priceOld":74,"priceNew":37,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":1217,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"1-STEP","size":10000,"priceOld":121,"priceNew":60.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":1218,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"1-STEP","size":25000,"priceOld":229,"priceNew":114.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":1219,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"1-STEP","size":50000,"priceOld":319,"priceNew":159.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":1220,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"1-STEP","size":100000,"priceOld":515,"priceNew":257.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":1221,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"1-STEP","size":200000,"priceOld":924,"priceNew":462,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":12383,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"1-STEP","size":5000,"priceOld":80,"priceNew":40,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":12379,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"1-STEP","size":10000,"priceOld":131,"priceNew":65.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":12381,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"1-STEP","size":25000,"priceOld":239,"priceNew":119.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":12382,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"1-STEP","size":50000,"priceOld":329,"priceNew":164.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":12378,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"1-STEP","size":100000,"priceOld":525,"priceNew":262.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":12380,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"1-STEP","size":200000,"priceOld":934,"priceNew":467,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":21272,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"1-STEP","size":5000,"priceOld":74,"priceNew":37,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":21264,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"1-STEP","size":10000,"priceOld":121,"priceNew":60.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":21268,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"1-STEP","size":25000,"priceOld":229,"priceNew":114.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":21270,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"1-STEP","size":50000,"priceOld":319,"priceNew":159.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":21262,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"1-STEP","size":100000,"priceOld":515,"priceNew":257.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":21266,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"1-STEP","size":200000,"priceOld":924,"priceNew":462,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":false},{"id":21273,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"1-STEP","size":5000,"priceOld":84,"priceNew":42,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":21265,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"1-STEP","size":10000,"priceOld":131,"priceNew":65.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":21269,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"1-STEP","size":25000,"priceOld":239,"priceNew":119.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":21271,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"1-STEP","size":50000,"priceOld":329,"priceNew":164.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":21263,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"1-STEP","size":100000,"priceOld":525,"priceNew":262.5,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":21267,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"1-STEP","size":200000,"priceOld":934,"priceNew":467,"split":"Up to 100%","p1":"10%","p2":"N/A","maxDaily":"4%","maxOverall":"6%","wcName":"1-Step","parentId":0,"needsDevice":true},{"id":1235,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"2-STEP","size":5000,"priceOld":47,"priceNew":23.5,"split":"95/5","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":1234,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"2-STEP","size":10000,"priceOld":102,"priceNew":51,"split":"95/5","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":1233,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"2-STEP","size":25000,"priceOld":209,"priceNew":104.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":1232,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"2-STEP","size":50000,"priceOld":289,"priceNew":144.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":1231,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"2-STEP","size":100000,"priceOld":469,"priceNew":234.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":1230,"product":"fyt","productName":"FYT CLASSIC","platform":"match-trader","type":"2-STEP","size":200000,"priceOld":824,"priceNew":412,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":12371,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"2-STEP","size":5000,"priceOld":50,"priceNew":25,"split":"95/5","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":12367,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"2-STEP","size":10000,"priceOld":112,"priceNew":56,"split":"95/5","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":12369,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"2-STEP","size":25000,"priceOld":219,"priceNew":109.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":12370,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"2-STEP","size":50000,"priceOld":299,"priceNew":149.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":12366,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"2-STEP","size":100000,"priceOld":479,"priceNew":239.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":12368,"product":"fyt","productName":"FYT CLASSIC","platform":"platform-5","type":"2-STEP","size":200000,"priceOld":834,"priceNew":417,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":20981,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"2-STEP","size":5000,"priceOld":47,"priceNew":23.5,"split":"95/5","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":20980,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"2-STEP","size":10000,"priceOld":102,"priceNew":51,"split":"95/5","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":20979,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"2-STEP","size":25000,"priceOld":209,"priceNew":104.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":20978,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"2-STEP","size":50000,"priceOld":289,"priceNew":144.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":20977,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"2-STEP","size":100000,"priceOld":469,"priceNew":234.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":20976,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"2-STEP","size":200000,"priceOld":824,"priceNew":412,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":false},{"id":20975,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"2-STEP","size":5000,"priceOld":50,"priceNew":25,"split":"95/5","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":20974,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"2-STEP","size":10000,"priceOld":112,"priceNew":56,"split":"95/5","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":20973,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"2-STEP","size":25000,"priceOld":219,"priceNew":109.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":20972,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"2-STEP","size":50000,"priceOld":299,"priceNew":149.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":20971,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"2-STEP","size":100000,"priceOld":479,"priceNew":239.5,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":20970,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"2-STEP","size":200000,"priceOld":834,"priceNew":417,"split":"Up to 100%","p1":"10%","p2":"6%","maxDaily":"6%","maxOverall":"10%","wcName":"2-Step","parentId":0,"needsDevice":true},{"id":20619,"product":"fyt","productName":"FYT PLUS","platform":"match-trader","type":"INSTANT-PLUS","size":5000,"priceOld":116,"priceNew":58,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":20613,"product":"fyt","productName":"FYT PLUS","platform":"match-trader","type":"INSTANT-PLUS","size":10000,"priceOld":216,"priceNew":108,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":20615,"product":"fyt","productName":"FYT PLUS","platform":"match-trader","type":"INSTANT-PLUS","size":25000,"priceOld":249,"priceNew":124.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":20617,"product":"fyt","productName":"FYT PLUS","platform":"match-trader","type":"INSTANT-PLUS","size":50000,"priceOld":479,"priceNew":239.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":20621,"product":"fyt","productName":"FYT PLUS","platform":"match-trader","type":"INSTANT-PLUS","size":100000,"priceOld":949,"priceNew":474.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":20620,"product":"fyt","productName":"FYT PLUS","platform":"platform-5","type":"INSTANT-PLUS","size":5000,"priceOld":126,"priceNew":63,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":true},{"id":20614,"product":"fyt","productName":"FYT PLUS","platform":"platform-5","type":"INSTANT-PLUS","size":10000,"priceOld":226,"priceNew":113,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":true},{"id":20616,"product":"fyt","productName":"FYT PLUS","platform":"platform-5","type":"INSTANT-PLUS","size":25000,"priceOld":259,"priceNew":129.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":true},{"id":20618,"product":"fyt","productName":"FYT PLUS","platform":"platform-5","type":"INSTANT-PLUS","size":50000,"priceOld":489,"priceNew":244.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":true},{"id":20622,"product":"fyt","productName":"FYT PLUS","platform":"platform-5","type":"INSTANT-PLUS","size":100000,"priceOld":959,"priceNew":479.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"N/A","maxOverall":"4%","wcName":"Instant","parentId":0,"needsDevice":true},{"id":22214,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"INSTANT","size":5000,"priceOld":136,"priceNew":68,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":22213,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"INSTANT","size":10000,"priceOld":246,"priceNew":123,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":22212,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"INSTANT","size":25000,"priceOld":319,"priceNew":159.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":22211,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"INSTANT","size":50000,"priceOld":609,"priceNew":304.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":22210,"product":"fyt-prime","productName":"FYT PRIME","platform":"match-trader","type":"INSTANT","size":100000,"priceOld":1019,"priceNew":509.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":false},{"id":22209,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"INSTANT","size":5000,"priceOld":136,"priceNew":68,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":true},{"id":22206,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"INSTANT","size":10000,"priceOld":246,"priceNew":123,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":true},{"id":22207,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"INSTANT","size":25000,"priceOld":319,"priceNew":159.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":true},{"id":22208,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"INSTANT","size":50000,"priceOld":609,"priceNew":304.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":true},{"id":22205,"product":"fyt-prime","productName":"FYT PRIME","platform":"platform-5","type":"INSTANT","size":100000,"priceOld":1019,"priceNew":509.5,"split":"Up to 90%","p1":"","p2":"N/A","maxDaily":"3%","maxOverall":"6%","wcName":"Instant","parentId":0,"needsDevice":true}],
+  initialId: (parseInt(new URLSearchParams(location.search).get('add-to-cart'),10) || 1231),
+  promo: {"code":"BLACKFRIDAY","percent":0.5,"amount":50,"discount_type":"percent","valid":true},
+  addonSets: {"instant_plus":{"reward_split_80":{"label":"80% Reward Split on Instant model","pct":15},"reward_split_90":{"label":"90% Reward Split on Instant model","pct":22},"no_daily_drawdown":{"label":"No daily drawdown","pct":35},"first_reward_demand":{"label":"First payout on demand","pct":25,"free":false}},"instant_prime":{"reward_split_80":{"label":"80% Reward Split on Instant model","pct":15},"reward_split_90":{"label":"90% Reward Split on Instant model","pct":22},"no_daily_drawdown":{"label":"No daily drawdown","pct":35},"first_reward_demand":{"label":"First payout on demand","pct":25,"free":false}},"instant_funding":{"reward_split_80":{"label":"80% reward split on Instant Model","pct":15},"reward_split_90":{"label":"90% reward split on Instant Model","pct":22}},"fyt_prime":{"reward_split":{"label":"100% reward split (vs 95%)","pct":15},"reward_bonus":{"label":"30% Reward Bonus from evaluation","pct":15},"first_reward_24h":{"label":"First payout in 24 hours (vs 7 days)","pct":25},"no_daily_drawdown":{"label":"No daily drawdown (challenge)","pct":20},"free_drawdown_reset":{"label":"Free drawdown reset (challenge)","pct":20,"free":false},"first_reward_demand":{"label":"First payout request on demand","pct":20,"free":false},"all_above":{"label":"All above (Save 25%)","pct":70,"bundle":true}},"classic":{"reward_split":{"label":"100% reward split (vs 95%)","pct":15},"reward_bonus":{"label":"30% Reward Bonus from evaluation","pct":15},"first_reward_24h":{"label":"First payout in 24 hours (vs 7 days)","pct":25},"no_daily_drawdown":{"label":"No daily drawdown (challenge)","pct":20},"free_drawdown_reset":{"label":"Free drawdown reset (challenge)","pct":20,"free":false},"first_reward_demand":{"label":"First payout request on demand","pct":20,"free":false},"all_above":{"label":"All above (Save 25%)","pct":70,"bundle":true}}},
+  bf: {"code":"BLACKFRIDAY","tiers":[{"buy":1,"off":50,"get":2},{"buy":2,"off":51,"get":5},{"buy":3,"off":53,"get":7},{"buy":4,"off":55,"get":10}],"entriesPerPaid":1},
+  typeLabels: {"1-STEP":"One Step","2-STEP":"Two Step","2-STEP-∞":"Two Step Pro","INSTANT":"Instant","INSTANT-PLUS":"Instant Plus"},
+  platformLabels: {"match-trader":"MatchTrader","platform-5":"Platform 5"},
+  productLabels: {"fyt":"FYT Classic","fyt-pro":"FYT Prime","fyt-prime":"FYT Prime"},
+  cryptoPromoLabel: "Crypto Pay Discount +5% off",
+  paySecureLabel: "Pay Securely & Get 2 Accounts",
+  currency: "USD"};
+(function(){
+  const C = window.FYT_CO, byId = {};
+  C.catalog.forEach(r => byId[r.id] = r);
+  const promo = C.promo || {};
+  const hasPromo = !!(promo.code && (promo.percent > 0 || promo.valid));
+  const state = {
+    productId: C.initialId,
+    coupons: hasPromo ? [{
+      code: promo.code,
+      kind: 'normal',
+      discount_type: promo.discount_type || 'percent',
+      amount: parseFloat(promo.amount) || 0,
+      percent: parseFloat(promo.percent) || 0,
+      tablePromo: true
+    }] : [],
+    cryptoPct: 0.05,
+    pm: "card",
+    selectedAddons: [],
+    qty: 1,
+    device: '',
+    lastTotal: 0
+  };
+  const fmt = n => '$' + Math.max(0,n).toFixed(2);
+  const money = n => Math.round(n*100)/100;
+  const sizeLabel = s => '$' + Number(s).toLocaleString('en-US');
+  const challengeLabel = t => C.typeLabels[t] || t;
+  const platformLabel = p => C.platformLabels[p] || p;
+  const accountLabel = p => C.productLabels[p] || p;
+  const couponCodes = () => state.coupons.map(c => c.code).filter(Boolean);
+  // ---- Black Friday bundles: qty = paid accounts; each tier has its own % off and total accounts ----
+  const BF = (C.bf && C.bf.tiers && C.bf.tiers.length) ? C.bf : null;
+  const isBfCode = c => !!BF && String(c||'').toUpperCase() === String(BF.code).toUpperCase();
+  function bfActive(){
+    if(!BF) return false;
+    const row = byId[state.productId];
+    if(row && row.standalone) return false;
+    return couponCodes().some(isBfCode);
+  }
+  const bfTier = () => BF.tiers[Math.min(BF.tiers.length, Math.max(1, state.qty||1)) - 1];
+  const paidQty = () => bfActive() ? bfTier().buy : 1;
+  function priceAfterCoupons(original, sale){
+    const bfOn = bfActive();
+    let price = original;
+    let save = 0;
+    const labels = [];
+    // Same order WooCommerce charges: percent codes first, fixed cashback amounts after.
+    // Before, the total changed depending on which code was typed first.
+    const rank = c => (c.tablePromo || c.discount_type === 'percent' || c.discount_type === 'percent_product' || !c.discount_type) ? 1 : 2;
+    state.coupons.slice().sort((a, b) => rank(a) - rank(b)).forEach(c => {
+      labels.push(c.code);
+      if(bfOn && isBfCode(c.code)){
+        const off = money(price * (bfTier().off / 100));
+        price = money(Math.max(0, price - off));
+        save += off;
+      } else if(c.tablePromo){
+        const pct = c.percent > 0 ? c.percent : ((original > 0 && sale < original) ? (1 - sale/original) : 0.4);
+        const next = sale > 0 && sale < original && state.coupons.length === 1 ? sale : money(price * (1 - pct));
+        save += money(Math.max(0, price - next));
+        price = next;
+      } else if(c.percent > 0 && (c.discount_type === 'percent' || c.discount_type === 'percent_product' || !c.discount_type)){
+        const off = money(price * c.percent);
+        price = money(Math.max(0, price - off));
+        save += off;
+      } else if(c.amount > 0 && (c.discount_type === 'fixed_cart' || c.discount_type === 'fixed_product')){
+        const off = Math.min(c.amount, price);
+        price = money(Math.max(0, price - off));
+        save += off;
+      } else if(sale > 0 && sale < price && state.coupons.length === 1){
+        save += money(Math.max(0, price - sale));
+        price = sale;
+      }
+    });
+    return { price: money(Math.max(0, price)), save: money(save), labels };
+  }
+  const findUpgrade = row => {
+    if(!row) return null;
+    let best = null;
+    C.catalog.forEach(r => {
+      if(r.product!==row.product || r.platform!==row.platform || r.type!==row.type) return;
+      if(r.size <= row.size) return;
+      if(!best || r.size < best.size) best = r;
+    });
+    return best;
+  };
+  const current = () => byId[state.productId] || C.catalog[0];
+  const addonEls = () => document.querySelectorAll('#addonGrid .addon');
+  const pmEls = () => document.querySelectorAll('#fyt-custom-checkout .pm');
+  const coError = document.getElementById('coError');
+  const showCouponToggle = document.getElementById('showCouponToggle');
+  const couponBox = document.getElementById('couponBox');
+  const couponInput = document.getElementById('couponInput');
+  const couponMsg = document.getElementById('couponMsg');
+  const promoList = document.getElementById('promoList');
+
+  function productGroup(row){
+    if(!row || row.standalone) return 'none';
+    const t = row.type, line = row.product;
+    if(t === 'INSTANT-PLUS') return 'instant_plus';
+    if(t === 'INSTANT' && (line === 'fyt-pro' || line === 'fyt-prime')) return 'instant_prime';
+    if(t === 'INSTANT') return 'instant_funding';
+    if(line === 'fyt-pro' || line === 'fyt-prime') return 'fyt_prime';
+    return 'classic';
+  }
+  function currentAddons(){
+    const g = productGroup(current());
+    if(g === 'none') return {};
+    return C.addonSets[g] || C.addonSets.classic || {};
+  }
+  function addonIcon(key){
+    if(key.indexOf('reward')>=0) return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>';
+    if(key.indexOf('express')>=0) return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
+    if(key.indexOf('refund')>=0) return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 3v6c0 5-3.4 8.7-8 11-4.6-2.3-8-6-8-11V5l8-3z"/></svg>';
+    if(key.indexOf('all_above')>=0) return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.6 6.4L21 9l-5 4.6L17.5 21 12 17.3 6.5 21 8 13.6 3 9l6.4-.6z"/></svg>';
+    return '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12l2.5 2.5L16 9"/></svg>';
+  }
+  function syncStandaloneSteps(){
+    const row = current();
+    const standalone = !!(row && row.standalone);
+    const up = document.getElementById('upgradeStep');
+    const ad = document.getElementById('addonsStep');
+    if(up) up.style.display = standalone ? 'none' : '';
+    if(ad) ad.style.display = standalone ? 'none' : '';
+  }
+  function ensureFree(map){
+    Object.keys(map).forEach(k => { if(map[k].free && state.selectedAddons.indexOf(k) < 0) state.selectedAddons.push(k); });
+  }
+  function renderAddons(){
+    const row = current();
+    const wrap = document.getElementById('addonGrid');
+    if(!wrap) return;
+    if(row && row.standalone){
+      wrap.innerHTML = '';
+      state.selectedAddons = [];
+      return;
+    }
+    const map = currentAddons();
+    state.selectedAddons = state.selectedAddons.filter(k => !!map[k]);
+    ensureFree(map);
+    let html = '';
+    Object.keys(map).forEach(key => {
+      const a = map[key];
+      const sel = state.selectedAddons.indexOf(key) >= 0 ? ' sel' : '';
+      const tip = a.tooltip ? ' title="'+String(a.tooltip).replace(/"/g,'&quot;')+'"' : '';
+      if(a.free){
+        html += '<div class="addon sel freeoffer" data-key="'+key+'" data-free="1" data-pct="0" style="cursor:default;border-color:#0FA968;background:#EAFBF3">';
+        html += '<div class="chk" style="background:#0FA968;border-color:#0FA968"></div>'+addonIcon(key)+'<b>'+a.label+'</b>';
+        html += '<span class="delta save"><s style="color:#94A3B8;font-weight:600">+'+a.pct+'%</s> &nbsp;FREE</span>';
+        html += '<div style="font-size:10.5px;color:#0B7A4B;font-weight:700;margin-top:3px">Applied free. Limited-time offer, only for you today.</div></div>';
+        return;
+      }
+      html += '<div class="addon'+sel+'" data-key="'+key+'" data-pct="'+a.pct+'"'+tip+'>';
+      html += '<div class="chk"></div>'+addonIcon(key)+'<b>'+a.label+'</b><span class="delta'+(a.bundle?' save':'')+'">+'+a.pct+'%</span></div>';
+    });
+    wrap.innerHTML = html || '<p style="color:#64748B;font-size:13px;margin:0">No add-ons for this challenge.</p>';
+  }
+  function payButtonLabel(total){
+    if(total <= 0.00001) return 'Complete free order';
+    if(state.pm === 'cod') return 'Place COD order';
+    if(current() && current().standalone) return 'Pay Securely';
+    if(bfActive()) return 'Pay Securely & Get '+bfTier().get+' Accounts';
+    return C.paySecureLabel || 'Pay Securely & Get 2 Accounts';
+  }
+  function paymentMethodStickyLabel(){
+    if(state.pm === 'crypto') return 'Pay with crypto (' + (C.cryptoPromoLabel || 'Crypto Pay Discount +5% off') + ')';
+    if(state.pm === 'cod') return 'Cash on Delivery (COD)';
+    return 'Pay with Card';
+  }
+  function syncStickyPaymentLabel(total){
+    const row = document.getElementById('sbPmRow');
+    const label = document.getElementById('sbPmLabel');
+    const isFree = typeof total === 'number' && total <= 0.00001;
+    if(row) row.style.display = isFree ? 'none' : '';
+    if(label && !isFree) label.textContent = paymentMethodStickyLabel();
+  }
+  function setPayButtons(total){
+    const label = payButtonLabel(total);
+    const payIcon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>';
+    const stickyBtn = document.getElementById('mobilePayBtn');
+    const deskBtn = document.getElementById('payBtn');
+    if(stickyBtn) stickyBtn.textContent = label;
+    if(deskBtn){
+      if(total <= 0.00001) deskBtn.innerHTML = 'Complete Free Order ' + payIcon;
+      else deskBtn.innerHTML = label + ' ' + payIcon;
+    }
+    syncStickyPaymentLabel(total);
+  }
+  function syncCouponUI(){
+    const codes = couponCodes();
+    if(!promoList) return;
+    if(!codes.length){
+      promoList.innerHTML = '';
+      return;
+    }
+    promoList.innerHTML = state.coupons.map(c => {
+      const kindLabel = c.kind === 'affiliate' ? 'Affiliate' : (c.kind === 'wallet' ? 'Cashback' : 'Regular');
+      return '<div class="promo" data-code="'+c.code+'"><div><b>'+c.code+' applied!</b><span class="promo-kind">'+kindLabel+' coupon</span></div><a href="javascript:void(0)" data-remove-coupon="'+c.code+'">Remove</a></div>';
+    }).join('');
+  }
+  function basePrice(row){
+    const q = paidQty();
+    const original = (parseFloat(row.priceOld)||parseFloat(row.priceNew)||0) * q;
+    const sale = (parseFloat(row.priceNew)||0) * q;
+    if(!state.coupons.length) return original;
+    return priceAfterCoupons(original, sale).price;
+  }
+  function renderOpts(){
+    const row = current(), wrap = document.getElementById('accountOpts');
+    if(!row || !wrap) return;
+    syncStandaloneSteps();
+    const keepPrice = basePrice(row);
+    if(row.standalone){
+      wrap.innerHTML = '<div class="opt sel" data-id="'+row.id+'"><div class="opt-top"><div class="radio"></div><div class="opt-name">'+row.productName+'</div></div><div class="opt-price">'+fmt(keepPrice)+'</div></div>';
+      renderAddons();
+      return;
+    }
+    const up = findUpgrade(row);
+    let html = '<div class="opt sel" data-id="'+row.id+'"><div class="opt-top"><div class="radio"></div><div class="opt-name">Keep '+sizeLabel(row.size)+' Account</div></div><div class="opt-price">'+fmt(keepPrice)+'</div></div>';
+    if(up){
+      const upPrice = basePrice(up);
+      const delta = money(upPrice - keepPrice);
+      html += '<div class="opt" data-id="'+up.id+'"><div class="opt-top"><div class="radio"></div><div class="opt-name">Upgrade to '+sizeLabel(up.size)+'</div><span class="badge">Popular</span></div><div class="opt-price">+'+fmt(delta)+'</div></div>';
+    }
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('.opt').forEach(opt => opt.addEventListener('click', () => {
+      wrap.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+      opt.classList.add('sel');
+      const prevGroup = productGroup(current());
+      state.productId = parseInt(opt.dataset.id,10);
+      if(productGroup(current()) !== prevGroup) state.selectedAddons = [];
+      renderAddons(); paintSummary(); recalc();
+    }));
+    renderAddons();
+  }
+  function needsDevice(row){
+    if(!C.askDevice) return false; // device question switched off (all Platform 5 -> MT5)
+    if(C.p5OnlyVisitor) return false; // connecting from a Platform 5 only country
+    const ctry = (document.getElementById('coCountry') || {}).value || '';
+    if((C.p5OnlyCountries || []).indexOf(String(ctry).toUpperCase()) >= 0) return false; // Platform 5 only country
+    if(!row || row.standalone) return false;
+    if(row.needsDevice) return true;
+    return String(row.platform || '').toLowerCase().replace(/[^a-z0-9]/g, '').indexOf('platform5') >= 0;
+  }
+  function syncDevicePick(){
+    const wrap = document.getElementById('devicePick');
+    if(!wrap) return;
+    wrap.style.display = needsDevice(current()) ? '' : 'none';
+    document.querySelectorAll('#deviceOpts .device-opt').forEach(function(b){
+      const on = b.dataset.device === state.device;
+      b.classList.toggle('sel', on);
+      b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+  }
+  const coCountryEl = document.getElementById('coCountry');
+  if(coCountryEl) coCountryEl.addEventListener('change', function(){ syncDevicePick(); });
+  const deviceOptsEl = document.getElementById('deviceOpts');
+  if(deviceOptsEl) deviceOptsEl.addEventListener('click', function(e){
+    const b = e.target.closest('.device-opt');
+    if(!b) return;
+    e.preventDefault();
+    state.device = b.dataset.device;
+    clearFieldErrors();
+    showErr('');
+    syncDevicePick();
+  });
+  function paintSummary(){
+    const row = current();
+    if(!row) return;
+    syncDevicePick();
+    if(row.standalone){
+      document.getElementById('sgChallenge').textContent = row.productName;
+      document.getElementById('sgSize').textContent = '—';
+      document.getElementById('sgPlatform').textContent = '—';
+      document.getElementById('sgAccount').textContent = '—';
+      const usp = document.getElementById('uspList');
+      if(usp) usp.innerHTML = '';
+      return;
+    }
+    document.getElementById('sgChallenge').textContent = challengeLabel(row.type);
+    document.getElementById('sgSize').textContent = sizeLabel(row.size);
+    document.getElementById('sgPlatform').textContent = platformLabel(row.platform);
+    document.getElementById('sgAccount').textContent = accountLabel(row.product);
+    renderUsps(row);
+  }
+  function renderBf(row){
+    const box = document.getElementById('bfBox');
+    if(!box) return;
+    if(!bfActive() || !row){ box.style.display='none'; return; }
+    const t = bfTier(), idx = BF.tiers.indexOf(t), next = BF.tiers[idx+1] || null;
+    const free = t.get - t.buy;
+    const k = Number(row.size) >= 1000 ? (Number(row.size)/1000)+'K' : String(row.size);
+    const sig = t.buy+'|'+row.id;
+    if(box.dataset.sig === sig){ box.style.display='block'; return; }
+    box.dataset.sig = sig;
+    let cards = '';
+    for(let i=0;i<t.get;i++) cards += '<div class="bf-c '+(i<t.buy?'p':'f')+'" style="animation-delay:'+(i*35)+'ms">'+(i<t.buy?'PAID':'FREE')+'<b>'+k+'</b></div>';
+    const entries = t.buy * (BF.entriesPerPaid || 1);
+    box.innerHTML =
+      '<div class="bf-top"><span class="bf-tag">BLACK FRIDAY</span><span class="bf-pct pop">'+t.off+'% OFF</span></div>'+
+      '<div class="bf-main"><div><div class="bf-you">YOU GET</div><div class="bf-n">'+t.get+'<small>&times; $'+k+'<em> accounts</em></small></div></div>'+
+      '<div class="bf-step" role="group" aria-label="Accounts to buy"><button type="button" data-bf-q="'+(t.buy-1)+'" aria-label="Buy one less"'+(idx===0?' disabled':'')+'>&minus;</button><span><b>'+t.buy+'</b>buy</span><button type="button" data-bf-q="'+(t.buy+1)+'" aria-label="Buy one more"'+(next?'':' disabled')+'>+</button></div></div>'+
+      '<div class="bf-cards" aria-hidden="true">'+cards+'</div>'+
+      '<div class="bf-sub"><b>'+t.buy+'</b> purchased + <i>'+free+' bonus</i>, all $'+k+'</div>'+
+      (next
+        ? '<button type="button" class="bf-up" data-bf-q="'+next.buy+'"><span>Make it <b>'+next.buy+'</b>, get <b>'+next.get+' accounts</b> at <b>'+next.off+'% off</b></span><u>Upgrade</u></button>'
+        : '<div class="bf-max">Maximum deal unlocked: '+t.off+'% off and '+t.get+' accounts</div>')+
+      '<div class="bf-give"><i>&#9733;</i>'+entries+' '+(entries>1?'entries':'entry')+' in today&#39;s 100K funded giveaway</div>';
+    box.style.display='block';
+    setTimeout(function(){ const p = box.querySelector('.bf-pct'); if(p) p.classList.remove('pop'); }, 260);
+  }
+  (function(){
+    const box = document.getElementById('bfBox');
+    if(!box) return;
+    box.addEventListener('click', function(e){
+      const b = e.target.closest('[data-bf-q]'); if(!b || b.disabled || !BF) return;
+      const q = parseInt(b.getAttribute('data-bf-q'),10);
+      if(!(q >= 1 && q <= BF.tiers.length)) return;
+      state.qty = q;
+      recalc();
+    });
+  })();
+  function renderUsps(row){
+    const wrap = document.getElementById('uspList');
+    if(!wrap) return;
+    const isInstant = !!(row && (row.type === 'INSTANT' || row.type === 'INSTANT-PLUS'));
+    // Diwali (DIWALI45): 25K and above = 2 free bonus accounts, 5K and 10K = 1
+    const dwOn = false && couponCodes().some(c => String(c).toUpperCase() === 'DIWALI45');
+    const bonusN = bfActive() ? (bfTier().get - bfTier().buy) : ((dwOn && row && Number(row.size) >= 25000) ? 2 : 1);
+    const bonusTxt = bonusN + ' Bonus account' + (bonusN > 1 ? 's' : '') + ' Free';
+    const items = isInstant
+      ? [bonusTxt, 'Weekend Holdings', 'Overnight Holdings']
+      : [bonusTxt, '18% bonus', '200% refund (challenge)', 'Weekend Holdings', 'Overnight Holdings'];
+    const icon = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>';
+    wrap.innerHTML = items.map(t => '<div class="usp-item">'+icon+t+'</div>').join('');
+  }
+
+  document.getElementById('addonGrid').addEventListener('click', e => {
+    const el = e.target.closest('.addon'); if(!el) return;
+    const key = el.dataset.key;
+    if(el.dataset.free) return; // free offer cannot be removed
+    const turningOn = !el.classList.contains('sel');
+    if(turningOn){
+      if(key === 'all_above') state.selectedAddons = ['all_above'];
+      else {
+        state.selectedAddons = state.selectedAddons.filter(k => k !== 'all_above');
+        if(key === 'reward_split_80') state.selectedAddons = state.selectedAddons.filter(k => k !== 'reward_split_90');
+        if(key === 'reward_split_90') state.selectedAddons = state.selectedAddons.filter(k => k !== 'reward_split_80');
+        if(state.selectedAddons.indexOf(key) < 0) state.selectedAddons.push(key);
+      }
+    } else state.selectedAddons = state.selectedAddons.filter(k => k !== key);
+    ensureFree(currentAddons());
+    addonEls().forEach(a => a.classList.toggle('sel', state.selectedAddons.indexOf(a.dataset.key) >= 0));
+    recalc();
+  });
+
+  pmEls().forEach(el => el.addEventListener('click', () => {
+    pmEls().forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+    state.pm = el.dataset.pm;
+    document.getElementById('cardPanel').style.display = state.pm === 'card' ? 'block' : 'none';
+    const cryptoPanel = document.getElementById('cryptoPanel');
+    if(cryptoPanel) cryptoPanel.style.display = state.pm === 'crypto' ? 'block' : 'none';
+    const codPanel = document.getElementById('codPanel');
+    if(codPanel) codPanel.style.display = state.pm === 'cod' ? 'block' : 'none';
+    recalc();
+  }));
+
+  showCouponToggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    const kinds = new Set(state.coupons.map(c => c.kind));
+    if(kinds.size >= 3){
+      couponMsg.textContent = 'Coupon limit reached';
+      couponMsg.className = 'coupon-msg err';
+      return;
+    }
+    couponBox.classList.toggle('is-open');
+    if(couponBox.classList.contains('is-open')) couponInput.focus();
+  });
+  document.getElementById('applyCoupon').addEventListener('click', applyCoupon);
+  couponInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); applyCoupon(); } });
+  function applyCoupon(){
+    const code = couponInput.value.trim().toUpperCase(); if(!code) return;
+    couponMsg.textContent = 'Checking…'; couponMsg.className = 'coupon-msg';
+    const body = new FormData(); body.append('action','fyt_co_apply_coupon'); body.append('nonce', C.nonce); body.append('code', code);
+    couponCodes().forEach(c => body.append('existing[]', c));
+    fetch(C.ajax,{method:'POST',body,credentials:'same-origin'}).then(r=>r.json()).then(res=>{
+      if(!res.success){ couponMsg.textContent=(res.data&&res.data.message)||'Invalid coupon'; couponMsg.className='coupon-msg err'; return; }
+      const d=res.data;
+      const entry = {
+        code: d.code,
+        kind: (d.kind === 'affiliate' || d.kind === 'wallet') ? d.kind : 'normal',
+        discount_type: d.discount_type || 'percent',
+        amount: parseFloat(d.amount)||0,
+        percent: parseFloat(d.percent)||0,
+        tablePromo: !!(d.table_promo) || (d.code === (C.promo && C.promo.code))
+      };
+      if(entry.tablePromo){ entry.percent = entry.percent || 0.4; entry.amount = 0; }
+      // Replace same kind, keep other kind
+      state.coupons = state.coupons.filter(c => c.kind !== entry.kind);
+      state.coupons.push(entry);
+      couponMsg.textContent=''; couponInput.value=''; couponBox.classList.remove('is-open');
+      syncCouponUI(); renderOpts(); paintSummary(); recalc();
+    }).catch(()=>{ couponMsg.textContent='Could not validate coupon.'; couponMsg.className='coupon-msg err'; });
+  }
+  if(promoList){
+    promoList.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-remove-coupon]');
+      if(!btn) return;
+      e.preventDefault();
+      const code = btn.getAttribute('data-remove-coupon');
+      state.coupons = state.coupons.filter(c => c.code !== code);
+      couponBox.classList.remove('is-open'); couponMsg.textContent='';
+      syncCouponUI(); renderOpts(); paintSummary(); recalc();
+    });
+  }
+
+  function recalc(){
+    const row = current();
+    try{ renderUsps(row); }catch(e){}
+    try{ renderBf(row); }catch(e){}
+    const q = paidQty();
+    const original = money((parseFloat(row.priceOld)||parseFloat(row.priceNew)||0) * q);
+    const sale = money((parseFloat(row.priceNew)||0) * q);
+    const priced = state.coupons.length ? priceAfterCoupons(original, sale) : { price: original, save: 0, labels: [] };
+    let discounted = priced.price;
+    let couponSave = priced.save;
+    document.getElementById('discountLine').style.display='none';
+    if(couponSave > 0 && state.coupons.length){
+      document.getElementById('discountLine').style.display='flex';
+      document.getElementById('discountLabel').textContent='Discount ('+priced.labels.map(l => (bfActive() && isBfCode(l)) ? l+' '+bfTier().off+'%' : l).join(' + ')+')';
+      document.getElementById('lineDiscount').textContent='−'+fmt(couponSave);
+    }
+    let addonPct=0; const labels=[];
+    const map = currentAddons();
+    state.selectedAddons.forEach(key => {
+      if(!map[key]) return;
+      if(map[key].free) return;
+      addonPct += parseFloat(map[key].pct)||0;
+      labels.push(map[key].label);
+    });
+    let withAddons=money(discounted*(1+addonPct/100));
+    const isFreePreview = withAddons <= 0.00001;
+    let cryptoOff = (!isFreePreview && state.pm==='crypto') ? money(withAddons*state.cryptoPct) : 0;
+    const total=money(Math.max(0, withAddons-cryptoOff));
+    state.lastTotal = total;
+    document.getElementById('lineOriginal').textContent=fmt(original);
+    try{ const lo=document.getElementById('lineOriginal').previousElementSibling; if(lo) lo.textContent = q > 1 ? 'Original Price ('+q+' accounts)' : 'Original Price'; }catch(e){}
+    document.getElementById('saveChip').textContent='Save '+fmt(couponSave + cryptoOff);
+    const cryptoLine=document.getElementById('cryptoLine');
+    if(!isFreePreview && state.pm==='crypto'){ cryptoLine.style.display='flex'; document.getElementById('lineCrypto').textContent='−'+fmt(cryptoOff); } else cryptoLine.style.display='none';
+    const addonLine=document.getElementById('addonLine');
+    if(addonPct!==0){ addonLine.style.display='flex'; document.getElementById('addonLabel').textContent='Add-ons ('+labels.length+')'; document.getElementById('addonAmt').textContent='+'+fmt(money(withAddons-discounted)); } else addonLine.style.display='none';
+    const payMethods = document.getElementById('payMethods');
+    const freeNote = document.getElementById('freePayNote');
+    if(payMethods) payMethods.style.display = total <= 0.00001 ? 'none' : '';
+    if(freeNote) freeNote.style.display = total <= 0.00001 ? 'block' : 'none';
+    const totalEl=document.getElementById('totalAmt'); totalEl.style.opacity=0;
+    setTimeout(()=>{
+      totalEl.textContent=fmt(total);
+      document.getElementById('stickyAmount').textContent=fmt(total);
+      setPayButtons(total);
+      totalEl.style.opacity=1;
+    },90);
+    // refresh upgrade option prices without wiping selection
+    const sel = document.querySelector('#accountOpts .opt.sel');
+    const selId = sel ? parseInt(sel.dataset.id,10) : state.productId;
+    const wrap = document.getElementById('accountOpts');
+    if(wrap && wrap.children.length){
+      const keep = current();
+      const up = findUpgrade(keep);
+      const keepP = basePrice(keep);
+      const keepOpt = wrap.querySelector('.opt[data-id="'+keep.id+'"]');
+      if(keepOpt) keepOpt.querySelector('.opt-price').textContent = fmt(keepP);
+      if(up){
+        const upP = basePrice(up);
+        const upOpt = wrap.querySelector('.opt[data-id="'+up.id+'"]');
+        if(upOpt) upOpt.querySelector('.opt-price').textContent = '+'+fmt(money(upP - keepP));
+      }
+      wrap.querySelectorAll('.opt').forEach(o => o.classList.toggle('sel', parseInt(o.dataset.id,10)===selId));
+    }
+    syncCouponUI();
+  }
+  function showErr(msg){ coError.style.display=msg?'block':'none'; coError.textContent=msg||''; }
+  function clearFieldErrors(){
+    document.querySelectorAll('#fyt-custom-checkout .fyt-invalid').forEach(el => el.classList.remove('fyt-invalid'));
+    document.querySelectorAll('#fyt-custom-checkout .fyt-field-err').forEach(el => el.remove());
+  }
+  function focusInvalid(el, msg){
+    clearFieldErrors();
+    showErr(msg);
+    if(!el) {
+      coError.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    el.classList.add('fyt-invalid');
+    const field = el.closest('.field') || el.closest('.agree') || el.parentElement;
+    if(field){
+      const note = document.createElement('div');
+      note.className = 'fyt-field-err';
+      note.textContent = msg;
+      note.style.cssText = 'color:#B91C1C;font-size:12px;font-weight:600;margin-top:6px;line-height:1.35;';
+      field.appendChild(note);
+    }
+    const sticky = document.querySelector('.fyt-co-mobile-sticky, #fyt-custom-checkout .mobile-sticky');
+    const stickyH = sticky && getComputedStyle(sticky).display !== 'none' ? (sticky.offsetHeight || 70) : 0;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - Math.max(110, stickyH + 28);
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    setTimeout(function(){ try{ el.focus({preventScroll:true}); }catch(e){ el.focus(); } }, 280);
+  }
+
+  function fytCoPushBeginCheckout(checkoutTotal){
+    if(window._fytCoBeginCheckoutSent) return;
+    window._fytCoBeginCheckoutSent = true;
+    const row = current();
+    const items = [];
+    if(row){
+      const priced = state.coupons.length
+        ? priceAfterCoupons(parseFloat(row.priceOld)||parseFloat(row.priceNew)||0, parseFloat(row.priceNew)||0)
+        : { price: parseFloat(row.priceNew)||parseFloat(row.priceOld)||0 };
+      items.push({
+        item_id: String(row.id),
+        item_name: row.productName || row.wcName || ('Product ' + row.id),
+        price: Number(priced.price) || 0,
+        quantity: 1,
+        item_category: row.type || '',
+        item_variant: row.platform || ''
+      });
+      const map = currentAddons();
+      (state.selectedAddons || []).forEach(function(key){
+        if(!map[key]) return;
+        const pct = parseFloat(map[key].pct) || 0;
+        items.push({
+          item_id: String(key),
+          item_name: map[key].label || key,
+          price: money((Number(priced.price) || 0) * (pct / 100)),
+          quantity: 1,
+          item_category: 'addon',
+          item_variant: row.platform || ''
+        });
+      });
+    }
+    const payload = {
+      event: 'begin_checkout',
+      ecommerce: {
+        currency: C.currency || 'USD',
+        value: Number(checkoutTotal) || 0,
+        items: items
+      }
+    };
+    const codes = couponCodes();
+    if(codes.length) payload.ecommerce.coupon = codes.join(',');
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(payload);
+  }
+  function placeOrder(btn){
+    try{
+      if(!btn) btn = document.getElementById('payBtn') || document.getElementById('mobilePayBtn');
+      if(!btn){ showErr('Pay button not found. Please refresh and try again.'); return; }
+      showErr('');
+      clearFieldErrors();
+      if(needsDevice(current()) && !state.device){
+        focusInvalid(document.getElementById('deviceOpts'), 'Please choose the device you will trade on.');
+        return;
+      }
+      if(!document.getElementById('coAgree').checked){
+        focusInvalid(document.getElementById('coAgree'), 'Please agree to the Terms & Conditions to continue.');
+        return;
+      }
+      const firstEl=document.getElementById('coFirst');
+      const lastEl=document.getElementById('coLast');
+      const emailEl=document.getElementById('coEmail');
+      const phoneEl=document.getElementById('coPhone');
+      const countryEl=document.getElementById('coCountry');
+      const addressEl=document.getElementById('coAddress');
+      const cityEl=document.getElementById('coCity');
+      const stateEl=document.getElementById('coState');
+            if(!firstEl||!lastEl||!emailEl||!phoneEl||!countryEl||!addressEl||!cityEl||!stateEl){
+        showErr('Checkout fields missing. Please refresh the page.');
+        return;
+      }
+      const first=firstEl.value.trim();
+      const last=lastEl.value.trim();
+      const email=emailEl.value.trim();
+      const country=countryEl.value;
+      const address=addressEl.value.trim();
+      const city=cityEl.value.trim();
+      const province=stateEl.value.trim();
+      if(!first){ focusInvalid(firstEl, 'Please enter your first name.'); return; }
+      if(!last){ focusInvalid(lastEl, 'Please enter your last name.'); return; }
+      if(!email){ focusInvalid(emailEl, 'Please enter your email address.'); return; }
+      const phoneVal = phoneEl.value.trim();
+      if(!phoneVal || phoneVal.replace(/\D/g,'').length < 6){ focusInvalid(phoneEl, 'Please enter a valid phone number.'); return; }
+      if(!country){ focusInvalid(countryEl, 'Please select your country.'); return; }
+      if(!address){ focusInvalid(addressEl, 'Please enter your address.'); return; }
+      if(!city){ focusInvalid(cityEl, 'Please enter your city.'); return; }
+      if(!province){ focusInvalid(stateEl, 'Please enter your state / province.'); return; }
+      const addons = (state.selectedAddons || []).slice();
+      recalc();
+      const totalEl = document.getElementById('totalAmt');
+      let checkoutTotal = state.lastTotal > 0 ? state.lastTotal : 0;
+      if(checkoutTotal <= 0 && totalEl){
+        checkoutTotal = parseFloat(String(totalEl.textContent || '').replace(/[^0-9.]/g, '')) || 0;
+      }
+      const old=btn.innerHTML; btn.disabled=true; btn.innerHTML='Processing…';
+      const stickyBtn=document.getElementById('mobilePayBtn');
+      const deskBtn=document.getElementById('payBtn');
+      if(stickyBtn) stickyBtn.disabled=true;
+      if(deskBtn) deskBtn.disabled=true;
+      const body=new FormData();
+      body.append('action','fyt_co_place_order'); body.append('nonce',C.nonce); body.append('product_id',state.productId);
+      body.append('first_name',first); body.append('last_name',last); body.append('email',email);
+      body.append('phone',document.getElementById('coPhone').value.trim()); body.append('country',country);
+      body.append('address',address); body.append('city',city);
+      body.append('bf_qty', String(paidQty()));
+      body.append('state',province); body.append('payment_ui',state.pm);
+      if(needsDevice(current())) body.append('device', state.device);
+      couponCodes().forEach(c => body.append('coupons[]', c));
+      if(couponCodes().length === 1) body.append('coupon', couponCodes()[0]);
+      if(document.getElementById('coNews').checked) body.append('newsletter','1');
+      addons.forEach(a=>body.append('addons[]',a));
+      fytCoPushBeginCheckout(money(checkoutTotal));
+      fetch(C.ajax,{method:'POST',body,credentials:'same-origin'}).then(function(r){
+        return r.text().then(function(t){
+          try{ return JSON.parse(t); }
+          catch(e){ throw new Error('Invalid server response'); }
+        });
+      }).then(function(res){
+        if(!res || !res.success){
+          window._fytCoBeginCheckoutSent = false;
+          showErr((res && res.data && res.data.message) || 'Could not place order.');
+          btn.disabled=false; btn.innerHTML=old;
+          if(stickyBtn) stickyBtn.disabled=false;
+          if(deskBtn) deskBtn.disabled=false;
+          return;
+        }
+        if(res.data && res.data.redirect){ window.location.replace(res.data.redirect); return; }
+        window._fytCoBeginCheckoutSent = false;
+        showErr('Order created but no redirect URL was returned.');
+        btn.disabled=false; btn.innerHTML=old;
+        if(stickyBtn) stickyBtn.disabled=false;
+        if(deskBtn) deskBtn.disabled=false;
+      }).catch(function(err){
+        window._fytCoBeginCheckoutSent = false;
+        showErr((err && err.message) || 'Network error. Please try again.');
+        btn.disabled=false; btn.innerHTML=old;
+        if(stickyBtn) stickyBtn.disabled=false;
+        if(deskBtn) deskBtn.disabled=false;
+      });
+    }catch(err){
+      window._fytCoBeginCheckoutSent = false;
+      showErr((err && err.message) || 'Something went wrong. Please refresh and try again.');
+    }
+  }
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest ? e.target.closest('#payBtn, #mobilePayBtn') : null;
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    placeOrder(btn);
+  });
+  function scrollToPaymentMethods(){
+    const el = document.getElementById('payStep');
+    if(!el) return;
+    const sticky = document.querySelector('.fyt-co-mobile-sticky, #fyt-custom-checkout .mobile-sticky');
+    const stickyH = sticky && getComputedStyle(sticky).display !== 'none' ? (sticky.offsetHeight || 72) : 0;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - Math.max(12, stickyH + 20);
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    el.classList.add('fyt-co-pay-highlight');
+    setTimeout(function(){ el.classList.remove('fyt-co-pay-highlight'); }, 1400);
+  }
+  const sbChangePm = document.getElementById('sbChangePm');
+  if(sbChangePm) sbChangePm.addEventListener('click', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    scrollToPaymentMethods();
+  });
+  ['coFirst','coLast','coEmail','coPhone','coCountry','coAddress','coCity','coState','coAgree'].forEach(function(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input', clearFieldErrors);
+    el.addEventListener('change', clearFieldErrors);
+  });
+
+  (function setupMobileSticky(){
+    var sticky = document.querySelector('#fyt-custom-checkout .mobile-sticky') || document.querySelector('.fyt-co-mobile-sticky') || document.querySelector('.mobile-sticky');
+    if(!sticky) return;
+    sticky.classList.add('fyt-co-mobile-sticky');
+    if(sticky.parentElement !== document.body) document.body.appendChild(sticky);
+
+    var raf = 0;
+    var lastInset = -1;
+    function updateSticky(){
+      raf = 0;
+      var inset = 0;
+      if(window.visualViewport){
+        var vv = window.visualViewport;
+        inset = Math.round(window.innerHeight - vv.height - vv.offsetTop);
+        if(inset < 0) inset = 0;
+      }
+      if(inset === lastInset) return;
+      lastInset = inset;
+      sticky.style.setProperty('bottom', inset + 'px', 'important');
+    }
+    function schedule(){
+      if(!raf) raf = window.requestAnimationFrame(updateSticky);
+    }
+    updateSticky();
+    if(window.visualViewport){
+      window.visualViewport.addEventListener('resize', schedule);
+      window.visualViewport.addEventListener('scroll', schedule);
+    }
+  })();
+
+  if(C.initialId && byId[C.initialId]) state.productId = C.initialId;
+  try{ const u=new URL(location.href); const q=parseInt(u.searchParams.get('add-to-cart')||u.searchParams.get('product_id')||'0',10); if(q&&byId[q]) state.productId=q; }catch(e){}
+  renderOpts(); paintSummary(); syncCouponUI(); recalc();
+})();
+</script>
+</div></body></html>
