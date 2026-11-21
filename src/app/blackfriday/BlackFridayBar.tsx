@@ -1,71 +1,31 @@
-import { useEffect, useState, type MouseEvent } from "react";
-import { PROMO_DEADLINE, formatHoursLeft } from "@/app/data/promoBanner";
-import { BF_CODE, BF_MAX_OFF } from "@/app/data/blackfriday";
-import { ensureBfAssets } from "./bfStyles";
+import { useEffect, useRef } from "react";
+import { PROMO_DEADLINE } from "@/app/data/promoBanner";
+import { BF_CODE } from "@/app/data/blackfriday";
+// The same paste-in bar used on the WordPress pages (kept in one file so both stay identical).
+import barHtml from "./topbar.html?raw";
 
-function useTick(): number {
-  const [now, setNow] = useState(() => Date.now());
+/** Black Friday top bar. Full height at the top of the page, thin once the visitor scrolls. */
+export function BlackFridayBar(_props: { compact?: boolean }) {
+  const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  return now;
-}
-
-/** Black Friday bar above the menu. Phone: two rows at the top, one slim row once scrolled. */
-export function BlackFridayBar({ compact = false }: { compact?: boolean }) {
-  const [copied, setCopied] = useState(false);
-  useEffect(() => { ensureBfAssets(); }, []);
-  const left = formatHoursLeft(PROMO_DEADLINE, useTick());
-
-  const go = () => { window.location.hash = "challenge"; };
-  const copy = async (e: MouseEvent) => {
-    e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(BF_CODE);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
-    } catch {
-      // Clipboard blocked: the code is still readable on the pill.
+    const el = host.current;
+    if (!el || el.dataset.ready) return;
+    el.dataset.ready = "1";
+    // The file's opening comment also contains the word "<script>", so cut at the last one.
+    const at = barHtml.lastIndexOf("<script>");
+    const end = barHtml.lastIndexOf("</script>");
+    const js = at >= 0 && end > at ? barHtml.slice(at + 8, end) : "";
+    el.innerHTML = at >= 0 ? barHtml.slice(0, at) : barHtml;
+    (window as unknown as { FYT_BF_CONFIG?: Record<string, unknown> }).FYT_BF_CONFIG = {
+      stickyMode: "none", // the landing's own header stack keeps it at the top
+      endDate: PROMO_DEADLINE,
+      couponCode: BF_CODE,
+      ctaUrl: "#challenge",
+      whenEnded: "message",
+    };
+    if (js) {
+      try { new Function(js)(); } catch { /* bar stays static if the script fails */ }
     }
-  };
-  const Flip = ({ className = "" }: { className?: string }) =>
-    left.expired ? null : (
-      <div className={`fyt-bf-flip ${className}`} aria-label={`${left.hh} hours ${left.mm} minutes left`}>
-        <span>{left.hh}</span><em>H</em><span>{left.mm}</span><em>M</em><span>{left.ss}</span><em>S</em>
-      </div>
-    );
-
-  return (
-    <div
-      className={`fyt-bf fyt-bf-bar ${compact ? "fyt-bf-compact" : ""}`}
-      role="link"
-      tabIndex={0}
-      onClick={go}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }}
-      aria-label="Black Friday offer, jump to pricing"
-    >
-      <span className="fyt-bf-beam" aria-hidden="true" />
-      <div className="fyt-bf-in">
-        <div className="fyt-bf-row">
-          <div className="fyt-bf-name"><b>BLACK</b> FRIDAY</div>
-          <div className="fyt-bf-upto">UP TO</div>
-          <div className="fyt-bf-55"><b>{BF_MAX_OFF}%</b> OFF</div>
-          <Flip className="fyt-bf-mflip" />
-        </div>
-        <div className="fyt-bf-chips">
-          <span className="fyt-bf-chip"><b>+1 free</b> account</span>
-          <span className="fyt-bf-chip">Buy 4 · <b>get 10</b></span>
-          <span className="fyt-bf-chip gd">★ Daily <b>100K</b> giveaway</span>
-        </div>
-        <div className="fyt-bf-row fyt-bf-m2">
-          <button type="button" className="fyt-bf-code" onClick={copy} aria-label={`Copy code ${BF_CODE}`}>{copied ? "COPIED" : "CODE"} <b>{BF_CODE}</b></button>
-          <Flip />
-        </div>
-        <button type="button" className="fyt-bf-code fyt-bf-d" onClick={copy} aria-label={`Copy code ${BF_CODE}`}>{copied ? "COPIED" : "CODE"} <b>{BF_CODE}</b></button>
-        <Flip className="fyt-bf-d" />
-        <div className="fyt-bf-cta">Claim now</div>
-      </div>
-    </div>
-  );
+  }, []);
+  return <div ref={host} style={{ width: "100%" }} />;
 }
