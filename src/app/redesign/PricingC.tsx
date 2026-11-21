@@ -14,6 +14,7 @@ import { SELECT_PLAN_EVENT, writeSavedPlan, type SavedPlan } from "@/app/data/sa
 import { DIWALI_CODE, DIWALI_END, DIWALI_OFF, diwaliBonus, isDiwaliLive } from "@/app/data/diwali";
 import { GiftLine } from "@/app/diwali/GiftStrip";
 import { BlackFridayOffer } from "@/app/blackfriday/BlackFridayOffer";
+import { BlackFridaySummary } from "@/app/blackfriday/BlackFridaySummary";
 import { HALLOWEEN_CODE, HALLOWEEN_END, HALLOWEEN_OFF, TREATS, TREAT_PICKS, halloweenStage, isHalloweenLive, withHalloween, type TreatId } from "@/app/data/halloween";
 
 const STEPS: StepId[] = ["1-Step", "2-Step", "Instant"];
@@ -597,6 +598,7 @@ function OfferSwitch({ p }: { p: Pick }) {
   const gift = useLeft(p.giftAt ? p.giftAt + GIFT_MS : null);
   const giftLive = WELCOME_ON && p.giftAt !== null && gift.ms > 0;
   const giftGone = !WELCOME_ON || (p.giftAt !== null && gift.ms <= 0);
+  if (!WELCOME_ON && p.offer === "launch") return null;
   const glass = { background: "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" };
   const pill = { background: "linear-gradient(180deg, rgba(255,255,255,0.2), rgba(147,197,253,0.08))", border: "1px solid rgba(255,255,255,0.32)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35), 0 14px 30px -14px rgba(59,130,246,0.75)" };
   const welcomeOn = p.offer === "welcome" && giftLive;
@@ -1768,13 +1770,7 @@ function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps
           <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
           <div className="w-[210px] shrink-0"><BuyButton p={p} onNeedTreats={openSheet} wide /></div>
         </div>
-        {p.offer === "launch" && (
-          <div className="relative flex items-center gap-[10px] rounded-[12px] px-[12px] py-[8px] text-[12.5px]" style={{ background: "linear-gradient(90deg, rgba(34,197,94,0.14), rgba(34,197,94,0.03))", border: "1px solid rgba(34,197,94,0.3)" }}>
-            <Svg d="M12 8v13M4 12v8h16v-8M3 8h18v4H3zM12 8c-1-3-5-4-5-1.5S10 8 12 8zM12 8c1-3 5-4 5-1.5S14 8 12 8z" size={14} color="#86efac" w={2} />
-            <span className="font-semibold text-white">+ 1 free account <span className="text-[#86efac]">instantly</span></span>
-            <span className="text-[#bbf7d0]">· Daily 100K giveaway entry</span>
-          </div>
-        )}
+        {p.offer === "launch" && <div className="relative"><BlackFridaySummary sizeLabel={fmtSize(p.size)} /></div>}
         <div className="relative flex items-center justify-between gap-[16px] text-[11.5px]">
           <span style={{ color: MUTED }}><span className="text-[#00b67a]">★</span> <b className="text-[#c7d2e6]">4.5/5</b> · 3K+ reviews · Rewards in 24-48h</span>
           <div className="origin-right scale-[0.78]"><PayMarks /></div>
@@ -1953,7 +1949,7 @@ function MobileTwo({ p, heading, compare, setCompare, openSheet }: LayoutProps) 
         <AccountHead p={p} />
         <Hairline />
         <PriceRow p={p} />
-        {p.offer === "diwali" ? <DiwaliSummary p={p} /> : <BonusRow />}
+        {p.offer === "diwali" ? <DiwaliSummary p={p} /> : p.offer === "launch" ? <BlackFridaySummary sizeLabel={fmtSize(p.size)} /> : <BonusRow />}
         {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
         <BuyButton p={p} onNeedTreats={openSheet} wide />
         <CodeLine p={p} />

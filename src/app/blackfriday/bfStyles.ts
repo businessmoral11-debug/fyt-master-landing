@@ -1,6 +1,6 @@
 /** Styles for the Black Friday bar and offer section. Light Inter weights, black with FYT blue and a gold accent. */
 export const BF_FONT_ID = "fyt-bf-fonts";
-export const BF_FONT_HREF = "https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap";
+export const BF_FONT_HREF = "https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&family=Unbounded:wght@700;800&display=swap";
 
 export const BF_CSS = `
 .fyt-bf,.fyt-bf *{box-sizing:border-box}
@@ -116,7 +116,31 @@ export const BF_CSS = `
   .fyt-bf-give{font-size:13px;margin-top:22px}
   .fyt-bf-st:hover{transform:none}
 }
-@media (prefers-reduced-motion:reduce){.fyt-bf-beam,.fyt-bf-card{animation:none}}
+/* ---------- table summary (same look as the top bar) ---------- */
+.fyt-bf-sum{--b1:#0767F7;--b2:#348CFC;--gd:#FFC845;position:relative;isolation:isolate;overflow:hidden;border-radius:16px;padding:14px 14px 15px;background:#03060C;border:1px solid rgba(110,160,255,.4);text-align:left}
+.fyt-bf-sum-bg{position:absolute;inset:0;z-index:-1;background:radial-gradient(60% 110% at 50% 125%,rgba(7,103,247,.6),transparent 70%),radial-gradient(40% 80% at 0% -10%,rgba(52,140,252,.38),transparent 70%),linear-gradient(180deg,#03060C,#061433 60%,#0A2466)}
+.fyt-bf-sum-line{position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent,var(--b2) 20%,var(--gd) 50%,var(--b2) 80%,transparent);background-size:200% 100%;animation:fyt-bf-run 3s linear infinite;box-shadow:0 0 10px var(--b2)}
+@keyframes fyt-bf-run{to{background-position:-200% 0}}
+.fyt-bf-sum-top{display:flex;align-items:center;gap:12px}
+.fyt-bf-sum-fan{position:relative;flex:none;width:46px;height:40px}
+.fyt-bf-sum-fan i{position:absolute;left:14px;top:3px;width:19px;height:29px;border-radius:4px;transform-origin:50% 125%;background:linear-gradient(155deg,var(--b2),var(--b1));border:1px solid #8FC0FF;box-shadow:0 0 10px rgba(52,140,252,.7);transform:rotate(-14deg)}
+.fyt-bf-sum-fan i+i{background:linear-gradient(155deg,rgba(255,236,170,.98),rgba(240,170,50,.9));border-color:rgba(255,240,200,.95);box-shadow:0 0 10px rgba(255,200,69,.5);transform:rotate(14deg)}
+.fyt-bf-sum-h{font:800 19px/1.05 Unbounded,'Arial Black',sans-serif;letter-spacing:-.02em;white-space:nowrap;color:#fff}
+.fyt-bf-sum-h span{background:linear-gradient(90deg,var(--b1),var(--b2) 40%,#9CD0FF 50%,var(--b2) 60%,var(--b1));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:fyt-bf-run 4s linear infinite}
+.fyt-bf-sum-s{margin-top:5px;font:500 12px/1.2 Inter,Arial,sans-serif;color:#DCE8FF;white-space:nowrap}
+.fyt-bf-sum-s b{color:var(--gd);font-weight:700}
+.fyt-bf-sum-off{margin-left:auto;flex:none;display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:7px;font:800 13px/1 Unbounded,'Arial Black',sans-serif;color:#1A1000;background:linear-gradient(100deg,#FFB800,#FFE08A 45%,#FFF6D6 50%,#FFE08A 55%,#FFB800);background-size:250% 100%;animation:fyt-bf-run 3s linear infinite;box-shadow:0 0 16px rgba(255,200,69,.45)}
+.fyt-bf-sum-more{display:flex;align-items:center;gap:6px;margin-top:12px}
+.fyt-bf-sum-more>small{flex:none;font:700 8.5px/1.2 Inter,Arial,sans-serif;letter-spacing:.14em;color:#8FB2EA;width:54px}
+.fyt-bf-sum-t{flex:1;min-width:0;border-radius:9px;padding:7px 2px 6px;text-align:center;background:linear-gradient(180deg,#0E1A33,#050A16);border:1px solid rgba(110,160,255,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.fyt-bf-sum-t small{display:block;font:700 7.5px/1 Inter,Arial,sans-serif;letter-spacing:.12em;color:#8FB2EA}
+.fyt-bf-sum-t b{display:block;font:800 12px/1 Unbounded,'Arial Black',sans-serif;color:#fff;margin-top:4px;white-space:nowrap}
+.fyt-bf-sum-t.gd{border-color:rgba(255,200,69,.7);box-shadow:0 0 12px rgba(255,200,69,.25)}
+.fyt-bf-sum-t.gd small{color:var(--gd)}
+.fyt-bf-sum-give{margin-top:10px;font:500 11.5px/1.2 Inter,Arial,sans-serif;color:#DCE8FF}
+.fyt-bf-sum-give b{color:var(--gd);font-weight:700}
+@media (max-width:420px){.fyt-bf-sum-h{font-size:15px}.fyt-bf-sum-top{gap:9px}.fyt-bf-sum-off{font-size:11.5px;padding:0 8px}.fyt-bf-sum-more>small{display:none}}
+@media (prefers-reduced-motion:reduce){.fyt-bf-beam,.fyt-bf-card,.fyt-bf-sum-line,.fyt-bf-sum-h span,.fyt-bf-sum-off{animation:none}}
 `;
 
 export function ensureBfAssets(): void {
