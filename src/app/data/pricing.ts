@@ -178,11 +178,6 @@ const INSTANT_PRIME_PRODUCT_IDS = new Set<number>([
 ]);
 
 export function checkoutUrl(productId: number): string {
-  // PREVIEW ONLY: on Vercel preview links the buy buttons open the Black Friday checkout preview page,
-  // not the live checkout. On fundingyourtrades.com this branch is never taken.
-  if (typeof window !== "undefined" && /\.vercel\.app$/i.test(window.location.hostname)) {
-    return `${import.meta.env.BASE_URL}bf-checkout.html?add-to-cart=${productId}`;
-  }
   if (INSTANT_PRIME_PRODUCT_IDS.has(productId)) {
     return `${CHECKOUT_ADD_TO_CART_BASE}${productId}`;
   }
