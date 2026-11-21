@@ -42,7 +42,7 @@ export const PROMO_ITEMS: PromoItem[] = [
 ];
 
 /** BOGO35 offer (live since 16 Nov 9:45 AM IST, coupon has no end). Front-end countdown: 100 hours from 16 Nov 4:20 PM IST. */
-export const PROMO_DEADLINE = "2026-12-01T10:29:00+05:30"; // PREVIEW placeholder (30 Nov 11:59 PM EST) until Tushar gives the end time
+export const PROMO_DEADLINE = "2026-12-01T17:00:00+05:30"; // 10 days from launch (21 Nov 2026)
 
 /** Spots left (not shown while the countdown runs; kept for switching back). Updated by hand from real sales. */
 export const PROMO_SPOTS_LEFT = 247;

@@ -1,763 +1,241 @@
-<!-- ==================================================================
-  FYT DIWALI SPECIAL STICKY TOP BAR  v2 (WordPress version: DIWALI45, shows 5 Nov 10:00 AM IST to 12 Nov 11:59 PM IST, folds thin on scroll)  (paste-in snippet, no libraries, no images)
-  Paste once into: WordPress > Custom HTML block, or a header/footer hook (e.g. wp_body_open / wp_footer).
-  It moves itself to the top of <body>, stays fixed at the top while scrolling and pads the page so nothing is covered.
-  Edit the CONFIG object in the <script> below (end date, code, copy, CTA).
-=================================================================== -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- FYT BLACK FRIDAY TOP BAR v1.1, thin on scroll (paste-in snippet, vanilla JS, no images, no libraries)
+  Paste once: WordPress Custom HTML block or header/footer hook (wp_body_open / wp_footer), same as the Diwali bar.
+  It moves itself to the top of <body>, stays fixed while scrolling and pads the page so nothing is covered.
+  Exposes --fyt-bf-h (bar height) on <html> so a sticky site header can use top:var(--fyt-bf-h,0px).
+  Edit CONFIG in the <script> below, or set window.FYT_BF_CONFIG={...} before this snippet. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-#fyt-dw-bar,#fyt-dw-bar *,#fyt-dw-bar *::before,#fyt-dw-bar *::after{box-sizing:border-box;margin:0;padding:0}
-#fyt-dw-bar{
-  --fyt-dw-gold:#FFC845;--fyt-dw-saffron:#FF9933;
-  position:relative;z-index:99990;width:100%;overflow:hidden;isolation:isolate;min-height:96px;
-  font-family:'Open Sans',Arial,sans-serif;line-height:1.2;color:#fff;text-align:left;
-  background:linear-gradient(90deg,#0B1440 0%,#1A3AA8 30%,#2257E0 50%,#1A3AA8 70%,#0B1440 100%);
-  -webkit-font-smoothing:antialiased;box-shadow:0 8px 28px rgba(4,7,13,.45)}
-#fyt-dw-bar.fyt-dw-fixed{position:fixed;left:0;right:0;top:var(--fyt-dw-top,0px)}
-#fyt-dw-bar.fyt-dw-sticky{position:sticky;top:var(--fyt-dw-top,0px)}
-#fyt-dw-bar.fyt-dw-hidden{display:none!important}
-#fyt-dw-bar .fyt-dw-veil{position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:radial-gradient(60% 140% at 50% 130%,rgba(255,153,51,.20),rgba(255,153,51,0) 70%),
-             radial-gradient(18% 120% at 6% 40%,rgba(255,170,60,.22),rgba(255,170,60,0) 70%),
-             radial-gradient(18% 120% at 94% 40%,rgba(255,170,60,.22),rgba(255,170,60,0) 70%),
-             linear-gradient(180deg,rgba(4,7,13,.62) 0%,rgba(6,17,43,.38) 50%,rgba(7,22,50,.66) 100%)}
-#fyt-dw-bar .fyt-dw-edge{position:absolute;left:0;right:0;height:1px;z-index:5;pointer-events:none;background:linear-gradient(90deg,rgba(255,200,69,0),rgba(255,214,120,.75) 50%,rgba(255,200,69,0))}
-#fyt-dw-bar .fyt-dw-edge--t{top:0;opacity:.6}
-#fyt-dw-bar .fyt-dw-edge--b{bottom:0}
-#fyt-dw-bar .fyt-dw-fx{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
-
-/* rangoli mandalas */
-#fyt-dw-bar .fyt-dw-rangoli{position:absolute;top:50%;width:220px;height:220px;margin-top:-110px;z-index:0;opacity:.16;pointer-events:none;animation:fyt-dw-spin 120s linear infinite}
-#fyt-dw-bar .fyt-dw-rangoli--l{left:-70px}
-#fyt-dw-bar .fyt-dw-rangoli--r{right:-70px;animation-direction:reverse}
-#fyt-dw-bar .fyt-dw-rangoli--c{left:50%;width:420px;height:420px;margin:-210px 0 0 -210px;opacity:.05;animation-duration:200s}
-
-/* bokeh + petals */
-#fyt-dw-bar .fyt-dw-bokeh{position:absolute;z-index:1;border-radius:50%;pointer-events:none;opacity:0;
-  background:radial-gradient(circle,rgba(255,226,154,.55) 0%,rgba(255,200,69,.18) 45%,rgba(255,200,69,0) 70%);animation:fyt-dw-drift 9s ease-in-out infinite}
-#fyt-dw-bar .fyt-dw-petal{position:absolute;top:-14px;z-index:2;width:7px;height:10px;pointer-events:none;opacity:0;border-radius:70% 0 70% 0;
-  background:linear-gradient(135deg,#FFD24A,#FF8C00 70%,#E25A00);animation:fyt-dw-fall 11s linear infinite}
-
-/* lanterns */
-#fyt-dw-bar .fyt-dw-lantern{position:absolute;top:0;z-index:3;pointer-events:none;transform-origin:50% 0;animation:fyt-dw-sway 5.2s ease-in-out infinite}
-#fyt-dw-bar .fyt-dw-lantern svg{position:relative;display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 0 7px rgba(255,140,40,.55))}
-#fyt-dw-bar .fyt-dw-lhalo{position:absolute;left:50%;top:40%;width:260%;height:150%;transform:translate(-50%,-50%);border-radius:50%;
-  background:radial-gradient(circle,rgba(255,176,70,.42) 0%,rgba(255,140,40,.14) 40%,rgba(255,140,40,0) 70%);animation:fyt-dw-glow 3.4s ease-in-out infinite}
-#fyt-dw-bar .fyt-dw-tas{transform-box:fill-box;transform-origin:50% 0;animation:fyt-dw-tassel 5.2s ease-in-out infinite;animation-delay:inherit}
-#fyt-dw-bar .fyt-dw-kin{animation:fyt-dw-glow 2.6s ease-in-out infinite}
-#fyt-dw-bar .fyt-dw-lA{left:26px;width:44px}
-#fyt-dw-bar .fyt-dw-lB{right:26px;width:44px;animation-delay:-2.1s}
-#fyt-dw-bar .fyt-dw-lB .fyt-dw-tas{animation-delay:-1.75s}
-#fyt-dw-bar .fyt-dw-lA .fyt-dw-tas{animation-delay:.35s}
-
-/* diyas */
-#fyt-dw-bar .fyt-dw-diya{position:absolute;z-index:3;width:58px;pointer-events:none}
-#fyt-dw-bar .fyt-dw-diya > svg{display:block;width:100%;height:auto;overflow:visible}
-#fyt-dw-bar .fyt-dw-dA{left:78px;bottom:16px}
-#fyt-dw-bar .fyt-dw-dB{right:78px;bottom:16px}
-#fyt-dw-bar .fyt-dw-flip > svg{transform:scaleX(-1)}
-#fyt-dw-bar .fyt-dw-flame{position:absolute;left:93.75%;top:32%;width:0;height:0}
-#fyt-dw-bar .fyt-dw-flip .fyt-dw-flame{left:6.25%}
-#fyt-dw-bar .fyt-dw-dhalo{position:absolute;left:-55px;top:-70px;width:110px;height:110px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,214,120,.55) 0%,rgba(255,153,51,.2) 35%,rgba(255,153,51,0) 68%);animation:fyt-dw-glow 1.7s ease-in-out infinite}
-#fyt-dw-bar .fyt-dw-fsvg{position:absolute;left:-9px;bottom:-3px;width:18px;height:32px;overflow:visible}
-#fyt-dw-bar .fyt-dw-fo,#fyt-dw-bar .fyt-dw-fm,#fyt-dw-bar .fyt-dw-fc{transform-box:fill-box;transform-origin:50% 100%}
-#fyt-dw-bar .fyt-dw-fo{animation:fyt-dw-flick 1.5s ease-in-out infinite}
-#fyt-dw-bar .fyt-dw-fm{animation:fyt-dw-flick 1.1s ease-in-out -.4s infinite}
-#fyt-dw-bar .fyt-dw-fc{animation:fyt-dw-flick2 .9s ease-in-out -.2s infinite}
-#fyt-dw-bar .fyt-dw-heat{position:absolute;left:-9px;bottom:22px;width:18px;height:24px;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(255,240,210,.22),rgba(255,240,210,0) 70%);animation:fyt-dw-heat 1.8s ease-in-out infinite}
-#fyt-dw-bar .fyt-dw-emb{position:absolute;left:-1px;bottom:20px;width:2px;height:2px;border-radius:50%;background:#FFD27A;box-shadow:0 0 4px #FF9933;opacity:0;animation:fyt-dw-ember 2.6s ease-out infinite}
-#fyt-dw-bar .fyt-dw-emb:nth-of-type(2){--dx:-6px;animation-delay:.9s}
-#fyt-dw-bar .fyt-dw-emb:nth-of-type(3){--dx:5px;animation-delay:1.7s;animation-duration:3s}
-
-/* layout */
-#fyt-dw-bar .fyt-dw-inner{position:relative;z-index:4;display:flex;align-items:center;justify-content:center;gap:22px;
-  max-width:1400px;margin:0 auto;padding:10px 150px 18px;min-height:96px}
-#fyt-dw-bar .fyt-dw-msg{display:flex;align-items:center;justify-content:center;gap:12px;flex:0 0 auto;min-width:0}
-#fyt-dw-bar .fyt-dw-hdiya{display:none;position:relative;width:44px;flex:0 0 auto;align-self:flex-end}
-#fyt-dw-bar .fyt-dw-hdiya > svg{display:block;width:100%;height:auto;overflow:visible}
-#fyt-dw-bar .fyt-dw-text{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;filter:drop-shadow(0 2px 10px rgba(4,7,13,.55))}
-#fyt-dw-bar .fyt-dw-eyebrow{position:relative;display:inline-flex;align-items:center;gap:8px;font-family:'Montserrat',Arial,sans-serif;font-weight:700;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:#FFD983;padding-left:.32em;line-height:13px}
-#fyt-dw-bar .fyt-dw-eyebrow::before,#fyt-dw-bar .fyt-dw-eyebrow::after{content:"";width:26px;height:1px;background:linear-gradient(90deg,rgba(255,200,69,0),#FFC845)}
-#fyt-dw-bar .fyt-dw-eyebrow::after{background:linear-gradient(90deg,#FFC845,rgba(255,200,69,0))}
-#fyt-dw-bar .fyt-dw-head{position:relative;display:block;white-space:nowrap;font-family:'Montserrat',Arial,sans-serif;font-weight:800;font-size:23px;line-height:26px;letter-spacing:-.01em}
-#fyt-dw-bar .fyt-dw-hbase{display:block;color:#fff;background:linear-gradient(180deg,#FFFFFF 0%,#FFF7E2 55%,#FFE3A1 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-#fyt-dw-bar .fyt-dw-hbase em{font-style:normal;background:linear-gradient(180deg,#FFF6CF 0%,#FFD053 50%,#FF9A1F 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-#fyt-dw-bar .fyt-dw-hshine{position:absolute;left:0;top:0;width:25%;height:100%;overflow:hidden;pointer-events:none;
-  -webkit-mask:linear-gradient(90deg,transparent,#000 45%,#000 55%,transparent);mask:linear-gradient(90deg,transparent,#000 45%,#000 55%,transparent);
-  transform:translateX(-100%);animation:fyt-dw-shineA 7s linear 1.5s infinite}
-#fyt-dw-bar .fyt-dw-hshine > span{display:block;width:400%;color:#fff;-webkit-text-fill-color:#fff;transform:translateX(25%);animation:fyt-dw-shineB 7s linear 1.5s infinite}
-#fyt-dw-bar .fyt-dw-hshine em{font-style:normal}
-#fyt-dw-bar .fyt-dw-spk{position:absolute;width:10px;height:10px;pointer-events:none;opacity:0;animation:fyt-dw-twinkle 2.8s ease-in-out infinite}
-#fyt-dw-bar .fyt-dw-spk::before{content:"";position:absolute;inset:0;background:#FFF4CF;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)}
-#fyt-dw-bar .fyt-dw-spk1{right:-16px;top:-8px}
-#fyt-dw-bar .fyt-dw-spk2{left:-14px;bottom:-4px;width:7px;height:7px;animation-delay:1.1s}
-#fyt-dw-bar .fyt-dw-spk3{left:46%;top:-12px;width:6px;height:6px;animation-delay:2s}
-
-/* ticket */
-#fyt-dw-bar .fyt-dw-ticket{position:relative;flex:0 0 auto;display:flex;align-items:stretch;height:46px;width:200px;cursor:pointer;overflow:hidden;
-  -webkit-appearance:none;appearance:none;border:0;border-radius:8px;font:inherit;text-transform:none;letter-spacing:normal;
-  box-shadow:inset 0 0 0 1px rgba(255,236,180,.55),inset 0 -8px 16px rgba(120,60,0,.25);
-  background:linear-gradient(135deg,#EBC66A 0%,#D9A23E 50%,#B97C24 100%);color:#2A1200;
-  -webkit-mask:radial-gradient(circle 7px at 0 50%,transparent 6.5px,#000 7px) left/51% 100% no-repeat,radial-gradient(circle 7px at 100% 50%,transparent 6.5px,#000 7px) right/51% 100% no-repeat;
-          mask:radial-gradient(circle 7px at 0 50%,transparent 6.5px,#000 7px) left/51% 100% no-repeat,radial-gradient(circle 7px at 100% 50%,transparent 6.5px,#000 7px) right/51% 100% no-repeat;
-  transition:transform .2s ease}
-#fyt-dw-bar .fyt-dw-ticket:hover{transform:translateY(-1px) scale(1.03)}
-/* the notch mask clips outlines, so the focus ring is drawn inside the ticket */
-#fyt-dw-bar .fyt-dw-ticket:focus{outline:none}
-#fyt-dw-bar .fyt-dw-ticket:focus-visible{box-shadow:inset 0 0 0 2px #0B1440,inset 0 0 0 4px #FFFFFF,inset 0 -8px 16px rgba(120,60,0,.25)}
-#fyt-dw-bar .fyt-dw-stub{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0 10px 0 16px;border-right:2px dashed rgba(58,26,0,.38);
-  font-family:'Montserrat',Arial,sans-serif;font-weight:800;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#5A2D00}
-#fyt-dw-bar .fyt-dw-stub svg{width:14px;height:14px}
-#fyt-dw-bar .fyt-dw-codewrap{position:relative;flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px 0 10px}
-#fyt-dw-bar .fyt-dw-code{font-family:'Montserrat',Arial,sans-serif;font-weight:800;font-size:18px;letter-spacing:.05em;color:#2A1200}
-#fyt-dw-bar .fyt-dw-copyico{width:15px;height:15px;opacity:.7;flex:0 0 auto}
-#fyt-dw-bar .fyt-dw-ticket::after{content:"";position:absolute;top:-20%;left:0;width:38%;height:140%;pointer-events:none;opacity:.5;
-  background:linear-gradient(100deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.8) 50%,rgba(255,255,255,0) 100%);transform:translateX(-160%) skewX(-18deg);
-  animation:fyt-dw-sheen 6.5s ease-in-out 3s infinite}
-#fyt-dw-bar .fyt-dw-ticket .fyt-dw-ok{display:none}
-#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied{background:linear-gradient(135deg,#FFFFFF 0%,#F4F6FB 55%,#E3E8F2 100%);box-shadow:inset 0 0 0 1px rgba(230,181,74,.85),inset 0 -8px 16px rgba(11,20,64,.08)}
-#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied:focus-visible{box-shadow:inset 0 0 0 2px #0B1440,inset 0 0 0 4px #E6B54A}
-#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied .fyt-dw-stub{border-right-color:rgba(11,20,64,.3)}
-#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied .fyt-dw-ok{color:#C8901E}
-#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied::after{opacity:0}
-#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied .fyt-dw-code,#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied .fyt-dw-stub{color:#0B1440}
-#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied .fyt-dw-ok{display:block}
-#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied .fyt-dw-copyico,#fyt-dw-bar .fyt-dw-ticket.fyt-dw-copied .fyt-dw-tag{display:none}
-
-/* countdown */
-#fyt-dw-bar .fyt-dw-timer{position:relative;display:flex;align-items:center;flex:0 0 auto}
-#fyt-dw-bar .fyt-dw-ends{font-family:'Montserrat',Arial,sans-serif;font-weight:700;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#FFD983;line-height:10px;white-space:nowrap;position:absolute;left:50%;bottom:100%;margin-bottom:5px;transform:translateX(-50%);padding-left:.22em}
-#fyt-dw-bar .fyt-dw-tiles{display:flex;gap:6px}
-#fyt-dw-bar .fyt-dw-tile{position:relative;width:42px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;perspective:160px;
-  background:linear-gradient(180deg,rgba(9,26,60,.95) 0%,rgba(9,26,60,.95) 50%,rgba(4,9,22,.96) 50%,rgba(4,9,22,.96) 100%);border:1px solid rgba(255,200,69,.38);box-shadow:inset 0 1px 0 rgba(255,226,154,.18),0 4px 12px rgba(4,7,13,.35)}
-#fyt-dw-bar .fyt-dw-tile::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.45)}
-#fyt-dw-bar .fyt-dw-tile::after{content:"";position:absolute;inset:-1px;border-radius:8px;border:1px solid #FF9933;box-shadow:0 0 14px rgba(255,153,51,.7),inset 0 0 10px rgba(255,153,51,.35);opacity:0;pointer-events:none}
-#fyt-dw-bar .fyt-dw-num{display:block;font-family:'Montserrat',Arial,sans-serif;font-weight:800;font-size:18px;line-height:1;color:#fff;font-variant-numeric:tabular-nums;transform-origin:50% 60%}
-#fyt-dw-bar .fyt-dw-lbl{margin-top:4px;font-family:'Montserrat',Arial,sans-serif;font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#F2C25B}
-#fyt-dw-bar .fyt-dw-lbl .fyt-dw-ls{display:none}
-#fyt-dw-bar .fyt-dw-flipping .fyt-dw-num{animation:fyt-dw-flipin .5s cubic-bezier(.3,1.4,.5,1)}
-#fyt-dw-bar.fyt-dw-soon .fyt-dw-tile{border-color:rgba(255,153,51,.9);background:linear-gradient(180deg,#3A1A08 0%,#1E0E06 50%,#160A04 100%);box-shadow:0 0 10px rgba(255,153,51,.35)}
-#fyt-dw-bar.fyt-dw-soon .fyt-dw-lbl{color:#FFB15C}
-#fyt-dw-bar.fyt-dw-soon .fyt-dw-tile::after{animation:fyt-dw-glow2 1.6s ease-in-out infinite}
-#fyt-dw-bar.fyt-dw-soon .fyt-dw-ends{color:#FFB15C}
-#fyt-dw-bar .fyt-dw-over{display:none;height:46px;align-items:center;box-sizing:border-box;font-family:'Montserrat',Arial,sans-serif;font-weight:800;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#FFE29A;
-  padding:0 18px;border-radius:8px;border:1px solid rgba(255,200,69,.45);background:rgba(4,7,13,.6)}
-
-/* CTA */
-#fyt-dw-bar .fyt-dw-cta{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 22px;border-radius:999px;overflow:hidden;
-  font-family:'Montserrat',Arial,sans-serif;font-weight:800;font-size:14px;letter-spacing:.01em;color:#fff!important;text-decoration:none!important;white-space:nowrap;
-  background:linear-gradient(180deg,#5A9BFF,#2563EB);box-shadow:0 6px 18px rgba(37,99,235,.5),inset 0 1px 0 rgba(255,255,255,.35),0 0 0 1px rgba(255,214,120,.5);transition:transform .2s ease}
-#fyt-dw-bar .fyt-dw-cta:hover{transform:scale(1.035)}
-#fyt-dw-bar .fyt-dw-cta:focus-visible{outline:2px solid #FFE29A;outline-offset:3px}
-#fyt-dw-bar .fyt-dw-cta svg{width:15px;height:15px;transition:transform .2s ease}
-#fyt-dw-bar .fyt-dw-cta:hover svg{transform:translateX(3px)}
-#fyt-dw-bar .fyt-dw-cta .fyt-dw-ctas{display:none}
-#fyt-dw-bar .fyt-dw-cta::after{content:"";position:absolute;top:0;left:0;width:45%;height:100%;pointer-events:none;
-  background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.55),rgba(255,255,255,0));transform:translateX(-140%) skewX(-20deg);animation:fyt-dw-sheen 4.5s ease-in-out 2s infinite}
-
-/* fairy lights */
-#fyt-dw-bar .fyt-dw-lights{position:absolute;left:0;right:0;bottom:0;height:16px;z-index:2;pointer-events:none}
-#fyt-dw-bar .fyt-dw-wire{position:absolute;left:0;top:0;width:100%;height:12px}
-#fyt-dw-bar .fyt-dw-bulb{position:absolute;top:6px;width:5px;height:7px;margin-left:-2.5px;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;background:var(--c);
-  box-shadow:0 0 5px 1px var(--c),0 0 12px 2px var(--c);animation:fyt-dw-bulb 2.4s ease-in-out infinite}
-#fyt-dw-bar .fyt-dw-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
-
-/* ended */
-#fyt-dw-bar.fyt-dw-ended .fyt-dw-tiles,#fyt-dw-bar.fyt-dw-ended .fyt-dw-ends,#fyt-dw-bar.fyt-dw-ended .fyt-dw-ticket{display:none}
-#fyt-dw-bar.fyt-dw-ended .fyt-dw-over{display:flex}
-#fyt-dw-bar.fyt-dw-paused *,#fyt-dw-bar.fyt-dw-paused *::before,#fyt-dw-bar.fyt-dw-paused *::after{animation-play-state:paused!important}
-
-/* keyframes: transform / opacity only */
-@keyframes fyt-dw-sway{0%,100%{transform:rotate(3.5deg)}50%{transform:rotate(-3.5deg)}}
-@keyframes fyt-dw-tassel{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
-@keyframes fyt-dw-glow{0%,100%{opacity:.72}50%{opacity:1}}
-@keyframes fyt-dw-glow2{0%,100%{opacity:.25}50%{opacity:1}}
-@keyframes fyt-dw-flick{0%,100%{transform:scale(1,1) rotate(-2deg)}30%{transform:scale(.93,1.07) rotate(2.5deg)}55%{transform:scale(1.05,.95) rotate(-1deg)}80%{transform:scale(.97,1.04) rotate(3deg)}}
-@keyframes fyt-dw-flick2{0%,100%{transform:scale(1,1);opacity:1}50%{transform:scale(.9,1.12);opacity:.85}}
-@keyframes fyt-dw-heat{0%,100%{transform:translateY(0) scaleX(1);opacity:.5}50%{transform:translateY(-6px) scaleX(1.25);opacity:1}}
-@keyframes fyt-dw-ember{0%{transform:translate(0,0);opacity:0}15%{opacity:1}100%{transform:translate(var(--dx,3px),-30px);opacity:0}}
-@keyframes fyt-dw-twinkle{0%,100%{opacity:0;transform:scale(.3) rotate(0)}45%{opacity:1;transform:scale(1) rotate(45deg)}70%{opacity:0;transform:scale(.4) rotate(90deg)}}
-@keyframes fyt-dw-sheen{0%,60%{transform:translateX(-160%) skewX(-18deg)}100%{transform:translateX(320%) skewX(-18deg)}}
-@keyframes fyt-dw-shineA{0%{transform:translateX(-100%)}35%,100%{transform:translateX(400%)}}
-@keyframes fyt-dw-shineB{0%{transform:translateX(25%)}35%,100%{transform:translateX(-100%)}}
-@keyframes fyt-dw-bulb{0%,100%{opacity:1}50%{opacity:.35}}
-@keyframes fyt-dw-flipin{0%{transform:rotateX(-90deg);opacity:.2}100%{transform:rotateX(0);opacity:1}}
-@keyframes fyt-dw-spin{to{transform:rotate(360deg)}}
-@keyframes fyt-dw-drift{0%,100%{transform:translate(0,8px) scale(.8);opacity:0}50%{transform:translate(6px,-8px) scale(1);opacity:.9}}
-@keyframes fyt-dw-fall{0%{transform:translate(0,0) rotate(0);opacity:0}8%{opacity:.85}50%{transform:translate(14px,62px) rotate(200deg)}90%{opacity:.7}100%{transform:translate(-6px,124px) rotate(400deg);opacity:0}}
-
-/* ---- tablet: two rows ---- */
-@media (max-width:1259px){
-  #fyt-dw-bar .fyt-dw-inner{flex-wrap:wrap;gap:8px 20px;padding:10px 150px 20px}
-  #fyt-dw-bar .fyt-dw-msg{flex:1 0 100%}
-  #fyt-dw-bar .fyt-dw-timer{flex-direction:row;gap:10px}
-  #fyt-dw-bar .fyt-dw-ends{position:static;transform:none;margin:0;padding:0;letter-spacing:.16em}
+#fyt-bf-bar,#fyt-bf-bar *{box-sizing:border-box;margin:0;padding:0}
+#fyt-bf-bar{--b1:#0767F7;--b2:#348CFC;--gd:#FFC845;position:relative;z-index:99990;width:100%;height:76px;overflow:hidden;isolation:isolate;color:#fff;font:500 13px/1.2 Inter,Arial,sans-serif;text-align:left;-webkit-font-smoothing:antialiased;background:#03060C;box-shadow:0 8px 26px rgba(0,0,0,.5)}
+#fyt-bf-bar.fbf-fixed{position:fixed;left:0;right:0;top:var(--fbf-top,0px)}
+#fyt-bf-bar.fbf-sticky{position:sticky;top:var(--fbf-top,0px)}
+#fyt-bf-bar.fbf-hide{display:none!important}
+#fyt-bf-bar .fbf-bg{position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(40% 160% at 50% 120%,rgba(7,103,247,.55),transparent 70%),radial-gradient(22% 140% at 12% -20%,rgba(52,140,252,.35),transparent 70%),radial-gradient(22% 140% at 88% -20%,rgba(52,140,252,.35),transparent 70%),linear-gradient(90deg,#03060C,#061433 35%,#0A2466 50%,#061433 65%,#03060C);background-size:200% 100%,100% 100%,100% 100%,100% 100%;animation:fbf-aur 9s ease-in-out infinite alternate}
+#fyt-bf-bar .fbf-grid{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.22;background:repeating-linear-gradient(90deg,rgba(120,170,255,.18) 0 1px,transparent 1px 28px);-webkit-mask:linear-gradient(90deg,transparent,#000 30%,#000 70%,transparent);mask:linear-gradient(90deg,transparent,#000 30%,#000 70%,transparent)}
+#fyt-bf-bar .fbf-sweep{position:absolute;top:0;bottom:0;left:-30%;width:22%;z-index:4;pointer-events:none;background:linear-gradient(100deg,transparent,rgba(255,255,255,.13) 45%,rgba(255,255,255,.22) 50%,transparent 60%);transform:skewX(-18deg);animation:fbf-sweep 6s ease-in-out infinite}
+#fyt-bf-bar .fbf-line{position:absolute;left:0;right:0;bottom:0;height:2px;z-index:5;pointer-events:none;background:linear-gradient(90deg,transparent,var(--b2) 20%,var(--gd) 50%,var(--b2) 80%,transparent);background-size:200% 100%;animation:fbf-run 3s linear infinite;box-shadow:0 0 10px var(--b2)}
+#fyt-bf-bar .fbf-spk{position:absolute;z-index:1;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 6px 2px rgba(140,190,255,.8);opacity:0;animation:fbf-tw 3.2s ease-in-out infinite}
+#fyt-bf-bar .fbf-in{position:relative;z-index:3;height:100%;max-width:1320px;margin:0 auto;padding:0 44px 0 20px;display:flex;align-items:center;justify-content:center;gap:22px}
+#fyt-bf-bar .fbf-brand{font:800 17px/.95 Unbounded,Arial Black,sans-serif;letter-spacing:-.02em;white-space:nowrap;flex:none}
+#fyt-bf-bar .fbf-brand span{display:block}
+#fyt-bf-bar .fbf-bk{background:linear-gradient(180deg,#fff 30%,#AFC3E6);-webkit-background-clip:text;background-clip:text;color:transparent}
+#fyt-bf-bar .fbf-fr,#fyt-bf-bar .fbf-g{background:linear-gradient(90deg,var(--b1),var(--b2) 40%,#9CD0FF 50%,var(--b2) 60%,var(--b1));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:fbf-run 4s linear infinite}
+#fyt-bf-bar .fbf-cards{position:relative;width:54px;height:40px;flex:none}
+#fyt-bf-bar .fbf-cards i{position:absolute;left:19px;top:3px;width:20px;height:30px;border-radius:4px;transform-origin:50% 120%;background:linear-gradient(155deg,rgba(255,255,255,.95),rgba(190,215,255,.55));border:1px solid rgba(255,255,255,.9);box-shadow:0 0 10px rgba(140,190,255,.75);animation:fbf-fan 5s cubic-bezier(.3,1.3,.5,1) infinite}
+#fyt-bf-bar .fbf-cards i:nth-child(-n+2){background:linear-gradient(155deg,var(--b2),var(--b1));border-color:#8FC0FF}
+#fyt-bf-bar .fbf-cards i:nth-child(1){--r:-36deg}#fyt-bf-bar .fbf-cards i:nth-child(2){--r:-18deg}#fyt-bf-bar .fbf-cards i:nth-child(3){--r:0deg}#fyt-bf-bar .fbf-cards i:nth-child(4){--r:18deg}#fyt-bf-bar .fbf-cards i:nth-child(5){--r:36deg}
+#fyt-bf-bar .fbf-offer{flex:none}
+#fyt-bf-bar .fbf-eb{display:none;font:800 10px/1 Unbounded,Arial Black,sans-serif;letter-spacing:.22em;margin-bottom:5px}
+#fyt-bf-bar .fbf-br{display:none}
+#fyt-bf-bar .fbf-head{font:800 21px/1.1 Unbounded,Arial Black,sans-serif;letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:9px}
+#fyt-bf-bar .fbf-n5{display:inline-block;animation:fbf-pop 2.5s ease-in-out infinite}
+#fyt-bf-bar .fbf-off{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:7px;font-size:15px;color:#1A1000;background:linear-gradient(100deg,#FFB800,#FFE08A 45%,#FFF6D6 50%,#FFE08A 55%,#FFB800);background-size:250% 100%;animation:fbf-run 3s linear infinite;box-shadow:0 0 16px rgba(255,200,69,.45)}
+#fyt-bf-bar .fbf-tick,#fyt-bf-bar .fbf-slides{position:relative;overflow:hidden;display:grid}
+#fyt-bf-bar .fbf-tick{height:18px;margin-top:5px;font-size:12.5px;font-weight:600;color:#DCE8FF}
+#fyt-bf-bar .fbf-tick>span,#fyt-bf-bar .fbf-slides>span{grid-area:1/1;min-width:0;white-space:nowrap;opacity:0;transform:translateY(100%);transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .5s}
+#fyt-bf-bar .fbf-tick>span.on,#fyt-bf-bar .fbf-slides>span.on{opacity:1;transform:none}
+#fyt-bf-bar .fbf-tick>span.out,#fyt-bf-bar .fbf-slides>span.out{opacity:0;transform:translateY(-100%)}
+#fyt-bf-bar b.fbf-gd{color:var(--gd);font-weight:800}
+#fyt-bf-bar .fbf-slides{display:none;grid-template-columns:minmax(0,1fr)}
+#fyt-bf-bar .fbf-code{flex:none;display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1.5px dashed rgba(255,200,69,.8);border-radius:9px;background:rgba(255,200,69,.08);color:#fff;font:600 10px/1 Inter,Arial,sans-serif;letter-spacing:.14em;cursor:pointer;transition:background .2s,transform .2s}
+#fyt-bf-bar .fbf-code:hover{background:rgba(255,200,69,.18);transform:translateY(-1px)}
+#fyt-bf-bar .fbf-code b{font:800 15px/1 Unbounded,Arial Black,sans-serif;letter-spacing:.01em;color:var(--gd)}
+#fyt-bf-bar .fbf-code svg{width:14px;height:14px;opacity:.85}
+#fyt-bf-bar .fbf-code.fbf-ok{border-style:solid;border-color:#3BE38B;background:rgba(59,227,139,.14)}
+#fyt-bf-bar .fbf-code.fbf-ok b{color:#3BE38B}
+#fyt-bf-bar .fbf-timer{flex:none;display:flex;align-items:center;gap:8px}
+#fyt-bf-bar .fbf-ends{font:700 9.5px/1.15 Inter,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#A9C4F0;width:52px}
+#fyt-bf-bar .fbf-tiles{display:flex;gap:4px}
+#fyt-bf-bar .fbf-t{width:40px;height:44px;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0E1A33,#050A16);border:1px solid rgba(110,160,255,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+#fyt-bf-bar .fbf-t b{display:block;font:800 17px/1 Unbounded,Arial Black,sans-serif;font-variant-numeric:tabular-nums}
+#fyt-bf-bar .fbf-t small{font:700 8px/1 Inter,Arial,sans-serif;letter-spacing:.12em;color:#8FB2EA;margin-top:4px}
+#fyt-bf-bar .fbf-t.fbf-flip b{animation:fbf-dig .45s cubic-bezier(.2,.8,.2,1)}
+#fyt-bf-bar.fbf-soon .fbf-t{border-color:rgba(255,200,69,.7);box-shadow:0 0 12px rgba(255,200,69,.3)}
+#fyt-bf-bar.fbf-soon .fbf-ends{color:var(--gd)}
+#fyt-bf-bar .fbf-lim,#fyt-bf-bar .fbf-over{display:none;font:800 11px/1 Unbounded,Arial Black,sans-serif;letter-spacing:.06em;padding:9px 12px;border-radius:8px;border:1px solid rgba(110,160,255,.45);background:rgba(7,103,247,.15);white-space:nowrap}
+#fyt-bf-bar.fbf-nodate .fbf-ends,#fyt-bf-bar.fbf-nodate .fbf-tiles,#fyt-bf-bar.fbf-ended .fbf-ends,#fyt-bf-bar.fbf-ended .fbf-tiles{display:none}
+#fyt-bf-bar.fbf-nodate .fbf-lim,#fyt-bf-bar.fbf-ended .fbf-over{display:block}
+#fyt-bf-bar .fbf-cta{position:relative;flex:none;order:9;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;border-radius:999px;overflow:hidden;font:800 12.5px/1 Unbounded,Arial Black,sans-serif;letter-spacing:.02em;color:#fff!important;text-decoration:none!important;white-space:nowrap;background:linear-gradient(180deg,#4C9BFF,var(--b1));box-shadow:0 0 0 0 rgba(52,140,252,.6),0 6px 18px rgba(7,103,247,.55),inset 0 1px 0 rgba(255,255,255,.35);animation:fbf-pulse 2.2s ease-out infinite;transition:transform .2s}
+#fyt-bf-bar .fbf-cta:hover{transform:translateY(-1px) scale(1.03)}
+#fyt-bf-bar .fbf-cta::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:fbf-sweep 3.2s ease-in-out infinite}
+#fyt-bf-bar .fbf-cta svg{width:15px;height:15px}
+#fyt-bf-bar .fbf-cs{display:none}
+#fyt-bf-bar :focus-visible{outline:2px solid #fff;outline-offset:2px}
+#fyt-bf-bar .fbf-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@keyframes fbf-aur{to{background-position:100% 0,0 0,0 0,0 0}}
+@keyframes fbf-sweep{0%,55%{left:-60%}100%{left:130%}}
+@keyframes fbf-run{to{background-position:-200% 0}}
+@keyframes fbf-tw{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
+@keyframes fbf-fan{0%,4%{transform:rotate(0)}18%,86%{transform:rotate(var(--r))}96%,100%{transform:rotate(0)}}
+@keyframes fbf-pop{0%,70%,100%{transform:none;text-shadow:none}80%{transform:scale(1.18);text-shadow:0 0 14px #6FB2FF}}
+@keyframes fbf-dig{from{transform:translateY(-35%);opacity:.25}to{transform:none;opacity:1}}
+@keyframes fbf-pulse{0%{box-shadow:0 0 0 0 rgba(52,140,252,.6),0 6px 18px rgba(7,103,247,.55),inset 0 1px 0 rgba(255,255,255,.35)}70%,100%{box-shadow:0 0 0 12px rgba(52,140,252,0),0 6px 18px rgba(7,103,247,.55),inset 0 1px 0 rgba(255,255,255,.35)}}
+@media (max-width:1359px){#fyt-bf-bar .fbf-brand{display:none}#fyt-bf-bar .fbf-eb{display:block}#fyt-bf-bar .fbf-in{gap:18px}#fyt-bf-bar .fbf-head{font-size:19px}#fyt-bf-bar .fbf-off{font-size:14px;height:24px}}
+@media (max-width:1180px){#fyt-bf-bar .fbf-cards,#fyt-bf-bar .fbf-ends,#fyt-bf-bar .fbf-code span{display:none!important}#fyt-bf-bar .fbf-in{gap:16px}#fyt-bf-bar .fbf-t{width:36px}}
+@media (max-width:1023px){
+#fyt-bf-bar{height:108px}
+#fyt-bf-bar .fbf-t{height:36px}#fyt-bf-bar .fbf-t small{margin-top:3px}#fyt-bf-bar .fbf-code{height:36px}
+#fyt-bf-bar .fbf-in{flex-wrap:wrap;align-content:center;gap:8px 14px;max-width:660px;padding:8px 12px}
+#fyt-bf-bar .fbf-br{display:block;flex:0 0 100%;height:0}
+#fyt-bf-bar .fbf-cta{order:0}
+#fyt-bf-bar .fbf-cards{display:block!important}
+#fyt-bf-bar .fbf-offer{flex:1 1 0;min-width:0}
+#fyt-bf-bar .fbf-eb{display:none}
+#fyt-bf-bar .fbf-code{margin-right:auto}
 }
-@media (max-width:920px){
-  #fyt-dw-bar .fyt-dw-inner{padding:10px 64px 20px}
-  #fyt-dw-bar .fyt-dw-dA,#fyt-dw-bar .fyt-dw-dB{display:none}
-  #fyt-dw-bar .fyt-dw-hdiya{display:block}
-  #fyt-dw-bar .fyt-dw-lA{left:12px;width:36px}#fyt-dw-bar .fyt-dw-lB{right:12px;width:36px}
-  #fyt-dw-bar .fyt-dw-ends{display:none}
-  #fyt-dw-bar .fyt-dw-petal{display:none}
+@media (max-width:600px){
+#fyt-bf-bar{height:98px}
+#fyt-bf-bar .fbf-in{gap:7px 10px;padding:8px 10px}
+#fyt-bf-bar .fbf-cards{width:40px;height:38px}#fyt-bf-bar .fbf-cards i{left:11px;top:4px;width:17px;height:26px}
+#fyt-bf-bar .fbf-cta{height:38px;padding:0 15px;font-size:12px}#fyt-bf-bar .fbf-cl{display:none}#fyt-bf-bar .fbf-cs{display:inline}
+#fyt-bf-bar .fbf-code{height:34px;padding:0 10px}#fyt-bf-bar .fbf-code b{font-size:13px}
+#fyt-bf-bar .fbf-head,#fyt-bf-bar .fbf-tick{display:none}
+#fyt-bf-bar .fbf-slides{display:grid;height:38px}
+#fyt-bf-bar .fbf-slides small{display:block;font:700 9px/1 Inter,Arial,sans-serif;letter-spacing:.1em;color:#A9C4F0;margin:2px 0 5px}
+#fyt-bf-bar .fbf-slides em{display:block;font:800 17px/1.15 Unbounded,Arial Black,sans-serif;font-style:normal;letter-spacing:-.02em}
+#fyt-bf-bar .fbf-tiles{gap:3px}#fyt-bf-bar .fbf-t{width:32px;height:34px;border-radius:7px}#fyt-bf-bar .fbf-t b{font-size:13px}#fyt-bf-bar .fbf-t small{font-size:7px;margin-top:3px}
 }
-/* ---- mobile: headline row + one action row ---- */
-@media (max-width:640px){
-  #fyt-dw-bar{min-height:0}
-  #fyt-dw-bar .fyt-dw-inner{gap:6px 6px;padding:7px 10px 15px;min-height:0;flex-wrap:wrap}
-  #fyt-dw-bar .fyt-dw-msg{padding:0 38px}
-  #fyt-dw-bar .fyt-dw-hdiya{display:none}
-  #fyt-dw-bar .fyt-dw-text{gap:2px}
-  #fyt-dw-bar .fyt-dw-eyebrow{font-size:11px;letter-spacing:.26em;gap:6px}
-  #fyt-dw-bar .fyt-dw-eyebrow::before,#fyt-dw-bar .fyt-dw-eyebrow::after{width:16px}
-  #fyt-dw-bar .fyt-dw-head{font-size:clamp(13px,3.75vw,16px);line-height:18px}
-  #fyt-dw-bar .fyt-dw-spk1{right:-12px}
-  #fyt-dw-bar .fyt-dw-ticket{height:42px;width:auto;min-width:0;flex:1 1 0}
-  #fyt-dw-bar .fyt-dw-stub{padding:0 6px 0 11px;font-size:0;gap:0}
-  #fyt-dw-bar .fyt-dw-codewrap{padding:0 11px 0 7px;gap:5px}
-  #fyt-dw-bar .fyt-dw-code{font-size:15px;letter-spacing:.02em}
-  #fyt-dw-bar .fyt-dw-copyico{width:13px;height:13px}
-  #fyt-dw-bar .fyt-dw-timer{gap:0}
-  #fyt-dw-bar .fyt-dw-ends{display:none}
-  #fyt-dw-bar .fyt-dw-tiles{gap:3px}
-  #fyt-dw-bar .fyt-dw-tile{width:31px;height:42px;border-radius:7px}
-  #fyt-dw-bar .fyt-dw-tile::after{border-radius:7px}
-  #fyt-dw-bar .fyt-dw-num{font-size:15px}
-  #fyt-dw-bar .fyt-dw-lbl{font-size:11px;letter-spacing:0;margin-top:2px;line-height:1}
-  #fyt-dw-bar .fyt-dw-lbl .fyt-dw-lf{display:none}#fyt-dw-bar .fyt-dw-lbl .fyt-dw-ls{display:inline}
-  #fyt-dw-bar .fyt-dw-cta{height:42px;padding:0 13px;font-size:13px;gap:4px}
-  #fyt-dw-bar .fyt-dw-cta .fyt-dw-ctal{display:none}#fyt-dw-bar .fyt-dw-cta .fyt-dw-ctas{display:inline}
-  #fyt-dw-bar .fyt-dw-cta svg{width:13px;height:13px}
-  #fyt-dw-bar .fyt-dw-over{height:42px;padding:0 12px;font-size:12px}
-  #fyt-dw-bar .fyt-dw-lA{left:6px;width:24px}#fyt-dw-bar .fyt-dw-lB{right:6px;width:24px}
-  #fyt-dw-bar .fyt-dw-lhalo{opacity:.7}
-  #fyt-dw-bar .fyt-dw-rangoli{width:130px;height:130px;margin-top:-65px;left:-50px}
-  #fyt-dw-bar .fyt-dw-rangoli--r{left:auto;right:-50px}
-  #fyt-dw-bar .fyt-dw-rangoli--c{display:none}
-  #fyt-dw-bar .fyt-dw-bokeh:nth-of-type(n+4){display:none}
+@media (max-width:370px){#fyt-bf-bar .fbf-code svg{display:none}#fyt-bf-bar .fbf-t{width:29px}#fyt-bf-bar .fbf-in{padding:8px}}
+/* ---- thin mode while scrolling ---- */
+#fyt-bf-bar{transition:height .28s ease}
+#fyt-bf-bar.fbf-thin{height:44px}
+#fyt-bf-bar.fbf-thin .fbf-brand,#fyt-bf-bar.fbf-thin .fbf-cards,#fyt-bf-bar.fbf-thin .fbf-tick,#fyt-bf-bar.fbf-thin .fbf-eb,#fyt-bf-bar.fbf-thin .fbf-ends,#fyt-bf-bar.fbf-thin .fbf-t small,#fyt-bf-bar.fbf-thin .fbf-code span,#fyt-bf-bar.fbf-thin .fbf-br{display:none!important}
+#fyt-bf-bar.fbf-thin .fbf-in{flex-wrap:nowrap;gap:14px;padding-top:0;padding-bottom:0}
+#fyt-bf-bar.fbf-thin .fbf-head{font-size:15px;gap:7px}
+#fyt-bf-bar.fbf-thin .fbf-off{height:21px;font-size:12px;padding:0 8px;border-radius:6px}
+#fyt-bf-bar.fbf-thin .fbf-code{height:28px;padding:0 9px}
+#fyt-bf-bar.fbf-thin .fbf-code b{font-size:12px}
+#fyt-bf-bar.fbf-thin .fbf-t{height:28px;width:32px;border-radius:6px}
+#fyt-bf-bar.fbf-thin .fbf-t b{font-size:13px}
+#fyt-bf-bar.fbf-thin .fbf-cta{height:30px;padding:0 14px;font-size:11px;order:9}
+#fyt-bf-bar.fbf-thin .fbf-cl{display:none}#fyt-bf-bar.fbf-thin .fbf-cs{display:inline}
+@media (max-width:1023px){#fyt-bf-bar.fbf-thin .fbf-code{display:none}#fyt-bf-bar.fbf-thin .fbf-offer{flex:0 1 auto}}
+@media (max-width:600px){
+#fyt-bf-bar.fbf-thin{height:42px}
+#fyt-bf-bar.fbf-thin .fbf-in{gap:8px;padding:0 8px;justify-content:space-between}
+#fyt-bf-bar.fbf-thin .fbf-slides{height:20px}
+#fyt-bf-bar.fbf-thin .fbf-slides small{display:none}
+#fyt-bf-bar.fbf-thin .fbf-slides em{font-size:13px}
+#fyt-bf-bar.fbf-thin .fbf-offer{flex:1 1 0}
+#fyt-bf-bar.fbf-thin .fbf-t{width:27px;height:26px}#fyt-bf-bar.fbf-thin .fbf-t b{font-size:11.5px}
+#fyt-bf-bar.fbf-thin .fbf-cta{height:28px;padding:0 11px}
 }
-@media (max-width:370px){
-  #fyt-dw-bar .fyt-dw-copyico{display:none}
-  #fyt-dw-bar .fyt-dw-tile{width:29px}
-  #fyt-dw-bar .fyt-dw-code{font-size:14px;letter-spacing:0}
-  #fyt-dw-bar .fyt-dw-cta{padding:0 11px}
-  #fyt-dw-bar .fyt-dw-msg{padding:0 32px}
-}
-/* reduced motion: static, fully lit */
-@media (prefers-reduced-motion:reduce){
-  #fyt-dw-bar *,#fyt-dw-bar *::before,#fyt-dw-bar *::after{animation:none!important;transition:none!important}
-  #fyt-dw-bar .fyt-dw-spk{opacity:.9}
-  #fyt-dw-bar .fyt-dw-ticket::after,#fyt-dw-bar .fyt-dw-cta::after,#fyt-dw-bar .fyt-dw-hshine,#fyt-dw-bar .fyt-dw-petal,#fyt-dw-bar .fyt-dw-emb{opacity:0}
-  #fyt-dw-bar .fyt-dw-bokeh{opacity:.5}
-  #fyt-dw-bar .fyt-dw-fx{display:none}
-}
-
-#fyt-dw-bar{transition:min-height .25s ease}
-#fyt-dw-bar.fyt-dw-thin{min-height:0}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-inner{min-height:46px;padding:5px 96px 11px;gap:14px;flex-wrap:nowrap}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-msg{flex:0 1 auto}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-text{flex-direction:row;align-items:center;gap:10px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-eyebrow{font-size:10px;letter-spacing:.22em}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-eyebrow::before,#fyt-dw-bar.fyt-dw-thin .fyt-dw-eyebrow::after{display:none}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-head{font-size:15px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-lantern,#fyt-dw-bar.fyt-dw-thin .fyt-dw-diya,#fyt-dw-bar.fyt-dw-thin .fyt-dw-hdiya,#fyt-dw-bar.fyt-dw-thin .fyt-dw-petal,#fyt-dw-bar.fyt-dw-thin .fyt-dw-bokeh,#fyt-dw-bar.fyt-dw-thin .fyt-dw-rangoli--c{display:none}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-rangoli{width:110px;height:110px;margin-top:-55px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-ticket{height:30px;width:152px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-stub{padding:0 7px 0 10px;font-size:7px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-stub svg{width:10px;height:10px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-code{font-size:13px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-copyico{width:12px;height:12px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-ends{display:none}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-timer{flex-direction:row}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-tiles{gap:4px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-tile{width:31px;height:30px;border-radius:6px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-num{font-size:13px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-lbl{font-size:6px;margin-top:2px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-cta{height:30px;padding:0 14px;font-size:12px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-cta svg{width:12px;height:12px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-lights{height:10px}
-#fyt-dw-bar.fyt-dw-thin .fyt-dw-bulb{top:3px;width:4px;height:5px}
-@media (max-width:1259px){
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-inner{flex-wrap:nowrap;gap:10px;padding:5px 44px 11px 40px}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-msg{flex:0 1 auto}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-head{font-size:13px}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-ticket{width:132px}
-}
-@media (max-width:820px){ #fyt-dw-bar.fyt-dw-thin .fyt-dw-cta{display:none} }
-@media (max-width:640px){
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-inner{gap:8px;padding:4px 34px 10px 10px;justify-content:space-between}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-msg{flex:1 1 auto;min-width:0;justify-content:flex-start;padding:0}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-text{flex-direction:column;align-items:flex-start;gap:1px}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-eyebrow{align-self:flex-start;font-size:8.5px;padding-left:0}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-head{font-size:11px}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-ticket,#fyt-dw-bar.fyt-dw-thin .fyt-dw-tile[data-u="s"]{display:none}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-tiles{gap:3px}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-tile{width:27px;height:27px;border-radius:5px}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-num{font-size:11.5px}
-  #fyt-dw-bar.fyt-dw-thin .fyt-dw-lbl{font-size:5.5px}
-}
-@media (max-width:640px){
-  /* top of the page on phones: the offer headline leads, the code, countdown and button stay small */
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-inner{padding:4px 10px 8px;gap:3px 5px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-msg{padding:0 30px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-text{gap:1px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-eyebrow{font-size:9px;letter-spacing:.26em;gap:5px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-eyebrow::before,#fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-eyebrow::after{width:12px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-head{font-size:clamp(14px,4.3vw,17.5px)}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-ticket{height:26px;border-radius:6px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-stub{padding:0 6px 0 9px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-stub svg{width:10px;height:10px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-code{font-size:12.5px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-copyico{width:11px;height:11px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-tiles{gap:3px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-tile{width:26px;height:26px;border-radius:5px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-num{font-size:11.5px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-lbl{font-size:5.5px;margin-top:1px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-cta{height:26px;padding:0 11px;font-size:11.5px;gap:5px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-cta svg{width:11px;height:11px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-lights{height:8px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-bulb{top:2px;width:4px;height:5px}
-}
-@media (min-width:641px){
-  #fyt-dw-bar:not(.fyt-dw-thin){min-height:84px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-inner{min-height:84px;padding-top:6px;padding-bottom:15px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-ticket{height:44px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-tile{height:40px}
-  #fyt-dw-bar:not(.fyt-dw-thin) .fyt-dw-cta{height:40px}
-}
+@media (prefers-reduced-motion:reduce){#fyt-bf-bar *,#fyt-bf-bar *::after{animation:none!important;transition:none!important}#fyt-bf-bar .fbf-sweep,#fyt-bf-bar .fbf-spk{display:none}#fyt-bf-bar .fbf-cards i{transform:rotate(var(--r))}}
 </style>
-
-<div id="fyt-dw-bar" class="fyt-dw-bar" role="region" aria-label="Diwali Special offer">
-  <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs>
-<linearGradient id="fyt-dw-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF1B8"/><stop offset=".5" stop-color="#E6B54A"/><stop offset="1" stop-color="#A9741A"/></linearGradient>
-<linearGradient id="fyt-dw-kp1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF7A2E"/><stop offset=".55" stop-color="#E0262E"/><stop offset="1" stop-color="#8E1230"/></linearGradient>
-<linearGradient id="fyt-dw-kp2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF5C9A"/><stop offset=".6" stop-color="#C2185B"/><stop offset="1" stop-color="#7A0E3A"/></linearGradient>
-<linearGradient id="fyt-dw-kp3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC266"/><stop offset=".6" stop-color="#FF8A1F"/><stop offset="1" stop-color="#D9480F"/></linearGradient>
-<radialGradient id="fyt-dw-klight" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFFBE6"/><stop offset=".45" stop-color="#FFD36B" stop-opacity=".9"/><stop offset=".8" stop-color="#FF9933" stop-opacity=".3"/><stop offset="1" stop-color="#FF9933" stop-opacity="0"/></radialGradient>
-<linearGradient id="fyt-dw-clay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8843F"/><stop offset=".5" stop-color="#B5501F"/><stop offset="1" stop-color="#5E220B"/></linearGradient>
-<linearGradient id="fyt-dw-oil" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7A3A08"/><stop offset=".6" stop-color="#E9A23B"/><stop offset="1" stop-color="#FFE08A"/></linearGradient>
-<radialGradient id="fyt-dw-flo" cx=".5" cy=".72" r=".62"><stop offset="0" stop-color="#FFD27A"/><stop offset=".5" stop-color="#FF8A1F"/><stop offset="1" stop-color="#FF4D00" stop-opacity="0"/></radialGradient>
-<radialGradient id="fyt-dw-flm" cx=".5" cy=".75" r=".6"><stop offset="0" stop-color="#FFF8D6"/><stop offset=".6" stop-color="#FFD45A"/><stop offset="1" stop-color="#FFB020" stop-opacity=".3"/></radialGradient>
-<symbol id="fyt-dw-mandala" viewBox="-100 -100 200 200"><g fill="none" stroke="#FFC845" stroke-width="1"><circle r="96" stroke-dasharray="1.5 4"/><circle r="90"/><circle r="64" stroke-opacity=".7"/><path transform="rotate(0)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".12"/><path transform="rotate(22.5)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".35"/><path transform="rotate(45)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".12"/><path transform="rotate(67.5)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".35"/><path transform="rotate(90)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".12"/><path transform="rotate(112.5)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".35"/><path transform="rotate(135)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".12"/><path transform="rotate(157.5)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".35"/><path transform="rotate(180)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".12"/><path transform="rotate(202.5)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".35"/><path transform="rotate(225)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".12"/><path transform="rotate(247.5)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".35"/><path transform="rotate(270)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".12"/><path transform="rotate(292.5)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".35"/><path transform="rotate(315)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".12"/><path transform="rotate(337.5)" d="M0-64C10-72 11-84 0-90C-11-84-10-72 0-64Z" fill="#FF9933" fill-opacity=".35"/><circle transform="rotate(0)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(11.25)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(22.5)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(33.75)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(45)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(56.25)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(67.5)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(78.75)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(90)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(101.25)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(112.5)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(123.75)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(135)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(146.25)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(157.5)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(168.75)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(180)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(191.25)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(202.5)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(213.75)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(225)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(236.25)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(247.5)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(258.75)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(270)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(281.25)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(292.5)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(303.75)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(315)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(326.25)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(337.5)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><circle transform="rotate(348.75)" cy="-58" r="1.6" fill="#FFE29A" stroke="none"/><path transform="rotate(22.5)" d="M0-22C16-32 17-46 0-54C-17-46-16-32 0-22Z" fill="#E0262E" fill-opacity=".25"/><circle transform="rotate(22.5)" cy="-40" r="3" fill="#FFC845" fill-opacity=".6"/><path transform="rotate(67.5)" d="M0-22C16-32 17-46 0-54C-17-46-16-32 0-22Z" fill="#E0262E" fill-opacity=".25"/><circle transform="rotate(67.5)" cy="-40" r="3" fill="#FFC845" fill-opacity=".6"/><path transform="rotate(112.5)" d="M0-22C16-32 17-46 0-54C-17-46-16-32 0-22Z" fill="#E0262E" fill-opacity=".25"/><circle transform="rotate(112.5)" cy="-40" r="3" fill="#FFC845" fill-opacity=".6"/><path transform="rotate(157.5)" d="M0-22C16-32 17-46 0-54C-17-46-16-32 0-22Z" fill="#E0262E" fill-opacity=".25"/><circle transform="rotate(157.5)" cy="-40" r="3" fill="#FFC845" fill-opacity=".6"/><path transform="rotate(202.5)" d="M0-22C16-32 17-46 0-54C-17-46-16-32 0-22Z" fill="#E0262E" fill-opacity=".25"/><circle transform="rotate(202.5)" cy="-40" r="3" fill="#FFC845" fill-opacity=".6"/><path transform="rotate(247.5)" d="M0-22C16-32 17-46 0-54C-17-46-16-32 0-22Z" fill="#E0262E" fill-opacity=".25"/><circle transform="rotate(247.5)" cy="-40" r="3" fill="#FFC845" fill-opacity=".6"/><path transform="rotate(292.5)" d="M0-22C16-32 17-46 0-54C-17-46-16-32 0-22Z" fill="#E0262E" fill-opacity=".25"/><circle transform="rotate(292.5)" cy="-40" r="3" fill="#FFC845" fill-opacity=".6"/><path transform="rotate(337.5)" d="M0-22C16-32 17-46 0-54C-17-46-16-32 0-22Z" fill="#E0262E" fill-opacity=".25"/><circle transform="rotate(337.5)" cy="-40" r="3" fill="#FFC845" fill-opacity=".6"/><path transform="rotate(0)" d="M0-8C6-13 6-19 0-24C-6-19-6-13 0-8Z" fill="#FFE29A" fill-opacity=".4"/><path transform="rotate(45)" d="M0-8C6-13 6-19 0-24C-6-19-6-13 0-8Z" fill="#FFE29A" fill-opacity=".4"/><path transform="rotate(90)" d="M0-8C6-13 6-19 0-24C-6-19-6-13 0-8Z" fill="#FFE29A" fill-opacity=".4"/><path transform="rotate(135)" d="M0-8C6-13 6-19 0-24C-6-19-6-13 0-8Z" fill="#FFE29A" fill-opacity=".4"/><path transform="rotate(180)" d="M0-8C6-13 6-19 0-24C-6-19-6-13 0-8Z" fill="#FFE29A" fill-opacity=".4"/><path transform="rotate(225)" d="M0-8C6-13 6-19 0-24C-6-19-6-13 0-8Z" fill="#FFE29A" fill-opacity=".4"/><path transform="rotate(270)" d="M0-8C6-13 6-19 0-24C-6-19-6-13 0-8Z" fill="#FFE29A" fill-opacity=".4"/><path transform="rotate(315)" d="M0-8C6-13 6-19 0-24C-6-19-6-13 0-8Z" fill="#FFE29A" fill-opacity=".4"/><circle r="7" fill="#FF9933" fill-opacity=".6"/></g></symbol></defs></svg>
-  <span class="fyt-dw-veil" aria-hidden="true"></span>
-  <svg class="fyt-dw-rangoli fyt-dw-rangoli--c" aria-hidden="true" focusable="false"><use href="#fyt-dw-mandala"/></svg>
-  <svg class="fyt-dw-rangoli fyt-dw-rangoli--l" aria-hidden="true" focusable="false"><use href="#fyt-dw-mandala"/></svg>
-  <svg class="fyt-dw-rangoli fyt-dw-rangoli--r" aria-hidden="true" focusable="false"><use href="#fyt-dw-mandala"/></svg>
-  <span aria-hidden="true"><i class="fyt-dw-bokeh" style="left:18%;top:20%;width:16px;height:16px;animation-delay:-1s;animation-duration:9s"></i><i class="fyt-dw-bokeh" style="left:82%;top:30%;width:22px;height:22px;animation-delay:-4s;animation-duration:11s"></i><i class="fyt-dw-bokeh" style="left:33%;top:62%;width:12px;height:12px;animation-delay:-6s;animation-duration:8s"></i><i class="fyt-dw-bokeh" style="left:64%;top:14%;width:14px;height:14px;animation-delay:-2.5s;animation-duration:10s"></i><i class="fyt-dw-bokeh" style="left:48%;top:70%;width:10px;height:10px;animation-delay:-7s;animation-duration:9.5s"></i><i class="fyt-dw-bokeh" style="left:8%;top:58%;width:18px;height:18px;animation-delay:-3s;animation-duration:12s"></i><i class="fyt-dw-petal" style="left:4%;animation-delay:0s;animation-duration:11s"></i><i class="fyt-dw-petal" style="left:11%;animation-delay:-6s;animation-duration:13s"></i><i class="fyt-dw-petal" style="left:89%;animation-delay:-3s;animation-duration:12s"></i><i class="fyt-dw-petal" style="left:96%;animation-delay:-8.5s;animation-duration:10s"></i></span>
-  <canvas class="fyt-dw-fx" aria-hidden="true"></canvas>
-  <span class="fyt-dw-lantern fyt-dw-lA" aria-hidden="true"><span class="fyt-dw-lhalo"></span><svg viewBox="0 0 60 124" aria-hidden="true" focusable="false"><path d="M30 -2v9" stroke="#E6B54A" stroke-width="1.3"/><circle cx="30" cy="9" r="2.4" fill="none" stroke="#E6B54A" stroke-width="1.2"/><path d="M21 11h18l4 5H17z" fill="url(#fyt-dw-gold)"/><path d="M18 16h24l14 20v24L42 80H18L4 60V36z" fill="#3E0918"/><ellipse class="fyt-dw-kin" cx="30" cy="48" rx="25" ry="31" fill="url(#fyt-dw-klight)"/><path d="M18 16h8l-4.7 20H4z" fill="url(#fyt-dw-kp1)" opacity=".8"/><path d="M26 16h8l4.7 20H21.3z" fill="url(#fyt-dw-kp3)" opacity=".72"/><path d="M34 16h8l14 20H38.7z" fill="url(#fyt-dw-kp1)" opacity=".8"/><path d="M4 60h17.3L26 80h-8z" fill="url(#fyt-dw-kp1)" opacity=".8"/><path d="M21.3 60h17.4L34 80h-8z" fill="url(#fyt-dw-kp3)" opacity=".72"/><path d="M38.7 60H56L42 80h-8z" fill="url(#fyt-dw-kp1)" opacity=".8"/><rect x="4" y="36" width="13" height="24" fill="url(#fyt-dw-kp2)" opacity=".82"/><rect x="17" y="36" width="13" height="24" fill="url(#fyt-dw-kp3)" opacity=".66"/><rect x="30" y="36" width="13" height="24" fill="url(#fyt-dw-kp3)" opacity=".66"/><rect x="43" y="36" width="13" height="24" fill="url(#fyt-dw-kp2)" opacity=".82"/><path d="M10.5 41.5l3 6.5-3 6.5-3-6.5z" fill="#FFF4C9"/><circle cx="10.5" cy="39.6" r=".9" fill="#FFF4C9"/><circle cx="10.5" cy="56.4" r=".9" fill="#FFF4C9"/><path d="M23.5 41.5l3 6.5-3 6.5-3-6.5z" fill="#FFF4C9"/><circle cx="23.5" cy="39.6" r=".9" fill="#FFF4C9"/><circle cx="23.5" cy="56.4" r=".9" fill="#FFF4C9"/><path d="M36.5 41.5l3 6.5-3 6.5-3-6.5z" fill="#FFF4C9"/><circle cx="36.5" cy="39.6" r=".9" fill="#FFF4C9"/><circle cx="36.5" cy="56.4" r=".9" fill="#FFF4C9"/><path d="M49.5 41.5l3 6.5-3 6.5-3-6.5z" fill="#FFF4C9"/><circle cx="49.5" cy="39.6" r=".9" fill="#FFF4C9"/><circle cx="49.5" cy="56.4" r=".9" fill="#FFF4C9"/><circle cx="13" cy="29" r="1.7" fill="#FFE9A3"/><circle cx="30" cy="23" r="1.7" fill="#FFE9A3"/><circle cx="47" cy="29" r="1.7" fill="#FFE9A3"/><circle cx="13" cy="67" r="1.7" fill="#FFE9A3"/><circle cx="30" cy="73" r="1.7" fill="#FFE9A3"/><circle cx="47" cy="67" r="1.7" fill="#FFE9A3"/><path d="M22 29.5h16M22 66.5h16" stroke="#FFE9A3" stroke-width=".8" stroke-dasharray="1.5 1.5"/><path d="M18 16h24l14 20v24L42 80H18L4 60V36z M26 16l-4.7 20 M34 16l4.7 20 M21.3 60L26 80 M38.7 60L34 80 M17 36v24 M30 36v24 M43 36v24" fill="none" stroke="url(#fyt-dw-gold)" stroke-width="1.1" stroke-linejoin="round"/><rect x="3" y="34.6" width="54" height="2.6" rx="1" fill="url(#fyt-dw-gold)"/><rect x="3" y="58.8" width="54" height="2.6" rx="1" fill="url(#fyt-dw-gold)"/><path d="M4 37.2a2 2 0 0 0 4 0M8 37.2a2 2 0 0 0 4 0M12 37.2a2 2 0 0 0 4 0M16 37.2a2 2 0 0 0 4 0M20 37.2a2 2 0 0 0 4 0M24 37.2a2 2 0 0 0 4 0M28 37.2a2 2 0 0 0 4 0M32 37.2a2 2 0 0 0 4 0M36 37.2a2 2 0 0 0 4 0M40 37.2a2 2 0 0 0 4 0M44 37.2a2 2 0 0 0 4 0M48 37.2a2 2 0 0 0 4 0M52 37.2a2 2 0 0 0 4 0M4 58.8a2 2 0 0 1 4 0M8 58.8a2 2 0 0 1 4 0M12 58.8a2 2 0 0 1 4 0M16 58.8a2 2 0 0 1 4 0M20 58.8a2 2 0 0 1 4 0M24 58.8a2 2 0 0 1 4 0M28 58.8a2 2 0 0 1 4 0M32 58.8a2 2 0 0 1 4 0M36 58.8a2 2 0 0 1 4 0M40 58.8a2 2 0 0 1 4 0M44 58.8a2 2 0 0 1 4 0M48 58.8a2 2 0 0 1 4 0M52 58.8a2 2 0 0 1 4 0" fill="none" stroke="#F5CF6B" stroke-width=".7"/><path d="M18 80h24l-5 6H23z" fill="url(#fyt-dw-gold)"/><circle cx="30" cy="89" r="2.6" fill="url(#fyt-dw-gold)"/><g class="fyt-dw-tas"><ellipse cx="30" cy="92" rx="6" ry="2" fill="url(#fyt-dw-gold)"/><path d="M22.00 92v19" stroke="#E6B54A" stroke-width="1.1" stroke-linecap="round"/><path d="M24.67 92v22" stroke="#E0364F" stroke-width="1.1" stroke-linecap="round"/><path d="M27.34 92v25" stroke="#E6B54A" stroke-width="1.1" stroke-linecap="round"/><path d="M30.01 92v28" stroke="#E0364F" stroke-width="1.1" stroke-linecap="round"/><path d="M32.68 92v25" stroke="#E6B54A" stroke-width="1.1" stroke-linecap="round"/><path d="M35.35 92v22" stroke="#E0364F" stroke-width="1.1" stroke-linecap="round"/><path d="M38.02 92v19" stroke="#E6B54A" stroke-width="1.1" stroke-linecap="round"/><circle cx="30" cy="99" r="1.6" fill="#FF4F6E"/><circle cx="24.7" cy="98" r="1.1" fill="#FFE29A"/><circle cx="35.3" cy="98" r="1.1" fill="#FFE29A"/><path d="M4 61v11M56 61v11" stroke="#E6B54A" stroke-width=".9"/><circle cx="4" cy="73.5" r="1.9" fill="#FF4F6E"/><circle cx="56" cy="73.5" r="1.9" fill="#FF4F6E"/></g></svg></span>
-  <span class="fyt-dw-lantern fyt-dw-lB" aria-hidden="true"><span class="fyt-dw-lhalo"></span><svg viewBox="0 0 60 124" aria-hidden="true" focusable="false"><path d="M30 -2v9" stroke="#E6B54A" stroke-width="1.3"/><circle cx="30" cy="9" r="2.4" fill="none" stroke="#E6B54A" stroke-width="1.2"/><path d="M21 11h18l4 5H17z" fill="url(#fyt-dw-gold)"/><path d="M18 16h24l14 20v24L42 80H18L4 60V36z" fill="#3E0918"/><ellipse class="fyt-dw-kin" cx="30" cy="48" rx="25" ry="31" fill="url(#fyt-dw-klight)"/><path d="M18 16h8l-4.7 20H4z" fill="url(#fyt-dw-kp1)" opacity=".8"/><path d="M26 16h8l4.7 20H21.3z" fill="url(#fyt-dw-kp3)" opacity=".72"/><path d="M34 16h8l14 20H38.7z" fill="url(#fyt-dw-kp1)" opacity=".8"/><path d="M4 60h17.3L26 80h-8z" fill="url(#fyt-dw-kp1)" opacity=".8"/><path d="M21.3 60h17.4L34 80h-8z" fill="url(#fyt-dw-kp3)" opacity=".72"/><path d="M38.7 60H56L42 80h-8z" fill="url(#fyt-dw-kp1)" opacity=".8"/><rect x="4" y="36" width="13" height="24" fill="url(#fyt-dw-kp2)" opacity=".82"/><rect x="17" y="36" width="13" height="24" fill="url(#fyt-dw-kp3)" opacity=".66"/><rect x="30" y="36" width="13" height="24" fill="url(#fyt-dw-kp3)" opacity=".66"/><rect x="43" y="36" width="13" height="24" fill="url(#fyt-dw-kp2)" opacity=".82"/><path d="M10.5 41.5l3 6.5-3 6.5-3-6.5z" fill="#FFF4C9"/><circle cx="10.5" cy="39.6" r=".9" fill="#FFF4C9"/><circle cx="10.5" cy="56.4" r=".9" fill="#FFF4C9"/><path d="M23.5 41.5l3 6.5-3 6.5-3-6.5z" fill="#FFF4C9"/><circle cx="23.5" cy="39.6" r=".9" fill="#FFF4C9"/><circle cx="23.5" cy="56.4" r=".9" fill="#FFF4C9"/><path d="M36.5 41.5l3 6.5-3 6.5-3-6.5z" fill="#FFF4C9"/><circle cx="36.5" cy="39.6" r=".9" fill="#FFF4C9"/><circle cx="36.5" cy="56.4" r=".9" fill="#FFF4C9"/><path d="M49.5 41.5l3 6.5-3 6.5-3-6.5z" fill="#FFF4C9"/><circle cx="49.5" cy="39.6" r=".9" fill="#FFF4C9"/><circle cx="49.5" cy="56.4" r=".9" fill="#FFF4C9"/><circle cx="13" cy="29" r="1.7" fill="#FFE9A3"/><circle cx="30" cy="23" r="1.7" fill="#FFE9A3"/><circle cx="47" cy="29" r="1.7" fill="#FFE9A3"/><circle cx="13" cy="67" r="1.7" fill="#FFE9A3"/><circle cx="30" cy="73" r="1.7" fill="#FFE9A3"/><circle cx="47" cy="67" r="1.7" fill="#FFE9A3"/><path d="M22 29.5h16M22 66.5h16" stroke="#FFE9A3" stroke-width=".8" stroke-dasharray="1.5 1.5"/><path d="M18 16h24l14 20v24L42 80H18L4 60V36z M26 16l-4.7 20 M34 16l4.7 20 M21.3 60L26 80 M38.7 60L34 80 M17 36v24 M30 36v24 M43 36v24" fill="none" stroke="url(#fyt-dw-gold)" stroke-width="1.1" stroke-linejoin="round"/><rect x="3" y="34.6" width="54" height="2.6" rx="1" fill="url(#fyt-dw-gold)"/><rect x="3" y="58.8" width="54" height="2.6" rx="1" fill="url(#fyt-dw-gold)"/><path d="M4 37.2a2 2 0 0 0 4 0M8 37.2a2 2 0 0 0 4 0M12 37.2a2 2 0 0 0 4 0M16 37.2a2 2 0 0 0 4 0M20 37.2a2 2 0 0 0 4 0M24 37.2a2 2 0 0 0 4 0M28 37.2a2 2 0 0 0 4 0M32 37.2a2 2 0 0 0 4 0M36 37.2a2 2 0 0 0 4 0M40 37.2a2 2 0 0 0 4 0M44 37.2a2 2 0 0 0 4 0M48 37.2a2 2 0 0 0 4 0M52 37.2a2 2 0 0 0 4 0M4 58.8a2 2 0 0 1 4 0M8 58.8a2 2 0 0 1 4 0M12 58.8a2 2 0 0 1 4 0M16 58.8a2 2 0 0 1 4 0M20 58.8a2 2 0 0 1 4 0M24 58.8a2 2 0 0 1 4 0M28 58.8a2 2 0 0 1 4 0M32 58.8a2 2 0 0 1 4 0M36 58.8a2 2 0 0 1 4 0M40 58.8a2 2 0 0 1 4 0M44 58.8a2 2 0 0 1 4 0M48 58.8a2 2 0 0 1 4 0M52 58.8a2 2 0 0 1 4 0" fill="none" stroke="#F5CF6B" stroke-width=".7"/><path d="M18 80h24l-5 6H23z" fill="url(#fyt-dw-gold)"/><circle cx="30" cy="89" r="2.6" fill="url(#fyt-dw-gold)"/><g class="fyt-dw-tas"><ellipse cx="30" cy="92" rx="6" ry="2" fill="url(#fyt-dw-gold)"/><path d="M22.00 92v19" stroke="#E6B54A" stroke-width="1.1" stroke-linecap="round"/><path d="M24.67 92v22" stroke="#E0364F" stroke-width="1.1" stroke-linecap="round"/><path d="M27.34 92v25" stroke="#E6B54A" stroke-width="1.1" stroke-linecap="round"/><path d="M30.01 92v28" stroke="#E0364F" stroke-width="1.1" stroke-linecap="round"/><path d="M32.68 92v25" stroke="#E6B54A" stroke-width="1.1" stroke-linecap="round"/><path d="M35.35 92v22" stroke="#E0364F" stroke-width="1.1" stroke-linecap="round"/><path d="M38.02 92v19" stroke="#E6B54A" stroke-width="1.1" stroke-linecap="round"/><circle cx="30" cy="99" r="1.6" fill="#FF4F6E"/><circle cx="24.7" cy="98" r="1.1" fill="#FFE29A"/><circle cx="35.3" cy="98" r="1.1" fill="#FFE29A"/><path d="M4 61v11M56 61v11" stroke="#E6B54A" stroke-width=".9"/><circle cx="4" cy="73.5" r="1.9" fill="#FF4F6E"/><circle cx="56" cy="73.5" r="1.9" fill="#FF4F6E"/></g></svg></span>
-  <span class="fyt-dw-diya fyt-dw-dA" aria-hidden="true"><svg viewBox="0 0 80 56" aria-hidden="true" focusable="false"><ellipse cx="34" cy="52.5" rx="16" ry="3" fill="#4A1A08"/><path d="M28 46h12l3 6.5H25z" fill="#7A3212"/><path d="M4 28C10 26 30 25.5 46 26C58 26.5 68 24 77 19C76 27 69 32 62 35C56 44 46 49 34 49C18 49 6 40 4 28Z" fill="url(#fyt-dw-clay)"/><ellipse cx="34" cy="28.6" rx="27" ry="3.4" fill="#3B1604"/><ellipse cx="35" cy="28.2" rx="24" ry="2.2" fill="url(#fyt-dw-oil)" opacity=".9"/><path d="M9 35.5C20 40 50 40 63 34.5" fill="none" stroke="#C81D3A" stroke-width="2.6"/><path d="M9 35.5C20 40 50 40 63 34.5" fill="none" stroke="#FFE29A" stroke-width="1" stroke-dasharray=".5 3.2" stroke-linecap="round"/><path d="M15 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="19" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M23 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="27" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M31 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="35" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M39 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="43" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M47 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="51" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M10 31.5C18 34 28 34.6 38 34.4" stroke="rgba(255,226,190,.35)" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M4 28C10 26 30 25.5 46 26C58 26.5 68 24 77 19" fill="none" stroke="url(#fyt-dw-gold)" stroke-width="1.6" stroke-linecap="round"/><path d="M72.5 21.5l2.5-3.5" stroke="#2A1203" stroke-width="1.8" stroke-linecap="round"/></svg><span class="fyt-dw-flame"><span class="fyt-dw-dhalo"></span><i class="fyt-dw-heat"></i><svg class="fyt-dw-fsvg" viewBox="0 0 20 34" aria-hidden="true" focusable="false"><g class="fyt-dw-fo"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" fill="url(#fyt-dw-flo)"/></g><g class="fyt-dw-fm"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" transform="translate(4 9.5) scale(.6 .72)" fill="url(#fyt-dw-flm)"/></g><g class="fyt-dw-fc"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" transform="translate(6.6 19.5) scale(.34 .42)" fill="#FFFDF4"/></g><ellipse cx="10" cy="32.2" rx="2.6" ry="1.4" fill="#6FB6FF" opacity=".75"/></svg><i class="fyt-dw-emb"></i><i class="fyt-dw-emb"></i><i class="fyt-dw-emb"></i></span></span>
-  <span class="fyt-dw-diya fyt-dw-dB fyt-dw-flip" aria-hidden="true"><svg viewBox="0 0 80 56" aria-hidden="true" focusable="false"><ellipse cx="34" cy="52.5" rx="16" ry="3" fill="#4A1A08"/><path d="M28 46h12l3 6.5H25z" fill="#7A3212"/><path d="M4 28C10 26 30 25.5 46 26C58 26.5 68 24 77 19C76 27 69 32 62 35C56 44 46 49 34 49C18 49 6 40 4 28Z" fill="url(#fyt-dw-clay)"/><ellipse cx="34" cy="28.6" rx="27" ry="3.4" fill="#3B1604"/><ellipse cx="35" cy="28.2" rx="24" ry="2.2" fill="url(#fyt-dw-oil)" opacity=".9"/><path d="M9 35.5C20 40 50 40 63 34.5" fill="none" stroke="#C81D3A" stroke-width="2.6"/><path d="M9 35.5C20 40 50 40 63 34.5" fill="none" stroke="#FFE29A" stroke-width="1" stroke-dasharray=".5 3.2" stroke-linecap="round"/><path d="M15 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="19" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M23 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="27" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M31 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="35" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M39 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="43" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M47 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="51" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M10 31.5C18 34 28 34.6 38 34.4" stroke="rgba(255,226,190,.35)" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M4 28C10 26 30 25.5 46 26C58 26.5 68 24 77 19" fill="none" stroke="url(#fyt-dw-gold)" stroke-width="1.6" stroke-linecap="round"/><path d="M72.5 21.5l2.5-3.5" stroke="#2A1203" stroke-width="1.8" stroke-linecap="round"/></svg><span class="fyt-dw-flame"><span class="fyt-dw-dhalo"></span><i class="fyt-dw-heat"></i><svg class="fyt-dw-fsvg" viewBox="0 0 20 34" aria-hidden="true" focusable="false"><g class="fyt-dw-fo"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" fill="url(#fyt-dw-flo)"/></g><g class="fyt-dw-fm"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" transform="translate(4 9.5) scale(.6 .72)" fill="url(#fyt-dw-flm)"/></g><g class="fyt-dw-fc"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" transform="translate(6.6 19.5) scale(.34 .42)" fill="#FFFDF4"/></g><ellipse cx="10" cy="32.2" rx="2.6" ry="1.4" fill="#6FB6FF" opacity=".75"/></svg><i class="fyt-dw-emb"></i><i class="fyt-dw-emb"></i><i class="fyt-dw-emb"></i></span></span>
-
-  <div class="fyt-dw-inner">
-    <div class="fyt-dw-msg">
-      <span class="fyt-dw-hdiya" aria-hidden="true"><svg viewBox="0 0 80 56" aria-hidden="true" focusable="false"><ellipse cx="34" cy="52.5" rx="16" ry="3" fill="#4A1A08"/><path d="M28 46h12l3 6.5H25z" fill="#7A3212"/><path d="M4 28C10 26 30 25.5 46 26C58 26.5 68 24 77 19C76 27 69 32 62 35C56 44 46 49 34 49C18 49 6 40 4 28Z" fill="url(#fyt-dw-clay)"/><ellipse cx="34" cy="28.6" rx="27" ry="3.4" fill="#3B1604"/><ellipse cx="35" cy="28.2" rx="24" ry="2.2" fill="url(#fyt-dw-oil)" opacity=".9"/><path d="M9 35.5C20 40 50 40 63 34.5" fill="none" stroke="#C81D3A" stroke-width="2.6"/><path d="M9 35.5C20 40 50 40 63 34.5" fill="none" stroke="#FFE29A" stroke-width="1" stroke-dasharray=".5 3.2" stroke-linecap="round"/><path d="M15 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="19" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M23 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="27" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M31 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="35" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M39 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="43" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M47 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="51" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M10 31.5C18 34 28 34.6 38 34.4" stroke="rgba(255,226,190,.35)" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M4 28C10 26 30 25.5 46 26C58 26.5 68 24 77 19" fill="none" stroke="url(#fyt-dw-gold)" stroke-width="1.6" stroke-linecap="round"/><path d="M72.5 21.5l2.5-3.5" stroke="#2A1203" stroke-width="1.8" stroke-linecap="round"/></svg><span class="fyt-dw-flame"><span class="fyt-dw-dhalo"></span><i class="fyt-dw-heat"></i><svg class="fyt-dw-fsvg" viewBox="0 0 20 34" aria-hidden="true" focusable="false"><g class="fyt-dw-fo"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" fill="url(#fyt-dw-flo)"/></g><g class="fyt-dw-fm"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" transform="translate(4 9.5) scale(.6 .72)" fill="url(#fyt-dw-flm)"/></g><g class="fyt-dw-fc"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" transform="translate(6.6 19.5) scale(.34 .42)" fill="#FFFDF4"/></g><ellipse cx="10" cy="32.2" rx="2.6" ry="1.4" fill="#6FB6FF" opacity=".75"/></svg><i class="fyt-dw-emb"></i><i class="fyt-dw-emb"></i><i class="fyt-dw-emb"></i></span></span>
-      <div class="fyt-dw-text" role="text" aria-label="Diwali Special: 45% Off + Buy 1 Get 3 Instantly">
-        <span class="fyt-dw-eyebrow" aria-hidden="true"><span class="fyt-dw-eyetxt">Diwali Special</span><i class="fyt-dw-spk fyt-dw-spk1"></i></span>
-        <span class="fyt-dw-head" aria-hidden="true"><span class="fyt-dw-hbase"><em>45% Off</em> + <em>Buy 1 Get 3</em> Instantly</span><span class="fyt-dw-hshine"><span><em>45% Off</em> + <em>Buy 1 Get 3</em> Instantly</span></span><i class="fyt-dw-spk fyt-dw-spk2"></i><i class="fyt-dw-spk fyt-dw-spk3"></i></span>
-      </div>
-      <span class="fyt-dw-hdiya fyt-dw-flip" aria-hidden="true"><svg viewBox="0 0 80 56" aria-hidden="true" focusable="false"><ellipse cx="34" cy="52.5" rx="16" ry="3" fill="#4A1A08"/><path d="M28 46h12l3 6.5H25z" fill="#7A3212"/><path d="M4 28C10 26 30 25.5 46 26C58 26.5 68 24 77 19C76 27 69 32 62 35C56 44 46 49 34 49C18 49 6 40 4 28Z" fill="url(#fyt-dw-clay)"/><ellipse cx="34" cy="28.6" rx="27" ry="3.4" fill="#3B1604"/><ellipse cx="35" cy="28.2" rx="24" ry="2.2" fill="url(#fyt-dw-oil)" opacity=".9"/><path d="M9 35.5C20 40 50 40 63 34.5" fill="none" stroke="#C81D3A" stroke-width="2.6"/><path d="M9 35.5C20 40 50 40 63 34.5" fill="none" stroke="#FFE29A" stroke-width="1" stroke-dasharray=".5 3.2" stroke-linecap="round"/><path d="M15 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="19" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M23 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="27" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M31 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="35" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M39 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="43" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M47 46q2.4-4 0-7.5q-2.4 3.5 0 7.5z" fill="#FFE29A"/><circle cx="51" cy="43" r=".9" fill="#7CFFB2" opacity=".8"/><path d="M10 31.5C18 34 28 34.6 38 34.4" stroke="rgba(255,226,190,.35)" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M4 28C10 26 30 25.5 46 26C58 26.5 68 24 77 19" fill="none" stroke="url(#fyt-dw-gold)" stroke-width="1.6" stroke-linecap="round"/><path d="M72.5 21.5l2.5-3.5" stroke="#2A1203" stroke-width="1.8" stroke-linecap="round"/></svg><span class="fyt-dw-flame"><span class="fyt-dw-dhalo"></span><i class="fyt-dw-heat"></i><svg class="fyt-dw-fsvg" viewBox="0 0 20 34" aria-hidden="true" focusable="false"><g class="fyt-dw-fo"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" fill="url(#fyt-dw-flo)"/></g><g class="fyt-dw-fm"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" transform="translate(4 9.5) scale(.6 .72)" fill="url(#fyt-dw-flm)"/></g><g class="fyt-dw-fc"><path d="M10 0C12 8 20 14 20 24A10 10 0 0 1 0 24C0 14 8 8 10 0Z" transform="translate(6.6 19.5) scale(.34 .42)" fill="#FFFDF4"/></g><ellipse cx="10" cy="32.2" rx="2.6" ry="1.4" fill="#6FB6FF" opacity=".75"/></svg><i class="fyt-dw-emb"></i><i class="fyt-dw-emb"></i><i class="fyt-dw-emb"></i></span></span>
+<div id="fyt-bf-bar" role="region" aria-label="Black Friday offer">
+  <div class="fbf-bg" aria-hidden="true"></div><div class="fbf-grid" aria-hidden="true"></div><div class="fbf-sweep" aria-hidden="true"></div>
+  <div class="fbf-in">
+    <div class="fbf-brand" aria-hidden="true"><span class="fbf-bk">BLACK</span><span class="fbf-fr">FRIDAY</span></div>
+    <div class="fbf-cards" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="fbf-offer">
+      <p class="fbf-sr fbf-full"></p>
+      <div class="fbf-eb" aria-hidden="true"><span class="fbf-bk">BLACK</span> <span class="fbf-fr">FRIDAY</span></div>
+      <div class="fbf-head" aria-hidden="true"><span>BUY <span class="fbf-g">2</span> GET <span class="fbf-g fbf-n5">5</span></span><span>+</span><span class="fbf-off">50% OFF</span></div>
+      <div class="fbf-tick" aria-hidden="true"></div>
+      <div class="fbf-slides" aria-hidden="true"></div>
     </div>
-
-    <button type="button" class="fyt-dw-ticket" aria-label="Copy coupon code Diwali45">
-      <span class="fyt-dw-stub" aria-hidden="true">
-        <svg class="fyt-dw-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
-        <svg class="fyt-dw-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-        <span class="fyt-dw-stubtxt">Code</span>
-      </span>
-      <span class="fyt-dw-codewrap" aria-hidden="true">
-        <span class="fyt-dw-code">Diwali45</span>
-        <svg class="fyt-dw-copyico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      </span>
-    </button>
-
-    <div class="fyt-dw-timer" role="timer">
-      <span class="fyt-dw-ends" aria-hidden="true">Offer ends in</span>
-      <div class="fyt-dw-tiles" aria-hidden="true">
-        <span class="fyt-dw-tile" data-u="d"><b class="fyt-dw-num">07</b><span class="fyt-dw-lbl"><span class="fyt-dw-lf">Days</span><span class="fyt-dw-ls">D</span></span></span>
-        <span class="fyt-dw-tile" data-u="h"><b class="fyt-dw-num">00</b><span class="fyt-dw-lbl"><span class="fyt-dw-lf">Hrs</span><span class="fyt-dw-ls">H</span></span></span>
-        <span class="fyt-dw-tile" data-u="m"><b class="fyt-dw-num">00</b><span class="fyt-dw-lbl"><span class="fyt-dw-lf">Mins</span><span class="fyt-dw-ls">M</span></span></span>
-        <span class="fyt-dw-tile" data-u="s"><b class="fyt-dw-num">00</b><span class="fyt-dw-lbl"><span class="fyt-dw-lf">Secs</span><span class="fyt-dw-ls">S</span></span></span>
-      </div>
-      <span class="fyt-dw-over">Offer ended</span>
-      <span class="fyt-dw-sr fyt-dw-timesr" aria-live="polite" aria-atomic="true"></span>
+    <a class="fbf-cta" href="https://fundingyourtrades.com/#challenge"><span class="fbf-cl">Claim 5 Accounts</span><span class="fbf-cs" aria-hidden="true">Claim</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <i class="fbf-br" aria-hidden="true"></i>
+    <button type="button" class="fbf-code"><span>CODE</span><b class="fbf-cv">BLACKFRIDAY</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+    <div class="fbf-timer" role="timer">
+      <span class="fbf-ends" aria-hidden="true">Deal ends in</span>
+      <div class="fbf-tiles" aria-hidden="true"><span class="fbf-t" data-u="d"><b>00</b><small>DAYS</small></span><span class="fbf-t" data-u="h"><b>00</b><small>HRS</small></span><span class="fbf-t" data-u="m"><b>00</b><small>MIN</small></span><span class="fbf-t" data-u="s"><b>00</b><small>SEC</small></span></div>
+      <span class="fbf-lim">LIMITED TIME</span><span class="fbf-over"></span>
+      <span class="fbf-sr fbf-tsr"></span>
     </div>
-
-    <a class="fyt-dw-cta" href="https://fundingyourtrades.com"><span class="fyt-dw-ctal">Claim Offer</span><span class="fyt-dw-ctas" aria-hidden="true">Claim</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
   </div>
-
-  <div class="fyt-dw-lights" aria-hidden="true"></div>
-  <span class="fyt-dw-edge fyt-dw-edge--t" aria-hidden="true"></span><span class="fyt-dw-edge fyt-dw-edge--b" aria-hidden="true"></span>
-  <span class="fyt-dw-sr fyt-dw-copysr" aria-live="assertive" aria-atomic="true"></span>
+  <span class="fbf-line" aria-hidden="true"></span>
+  <span class="fbf-sr fbf-csr" aria-live="polite"></span>
 </div>
-
 <script>
 (function(){
-  /* ========================= CONFIG (edit here) ========================= */
+  /* ============================ CONFIG (edit here) ============================ */
   var CONFIG = {
-    startDate: '2026-11-05T10:00:00+05:30', // the bar stays hidden until this moment (IST), then appears by itself
-    endDate: '2026-11-15T23:15:00-05:00',   // fixed deadline: 15 Nov 11:15 PM EST
-    // rollingDays: 7,                       // ALTERNATIVE: uncomment for a 7-day countdown that starts at each
-    rollingDays: null,                       // visitor's first visit (saved in localStorage). null = use endDate.
-    couponCode: 'DIWALI45',                  // shown on the ticket and copied exactly as written
-    headline: 'Diwali Special: 45% Off + Buy 1 Get 3 Instantly', // text before ":" = small gold top line
-    highlights: ['45% Off', 'Buy 1 Get 3'],  // phrases in the headline drawn in gold
-    ctaText: 'Claim Offer',
-    ctaTextShort: 'Claim',                   // button text on phones
+    endDate: '2026-12-01T17:00:00+05:30',  // PLACEHOLDER. Set like '2026-11-30T23:59:59+05:30' (IST). Until set, a "LIMITED TIME" chip shows instead of the countdown.
+    couponCode: 'BLACKFRIDAY', // shown on the ticket, copied on click
     ctaUrl: 'https://fundingyourtrades.com/#challenge',
-    ctaNewTab: false,
-    soonHours: 24,                           // last N hours: tiles glow saffron + "Ending soon"
-    soonText: 'Ending soon',
-    whenEnded: 'hide',                       // 'message' = show endedText | 'hide' = remove the bar
-    endedText: 'Offer ended',
-    sticky: true,                            // bar always stays at the top of the screen
-    stickyMode: 'fixed',                     // 'fixed' (most robust, adds body padding) | 'sticky' (CSS position:sticky)
-    zIndex: 99990,
-    fireworks: true
+    ctaText: 'Claim 5 Accounts', ctaTextShort: 'Claim', ctaNewTab: false,
+    // Desktop/tablet line under the headline (rotates). Wrap words in [[ ]] to make them gold.
+    ticker: ['Every purchase = 1 entry to win a [[$100K funded account]]', 'Pay for 2 accounts, get 5. [[All the same size.]]', 'Use code [[BLACKFRIDAY]] at checkout'],
+    // Phone slides: [small top line, big line]
+    slides: [['BLACK FRIDAY', 'BUY [[2]] GET [[5]]'], ['BUY 2 GET 5, PLUS', '[[50% OFF]]'], ['1 ENTRY WITH EVERY PURCHASE', '[[$100K]] FUNDED ACCOUNT']],
+    srText: 'Black Friday: Buy 2 Get 5 plus 50% off. Every purchase is 1 entry to win a $100K funded account.',
+    rotateMs: 3200,
+    soonHours: 24, soonText: 'Ends soon',
+    whenEnded: 'hide',        // 'hide' removes the bar | 'message' shows endedText
+    endedText: 'DEAL ENDED',
+    stickyMode: 'fixed',      // 'fixed' (pads <body>) | 'sticky' | 'none' (stays where pasted)
+    thinOnScroll: true, thinAfter: 80, // bar gets thin once the page is scrolled this many pixels
+    zIndex: 99990
   };
-  /* ======================================================================= */
-  if (window.FYT_DW_CONFIG) for (var k in window.FYT_DW_CONFIG) CONFIG[k] = window.FYT_DW_CONFIG[k];
-
-  var bar = document.getElementById('fyt-dw-bar');
-  if (!bar || bar.getAttribute('data-fyt-dw-init')) return;
-  /* never show on the checkout page (it has its own Diwali box) */
-  if (/checkout/i.test(location.pathname) || document.getElementById('fyt-custom-checkout')) { bar.parentNode && bar.parentNode.removeChild(bar); return; }
-  bar.setAttribute('data-fyt-dw-init', '1');
+  /* =========================================================================== */
+  if (window.FYT_BF_CONFIG) for (var k in window.FYT_BF_CONFIG) CONFIG[k] = window.FYT_BF_CONFIG[k];
+  var bar = document.getElementById('fyt-bf-bar');
+  if (!bar || bar.getAttribute('data-init')) return; bar.setAttribute('data-init', '1');
   var $ = function(s){ return bar.querySelector(s); };
-  var LS = null; try { localStorage.setItem('fyt-dw-t', '1'); localStorage.removeItem('fyt-dw-t'); LS = localStorage; } catch(e){}
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  bar.style.zIndex = CONFIG.zIndex;
-  // not before the start time: stay hidden, then show by itself (no reload needed)
-  var startMs = CONFIG.startDate ? new Date(CONFIG.startDate).getTime() : 0;
-  if (startMs > Date.now()) {
-    bar.classList.add('fyt-dw-hidden');
-    setTimeout(function(){ bar.classList.remove('fyt-dw-hidden'); schedulePlace(); }, Math.min(startMs - Date.now(), 2147000000));
-  }
-
-  /* ---------- copy ---------- */
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var esc = function(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-  var hl = String(CONFIG.headline), ci = hl.indexOf(':');
-  var eyebrow = ci > -1 ? hl.slice(0, ci).trim() : '', main = ci > -1 ? hl.slice(ci + 1).trim() : hl;
-  var mainHtml = esc(main);
-  (CONFIG.highlights || []).forEach(function(h){ if (h) mainHtml = mainHtml.split(esc(h)).join('<em>' + esc(h) + '</em>'); });
-  $('.fyt-dw-eyetxt').textContent = eyebrow;
-  if (!eyebrow) $('.fyt-dw-eyebrow').style.display = 'none';
-  $('.fyt-dw-hbase').innerHTML = mainHtml;
-  $('.fyt-dw-hshine > span').innerHTML = mainHtml;
-  $('.fyt-dw-text').setAttribute('aria-label', hl);
-  $('.fyt-dw-code').textContent = CONFIG.couponCode;
-  var ticket = $('.fyt-dw-ticket');
-  ticket.setAttribute('aria-label', 'Copy coupon code ' + CONFIG.couponCode);
-  var cta = $('.fyt-dw-cta');
-  cta.href = CONFIG.ctaUrl; $('.fyt-dw-ctal').textContent = CONFIG.ctaText; $('.fyt-dw-ctas').textContent = CONFIG.ctaTextShort || CONFIG.ctaText;
-  cta.setAttribute('aria-label', CONFIG.ctaText);
+  var gold = function(t){ return esc(t).replace(/\[\[(.+?)\]\]/g, '<b class="fbf-gd">$1</b>'); };
+  bar.style.zIndex = CONFIG.zIndex;
+  $('.fbf-full').textContent = CONFIG.srText;
+  $('.fbf-cv').textContent = CONFIG.couponCode;
+  var code = $('.fbf-code'); code.setAttribute('aria-label', 'Copy coupon code ' + CONFIG.couponCode);
+  var cta = $('.fbf-cta'); cta.href = CONFIG.ctaUrl; cta.setAttribute('aria-label', CONFIG.ctaText);
+  $('.fbf-cl').textContent = CONFIG.ctaText; $('.fbf-cs').textContent = CONFIG.ctaTextShort || CONFIG.ctaText;
   if (CONFIG.ctaNewTab) { cta.target = '_blank'; cta.rel = 'noopener'; }
-  $('.fyt-dw-over').textContent = CONFIG.endedText;
-
-  /* ---------- sticky / fixed positioning ---------- */
-  var body = document.body, basePad = null, adminBar = document.getElementById('wpadminbar'), posRaf = null;
-  function place(){
-    posRaf = null;
-    if (!CONFIG.sticky || bar.classList.contains('fyt-dw-hidden')) return;
-    if (bar.classList.contains('fyt-dw-thin') && basePad !== null) return; // keep the page from jumping while the bar folds thin
-    var top = 0;
-    if (adminBar) {
-      var cs = getComputedStyle(adminBar);
-      if (cs.display !== 'none') {
-        if (cs.position === 'fixed') top = adminBar.offsetHeight;
-        else top = Math.max(0, adminBar.offsetHeight - (window.pageYOffset || 0)); // WP mobile: admin bar scrolls away
-      }
-    }
-    bar.style.setProperty('--fyt-dw-top', top + 'px');
-    if (CONFIG.stickyMode !== 'sticky') {
-      if (basePad === null) basePad = parseFloat(getComputedStyle(body).paddingTop) || 0;
-      body.style.paddingTop = (basePad + bar.offsetHeight) + 'px';
-    }
-  }
-  function schedulePlace(){ if (!posRaf) posRaf = requestAnimationFrame(place); }
-  function unplace(){ if (basePad !== null) body.style.paddingTop = basePad ? basePad + 'px' : ''; }
-  if (CONFIG.sticky) {
-    if (CONFIG.stickyMode === 'sticky') bar.classList.add('fyt-dw-sticky');
-    else {
-      if (bar.parentNode !== body) body.insertBefore(bar, body.firstChild); // escape theme wrappers (transforms/overflow)
-      bar.classList.add('fyt-dw-fixed');
-    }
-    place();
-    window.addEventListener('resize', schedulePlace);
-    if (adminBar) window.addEventListener('scroll', schedulePlace, { passive: true });
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedulePlace);
-  }
-
-  /* ---------- thin when scrolled ---------- */
-  var thinOn = false, thinRaf = 0;
-  function thinCheck(){ thinRaf = 0; var t = (window.pageYOffset || 0) > 40; if (t !== thinOn) { thinOn = t; bar.classList.toggle('fyt-dw-thin', t); } }
-  window.addEventListener('scroll', function(){ if (!thinRaf) thinRaf = requestAnimationFrame(thinCheck); }, { passive: true });
-  thinCheck();
-
-  /* ---------- countdown ---------- */
-  var end;
-  if (CONFIG.rollingDays) {
-    var key = 'fyt-dw-first-visit', first = LS && parseInt(LS.getItem(key), 10);
-    if (!first) { first = Date.now(); if (LS) LS.setItem(key, String(first)); }
-    end = first + CONFIG.rollingDays * 864e5;
-  } else end = new Date(CONFIG.endDate).getTime();
-  var tiles = {}; ['d','h','m','s'].forEach(function(u){ tiles[u] = bar.querySelector('.fyt-dw-tile[data-u="' + u + '"]'); });
-  if (tiles.d) tiles.d.style.display = 'none';
-  var prev = {}, lastMin = -1, timerId = null, srT = $('.fyt-dw-timesr'), endsEl = $('.fyt-dw-ends'), endsTxt = endsEl.textContent;
+  $('.fbf-over').textContent = CONFIG.endedText;
+  $('.fbf-tick').innerHTML = CONFIG.ticker.map(function(t){ return '<span>' + gold(t) + '</span>'; }).join('');
+  $('.fbf-slides').innerHTML = CONFIG.slides.map(function(s){ return '<span><small>' + gold(s[0]) + '</small><em>' + gold(s[1]).replace(/fbf-gd/g, 'fbf-g') + '</em></span>'; }).join('');
+  bar.querySelectorAll('.fbf-slides em b').forEach(function(b){ if (/%|\$/.test(b.textContent)) b.className = 'fbf-gd'; });
+  /* sparkles */
+  if (!reduce) for (var i = 0; i < 9; i++) { var s = document.createElement('i'); s.className = 'fbf-spk'; s.setAttribute('aria-hidden', 'true');
+    s.style.cssText = 'left:' + (3 + i * 10.6 + Math.random() * 4).toFixed(1) + '%;top:' + (12 + Math.random() * 70).toFixed(0) + '%;animation-delay:' + (-Math.random() * 3.2).toFixed(2) + 's'; bar.appendChild(s); }
+  /* rotators */
+  function rotator(box){ var items = box.children, n = items.length, idx = 0; if (!n) return; items[0].classList.add('on');
+    if (n < 2) return;
+    setInterval(function(){ if (document.hidden) return; var cur = items[idx]; idx = (idx + 1) % n; var nx = items[idx];
+      cur.classList.add('out'); cur.classList.remove('on'); nx.classList.remove('out'); nx.classList.add('on');
+      setTimeout(function(){ cur.classList.remove('out'); }, 520); }, reduce ? CONFIG.rotateMs * 1.6 : CONFIG.rotateMs); }
+  rotator($('.fbf-tick')); rotator($('.fbf-slides'));
+  /* placement */
+  var body = document.body, root = document.documentElement, basePad = null, adminBar = document.getElementById('wpadminbar'), raf = null;
+  function place(){ raf = null; if (bar.classList.contains('fbf-hide')) return; fit(); var top = 0;
+    if (adminBar) { var cs = getComputedStyle(adminBar); if (cs.display !== 'none') top = cs.position === 'fixed' ? adminBar.offsetHeight : Math.max(0, adminBar.offsetHeight - (window.pageYOffset || 0)); }
+    bar.style.setProperty('--fbf-top', top + 'px'); root.style.setProperty('--fyt-bf-h', bar.offsetHeight + 'px');
+    if (CONFIG.stickyMode === 'fixed' && !bar.classList.contains('fbf-thin')) { if (basePad === null) basePad = parseFloat(getComputedStyle(body).paddingTop) || 0; body.style.paddingTop = (basePad + bar.offsetHeight) + 'px'; } }
+  function fit(){ bar.querySelectorAll('.fbf-slides em,.fbf-slides small').forEach(function(e){ e.style.fontSize = ''; var f = parseFloat(getComputedStyle(e).fontSize); while (e.scrollWidth > e.clientWidth + 1 && f > 7) { f -= .5; e.style.fontSize = f + 'px'; } }); }
+  function sched(){ if (!raf) raf = requestAnimationFrame(place); }
+  function unplace(){ root.style.removeProperty('--fyt-bf-h'); if (basePad !== null) body.style.paddingTop = basePad ? basePad + 'px' : ''; }
+  if (CONFIG.stickyMode === 'fixed') { if (bar.parentNode !== body) body.insertBefore(bar, body.firstChild); bar.classList.add('fbf-fixed'); }
+  else if (CONFIG.stickyMode === 'sticky') bar.classList.add('fbf-sticky');
+  place(); addEventListener('resize', sched);
+  if (CONFIG.thinOnScroll) { var onScroll = function(){ var thin = (window.pageYOffset || root.scrollTop || 0) > CONFIG.thinAfter; if (thin !== bar.classList.contains('fbf-thin')) { bar.classList.toggle('fbf-thin', thin); setTimeout(sched, 300); } }; addEventListener('scroll', onScroll, { passive: true }); onScroll(); } if (adminBar) addEventListener('scroll', sched, { passive: true });
+  /* countdown */
+  var end = new Date(CONFIG.endDate).getTime(), tiles = {}, prev = {}, lastMin = -1, timer = null, tsr = $('.fbf-tsr'), endsEl = $('.fbf-ends'), endsTxt = endsEl.textContent;
+  ['d','h','m','s'].forEach(function(u){ tiles[u] = bar.querySelector('.fbf-t[data-u="' + u + '"]'); });
   var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
-  function tick(){
-    var left = end - Date.now();
-    if (!(left > 0)) { endOffer(); return; }
-    var soon = left <= CONFIG.soonHours * 36e5;
-    if (soon !== bar.classList.contains('fyt-dw-soon')) { bar.classList.toggle('fyt-dw-soon', soon); endsEl.textContent = soon ? CONFIG.soonText : endsTxt; }
-    var s = Math.floor(left / 1000), v = { d: 0, h: Math.floor(s / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 }; /* hours only */
-    for (var u in v) if (prev[u] !== v[u]) {
-      var t = tiles[u]; t.querySelector('.fyt-dw-num').textContent = pad(v[u]);
-      if (!reduce && prev[u] !== undefined) { t.classList.remove('fyt-dw-flipping'); void t.offsetWidth; t.classList.add('fyt-dw-flipping'); }
-      prev[u] = v[u];
-    }
-    var totalMin = Math.floor(s / 60);
-    if (totalMin !== lastMin) { lastMin = totalMin; srT.textContent = (soon ? CONFIG.soonText + '. ' : '') + 'Offer ends in ' + v.h + ' hours, ' + v.m + ' minutes'; }
-  }
-  function endOffer(){
-    if (timerId) clearInterval(timerId); timerId = null;
-    if (CONFIG.whenEnded === 'hide') { stop(); bar.classList.add('fyt-dw-hidden'); unplace(); return; }
-    bar.classList.remove('fyt-dw-soon'); bar.classList.add('fyt-dw-ended'); srT.textContent = CONFIG.endedText; schedulePlace();
-  }
-
-  /* ---------- copy coupon ---------- */
-  var copySr = $('.fyt-dw-copysr'), codeEl = $('.fyt-dw-code'), stubTxt = $('.fyt-dw-stubtxt'), resetT;
-  function legacyCopy(text){
-    var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', '');
-    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
-    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
-    var ok = false; try { ok = document.execCommand('copy'); } catch(e){}
-    document.body.removeChild(ta); return ok;
-  }
-  function copied(ok){
-    clearTimeout(resetT);
-    if (ok) {
-      ticket.classList.add('fyt-dw-copied'); codeEl.textContent = 'Copied!'; stubTxt.textContent = 'Done';
-      copySr.textContent = 'Coupon code ' + CONFIG.couponCode + ' copied to clipboard';
-      var b = bar.getBoundingClientRect(), r = ticket.getBoundingClientRect();
-      if (fx) fx.sparkle(r.left - b.left + r.width / 2, r.top - b.top + r.height / 2);
-    } else {
-      try { var rg = document.createRange(); rg.selectNodeContents(codeEl); var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(rg); } catch(e){}
-      copySr.textContent = 'Press Ctrl+C or Cmd+C to copy code ' + CONFIG.couponCode;
-    }
-    resetT = setTimeout(function(){ ticket.classList.remove('fyt-dw-copied'); codeEl.textContent = CONFIG.couponCode; stubTxt.textContent = 'Code'; copySr.textContent = ''; }, 2200);
-  }
-  ticket.addEventListener('click', function(){
-    var code = CONFIG.couponCode;
-    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(code).then(function(){ copied(true); }, function(){ copied(legacyCopy(code)); });
-    else copied(legacyCopy(code));
-  });
-
-  /* ---------- fairy lights ---------- */
-  var lights = $('.fyt-dw-lights'), COLORS = ['#FFC845','#FF9933','#FF5C7A','#7CFFB2','#FFE29A','#6FB6FF'];
-  function buildLights(){
-    // n evenly spaced bulbs that exactly fill the width: first and last bulb sit gap/2 from each edge
-    var w = bar.clientWidth, n = Math.max(1, Math.min(64, Math.round(w / (w < 640 ? 28 : 36)))), gap = w / n, path = 'M0 2', html = '';
-    for (var i = 0; i < n; i++) {
-      var x = +(i * gap).toFixed(2); path += ' Q' + (x + gap / 2).toFixed(2) + ' 10 ' + (x + gap).toFixed(2) + ' 2';
-      html += '<span class="fyt-dw-bulb" style="left:' + (x + gap / 2).toFixed(2) + 'px;--c:' + COLORS[i % COLORS.length] + ';animation-delay:' + (-(i * 0.37) % 2.4).toFixed(2) + 's"></span>';
-    }
-    lights.innerHTML = '<svg class="fyt-dw-wire" viewBox="0 0 ' + w + ' 12" preserveAspectRatio="none"><path d="' + path + '" fill="none" stroke="rgba(255,226,154,.45)" stroke-width="1"/></svg>' + html;
-  }
-  buildLights();
-
-  /* ---------- fireworks (canvas) ---------- */
-  var fx = null;
-  var cv = $('.fyt-dw-fx'), ctx = !reduce && cv.getContext ? cv.getContext('2d') : null;
-  var W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 1.5), raf = null, running = false, last = 0, zones = [];
-  var P = [], G = [], C = [], F = [], R = [], Q = [];   // particles, glitter, crackles, flashes, rockets, queued events
-  var MAXP = 200, MAXG = 150, MAXC = 40, nextSmall = 0, nextHero = 0;
-  var PAL = [['#FFC845','#FFF1B8'],['#FF9933','#FFD27A'],['#FF5C7A','#FFC2D0'],['#FFE29A','#FFFFFF'],['#7CFFB2','#E6FFF0'],['#B9A2FF','#FFE29A']];
-  function size(){
-    W = bar.clientWidth; H = bar.clientHeight; if (!ctx) return;
-    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    var br = bar.getBoundingClientRect(), mobile = W <= 640, els = mobile ? ['.fyt-dw-text'] : ['.fyt-dw-text','.fyt-dw-ticket','.fyt-dw-timer','.fyt-dw-cta'];
-    var l = W, r = 0, bot = H;
-    els.forEach(function(s){ var e = $(s); if (!e || !e.offsetWidth) return; var q = e.getBoundingClientRect(); l = Math.min(l, q.left - br.left); r = Math.max(r, q.right - br.left); if (mobile) bot = q.bottom - br.top; });
-    var yMax = mobile ? bot : H * 0.72;
-    zones = [{ x0: 0, x1: Math.max(34, l - 10), y1: yMax }, { x0: Math.min(W - 34, r + 10), x1: W, y1: yMax }];
-  }
-  function rnd(a, b){ return a + Math.random() * (b - a); }
-  function spot(z){ var c = (z.x0 + z.x1) / 2, w = z.x1 - z.x0; return { x: c + rnd(-.18, .18) * w, y: rnd(Math.min(18, z.y1 * .35), z.y1 * 0.55), z: z }; }
-  function burst(x, y, hero, t, z){
-    var pal = PAL[(Math.random() * PAL.length) | 0], scale = Math.min(1, H / 96) * (W <= 640 ? 0.8 : 1);
-    var n = hero ? 54 : 20, spd = (hero ? 2.5 : 1.45) * scale;
-    if (z) { spd = Math.min(spd, Math.max(.6, Math.min(x - z.x0, z.x1 - x) / 27)); if (W <= 640) spd = Math.min(spd, Math.max(.6, (z.y1 + 14 - y) / 27)); } // radius ~= spd*26: stay inside the side zone
-    for (var i = 0; i < n && P.length < MAXP; i++) {
-      var a = Math.PI * 2 * i / n + rnd(-.08, .08), v = spd * rnd(.82, 1.08);
-      P.push({ x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, l: 1, d: hero ? rnd(.008, .012) : rnd(.016, .022), c: pal[0], g: hero });
-    }
-    if (hero) {
-      for (var j = 0; j < 22 && P.length < MAXP; j++) { var a2 = Math.PI * 2 * j / 22, v2 = spd * .48; P.push({ x: x, y: y, vx: Math.cos(a2) * v2, vy: Math.sin(a2) * v2, l: 1, d: .016, c: pal[1], g: false }); }
-      Q.push({ t: t + 650, f: function(){ for (var k = 0; k < 16 && C.length < MAXC; k++) { var aa = rnd(0, 6.283), rr = rnd(.3, 1) * spd * 26; C.push({ x: x + Math.cos(aa) * rr, y: y + Math.sin(aa) * rr + 8, l: 1, d: rnd(.06, .1), s: rnd(1.5, 3) }); } } });
-    }
-    F.push({ x: x, y: y, r: (hero ? 190 : 90) * scale, a: hero ? .34 : .16, c: pal[0] });
-  }
-  function rocket(z, hero){ var s = spot(z); R.push({ x: s.x, y: H + 2, ty: s.y, vy: -Math.max(2.2, H * .03), hero: hero, z: z }); }
-  function loop(t){
-    raf = null; if (!running) return;
-    var dt = last ? Math.min(2.5, (t - last) / 16.67) : 1; last = t;
-    if (CONFIG.fireworks) {
-      if (t > nextHero) { rocket(zones[(Math.random() * 2) | 0], true); nextHero = t + rnd(6000, 9000); }
-      if (t > nextSmall) { var z = zones[(Math.random() * 2) | 0], s = spot(z); burst(s.x, s.y, false, t, z); nextSmall = t + rnd(1700, 3000); }
-    }
-    for (var q = Q.length - 1; q >= 0; q--) if (t >= Q[q].t) { Q[q].f(); Q.splice(q, 1); }
-    ctx.clearRect(0, 0, W, H);
-    ctx.globalCompositeOperation = 'lighter';
-    for (var f = F.length - 1; f >= 0; f--) {
-      var fl = F[f], gr = ctx.createRadialGradient(fl.x, fl.y, 0, fl.x, fl.y, fl.r);
-      gr.addColorStop(0, fl.c); gr.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.globalAlpha = fl.a; ctx.fillStyle = gr; ctx.fillRect(fl.x - fl.r, fl.y - fl.r, fl.r * 2, fl.r * 2);
-      fl.a -= .012 * dt; if (fl.a <= 0) F.splice(f, 1);
-    }
-    ctx.globalAlpha = 1; ctx.lineCap = 'round';
-    for (var i = R.length - 1; i >= 0; i--) {
-      var r = R[i]; r.y += r.vy * dt;
-      ctx.strokeStyle = 'rgba(255,214,120,.95)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x, r.y + 10); ctx.stroke();
-      if (G.length < MAXG && Math.random() < .5) G.push({ x: r.x + rnd(-1, 1), y: r.y + 8, vx: 0, vy: .3, l: .7, d: .05, w: rnd(0, 6) });
-      if (r.y <= r.ty) { burst(r.x, r.y, r.hero, t, r.z); R.splice(i, 1); }
-    }
-    for (var j = P.length - 1; j >= 0; j--) {
-      var p = P[j]; p.vx *= .962; p.vy = p.vy * .962 + .028 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.l -= p.d * dt;
-      if (p.l <= 0) { P.splice(j, 1); continue; }
-      if (p.g && p.l < .8 && G.length < MAXG && Math.random() < .22) G.push({ x: p.x, y: p.y, vx: p.vx * .15, vy: .25, l: 1, d: rnd(.02, .035), w: rnd(0, 6) });
-      ctx.globalAlpha = Math.min(1, p.l * 1.15); ctx.strokeStyle = p.c; ctx.lineWidth = p.g ? 2 : 1.6;
-      ctx.beginPath(); ctx.moveTo(p.x - p.vx * 3.2, p.y - p.vy * 3.2); ctx.lineTo(p.x, p.y); ctx.stroke();
-    }
-    ctx.fillStyle = '#FFE7A8';
-    for (var g = G.length - 1; g >= 0; g--) {
-      var e = G[g]; e.vy += .012 * dt; e.x += e.vx * dt; e.y += e.vy * dt; e.l -= e.d * dt;
-      if (e.l <= 0 || e.y > H) { G.splice(g, 1); continue; }
-      ctx.globalAlpha = e.l * (.45 + .55 * Math.abs(Math.sin(t * .02 + e.w))); ctx.fillRect(e.x - .8, e.y - .8, 1.6, 1.6);
-    }
-    ctx.fillStyle = '#FFFFFF';
-    for (var c = C.length - 1; c >= 0; c--) {
-      var k = C[c]; k.l -= k.d * dt; if (k.l <= 0) { C.splice(c, 1); continue; }
-      ctx.globalAlpha = k.l; var sz = k.s * (1.4 - k.l * .4);
-      ctx.fillRect(k.x - sz, k.y - .5, sz * 2, 1); ctx.fillRect(k.x - .5, k.y - sz, 1, sz * 2);
-    }
-    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
-    raf = requestAnimationFrame(loop);
-  }
-  function start(){ if (!ctx || running || document.hidden) return; running = true; last = 0; raf = requestAnimationFrame(loop); }
-  function stop(){ running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
-  if (ctx) {
-    size();
-    fx = { sparkle: function(x, y){ var pal = PAL[0]; for (var i = 0; i < 26 && P.length < MAXP; i++) { var a = rnd(0, 6.283), v = rnd(1, 2.4); P.push({ x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, l: 1, d: .03, c: i % 2 ? pal[0] : pal[1], g: false }); } } };
-    // one-time celebration on first load
-    var t0 = performance.now();
-    Q.push({ t: t0 + 300, f: function(){ var a = spot(zones[0]), b = spot(zones[1]); burst(a.x, a.y, true, performance.now(), a.z); burst(b.x, b.y, true, performance.now(), b.z); } });
-    Q.push({ t: t0 + 900, f: function(){ var a = spot(zones[1]); burst(a.x, a.y, false, performance.now(), a.z); } });
-    Q.push({ t: t0 + 1300, f: function(){ var a = spot(zones[0]); burst(a.x, a.y, false, performance.now(), a.z); } });
-    nextHero = t0 + rnd(6500, 8000); nextSmall = t0 + 2200;
-  }
-  // pause animation work while the tab is in the background (the bar itself always stays visible)
-  function sync(){ bar.classList.toggle('fyt-dw-paused', document.hidden); if (document.hidden) stop(); else start(); }
-  document.addEventListener('visibilitychange', sync);
-  var rz; function onResize(){ clearTimeout(rz); rz = setTimeout(function(){ size(); buildLights(); schedulePlace(); }, 120); }
-  if ('ResizeObserver' in window) new ResizeObserver(onResize).observe(bar); else window.addEventListener('resize', onResize);
-
-  tick(); if (end - Date.now() > 0) timerId = setInterval(tick, 1000);
-  start();
+  function tick(){ var left = end - Date.now();
+    if (!(left > 0)) { clearInterval(timer); if (CONFIG.whenEnded === 'hide') { bar.classList.add('fbf-hide'); unplace(); } else { bar.classList.add('fbf-ended'); tsr.textContent = CONFIG.endedText; } return; }
+    var soon = left <= CONFIG.soonHours * 36e5; if (soon !== bar.classList.contains('fbf-soon')) { bar.classList.toggle('fbf-soon', soon); endsEl.textContent = soon ? CONFIG.soonText : endsTxt; }
+    var s = Math.floor(left / 1000), v = { d: Math.floor(s / 86400), h: Math.floor(s % 86400 / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 };
+    for (var u in v) if (prev[u] !== v[u]) { var t = tiles[u]; t.firstChild.textContent = pad(v[u]);
+      if (!reduce && prev[u] !== undefined) { t.classList.remove('fbf-flip'); void t.offsetWidth; t.classList.add('fbf-flip'); } prev[u] = v[u]; }
+    var tm = Math.floor(s / 60); if (tm !== lastMin) { lastMin = tm; tsr.textContent = 'Deal ends in ' + v.d + ' days, ' + v.h + ' hours, ' + v.m + ' minutes'; } }
+  if (isNaN(end)) bar.classList.add('fbf-nodate'); else { tick(); timer = setInterval(tick, 1000); }
+  /* copy code */
+  var cv = $('.fbf-cv'), csr = $('.fbf-csr'), rt;
+  function legacy(t){ var ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;opacity:0';
+    body.appendChild(ta); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch(e){} body.removeChild(ta); return ok; }
+  function done(ok){ clearTimeout(rt); if (ok) { code.classList.add('fbf-ok'); cv.textContent = 'COPIED!'; csr.textContent = 'Code ' + CONFIG.couponCode + ' copied'; }
+    else csr.textContent = 'Code: ' + CONFIG.couponCode;
+    rt = setTimeout(function(){ code.classList.remove('fbf-ok'); cv.textContent = CONFIG.couponCode; csr.textContent = ''; }, 2000); }
+  code.addEventListener('click', function(){ var c = CONFIG.couponCode;
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(c).then(function(){ done(true); }, function(){ done(legacy(c)); }); else done(legacy(c)); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(sched);
 })();
 </script>
-
-<!-- ===================== BOGO35 bar (shows by itself from 16 Nov 9:45 AM IST, when the Diwali bar above hides) ===================== -->
-<style>
-#fyt-bg-bar,#fyt-bg-bar *{box-sizing:border-box;margin:0;padding:0}
-#fyt-bg-bar{display:none;position:fixed;left:0;right:0;top:var(--fyt-bg-top,0px);z-index:99990;width:100%;overflow:hidden;
-  font-family:'Inter','Open Sans',Arial,sans-serif;color:#fff;line-height:1.2;-webkit-font-smoothing:antialiased;cursor:pointer;
-  background:linear-gradient(90deg,#0b1d5c 0%,#1d4ed8 35%,#2563eb 50%,#1d4ed8 65%,#0b1d5c 100%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(0,0,0,.25),0 8px 28px rgba(37,99,235,.35)}
-#fyt-bg-bar.on{display:block}
-#fyt-bg-bar .bg-sheen{position:absolute;top:0;bottom:0;width:33%;opacity:.35;pointer-events:none;background:linear-gradient(100deg,transparent,rgba(255,255,255,.25),transparent);animation:fytBgSheen 4.5s ease-in-out infinite}
-@keyframes fytBgSheen{0%{left:-35%}60%,100%{left:105%}}
-@media (prefers-reduced-motion:reduce){#fyt-bg-bar .bg-sheen{display:none}}
-#fyt-bg-bar .bg-in{position:relative;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;padding:10px 16px;min-height:46px;text-align:center}
-#fyt-bg-bar .bg-deal{font-size:13.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-#fyt-bg-bar .bg-deal b{color:#bfdbfe;font-weight:700}
-#fyt-bg-bar .bg-sep{width:1px;height:14px;background:rgba(255,255,255,.35)}
-#fyt-bg-bar .bg-ben.m{display:none}
-#fyt-bg-bar .bg-ben{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#dbeafe}
-#fyt-bg-bar .bg-code{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 11px;border-radius:999px;border:0;cursor:pointer;background:#0b1220;color:#fff;font:inherit;box-shadow:0 2px 8px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12)}
-#fyt-bg-bar .bg-code small{font-size:9px;font-weight:700;letter-spacing:.08em;color:#93c5fd;text-transform:uppercase}
-#fyt-bg-bar .bg-code span{font-size:11px;font-weight:800;letter-spacing:.06em}
-#fyt-bg-bar .bg-left{display:inline-flex;align-items:center;height:26px;padding:0 12px;border-radius:999px;background:linear-gradient(180deg,#ef4444,#b91c1c);font-size:12px;font-weight:800;letter-spacing:.06em;font-variant-numeric:tabular-nums;box-shadow:0 2px 8px rgba(220,38,38,.35),inset 0 1px 0 rgba(255,255,255,.2)}
-#fyt-bg-bar .bg-cta{display:inline-flex;align-items:center;height:28px;padding:0 14px;border-radius:999px;background:#fff;color:#1d4ed8;font-size:12.5px;font-weight:800;text-decoration:none}
-@media (max-width:767px){
-  #fyt-bg-bar .bg-in{gap:6px 8px;padding:7px 8px}
-  #fyt-bg-bar .bg-deal{font-size:11.5px;width:100%}
-  #fyt-bg-bar .bg-ben,#fyt-bg-bar .bg-sep,#fyt-bg-bar .bg-cta{display:none}
-  #fyt-bg-bar .bg-ben.m{display:inline;font-size:9.5px;width:100%}
-  #fyt-bg-bar .bg-left{height:20px;font-size:10px;padding:0 8px}
-  #fyt-bg-bar .bg-code{height:20px}
-}
-</style>
-<div id="fyt-bg-bar" role="region" aria-label="BOGO offer">
-  <span class="bg-sheen" aria-hidden="true"></span>
-  <div class="bg-in">
-    <span class="bg-deal">BOGO Offer: <b>35% off + Buy 1 Get 1 Free</b></span>
-    <span class="bg-sep"></span><span class="bg-ben">First Payout on Demand</span>
-    <span class="bg-sep"></span><span class="bg-ben">Free Drawdown Reset</span>
-    <span class="bg-ben m">Free Reset &middot; Payout on Demand</span>
-    <button type="button" class="bg-code" aria-label="Copy code BOGO35"><small>Code</small><span>BOGO35</span></button>
-    <span class="bg-left" aria-live="off"></span>
-    <a class="bg-cta" href="https://fundingyourtrades.com/#challenge">Claim Offer</a>
-  </div>
-</div>
-<script>
-(function(){
-  /* BOGO35 bar settings */
-  var START = new Date('2026-11-15T23:15:00-05:00').getTime(); // 16 Nov 9:45 AM IST, the moment Diwali ends
-  var END   = 0;   // offer end (bar hides). 0 = no end. e.g. new Date('2026-11-30T23:59:59+05:30').getTime()
-  var COUNTDOWN_TO = new Date('2026-11-21T07:20:00+05:30').getTime(); // countdown shown on the bar (0 = no countdown)
-  var URL = 'https://fundingyourtrades.com/#challenge';
-
-  var bar = document.getElementById('fyt-bg-bar'); if (!bar) return;
-  var left = bar.querySelector('.bg-left'), body = document.body, basePad = null, t = null;
-  function pad(n){ return n < 10 ? '0' + n : '' + n; }
-  function place(){
-    var ab = document.getElementById('wpadminbar'), top = ab ? ab.offsetHeight : 0;
-    bar.style.setProperty('--fyt-bg-top', top + 'px');
-    if (basePad === null) basePad = parseFloat(getComputedStyle(body).paddingTop) || 0;
-    body.style.paddingTop = (basePad + bar.offsetHeight) + 'px';
-  }
-  function unplace(){ if (basePad !== null) body.style.paddingTop = basePad + 'px'; }
-  function tick(){
-    var now = Date.now();
-    if (now < START) { bar.classList.remove('on'); return; }
-    if (END && now >= END) { bar.classList.remove('on'); unplace(); clearInterval(t); return; }
-    if (!bar.classList.contains('on')) {
-      if (bar.parentNode !== body) body.insertBefore(bar, body.firstChild);
-      bar.classList.add('on'); place();
-    }
-    var ms = COUNTDOWN_TO ? COUNTDOWN_TO - now : 0;
-    if (ms > 0) {
-      var h = Math.floor(ms / 36e5), m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60;
-      left.textContent = pad(h) + 'H ' + pad(m) + 'M ' + pad(s) + 'S LEFT'; left.style.display = '';
-    } else left.style.display = 'none';
-  }
-  bar.addEventListener('click', function(e){ if (e.target.closest('.bg-code') || e.target.closest('.bg-cta')) return; window.location.href = URL; });
-  bar.querySelector('.bg-code').addEventListener('click', function(e){
-    e.preventDefault(); e.stopPropagation();
-    var el = this.querySelector('span'), txt = 'BOGO35';
-    try { navigator.clipboard.writeText(txt); } catch (x) {}
-    el.textContent = 'COPIED'; setTimeout(function(){ el.textContent = txt; }, 1500);
-  });
-  window.addEventListener('resize', function(){ if (bar.classList.contains('on')) place(); });
-  tick(); t = setInterval(tick, 1000);
-})();
-</script>
+<!-- /FYT BLACK FRIDAY TOP BAR -->
 
 <!-- ===================== Site-wide: point every Discord link to the current invite ===================== -->
 <script>

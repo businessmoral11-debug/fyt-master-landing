@@ -530,12 +530,21 @@
                     coupon: "45% off + " + bonus + " Bonus Account" + (bonus > 1 ? "s" : "")
                 });
             }
-            if (!BOGO_END || now < BOGO_END) {
+            // Black Friday (from 21 Nov 2026): list prices went up (5K +12, 10K +14, 25K to 100K +20, 200K +25),
+            // then BLACKFRIDAY takes 50% off, with 1 free bonus account. Bundles are picked at checkout.
+            // BF_END: 0 = no end.
+            const BF_END = 0;
+            if (!BF_END || now < BF_END) {
+                const bump = S.amount <= 5000 ? 12 : S.amount <= 10000 ? 14 : S.amount <= 100000 ? 20 : 25;
+                // 1-Step Prime 10K MatchTrader was listed at $104 by mistake; its base is $114 like Classic.
+                const base = (r.priceOld === 104 && S.amount === 10000) ? 114 : r.priceOld;
+                const list = base + bump;
                 return Object.assign({}, r, {
-                    code: "BOGO35",
-                    url: (r.url || "") + (r.url ? "&coupon=BOGO35" : ""),
-                    priceNew: Math.round(r.priceOld * 0.65 * 100) / 100,
-                    coupon: "35% off + 1 Bonus Account + Free Drawdown Reset + First Payout on Demand"
+                    code: "BLACKFRIDAY",
+                    url: (r.url || "") + (r.url ? "&coupon=BLACKFRIDAY" : ""),
+                    priceOld: list,
+                    priceNew: Math.round(list * 0.5 * 100) / 100,
+                    coupon: "50% off + 1 Bonus Account + Daily $100K Giveaway Entry"
                 });
             }
             return Object.assign({}, r, { priceNew: r.priceOld, coupon: "", code: "" });
