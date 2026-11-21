@@ -15,6 +15,7 @@ import { DIWALI_CODE, DIWALI_END, DIWALI_OFF, diwaliBonus, isDiwaliLive } from "
 import { GiftLine } from "@/app/diwali/GiftStrip";
 import { BlackFridayOffer } from "@/app/blackfriday/BlackFridayOffer";
 import { BlackFridaySummary } from "@/app/blackfriday/BlackFridaySummary";
+import { BF_TIERS } from "@/app/data/blackfriday";
 import { HALLOWEEN_CODE, HALLOWEEN_END, HALLOWEEN_OFF, TREATS, TREAT_PICKS, halloweenStage, isHalloweenLive, withHalloween, type TreatId } from "@/app/data/halloween";
 
 const STEPS: StepId[] = ["1-Step", "2-Step", "Instant"];
@@ -76,6 +77,7 @@ function usePick() {
   const [step, setStepRaw] = useState<StepId>(feature200k ? "1-Step" : "2-Step");
   const [planRaw, setPlan] = useState<PlanId>("prime");
   const [platform, setPlatform] = useState<PlatformId>("match-trader");
+  const [qty, setQty] = useState(1);
   const [i, setI] = useState(feature200k ? 5 : 4); // 200K (featured) or 100K on the challenges (5K is first)
   const [giftAt, setGiftAt] = useState<number | null>(() => (typeof window === "undefined" ? null : readGift()));
   const giftValid = giftAt !== null && Date.now() < giftAt + GIFT_MS;
@@ -119,11 +121,22 @@ function usePick() {
   const sizes = STEP_SIZES[step];
   const size = sizes[Math.min(i, sizes.length - 1)];
   const entry = getEntry(step, plan, platform, size)!;
-  const price = offerPrice(entry.priceOld, offer);
-  const co = halloween ? { href: withHalloween(checkoutUrl(entry.productId), entry.productId, treats), auto: true } : offerCheckout(entry.productId, offer);
+  // Black Friday bundle (paid accounts): picked in the summary, carried to the checkout.
+  const bfOn = offer === "launch";
+  const tier = BF_TIERS[Math.min(BF_TIERS.length, Math.max(1, bfOn ? qty : 1)) - 1];
+  const listTotal = entry.priceOld * tier.buy;
+  const price = bfOn ? Math.round(listTotal * (1 - tier.off / 100) * 100) / 100 : offerPrice(entry.priceOld, offer);
+  useEffect(() => {
+    if (!bfOn) return;
+    // Same site as the checkout, so it can open on the bundle picked here.
+    try { window.localStorage.setItem("fyt_bf_pick", JSON.stringify({ q: tier.buy, id: entry.productId, t: Date.now() })); } catch { /* storage blocked: checkout opens on Buy 1 */ }
+  }, [bfOn, tier.buy, entry.productId]);
+  const co0 = halloween ? { href: withHalloween(checkoutUrl(entry.productId), entry.productId, treats), auto: true } : offerCheckout(entry.productId, offer);
+  const co = bfOn && tier.buy > 1 ? { ...co0, href: `${co0.href}&bf_qty=${tier.buy}` } : co0;
   return {
     step, plan, platform, i, plans, sizes, size, entry, offer, price, co, halloween, treats, toggleTreat,
-    save: Math.round((entry.priceOld - price) * 100) / 100,
+    tier, listTotal, setQty,
+    save: Math.round((listTotal - price) * 100) / 100,
     setStep: (s: StepId) => { setStepRaw(s); setPlan("prime"); },
     setPlan, setPlatform, setI, setOffer, giftAt, unlockGift,
   };
@@ -890,7 +903,7 @@ function TreatSheet({ p, onClose }: { p: Pick; onClose: () => void }) {
         <a href={p.co.href} className="mt-[4px] flex h-[56px] shrink-0 items-center justify-between rounded-[18px] pl-[18px] pr-[8px] text-white no-underline" style={{ background: done ? "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)" : "rgba(255,255,255,0.08)", boxShadow: done ? "0 18px 36px -14px rgba(37,99,235,0.95)" : "none" }}>
           <span className="flex items-baseline gap-[8px]">
             <b className="text-[20px]">{money(p.price)}</b>
-            <s className="text-[12px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
+            <s className="text-[12px] text-[#bfdbfe]">{money(p.listTotal)}</s>
           </span>
           <span className="flex items-center gap-[6px] rounded-[12px] px-[14px] py-[10px] text-[14px] font-bold" style={{ background: done ? "#fff" : "rgba(255,255,255,0.1)", color: done ? "#2563eb" : "#fff" }}>
             {done ? "Get funded" : "Continue without treats"}
@@ -1151,7 +1164,7 @@ function BuyButton({ p, onNeedTreats, wide = false }: { p: Pick; onNeedTreats: (
         className="relative flex h-[56px] shrink-0 items-center justify-center gap-[10px] overflow-hidden rounded-[16px] text-[16px] font-bold text-white no-underline transition-transform hover:-translate-y-[1px] active:scale-[0.99]"
         style={{ background: "linear-gradient(180deg,#5b95ff,#2563eb 55%,#1d4ed8)", boxShadow: "0 18px 36px -16px rgba(37,99,235,0.95), inset 0 1px 0 rgba(255,255,255,0.3)" }}
       >
-        Get funded
+        {p.offer === "launch" ? `Get ${p.tier.get} accounts` : "Get funded"}
         <Svg d="M5 12h14M13 6l6 6-6 6" size={16} color="#fff" w={2.6} />
       </a>
     );
@@ -1184,12 +1197,12 @@ function BuyButton({ p, onNeedTreats, wide = false }: { p: Pick; onNeedTreats: (
       <span className="flex flex-col">
         <span className="flex items-baseline gap-[8px]">
           <Roll value={money(p.price)} className="text-[24px] font-bold leading-none" />
-          <s className="text-[13px] text-[#bfdbfe]">{money(p.entry.priceOld)}</s>
+          <s className="text-[13px] text-[#bfdbfe]">{money(p.listTotal)}</s>
         </span>
         <span className="mt-[3px] whitespace-nowrap text-[11px] font-semibold text-[#bbf7d0]">You save {money(p.save)}</span>
       </span>
       <span className="relative flex shrink-0 items-center gap-[6px] whitespace-nowrap rounded-[13px] bg-white px-[16px] py-[12px] text-[14.5px] font-bold text-[#2563eb] shadow-[0_8px_20px_-8px_rgba(0,0,0,0.5)]">
-        Get funded
+        {p.offer === "launch" ? `Get ${p.tier.get} accounts` : "Get funded"}
         <motion.span className="flex" animate={reduce ? undefined : { x: [0, 4, 0] }} transition={reduce ? undefined : { duration: 1.2, repeat: Infinity, ease: "easeInOut" }}>
           <Svg d="M5 12h14M13 6l6 6-6 6" size={15} color="#2563eb" w={2.6} />
         </motion.span>
@@ -1433,7 +1446,7 @@ function VariantA({ p, heading, compare, setCompare, openSheet }: LayoutProps) {
             <div className="flex shrink-0 items-end justify-between gap-[10px]">
               <span className="flex items-baseline gap-[8px]">
                 <Roll value={money(p.price)} className="text-[32px] font-bold leading-none tracking-[-0.025em] text-white" />
-                <s className="text-[14px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+                <s className="text-[14px] text-[#8e98b0]">{money(p.listTotal)}</s>
               </span>
               <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
             </div>
@@ -1514,7 +1527,7 @@ function AccountCard({ p, openSheet }: { p: Pick; openSheet: () => void }) {
       <div className="flex shrink-0 items-end justify-between gap-[10px]">
         <span className="flex items-baseline gap-[8px]">
           <Roll value={money(p.price)} className="text-[32px] font-bold leading-none tracking-[-0.025em] text-white" />
-          <s className="text-[14px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+          <s className="text-[14px] text-[#8e98b0]">{money(p.listTotal)}</s>
         </span>
         <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
       </div>
@@ -1600,7 +1613,7 @@ function VariantBar({ p, heading, compare, setCompare, openSheet }: LayoutProps)
             </div>
             <span className="flex items-baseline gap-[8px]">
               <Roll value={money(p.price)} className="text-[30px] font-semibold leading-none tracking-[-0.02em] text-white" />
-              <s className="text-[13px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+              <s className="text-[13px] text-[#8e98b0]">{money(p.listTotal)}</s>
             </span>
             <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
             <div className="w-[240px]"><BuyButton p={p} onNeedTreats={openSheet} wide /></div>
@@ -1765,12 +1778,12 @@ function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps
           </div>
           <span className="flex items-baseline gap-[8px]">
             <Roll value={money(p.price)} className="text-[30px] font-semibold leading-none tracking-[-0.025em] text-white" />
-            <s className="text-[13px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+            <s className="text-[13px] text-[#8e98b0]">{money(p.listTotal)}</s>
           </span>
           <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
           <div className="w-[210px] shrink-0"><BuyButton p={p} onNeedTreats={openSheet} wide /></div>
         </div>
-        {p.offer === "launch" && <div className="relative"><BlackFridaySummary sizeLabel={fmtSize(p.size)} /></div>}
+        {p.offer === "launch" && <div className="relative"><BlackFridaySummary sizeLabel={fmtSize(p.size)} qty={p.tier.buy} onQty={p.setQty} unitList={p.entry.priceOld} /></div>}
         <div className="relative flex items-center justify-between gap-[16px] text-[11.5px]">
           <span style={{ color: MUTED }}><span className="text-[#00b67a]">★</span> <b className="text-[#c7d2e6]">4.5/5</b> · 3K+ reviews · Rewards in 24-48h</span>
           <div className="origin-right scale-[0.78]"><PayMarks /></div>
@@ -1843,7 +1856,7 @@ function PriceRow({ p }: { p: Pick }) {
     <div className="flex shrink-0 items-end justify-between gap-[10px]">
       <span className="flex items-baseline gap-[8px]">
         <Roll value={money(p.price)} className="text-[30px] font-bold leading-none tracking-[-0.025em] text-white" />
-        <s className="text-[13px] text-[#8e98b0]">{money(p.entry.priceOld)}</s>
+        <s className="text-[13px] text-[#8e98b0]">{money(p.listTotal)}</s>
       </span>
       <span className="rounded-full px-[10px] py-[4px] text-[11.5px] font-bold text-[#86efac]" style={{ background: "rgba(34,197,94,0.14)", border: "1px solid rgba(34,197,94,0.35)" }}>Save {money(p.save)}</span>
     </div>
@@ -1949,7 +1962,7 @@ function MobileTwo({ p, heading, compare, setCompare, openSheet }: LayoutProps) 
         <AccountHead p={p} />
         <Hairline />
         <PriceRow p={p} />
-        {p.offer === "diwali" ? <DiwaliSummary p={p} /> : p.offer === "launch" ? <BlackFridaySummary sizeLabel={fmtSize(p.size)} /> : <BonusRow />}
+        {p.offer === "diwali" ? <DiwaliSummary p={p} /> : p.offer === "launch" ? <BlackFridaySummary sizeLabel={fmtSize(p.size)} qty={p.tier.buy} onQty={p.setQty} unitList={p.entry.priceOld} /> : <BonusRow />}
         {p.halloween && <TreatSlots p={p} onPick={openSheet} />}
         <BuyButton p={p} onNeedTreats={openSheet} wide />
         <CodeLine p={p} />

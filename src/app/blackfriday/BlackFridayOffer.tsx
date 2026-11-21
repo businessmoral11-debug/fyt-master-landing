@@ -37,7 +37,7 @@ export function BlackFridayOffer() {
         ))}
       </div>
       <div className="fyt-bf-give"><i>100K</i><span>One <b>100K funded account</b> given away every day. Every purchase is an entry.</span></div>
-      <div className="fyt-bf-note" id="fyt-bf-picker">Choose your account below. Pick your bundle at checkout.</div>
+      <div className="fyt-bf-note" id="fyt-bf-picker">Choose your account, then pick your deal below.</div>
     </div>
   );
 }
