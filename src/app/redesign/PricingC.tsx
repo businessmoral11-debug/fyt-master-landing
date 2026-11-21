@@ -13,6 +13,7 @@ import { ALT_PROMO_CODE, PROMO_CODE, PROMO_DEADLINE } from "@/app/data/promoBann
 import { SELECT_PLAN_EVENT, writeSavedPlan, type SavedPlan } from "@/app/data/savedPlan";
 import { DIWALI_CODE, DIWALI_END, DIWALI_OFF, diwaliBonus, isDiwaliLive } from "@/app/data/diwali";
 import { GiftLine } from "@/app/diwali/GiftStrip";
+import { BlackFridayOffer } from "@/app/blackfriday/BlackFridayOffer";
 import { HALLOWEEN_CODE, HALLOWEEN_END, HALLOWEEN_OFF, TREATS, TREAT_PICKS, halloweenStage, isHalloweenLive, withHalloween, type TreatId } from "@/app/data/halloween";
 
 const STEPS: StepId[] = ["1-Step", "2-Step", "Instant"];
@@ -31,11 +32,13 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 type OfferId = "launch" | "welcome" | "halloween" | "diwali";
 const OFFERS: Record<OfferId, { off: number; code: string; title: string; extras: string[]; who: string }> = {
-  launch: { off: 0.35, code: PROMO_CODE, title: "35% OFF", extras: ["+ 1 free account instantly", "+ free drawdown reset", "+ first payout on demand"], who: "Buy 1 Get 1 · Free reset" },
+  launch: { off: 0.5, code: PROMO_CODE, title: "50% OFF", extras: ["+ 1 free account instantly", "+ daily 100K giveaway entry"], who: "Black Friday · +1 free account" },
   welcome: { off: 0.45, code: ALT_PROMO_CODE, title: "45% OFF", extras: ["+ 1 free account instantly", "+ 5% instant cashback"], who: "Welcome gift" },
   halloween: { off: HALLOWEEN_OFF, code: HALLOWEEN_CODE, title: "45% OFF", extras: ["+ 1 free account instantly", "+ any 2 treats"], who: "Haunted Vault" },
   diwali: { off: DIWALI_OFF, code: DIWALI_CODE, title: "45% OFF", extras: ["+ bonus accounts instantly"], who: "Diwali Special" },
 };
+/** The 45% welcome gift is paused while Black Friday (50%) runs: it would be a worse deal. */
+const WELCOME_ON = false;
 const EMBER = "#ff8a3d";
 const EMBER_SOFT = "#ffb47a";
 const TREATS_KEY = "fyt_hw_treats_v1";
@@ -78,7 +81,7 @@ function usePick() {
   const [offerRaw, setOffer] = useState<OfferId>(() => (giftValid ? "welcome" : "launch"));
   const halloween = isHalloweenLive();
   const diwali = !halloween && isDiwaliLive();
-  const offer: OfferId = halloween ? "halloween" : diwali ? "diwali" : offerRaw === "welcome" && giftValid ? "welcome" : "launch";
+  const offer: OfferId = halloween ? "halloween" : diwali ? "diwali" : WELCOME_ON && offerRaw === "welcome" && giftValid ? "welcome" : "launch";
   const [treats, setTreatsRaw] = useState<TreatId[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -592,8 +595,8 @@ function OfferSwitch({ p }: { p: Pick }) {
     }
   };
   const gift = useLeft(p.giftAt ? p.giftAt + GIFT_MS : null);
-  const giftLive = p.giftAt !== null && gift.ms > 0;
-  const giftGone = p.giftAt !== null && gift.ms <= 0;
+  const giftLive = WELCOME_ON && p.giftAt !== null && gift.ms > 0;
+  const giftGone = !WELCOME_ON || (p.giftAt !== null && gift.ms <= 0);
   const glass = { background: "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)" };
   const pill = { background: "linear-gradient(180deg, rgba(255,255,255,0.2), rgba(147,197,253,0.08))", border: "1px solid rgba(255,255,255,0.32)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35), 0 14px 30px -14px rgba(59,130,246,0.75)" };
   const welcomeOn = p.offer === "welcome" && giftLive;
@@ -1769,7 +1772,7 @@ function VariantCard({ p, heading, compare, setCompare, openSheet }: LayoutProps
           <div className="relative flex items-center gap-[10px] rounded-[12px] px-[12px] py-[8px] text-[12.5px]" style={{ background: "linear-gradient(90deg, rgba(34,197,94,0.14), rgba(34,197,94,0.03))", border: "1px solid rgba(34,197,94,0.3)" }}>
             <Svg d="M12 8v13M4 12v8h16v-8M3 8h18v4H3zM12 8c-1-3-5-4-5-1.5S10 8 12 8zM12 8c1-3 5-4 5-1.5S14 8 12 8z" size={14} color="#86efac" w={2} />
             <span className="font-semibold text-white">+ 1 free account <span className="text-[#86efac]">instantly</span></span>
-            <span className="text-[#bbf7d0]">· Free drawdown reset · First payout on demand</span>
+            <span className="text-[#bbf7d0]">· Daily 100K giveaway entry</span>
           </div>
         )}
         <div className="relative flex items-center justify-between gap-[16px] text-[11.5px]">
@@ -1833,7 +1836,7 @@ function BonusRow() {
       <span className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-[#22c55e]"><Svg d="M12 8v13M4 12v8h16v-8M3 8h18v4H3zM12 8c-1-3-5-4-5-1.5S10 8 12 8zM12 8c1-3 5-4 5-1.5S14 8 12 8z" size={14} color="#04210f" w={2.2} /></span>
       <span className="flex min-w-0 flex-col leading-tight">
         <span className="text-[13.5px] font-bold text-white">+ 1 free account <span className="text-[#86efac]">instantly</span></span>
-        <span className="mt-[2px] text-[11px] font-medium text-[#bbf7d0]">Free drawdown reset · First payout on demand</span>
+        <span className="mt-[2px] text-[11px] font-medium text-[#bbf7d0]">Daily 100K giveaway entry · Buy 2, get 5</span>
       </span>
     </div>
   );
@@ -2000,6 +2003,7 @@ export function ChallengePricing({ heading }: { heading?: ReactNode }) {
     <section id="challenge" className="fyt-rd relative w-full shrink-0 scroll-mt-[120px] overflow-clip" style={{ background: `radial-gradient(90% 45% at 50% 0%, #0b1a3a 0%, #03060d 70%)`, color: "#eef0f6" }}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(96,165,250,0.3), transparent)" }} />
       {p.halloween && <HalloweenDecor />}
+      {p.offer === "launch" && <BlackFridayOffer />}
       {desktop ? (layoutParam() === "old" ? <VariantA {...lp} /> : layoutParam() === "a" ? <VariantFit {...lp} /> : layoutParam() === "b" ? <VariantBar {...lp} /> : <VariantCard {...lp} />) : <MobileTwo {...lp} />}
       <AnimatePresence>{sheet && <TreatSheet p={p} onClose={() => setSheet(false)} />}</AnimatePresence>
     </section>

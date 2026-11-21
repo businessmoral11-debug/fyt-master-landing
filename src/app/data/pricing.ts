@@ -35,8 +35,15 @@ interface Row {
 
 type PlatformTable = Record<PlatformId, Record<number, PricingEntry>>;
 
-/** Display sale price: 35% off the list price (BOGO35). */
-export const SALE_DISCOUNT_FRACTION = 0.35;
+/** Display sale price: 50% off the list price (BLACKFRIDAY). */
+export const SALE_DISCOUNT_FRACTION = 0.5;
+
+/** Black Friday list-price rise, added on top of the base prices in the rows below. */
+export function priceBump(size: number): number {
+  if (size <= 10000) return 7;
+  if (size <= 100000) return 10;
+  return 15;
+}
 
 export function salePrice(priceOld: number): number {
   return Math.round(priceOld * (1 - SALE_DISCOUNT_FRACTION) * 100) / 100;
@@ -46,8 +53,10 @@ function build(rules: Rules, rows: Row[]): PlatformTable {
   const out: PlatformTable = { "match-trader": {}, "platform-5": {} };
   for (const r of rows) {
     const split = r.split ?? rules.split;
-    out["match-trader"][r.size] = { ...rules, split, priceOld: r.mt[0], priceNew: salePrice(r.mt[0]), productId: r.mt[2] };
-    out["platform-5"][r.size] = { ...rules, split, priceOld: r.p5[0], priceNew: salePrice(r.p5[0]), productId: r.p5[2] };
+    const mt = r.mt[0] + priceBump(r.size);
+    const p5 = r.p5[0] + priceBump(r.size);
+    out["match-trader"][r.size] = { ...rules, split, priceOld: mt, priceNew: salePrice(mt), productId: r.mt[2] };
+    out["platform-5"][r.size] = { ...rules, split, priceOld: p5, priceNew: salePrice(p5), productId: r.p5[2] };
   }
   return out;
 }
@@ -160,7 +169,7 @@ export function getEntry(step: StepId, plan: PlanId, platform: PlatformId, size:
 // Instant Prime SKUs use plain add-to-cart (checkout-link is unreliable for those products).
 const CHECKOUT_LINK_BASE = "https://fundingyourtrades.com/checkout-link/?products=";
 const CHECKOUT_ADD_TO_CART_BASE = "https://fundingyourtrades.com/checkout/?add-to-cart=";
-export const CHECKOUT_COUPON_CODE = "BOGO35";
+export const CHECKOUT_COUPON_CODE = "BLACKFRIDAY";
 
 const INSTANT_PRIME_PRODUCT_IDS = new Set<number>([
   22214, 22213, 22212, 22211, 22210,
