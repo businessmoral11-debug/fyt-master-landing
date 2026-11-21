@@ -1025,6 +1025,7 @@ window.FYT_CO = {
     const code = couponInput.value.trim().toUpperCase(); if(!code) return;
     couponMsg.textContent = 'Checking…'; couponMsg.className = 'coupon-msg';
     const body = new FormData(); body.append('action','fyt_co_apply_coupon'); body.append('nonce', C.nonce); body.append('code', code);
+    if(BF) body.append('bf','1');
     couponCodes().forEach(c => body.append('existing[]', c));
     fetch(C.ajax,{method:'POST',body,credentials:'same-origin'}).then(r=>r.json()).then(res=>{
       if(!res.success){ couponMsg.textContent=(res.data&&res.data.message)||'Invalid coupon'; couponMsg.className='coupon-msg err'; return; }
@@ -1255,6 +1256,7 @@ window.FYT_CO = {
       body.append('phone',document.getElementById('coPhone').value.trim()); body.append('country',country);
       body.append('address',address); body.append('city',city);
       body.append('bf_qty', String(paidQty()));
+      if(BF) body.append('bf','1');
       body.append('state',province); body.append('payment_ui',state.pm);
       if(needsDevice(current())) body.append('device', state.device);
       couponCodes().forEach(c => body.append('coupons[]', c));
