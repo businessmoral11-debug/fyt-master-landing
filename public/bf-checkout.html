@@ -419,7 +419,7 @@ body.fyt-co-active iframe[name="intercom-launcher-frame"]{
 #fyt-custom-checkout .bf-notes div{display:flex;gap:8px;align-items:flex-start}
 #fyt-custom-checkout .bf-notes svg{flex:none;margin-top:1px}
 #fyt-custom-checkout .bf-notes b{font-weight:600;color:#0B1B3F}
-#fyt-custom-checkout .bf-notes a{color:#2F6BFF;text-decoration:underline;text-underline-offset:2px}
+#fyt-custom-checkout.bf-on #upgradeStep{display:none!important}
 @media (max-width:520px){
 #fyt-custom-checkout #bfBox{padding:16px 14px}
 #fyt-custom-checkout .bf-head{font-size:34px}
@@ -894,7 +894,22 @@ window.FYT_CO = {
   function renderBf(row){
     const box = document.getElementById('bfBox');
     if(!box) return;
-    if(!bfActive() || !row){ box.style.display='none'; return; }
+    const bfShow = bfActive() && !!row;
+    // While Black Friday bundles show, the "Upgrade Your Account" step is hidden and the steps are renumbered.
+    try{
+      const root = document.getElementById('fyt-custom-checkout');
+      if(root && root.classList.contains('bf-on') !== bfShow){
+        root.classList.toggle('bf-on', bfShow);
+        let n = 0;
+        root.querySelectorAll('.step').forEach(function(st){
+          const num = st.querySelector('.step-num'); if(!num) return;
+          if(bfShow && st.id === 'upgradeStep') return;
+          if(st.offsetParent === null && st.id !== 'upgradeStep') return;
+          num.textContent = String(++n);
+        });
+      }
+    }catch(e){}
+    if(!bfShow){ box.style.display='none'; return; }
     const t = bfTier(), idx = BF.tiers.indexOf(t), next = BF.tiers[idx+1] || null;
     const free = t.get - t.buy;
     const k = Number(row.size) >= 1000 ? (Number(row.size)/1000)+'K' : String(row.size);
@@ -931,7 +946,7 @@ window.FYT_CO = {
       '<div class="bf-tiles" role="group" aria-label="How many accounts to buy">'+tiles+'</div>'+
       up+
       '<div class="bf-notes">'+
-        '<div>'+tick+'<span>Bonus accounts are the <b>same size</b> and are sent with your order. <a href="https://fundingyourtrades.com/faq/how-does-the-bogo-offer-works/" target="_blank" rel="noopener">How bonus accounts work</a></span></div>'+
+        '<div>'+tick+'<span>Bonus accounts are the <b>same size</b>.</span></div>'+
         '<div>'+tick+'<span><b>'+entries+' '+(entries>1?'entries':'entry')+'</b> in today&#39;s $100K funded account giveaway</span></div>'+
       '</div>';
     box.style.display='block';
