@@ -11,25 +11,25 @@ export interface PromoItem {
 
 /** Top-banner benefit lines (deal line is separate so mobile can stack cleanly). */
 export const PROMO_BENEFITS = [
-  "First Payout on Demand",
-  "Free Drawdown Reset",
+  "Buy 4 Get 10 Accounts",
+  "Daily 100K Funded Giveaway",
 ] as const;
 
 /** Deal line shown after benefits on the top banner. */
-export const PROMO_DEAL_LINE = "BOGO Offer: 35% off + Buy 1 Get 1 Free";
+export const PROMO_DEAL_LINE = "Black Friday: 50% off + 1 Free Account";
 
 /** Short deal (no "Dashboard Launch Offer:" label) for the phone banner and floating button. */
-export const PROMO_DEAL_SHORT = "35% off + Buy 1 Get 1 Free";
+export const PROMO_DEAL_SHORT = "50% off + 1 Free Account";
 
 /** Offer card next to the pricing table: one big headline plus two short extras. */
-export const PROMO_CARD_HEADLINE = "35% off";
-export const PROMO_CARD_EXTRAS = ["1 Bonus Account Instantly", "Free Drawdown Reset"] as const;
+export const PROMO_CARD_HEADLINE = "50% off";
+export const PROMO_CARD_EXTRAS = ["1 Free Account Instantly", "Daily 100K Giveaway"] as const;
 
 /** Full banner copy order: deal first, then benefits. */
 export const PROMO_BANNER_ITEMS = [PROMO_DEAL_LINE, ...PROMO_BENEFITS] as const;
 
 /** Promo code shown in the top-banner CODE pill (also used at checkout). */
-export const PROMO_CODE = "BOGO35";
+export const PROMO_CODE = "BLACKFRIDAY";
 
 /** Alternate welcome offer shown on the pricing card (manual code entry). */
 export const ALT_PROMO_LABEL = "For new traders";
@@ -38,11 +38,11 @@ export const ALT_PROMO_CODE = "WELCOME45";
 
 /** Kept for pricing-panel badge / coupon references. */
 export const PROMO_ITEMS: PromoItem[] = [
-  { kind: "code", label: "BOGO Offer", text: "35% off + Buy 1 Get 1 Free + Free Drawdown Reset + First Payout on Demand", code: PROMO_CODE },
+  { kind: "code", label: "Black Friday", text: "50% off + 1 Free Account + Daily 100K Funded Giveaway", code: PROMO_CODE },
 ];
 
 /** BOGO35 offer (live since 16 Nov 9:45 AM IST, coupon has no end). Front-end countdown: 100 hours from 16 Nov 4:20 PM IST. */
-export const PROMO_DEADLINE = "2026-11-21T07:20:00+05:30";
+export const PROMO_DEADLINE = "2026-12-01T17:00:00+05:30"; // 10 days from launch (21 Nov 2026)
 
 /** Spots left (not shown while the countdown runs; kept for switching back). Updated by hand from real sales. */
 export const PROMO_SPOTS_LEFT = 247;

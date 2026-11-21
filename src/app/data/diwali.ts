@@ -25,7 +25,6 @@ function previewFlag(): boolean | null {
     const q = new URLSearchParams(window.location.search).get("diwali");
     if (q === "1") return true;
     if (q === "0") return false;
-    if (/\.vercel\.app$/i.test(window.location.hostname)) return true;
   } catch {
     // Ignore and fall back to the dates.
   }
