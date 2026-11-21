@@ -1,0 +1,75 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Thank you preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:#06102a;color:#0B1B3F;-webkit-font-smoothing:antialiased;padding:70px 14px 60px}
+.pv{position:fixed;left:50%;transform:translateX(-50%);top:8px;background:#ffb800;color:#1a1000;font:600 11px/1 Inter,sans-serif;letter-spacing:.12em;padding:6px 12px;border-radius:999px}
+.card{max-width:620px;margin:0 auto;background:#fff;border-radius:22px;padding:34px 30px;text-align:center}
+.ok{width:58px;height:58px;border-radius:50%;background:#E7F7EE;display:flex;align-items:center;justify-content:center;margin:0 auto}
+h1{font-weight:300;font-size:32px;letter-spacing:-.02em;margin-top:18px}
+h1 b{font-weight:600}
+.lead{margin-top:8px;font-size:14.5px;color:#42527A}
+.box{margin-top:24px;text-align:left;border-radius:18px;padding:18px;background:linear-gradient(180deg,#F4F8FF,#fff 80%);border:1px solid #D6E4FF}
+.k{font-size:10.5px;font-weight:600;letter-spacing:.26em;color:#2F6BFF}
+.n{margin-top:10px;font-size:36px;font-weight:300;letter-spacing:-.03em;line-height:1}
+.n small{font-size:16px;font-weight:400;color:#42527A;letter-spacing:0;margin-left:8px}
+.s{margin-top:8px;font-size:13px;color:#42527A}.s b{color:#0B1B3F;font-weight:600}
+.dots{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.dots i{width:26px;height:16px;border-radius:5px;background:#2F6BFF}
+.dots i.f{background:#FFF3D1;border:1px solid #E9C46A}
+.give{margin-top:14px;text-align:left;border-radius:18px;padding:18px;background:#0B1B3F;color:#fff;position:relative;overflow:hidden}
+.give:before{content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(closest-side,rgba(47,107,255,.55),transparent)}
+.give>*{position:relative}
+.give .k{color:#9CC8FF}
+.give h2{margin-top:10px;font-size:20px;font-weight:400;line-height:1.3}
+.give h2 b{font-weight:600;color:#FFD98A}
+.tix{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tk{position:relative;border-radius:10px;padding:9px 14px 9px 18px;background:linear-gradient(135deg,#FFE9B0,#F2B544);color:#3a2200;font-size:10px;font-weight:700;letter-spacing:.14em;animation:in .5s cubic-bezier(.3,1.4,.5,1) both}
+.tk b{display:block;font-size:15px;letter-spacing:0;font-weight:600;margin-top:2px}
+.tk:before{content:"";position:absolute;left:-6px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#0B1B3F}
+@keyframes in{from{opacity:0;transform:translateY(8px) scale(.9)}}
+.give p{margin-top:12px;font-size:12.5px;color:#C7D5F2}
+.next{margin-top:22px;display:grid;gap:9px;text-align:left;font-size:13px;color:#42527A}
+.next div{display:flex;gap:9px}
+.next b{color:#0B1B3F;font-weight:600}
+.btn{display:block;margin-top:24px;background:#2F6BFF;color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:15px;border-radius:14px}
+@media (max-width:520px){.card{padding:26px 18px}h1{font-size:26px}.n{font-size:30px}}
+@media (prefers-reduced-motion:reduce){.tk{animation:none}}
+</style></head><body>
+<div class="pv">PREVIEW · NOT LIVE</div>
+<div class="card">
+  <div class="ok"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0E8A45" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+  <h1>Thank you. <b>Your order is confirmed.</b></h1>
+  <p class="lead">Your account details are on the way to your email.</p>
+  <div class="box">
+    <div class="k">YOUR ACCOUNTS</div>
+    <div class="n" id="n"></div>
+    <div class="s" id="s"></div>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+  </div>
+  <div class="give">
+    <div class="k">DAILY $100K FUNDED ACCOUNT GIVEAWAY</div>
+    <h2 id="gh"></h2>
+    <div class="tix" id="tix"></div>
+    <p>One $100K funded account is given away every day. Good luck.</p>
+  </div>
+  <div class="next">
+    <div><b>1.</b><span>Check your email for your login details.</span></div>
+    <div><b>2.</b><span>Your bonus accounts are the same size as the account you bought.</span></div>
+  </div>
+  <a class="btn" href="#">Go to my dashboard</a>
+</div>
+<script>
+(function(){
+  var q=new URLSearchParams(location.search), tiers={1:2,2:5,3:7,4:10};
+  var paid=Math.min(4,Math.max(1,parseInt(q.get('paid'),10)||1)), get=tiers[paid], size=(q.get('size')||'100K').replace(/[^0-9Kk]/g,'').toUpperCase();
+  document.getElementById('n').innerHTML=get+'<small>&times; $'+size+' accounts</small>';
+  document.getElementById('s').innerHTML='<b>'+paid+'</b> purchased + <b>'+(get-paid)+'</b> bonus';
+  var d='';for(var i=0;i<get;i++)d+='<i'+(i<paid?'':' class="f"')+'></i>';document.getElementById('dots').innerHTML=d;
+  var times={1:'Your entry is in.',2:'You are entered <b>twice</b>.',3:'You are entered <b>3 times</b>.',4:'You are entered <b>4 times</b>.'};
+  document.getElementById('gh').innerHTML=times[paid]+' '+(paid>1?'Each account you bought is one entry in today&#39;s draw.':'This purchase is one entry in today&#39;s draw.');
+  var t='';for(var j=1;j<=paid;j++)t+='<div class="tk" style="animation-delay:'+(j*120)+'ms">ENTRY<b>'+j+' of '+paid+'</b></div>';document.getElementById('tix').innerHTML=t;
+})();
+</script>
+</body></html>
