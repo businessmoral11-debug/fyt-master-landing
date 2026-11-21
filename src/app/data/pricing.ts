@@ -40,10 +40,10 @@ export const SALE_DISCOUNT_FRACTION = 0.5;
 
 /** Black Friday list-price rise, added on top of the base prices in the rows below. */
 export function priceBump(size: number): number {
-  if (size <= 5000) return 12; // +7, then +5 more
+  if (size <= 5000) return 10; // +7, +5, then -2
   if (size <= 10000) return 14; // +7, then +7 more
   if (size <= 100000) return 20; // +10, then +10 more
-  return 25; // 200K: +15, then +10 more
+  return 20; // 200K: +15, +10, then -5
 }
 
 export function salePrice(priceOld: number): number {

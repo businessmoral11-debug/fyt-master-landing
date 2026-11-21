@@ -173,6 +173,8 @@
   if (window.FYT_BF_CONFIG) for (var k in window.FYT_BF_CONFIG) CONFIG[k] = window.FYT_BF_CONFIG[k];
   var bar = document.getElementById('fyt-bf-bar');
   if (!bar || bar.getAttribute('data-init')) return; bar.setAttribute('data-init', '1');
+  // No promo bar on the checkout: nothing should pull the eye away from paying.
+  if (document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) { if (bar.parentNode) bar.parentNode.removeChild(bar); return; }
   var $ = function(s){ return bar.querySelector(s); };
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var esc = function(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
