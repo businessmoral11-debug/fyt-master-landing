@@ -1,4 +1,4 @@
-<!-- FYT BLACK FRIDAY TOP BAR v2.1, thin on scroll (paste-in snippet, vanilla JS, no images, no libraries)
+<!-- FYT BLACK FRIDAY TOP BAR v2.2, slim, one row on phones, thin on scroll (paste-in snippet, vanilla JS, no images, no libraries)
   Paste once: WordPress Custom HTML block or header/footer hook (wp_body_open / wp_footer), same as the Diwali bar.
   It moves itself to the top of <body>, stays fixed while scrolling and pads the page so nothing is covered.
   Exposes --fyt-bf-h (bar height) on <html> so a sticky site header can use top:var(--fyt-bf-h,0px).
@@ -95,6 +95,46 @@
 #fyt-bf-bar .fbf-tiles{gap:3px}#fyt-bf-bar .fbf-t{width:32px;height:34px;border-radius:7px}#fyt-bf-bar .fbf-t b{font-size:13px}#fyt-bf-bar .fbf-t small{font-size:7px;margin-top:3px}
 }
 @media (max-width:370px){#fyt-bf-bar .fbf-code svg{display:none}#fyt-bf-bar .fbf-t{width:29px}#fyt-bf-bar .fbf-in{padding:8px}}
+/* ---- optimised sizes ---- */
+#fyt-bf-bar{height:60px}
+#fyt-bf-bar .fbf-in{gap:20px}
+#fyt-bf-bar .fbf-brand{font-size:15px}
+#fyt-bf-bar .fbf-cards{width:50px;height:34px}#fyt-bf-bar .fbf-cards i{left:17px;top:3px;width:17px;height:25px}
+#fyt-bf-bar .fbf-hero{font-size:20px}
+#fyt-bf-bar .fbf-tick{height:19px;margin-top:3px}
+#fyt-bf-bar .fbf-chip{height:19px;padding:0 8px;font-size:11.5px;border-radius:5px}
+#fyt-bf-bar .fbf-code{height:36px}#fyt-bf-bar .fbf-code b{font-size:14px}
+#fyt-bf-bar .fbf-t{width:38px;height:38px}#fyt-bf-bar .fbf-t b{font-size:15px}#fyt-bf-bar .fbf-t small{font-size:7.5px;margin-top:3px}
+#fyt-bf-bar .fbf-cta{height:38px;padding:0 18px;font-size:12px}
+@media (max-width:1359px){#fyt-bf-bar{height:60px}#fyt-bf-bar .fbf-eb{display:none}#fyt-bf-bar .fbf-hero{font-size:19px}}
+@media (max-width:1023px){
+#fyt-bf-bar{height:90px}
+#fyt-bf-bar .fbf-in{gap:6px 14px;padding:6px 12px}
+#fyt-bf-bar .fbf-t{height:32px}#fyt-bf-bar .fbf-t small{margin-top:2px}#fyt-bf-bar .fbf-code{height:32px}
+#fyt-bf-bar .fbf-hero{font-size:19px}
+}
+@media (max-width:600px){
+#fyt-bf-bar{height:86px}
+#fyt-bf-bar .fbf-in{gap:6px 8px;padding:7px 10px}
+#fyt-bf-bar .fbf-cards{display:none!important}
+#fyt-bf-bar .fbf-hero{font-size:16px}
+#fyt-bf-bar .fbf-tick{height:17px;margin-top:3px}
+#fyt-bf-bar .fbf-chip{height:17px;padding:0 7px;font-size:10.5px}
+#fyt-bf-bar .fbf-cta{order:0;flex:none;height:34px;padding:0 14px;font-size:11.5px}
+#fyt-bf-bar .fbf-cl{display:none}#fyt-bf-bar .fbf-cs{display:inline}
+#fyt-bf-bar .fbf-code{height:28px;padding:0 9px}#fyt-bf-bar .fbf-code b{font-size:12px}
+#fyt-bf-bar .fbf-t{width:31px;height:28px;border-radius:6px}#fyt-bf-bar .fbf-t b{font-size:12px}#fyt-bf-bar .fbf-t small{font-size:6.5px;margin-top:2px}
+}
+@media (max-width:600px){
+#fyt-bf-bar{height:58px}
+#fyt-bf-bar .fbf-in{flex-wrap:nowrap;gap:8px;padding:0 10px;justify-content:space-between}
+#fyt-bf-bar .fbf-br,#fyt-bf-bar .fbf-code{display:none!important}
+#fyt-bf-bar .fbf-hero{font-size:14px}
+#fyt-bf-bar .fbf-t{width:28px;height:30px}#fyt-bf-bar .fbf-t b{font-size:12px}
+#fyt-bf-bar .fbf-cta{order:9;height:32px;padding:0 12px}
+}
+@media (max-width:600px){#fyt-bf-bar .fbf-chip{letter-spacing:0;padding:0 6px}}
+@media (max-width:370px){#fyt-bf-bar .fbf-in{gap:6px;padding:0 8px}#fyt-bf-bar .fbf-cta svg{display:none}#fyt-bf-bar .fbf-cta{padding:0 11px}#fyt-bf-bar .fbf-t{width:26px}}
 /* ---- thin mode while scrolling ---- */
 #fyt-bf-bar{transition:height .28s ease}
 #fyt-bf-bar.fbf-thin{height:44px}
@@ -155,7 +195,7 @@
     heroShort: 'BUY 2 GET 5',      // used when the long headline does not fit
     // Line under the hero (rotates continuously). tickerShort is used when a line does not fit.
     ticker: ['50% OFF + INSTANT BOGO', 'EVERY PURCHASE = 100K GIVEAWAY ENTRY'],
-    tickerShort: ['50% OFF + INSTANT BOGO', '1 ENTRY TO WIN A 100K ACCOUNT'],
+    tickerShort: ['50% OFF + BOGO', 'WIN A 100K ACCOUNT'],
     srText: 'Black Friday: Buy 2 Get 5 accounts, plus 50% off and Instant BOGO. Every purchase is 1 entry to win a 100K funded account.',
     rotateMs: 2500,
     soonHours: 24, soonText: 'Ends soon',
