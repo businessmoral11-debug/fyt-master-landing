@@ -88,7 +88,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
   },
   "2-Step": {
     classic: build(RULES_2STEP, [
-      { size: 5000, mt: [40, 24, 1235], p5: [43, 25.8, 12371], split: "95/5" },
+      { size: 5000, mt: [34.1, 24, 1235], p5: [43, 25.8, 12371], split: "95/5" }, // MT list 44.10 (BF 22.05, crypto 20.95)
       { size: 10000, mt: [95, 57, 1234], p5: [105, 63, 12367], split: "95/5" },
       { size: 25000, mt: [199, 119.4, 1233], p5: [209, 125.4, 12369] },
       { size: 50000, mt: [279, 167.4, 1232], p5: [289, 173.4, 12370] },
