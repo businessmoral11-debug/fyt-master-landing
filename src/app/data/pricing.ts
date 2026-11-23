@@ -70,7 +70,7 @@ const RULES_INSTANT_PRIME: Rules = { profit: "4%", maxDaily: "3%", maxOverall: "
 export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>> = {
   "1-Step": {
     classic: build(RULES_1STEP, [
-      { size: 5000, mt: [67, 40.2, 1216], p5: [73, 43.8, 12383] },
+      { size: 5000, mt: [54, 40.2, 1216], p5: [60, 43.8, 12383] }, // list 64 / 70 (BF 32 / 35)
       { size: 10000, mt: [114, 68.4, 1217], p5: [124, 74.4, 12379] },
       { size: 25000, mt: [219, 131.4, 1218], p5: [229, 137.4, 12381] },
       { size: 50000, mt: [309, 185.4, 1219], p5: [319, 191.4, 12382] },
@@ -78,7 +78,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
       { size: 200000, mt: [909, 545.4, 1221], p5: [919, 551.4, 12380] },
     ]),
     prime: build(RULES_1STEP, [
-      { size: 5000, mt: [67, 40.2, 21272], p5: [77, 46.2, 21273] },
+      { size: 5000, mt: [54, 40.2, 21272], p5: [64, 46.2, 21273] }, // list 64 / 74 (BF 32 / 37)
       { size: 10000, mt: [114, 68.4, 21264], p5: [124, 74.4, 21265] },
       { size: 25000, mt: [219, 131.4, 21268], p5: [229, 137.4, 21269] },
       { size: 50000, mt: [309, 185.4, 21270], p5: [319, 191.4, 21271] },
