@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BF_CODE, BF_TIERS } from "@/app/data/blackfriday";
+import { BF_CODE, BF_LANDING_TIERS as BF_TIERS } from "@/app/data/blackfriday";
 import { ensureBfAssets } from "./bfStyles";
 
 /** Black Friday offer block at the top of the pricing section: giant 50%, then the Buy 1 to Buy 4 staircase. */
@@ -19,9 +19,9 @@ export function BlackFridayOffer() {
         <div className="fyt-bf-off"><b>OFF</b>EVERY ACCOUNT<br />+ 1 FREE</div>
       </div>
       <h2 className="fyt-bf-h2"><span>Buy more. </span><b className="fyt-bf-g">Pay less. Get more.</b></h2>
-      <div className="fyt-bf-stairs">
+      <div className="fyt-bf-stairs fyt-bf-two">
         {BF_TIERS.map((t, k) => (
-          <button key={t.buy} type="button" className={`fyt-bf-st fyt-bf-s${k + 1}`} onClick={toPicker} aria-label={`Buy ${t.buy}, ${t.off}% off, get ${t.get} accounts`}>
+          <button key={t.buy} type="button" className={`fyt-bf-st fyt-bf-s${k === BF_TIERS.length - 1 ? 4 : 2}`} onClick={toPicker} aria-label={`Buy ${t.buy}, ${t.off}% off, get ${t.get} accounts`}>
             <div className="fyt-bf-si">
               <div>
                 {k === BF_TIERS.length - 1 && <span className="fyt-bf-ribbon">BEST DEAL</span>}

@@ -19,3 +19,6 @@ export const BF_TIERS: BfTier[] = [
 ];
 
 export const BF_MAX_OFF = 55;
+
+/** Deals shown on the landing page (pricing table and the block above it). Buy 3 and Buy 4 stay available at checkout. */
+export const BF_LANDING_TIERS: BfTier[] = BF_TIERS.slice(0, 2);

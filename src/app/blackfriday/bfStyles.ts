@@ -121,6 +121,10 @@ export const BF_CSS = `
 .fyt-bf-sum-q{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;font-weight:500;color:#DCE6FA}
 .fyt-bf-sum-q span{font-size:11px;font-weight:400;color:#8FA6D6}
 .fyt-bf-sum-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:16px}
+.fyt-bf-sum-tiles.fyt-bf-two{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fyt-bf-stairs.fyt-bf-two{max-width:520px}
+.fyt-bf-two .fyt-bf-s2{height:176px}.fyt-bf-two .fyt-bf-s4{height:214px}
+@media (max-width:640px){.fyt-bf-two .fyt-bf-s2{height:128px}.fyt-bf-two .fyt-bf-s4{height:156px}}
 .fyt-bf-sum-t{position:relative;min-width:0;appearance:none;cursor:pointer;border-radius:13px;padding:11px 2px 9px;text-align:center;font-family:inherit;color:#fff;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.12);transition:border-color .2s,background .2s,box-shadow .2s,transform .15s}
 .fyt-bf-sum-t:hover{border-color:rgba(140,180,255,.6)}
 .fyt-bf-sum-t:active{transform:scale(.97)}

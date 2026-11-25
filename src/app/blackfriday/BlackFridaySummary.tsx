@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BF_TIERS } from "@/app/data/blackfriday";
+import { BF_LANDING_TIERS as BF_TIERS } from "@/app/data/blackfriday";
 import { ensureBfAssets } from "./bfStyles";
 
 const usd = (n: number) => "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
@@ -16,11 +16,10 @@ export function BlackFridaySummary({ sizeLabel, qty, onQty, unitList }: { sizeLa
   return (
     <div className="fyt-bf fyt-bf-sum">
       <div className="fyt-bf-sum-q">How many accounts do you want?<span>Tap to change</span></div>
-      <div className="fyt-bf-sum-tiles" role="radiogroup" aria-label="Black Friday deal">
+      <div className="fyt-bf-sum-tiles fyt-bf-two" role="radiogroup" aria-label="Black Friday deal">
         {BF_TIERS.map((x) => (
           <button key={x.buy} type="button" role="radio" aria-checked={x.buy === t.buy} className={`fyt-bf-sum-t${x.buy === t.buy ? " on" : ""}`} onClick={() => onQty(x.buy)}>
-            {x.buy === 2 && <span className="fyt-bf-sum-tag">POPULAR</span>}
-            {x.buy === 4 && <span className="fyt-bf-sum-tag gd">BEST VALUE</span>}
+            {x.buy === BF_TIERS[BF_TIERS.length - 1].buy && <span className="fyt-bf-sum-tag gd">BEST VALUE</span>}
             <small>Buy {x.buy}</small>
             <b>Get {x.get}</b>
             <em>{x.off}% off</em>
