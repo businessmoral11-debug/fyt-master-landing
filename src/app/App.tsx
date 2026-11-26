@@ -23,6 +23,7 @@ import { PROMO_BENEFITS, PROMO_CODE, PROMO_DEAL_LINE, PROMO_DEAL_SHORT, PROMO_DE
 import { HalloweenPromoBar } from "@/app/HalloweenPromoBar";
 import { DiwaliPromoBar } from "@/app/diwali/DiwaliPromoBar";
 import { BlackFridayBar } from "@/app/blackfriday/BlackFridayBar";
+import { FLASH_OFF, useFlash } from "@/app/data/flash";
 import { GiftStrip } from "@/app/diwali/GiftStrip";
 import { DIWALI_OFF, isDiwaliLive } from "@/app/data/diwali";
 import { HALLOWEEN_OFF, HALLOWEEN_CODE, HALLOWEEN_DEAL_LINE, HALLOWEEN_DEAL_SHORT, HALLOWEEN_END, STAGE_LABEL, halloweenStage, isHalloweenLive } from "@/app/data/halloween";
@@ -608,10 +609,16 @@ function PromoCountdownPill({ compact = false, pulse, deadline = PROMO_DEADLINE,
 }
 
 /** Lowest starting price across the three models (Prime, MatchTrader, smallest size) with today's offer. */
-function heroFromPrice(): number {
-  const off = isHalloweenLive() ? HALLOWEEN_OFF : isDiwaliLive() ? DIWALI_OFF : 0.5;
+function heroFromPrice(flash = false): number {
+  const off = isHalloweenLive() ? HALLOWEEN_OFF : isDiwaliLive() ? DIWALI_OFF : flash ? FLASH_OFF / 100 : 0.5;
   const prices = (Object.keys(STEP_SIZES) as StepId[]).map((st) => getEntry(st, "prime", "match-trader", STEP_SIZES[st][0])?.priceOld ?? Infinity);
   return Math.round(Math.min(...prices) * (1 - off));
+}
+
+/** Starting price on the hero button (drops to the flash price during the visitor's 12 hours). */
+function HeroFrom() {
+  const flash = useFlash().on;
+  return <>${heroFromPrice(flash)}</>;
 }
 
 /** Small carved pumpkin used in the Halloween banner. */
@@ -1492,7 +1499,7 @@ function HeroCtaRow({ left = false }: { left?: boolean }) {
             <div aria-hidden className="absolute border border-[rgba(156,196,255,0.35)] border-solid inset-0 pointer-events-none rounded-[999px]" />
             <span className="flex flex-col items-start leading-none">
               <span className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[16px] lg:text-[17px] text-white whitespace-nowrap">Get funded</span>
-              <span className="mt-[4px] font-['Inter:Medium',sans-serif] text-[11.5px] text-[#dbeafe] whitespace-nowrap">from ${heroFromPrice()}</span>
+              <span className="mt-[4px] font-['Inter:Medium',sans-serif] text-[11.5px] text-[#dbeafe] whitespace-nowrap">from <HeroFrom /></span>
             </span>
             <span className="flex size-[42px] lg:size-[44px] shrink-0 items-center justify-center rounded-full bg-white shadow-[0_6px_16px_-6px_rgba(0,0,0,0.5)] transition-transform duration-300 group-hover:translate-x-[2px]">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">

@@ -15,7 +15,7 @@ import { DIWALI_CODE, DIWALI_END, DIWALI_OFF, diwaliBonus, isDiwaliLive } from "
 import { GiftLine } from "@/app/diwali/GiftStrip";
 import { BlackFridayOffer } from "@/app/blackfriday/BlackFridayOffer";
 import { BlackFridaySummary } from "@/app/blackfriday/BlackFridaySummary";
-import { BF_TIERS } from "@/app/data/blackfriday";
+import { useBfTiers, useFlash } from "@/app/data/flash";
 import { HALLOWEEN_CODE, HALLOWEEN_END, HALLOWEEN_OFF, TREATS, TREAT_PICKS, halloweenStage, isHalloweenLive, withHalloween, type TreatId } from "@/app/data/halloween";
 
 const STEPS: StepId[] = ["1-Step", "2-Step", "Instant"];
@@ -123,6 +123,8 @@ function usePick() {
   const entry = getEntry(step, plan, platform, size)!;
   // Black Friday bundle (paid accounts): picked in the summary, carried to the checkout.
   const bfOn = offer === "launch";
+  const BF_TIERS = useBfTiers();
+  const flash = useFlash().on;
   const tier = BF_TIERS[Math.min(BF_TIERS.length, Math.max(1, bfOn ? qty : 1)) - 1];
   const listTotal = entry.priceOld * tier.buy;
   const price = bfOn ? Math.round(listTotal * (1 - tier.off / 100) * 100) / 100 : offerPrice(entry.priceOld, offer);
@@ -132,7 +134,8 @@ function usePick() {
     try { window.localStorage.setItem("fyt_bf_pick", JSON.stringify({ q: tier.buy, id: entry.productId, t: Date.now() })); } catch { /* storage blocked: checkout opens on Buy 1 */ }
   }, [bfOn, tier.buy, entry.productId]);
   const co0 = halloween ? { href: withHalloween(checkoutUrl(entry.productId), entry.productId, treats), auto: true } : offerCheckout(entry.productId, offer);
-  const co = bfOn && tier.buy > 1 ? { ...co0, href: `${co0.href}&bf_qty=${tier.buy}` } : co0;
+  const co1 = bfOn && tier.buy > 1 ? { ...co0, href: `${co0.href}&bf_qty=${tier.buy}` } : co0;
+  const co = bfOn && flash ? { ...co1, href: `${co1.href}&flash=1` } : co1;
   return {
     step, plan, platform, i, plans, sizes, size, entry, offer, price, co, halloween, treats, toggleTreat,
     tier, listTotal, setQty,

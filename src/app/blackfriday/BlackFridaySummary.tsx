@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BF_LANDING_TIERS as BF_TIERS } from "@/app/data/blackfriday";
+import { useBfTiers } from "@/app/data/flash";
 import { ensureBfAssets } from "./bfStyles";
 
 const usd = (n: number) => "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
@@ -10,6 +10,7 @@ const usd = (n: number) => "$" + n.toLocaleString("en-US", { minimumFractionDigi
  */
 export function BlackFridaySummary({ sizeLabel, qty, onQty, unitList }: { sizeLabel: string; qty: number; onQty: (q: number) => void; unitList: number }) {
   useEffect(() => { ensureBfAssets(); }, []);
+  const BF_TIERS = useBfTiers().slice(0, 2);
   const t = BF_TIERS.find((x) => x.buy === qty) ?? BF_TIERS[0];
   const bonus = t.get - t.buy;
   const each = Math.round(((unitList * t.buy * (1 - t.off / 100)) / t.get) * 100) / 100;

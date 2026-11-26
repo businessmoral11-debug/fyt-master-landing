@@ -2,10 +2,18 @@ import { useEffect, useRef } from "react";
 import { PROMO_DEADLINE } from "@/app/data/promoBanner";
 import { BF_CODE } from "@/app/data/blackfriday";
 // The same paste-in bar used on the WordPress pages (kept in one file so both stay identical).
+import { useFlash } from "@/app/data/flash";
+import { FlashBar } from "./FlashSale";
 import barHtml from "./topbar.html?raw";
 
+/** Top bar: the 12-hour flash bar while this visitor's flash runs, the Black Friday bar otherwise. */
+export function BlackFridayBar(props: { compact?: boolean }) {
+  const flash = useFlash().on;
+  return flash ? <FlashBar compact={props.compact} /> : <BfBar {...props} />;
+}
+
 /** Black Friday top bar. Full height at the top of the page, thin once the visitor scrolls. */
-export function BlackFridayBar(_props: { compact?: boolean }) {
+function BfBar(_props: { compact?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = host.current;

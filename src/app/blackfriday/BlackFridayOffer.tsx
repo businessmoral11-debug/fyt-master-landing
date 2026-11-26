@@ -1,9 +1,16 @@
 import { useEffect } from "react";
 import { BF_CODE, BF_LANDING_TIERS as BF_TIERS } from "@/app/data/blackfriday";
 import { ensureBfAssets } from "./bfStyles";
+import { useFlash } from "@/app/data/flash";
+import { FlashOffer } from "./FlashSale";
 
 /** Black Friday offer block at the top of the pricing section: giant 50%, then the Buy 1 to Buy 4 staircase. */
 export function BlackFridayOffer() {
+  const flash = useFlash().on;
+  return flash ? <FlashOffer /> : <BlackFridayBlock />;
+}
+
+function BlackFridayBlock() {
   useEffect(() => { ensureBfAssets(); }, []);
   const toPicker = () => document.getElementById("fyt-bf-picker")?.scrollIntoView({ behavior: "smooth", block: "start" });
   return (
