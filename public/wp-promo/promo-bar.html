@@ -295,6 +295,70 @@
 </script>
 <!-- /FYT BLACK FRIDAY TOP BAR -->
 
+<!-- ===================== Site-wide: old offers in the WordPress header and footer -> current offer =====================
+  The Elementor header still carries an old scrolling offer line (Summer40, 47.5% off with crypto, 200% refund...).
+  This swaps those words for the current offer on every WordPress page. When the offer changes, edit FYT_CURRENT_OFFER only. -->
+<script>
+(function () {
+  var FYT_CURRENT_OFFER = {
+    code: 'BLACKFRIDAY',
+    swaps: [
+      [/summer\s*special[^<>]*?40%\s*off\s*\+\s*2\s*accounts\s*instantly/gi, 'Black Friday: 50% Off + 1 Free Account'],
+      [/47\.5%\s*off\s*with\s*crypto\s*\+\s*2\s*accounts\s*instantly(\s*same\s*size)?/gi, 'Extra 5% Off When You Pay With Crypto'],
+      [/200%\s*refund\s*\+\s*1st\s*reward\s*on\s*demand/gi, 'Free First Payout on Demand'],
+      [/40%\s*off\s*\+\s*2\s*accounts\s*instantly(\s*same\s*size)?/gi, 'Buy 2, Get 5 Accounts'],
+      [/limited[-\s]*time\s*deal\s*[-\u2013\u00b7]\s*limited\s*spots/gi, 'Daily 100K Funded Account Giveaway'],
+      [/summer\s*special/gi, 'Black Friday']
+    ],
+    oldCodes: /\b(SUMMER40|FYT40|BOGO35|DIWALI45|FYTWEEN|NEWDASH)\b/gi
+  };
+  var AREAS = '[data-elementor-type="header"], [data-elementor-type="footer"], header.site-header, footer.site-footer';
+  function fixText(node) {
+    var t = node.nodeValue, n = t;
+    FYT_CURRENT_OFFER.swaps.forEach(function (p) { n = n.replace(p[0], p[1]); });
+    n = n.replace(FYT_CURRENT_OFFER.oldCodes, FYT_CURRENT_OFFER.code);
+    if (n !== t) node.nodeValue = n;
+  }
+  function fixAttrs(el) {
+    for (var i = 0; i < el.attributes.length; i++) {
+      var a = el.attributes[i];
+      if (/^(data-|onclick|title|aria-label|value)/i.test(a.name) && FYT_CURRENT_OFFER.oldCodes.test(a.value)) {
+        FYT_CURRENT_OFFER.oldCodes.lastIndex = 0;
+        el.setAttribute(a.name, a.value.replace(FYT_CURRENT_OFFER.oldCodes, FYT_CURRENT_OFFER.code));
+      }
+      FYT_CURRENT_OFFER.oldCodes.lastIndex = 0;
+    }
+  }
+  function run() {
+    if (document.getElementById('fyt-custom-checkout')) return;
+    document.querySelectorAll(AREAS).forEach(function (root) {
+      var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), nd;
+      while ((nd = w.nextNode())) { if (nd.parentNode && !/^(SCRIPT|STYLE)$/.test(nd.parentNode.nodeName)) fixText(nd); }
+      fixAttrs(root); root.querySelectorAll('*').forEach(fixAttrs);
+    });
+  }
+  // Copy buttons in the old ticker: make them copy the current code.
+  document.addEventListener('copy', function (e) {
+    try {
+      var sel = String(window.getSelection() || '');
+      if (FYT_CURRENT_OFFER.oldCodes.test(sel)) { e.clipboardData.setData('text/plain', sel.replace(FYT_CURRENT_OFFER.oldCodes, FYT_CURRENT_OFFER.code)); e.preventDefault(); }
+      FYT_CURRENT_OFFER.oldCodes.lastIndex = 0;
+    } catch (x) {}
+  }, true);
+  if (navigator.clipboard && navigator.clipboard.writeText && !navigator.clipboard.__fytWrapped) {
+    var orig = navigator.clipboard.writeText.bind(navigator.clipboard);
+    navigator.clipboard.writeText = function (t) { FYT_CURRENT_OFFER.oldCodes.lastIndex = 0; return orig(String(t).replace(FYT_CURRENT_OFFER.oldCodes, FYT_CURRENT_OFFER.code)); };
+    navigator.clipboard.__fytWrapped = true;
+  }
+  run();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  // Tickers often clone their items after load; keep fixing for a few seconds.
+  var mo = new MutationObserver(function () { run(); });
+  document.querySelectorAll(AREAS).forEach(function (r) { mo.observe(r, { childList: true, subtree: true }); });
+  setTimeout(function () { run(); mo.disconnect(); }, 8000);
+})();
+</script>
+
 <!-- ===================== Site-wide: point every Discord link to the current invite ===================== -->
 <script>
 (function(){
