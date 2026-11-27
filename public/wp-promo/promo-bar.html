@@ -5,7 +5,7 @@
   FLASH_MODE: 'off' | 'preview' (only browsers that opened a page with ?flash=1) | 'live' (everyone). -->
 <script>
 (function () {
-  var FLASH_MODE = 'preview', OFF = 60, HOURS = 24, LAST_START = '2026-12-01T17:00:00+05:30';
+  var FLASH_MODE = 'live', OFF = 60, HOURS = 24, LAST_START = '2026-12-01T17:00:00+05:30';
   function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
   var q = location.search;
   if (/[?&]flash=(1|reset)(&|$)/.test(q)) ls('fyt_flash_preview', '1');
@@ -13,18 +13,24 @@
   if (/[?&]flash=reset(&|$)/.test(q)) ls('fyt_flash_start', null);
   if (!(FLASH_MODE === 'live' || (FLASH_MODE === 'preview' && ls('fyt_flash_preview') === '1'))) return;
   if (document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) return;
+  // Live: the flash only shows once the checkout has confirmed it charges 60% too (remembered in this browser).
+  var live = FLASH_MODE === 'live', ok = !live || ls('fyt_flash_ok') === '1';
   var now = Date.now(), start = Number(ls('fyt_flash_start')) || 0;
+  function sign(s) {
+    try {
+      fetch('/wp-admin/admin-ajax.php?action=fyt_flash_start' + (s ? '&s=' + Math.floor(s / 1000) : ''), { credentials: 'include' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { if (j && j.start && (!live || j.live)) { ls('fyt_flash_start', String(j.start * 1000)); if (live) ls('fyt_flash_ok', '1'); } })
+        .catch(function () {});
+    } catch (e) {}
+  }
+  if (!ok) { sign(start); return; }
   if (!start) { if (now > new Date(LAST_START).getTime()) return; start = now; ls('fyt_flash_start', String(start)); }
   var end = start + HOURS * 36e5;
   if (now >= end) return;
   window.FYT_FLASH = { off: OFF, end: end };
   // Sign the start time on the server so the checkout gives the same 60% (the earliest start always wins).
-  try {
-    fetch('/wp-admin/admin-ajax.php?action=fyt_flash_start&s=' + Math.floor(start / 1000), { credentials: 'include' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { if (j && j.start) ls('fyt_flash_start', String(j.start * 1000)); })
-      .catch(function () {});
-  } catch (e) {}
+  sign(start);
   // Back to the normal Black Friday bar the moment their 24 hours end.
   setTimeout(function () { if (!document.hidden) location.reload(); else document.addEventListener('visibilitychange', function () { location.reload(); }, { once: true }); }, end - now + 1500);
 })();

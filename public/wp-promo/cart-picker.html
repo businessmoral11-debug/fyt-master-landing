@@ -518,11 +518,12 @@
         const DIWALI_END = new Date("2026-11-15T23:15:00-05:00").getTime();
         const BOGO_END = 0;
         // Same rule as the promo bar and the home page. FLASH_MODE: 'off' | 'preview' (browsers that opened ?flash=1) | 'live'.
-        const FLASH_MODE = "preview", FLASH_HOURS = 24;
+        const FLASH_MODE = "live", FLASH_HOURS = 24;
         function fytFlashOn() {
             try {
                 if (window.FYT_FLASH && window.FYT_FLASH.end > Date.now()) return true;
-                if (!(FLASH_MODE === "live" || (FLASH_MODE === "preview" && localStorage.getItem("fyt_flash_preview") === "1"))) return false;
+                // Live: only after the checkout has confirmed it charges 60% too (the promo bar script stores that).
+                if (!((FLASH_MODE === "live" && localStorage.getItem("fyt_flash_ok") === "1") || (FLASH_MODE === "preview" && localStorage.getItem("fyt_flash_preview") === "1"))) return false;
                 const start = Number(localStorage.getItem("fyt_flash_start")) || 0;
                 return start > 0 && Date.now() < start + FLASH_HOURS * 36e5;
             } catch (e) { return false; }

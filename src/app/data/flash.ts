@@ -12,7 +12,7 @@ import { BF_TIERS, type BfTier } from "@/app/data/blackfriday";
  *  "preview" only a browser that opened the site once with ?flash=1 (test page); ?flash=reset starts a fresh 24 hours
  *  "live"    everyone
  */
-export const FLASH_MODE: "off" | "preview" | "live" = "preview";
+export const FLASH_MODE: "off" | "preview" | "live" = "live";
 export const FLASH_OFF = 60;
 export const FLASH_HOURS = 24;
 /** No new 24-hour windows start after this moment (windows already running finish normally). */
@@ -22,6 +22,7 @@ export const FLASH_START_URL = "/wp-admin/admin-ajax.php?action=fyt_flash_start"
 
 const KEY = "fyt_flash_start";
 const PREVIEW_KEY = "fyt_flash_preview";
+const OK_KEY = "fyt_flash_ok";
 const MS = FLASH_HOURS * 3600e3;
 
 interface State { enabled: boolean; start: number; end: number; now: number }
@@ -53,35 +54,47 @@ function boot() {
     if (sp.get("flash") === "reset") window.localStorage.removeItem(KEY);
     preview = window.localStorage.getItem(PREVIEW_KEY) === "1";
   } catch { preview = sp.get("flash") === "1"; }
-  const enabled = FLASH_MODE === "live" || (FLASH_MODE === "preview" && preview);
-  if (!enabled) return;
+  const live = FLASH_MODE === "live";
+  if (!(live || (FLASH_MODE === "preview" && preview))) return;
+
+  // Live: the 60% only shows once the checkout has confirmed it is charging 60% too (the checkout snippet answers
+  // "live"). That answer is remembered in this browser, so later pages show the flash at once.
+  let ok = !live;
+  try { if (live && window.localStorage.getItem(OK_KEY) === "1") ok = true; } catch { /* storage blocked */ }
 
   let start = readLocal();
   const now = Date.now();
-  if (!start) {
-    if (now > new Date(FLASH_LAST_START).getTime()) return; // sale closed for new visitors
-    start = now;
-    writeLocal(start);
+  const tick = () => {
+    const t = window.setInterval(() => {
+      const n = Date.now();
+      emit({ now: n });
+      if (n >= state.end) window.clearInterval(t);
+    }, 1000);
+  };
+  if (ok) {
+    if (!start) {
+      if (now > new Date(FLASH_LAST_START).getTime()) return; // sale closed for new visitors
+      start = now;
+      writeLocal(start);
+    }
+    emit({ enabled: true, start, end: start + MS, now });
+    tick();
   }
-  emit({ enabled: true, start, end: start + MS, now });
 
   // Ask the site for the signed start time (same one the checkout checks). The server keeps the earliest.
-  fetch(`${FLASH_START_URL}&s=${Math.floor(start / 1000)}${sp.get("flash") === "reset" ? "&reset=1" : ""}`, { credentials: "include" })
+  const qs = (start ? `&s=${Math.floor(start / 1000)}` : "") + (sp.get("flash") === "reset" ? "&reset=1" : "");
+  fetch(`${FLASH_START_URL}${qs}`, { credentials: "include" })
     .then((r) => (r.ok ? r.json() : null))
     .then((j) => {
-      if (j && j.start) {
-        const s = Number(j.start) * 1000;
-        writeLocal(s);
-        emit({ start: s, end: s + MS });
-      }
+      if (!j || !j.start) return;
+      if (live && !j.live) return; // checkout not live yet: keep the normal Black Friday prices
+      const s = Number(j.start) * 1000;
+      writeLocal(s);
+      if (live) { try { window.localStorage.setItem(OK_KEY, "1"); } catch { /* storage blocked */ } }
+      if (ok) emit({ start: s, end: s + MS });
+      else if (Date.now() < s + MS) { ok = true; emit({ enabled: true, start: s, end: s + MS, now: Date.now() }); tick(); }
     })
-    .catch(() => { /* test page without the checkout snippet: the local start is used */ });
-
-  const t = window.setInterval(() => {
-    const n = Date.now();
-    emit({ now: n });
-    if (n >= state.end) window.clearInterval(t);
-  }, 1000);
+    .catch(() => { /* no answer: test page keeps its local start; the live site stays on normal prices */ });
 }
 
 function subscribe(f: () => void) {
