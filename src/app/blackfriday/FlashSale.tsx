@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BF_LANDING_TIERS } from "@/app/data/blackfriday";
 import { FLASH_OFF, useFlash } from "@/app/data/flash";
 import { ensureFlashAssets } from "./flashStyles";
@@ -41,9 +41,40 @@ export function FlashBar({ compact }: { compact?: boolean }) {
   );
 }
 
+/** 50 -> 60 once on load: the "upgrade" moment. Rests on 60. */
+function useUpgradeCount(): number {
+  const [n, setN] = useState(FLASH_OFF);
+  useEffect(() => {
+    if (typeof window === "undefined" || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0; const t0 = performance.now() + 350; const from = 50;
+    setN(from);
+    const step = (t: number) => {
+      const k = Math.min(1, Math.max(0, (t - t0) / 1100));
+      const e = 1 - Math.pow(1 - k, 3);
+      setN(Math.round(from + (FLASH_OFF - from) * e));
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return n;
+}
+
+/** Mini fanned account cards: blue = paid, gold = free. */
+function Fan({ buy, get }: { buy: number; get: number }) {
+  return (
+    <span className="fyt-fl-fan" aria-hidden="true" style={{ width: `${34 + (get - 1) * 9}px` }}>
+      {Array.from({ length: get }, (_, n) => (
+        <i key={n} className={n < buy ? undefined : "f"} style={{ left: `${n * 9}px`, transform: `rotate(${(n - (get - 1) / 2) * 7}deg)`, zIndex: n }} />
+      ))}
+    </span>
+  );
+}
+
 /** Offer block above the pricing table during this visitor's 12 hours. */
 export function FlashOffer() {
   const f = useFlash();
+  const n = useUpgradeCount();
   useEffect(() => { ensureFlashAssets(); }, []);
   return (
     <div className="fyt-fl fyt-fl-hero">
@@ -53,13 +84,13 @@ export function FlashOffer() {
       <div className="fyt-fl-mega" aria-label={`Upgraded from 50% to ${FLASH_OFF}% off`}>
         <span className="fyt-fl-old">50%</span>
         <Arrow className="fyt-fl-arrow" />
-        <span className="fyt-fl-num">{FLASH_OFF}%</span>
-        <span className="fyt-fl-offtxt"><b>OFF</b>EVERYTHING<br />EVERY BUNDLE</span>
+        <span className={`fyt-fl-num${n === FLASH_OFF ? " done" : ""}`}>{n}%</span>
+        <span className="fyt-fl-offtxt"><b>OFF</b>EVERYTHING</span>
       </div>
       <div className="fyt-fl-time">
-        <div className="fyt-fl-time-l">YOUR 12 HOURS END IN</div>
+        <div className="fyt-fl-time-l"><span className="fyt-fl-live" />YOUR 12 HOURS END IN</div>
         <div className="fyt-fl-digits" role="timer">
-          <div className="fyt-fl-dg"><b>{f.hh}</b><small>HOURS</small></div><span className="fyt-fl-sep">:</span>
+          <div className="fyt-fl-dg"><b>{f.hh}</b><small>HRS</small></div><span className="fyt-fl-sep">:</span>
           <div className="fyt-fl-dg"><b>{f.mm}</b><small>MIN</small></div><span className="fyt-fl-sep">:</span>
           <div className="fyt-fl-dg"><b>{f.ss}</b><small>SEC</small></div>
         </div>
@@ -72,20 +103,23 @@ export function FlashOffer() {
             <button key={t.buy} type="button" className={`fyt-fl-deal${best ? " gd" : ""}`} onClick={toTable} aria-label={`Buy ${t.buy}, get ${t.get} instantly, ${FLASH_OFF}% off`}>
               {best && <span className="fyt-fl-tag">BEST DEAL</span>}
               <div className="fyt-fl-di">
-                <div className="fyt-fl-dl">BUY {t.buy}</div>
-                <div className="fyt-fl-dh">Get <b className={best ? "fyt-fl-gold" : undefined}>{t.get}</b> Instantly</div>
-                <div className="fyt-fl-ds">
-                  <span className="fyt-fl-dots" aria-hidden="true">{Array.from({ length: t.get }, (_, n) => <i key={n} className={n < t.buy ? undefined : "f"} />)}</span>
+                <span className="fyt-fl-cnt">{t.get}</span>
+                <span className="fyt-fl-dtx">
+                  <span className="fyt-fl-dl">BUY {t.buy} &middot; GET {t.get}</span>
+                  <span className="fyt-fl-dh">accounts <b>instantly</b></span>
                   <span className="fyt-fl-pct">{FLASH_OFF}% OFF</span>
-                </div>
+                </span>
+                <Fan buy={t.buy} get={t.get} />
               </div>
             </button>
           );
         })}
       </div>
-      <div className="fyt-fl-more">Buy 3 Get 7 and Buy 4 Get 10 are <b>{FLASH_OFF}% off</b> too, at checkout.</div>
-      <div><span className="fyt-fl-give"><i>100K</i><span>One <b>100K funded account</b> given away every day.</span></span></div>
-      <div className="fyt-fl-note" id="fyt-bf-picker">Choose your account, then pick your deal below.</div>
+      <div className="fyt-fl-chips2">
+        <span>Buy 3 Get 7 &middot; Buy 4 Get 10 <b>also {FLASH_OFF}% off</b></span>
+        <span className="g"><i>100K</i>Daily funded account <b>giveaway</b></span>
+      </div>
+      <div id="fyt-bf-picker" />
     </div>
   );
 }
