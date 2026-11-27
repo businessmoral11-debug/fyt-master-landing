@@ -552,7 +552,10 @@
                 const flash = fytFlashOn();
                 // 1-Step Prime 10K MatchTrader was listed at $104 by mistake; its base is $114 like Classic.
                 const base = (r.priceOld === 104 && S.amount === 10000) ? 114 : r.priceOld;
-                const list = base + bump;
+                // 27 Nov evening: 200K challenges -7; 1-Step Prime and Instant Prime 100K -5.
+                const cut = S.amount === 200000 ? 7
+                          : (S.amount === 100000 && ((S.product === "fyt-prime" && realType() === "1-STEP") || realType() === "INSTANT")) ? 5 : 0;
+                const list = base + bump - cut;
                 return Object.assign({}, r, {
                     code: "BLACKFRIDAY",
                     url: (r.url || "") + (r.url ? "&coupon=BLACKFRIDAY" : ""),
