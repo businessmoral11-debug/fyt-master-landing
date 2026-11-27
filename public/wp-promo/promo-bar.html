@@ -1,3 +1,35 @@
+<!-- ===================== 12-hour flash sale ("Black Friday Upgraded") on every WordPress page =====================
+  Same rules as the home page: each visitor gets their own 12 hours from their first visit (kept in this browser, and
+  signed by the checkout snippet so the checkout checks the same deadline). During those hours the flash bar (fyt-fs60) shows
+  instead of the Black Friday bar. When their 12 hours end, the page reloads once and the normal Black Friday bar comes back.
+  FLASH_MODE: 'off' | 'preview' (only browsers that opened a page with ?flash=1) | 'live' (everyone). -->
+<script>
+(function () {
+  var FLASH_MODE = 'preview', OFF = 60, HOURS = 12, LAST_START = '2026-12-01T17:00:00+05:30';
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
+  var q = location.search;
+  if (/[?&]flash=(1|reset)(&|$)/.test(q)) ls('fyt_flash_preview', '1');
+  if (/[?&]flash=off(&|$)/.test(q)) ls('fyt_flash_preview', null);
+  if (/[?&]flash=reset(&|$)/.test(q)) ls('fyt_flash_start', null);
+  if (!(FLASH_MODE === 'live' || (FLASH_MODE === 'preview' && ls('fyt_flash_preview') === '1'))) return;
+  if (document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) return;
+  var now = Date.now(), start = Number(ls('fyt_flash_start')) || 0;
+  if (!start) { if (now > new Date(LAST_START).getTime()) return; start = now; ls('fyt_flash_start', String(start)); }
+  var end = start + HOURS * 36e5;
+  if (now >= end) return;
+  window.FYT_FLASH = { off: OFF, end: end };
+  // Sign the start time on the server so the checkout gives the same 60% (the earliest start always wins).
+  try {
+    fetch('/wp-admin/admin-ajax.php?action=fyt_flash_start&s=' + Math.floor(start / 1000), { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.start) ls('fyt_flash_start', String(j.start * 1000)); })
+      .catch(function () {});
+  } catch (e) {}
+  // Back to the normal Black Friday bar the moment their 12 hours end.
+  setTimeout(function () { if (!document.hidden) location.reload(); else document.addEventListener('visibilitychange', function () { location.reload(); }, { once: true }); }, end - now + 1500);
+})();
+</script>
+
 <!-- FYT BLACK FRIDAY TOP BAR v2.2, slim, one row on phones, thin on scroll (paste-in snippet, vanilla JS, no images, no libraries)
   Paste once: WordPress Custom HTML block or header/footer hook (wp_body_open / wp_footer), same as the Diwali bar.
   It moves itself to the top of <body>, stays fixed while scrolling and pads the page so nothing is covered.
@@ -202,47 +234,6 @@
   <span class="fbf-line" aria-hidden="true"></span>
   <span class="fbf-sr fbf-csr" aria-live="polite"></span>
 </div>
-<!-- ===================== 12-hour flash sale ("Black Friday Upgraded") on every WordPress page =====================
-  Same rules as the home page: each visitor gets their own 12 hours from their first visit (kept in this browser, and
-  signed by the checkout snippet so the checkout checks the same deadline). During those hours the bar below switches to
-  the flash look. When their 12 hours end, the page reloads once and the normal Black Friday bar comes back.
-  FLASH_MODE: 'off' | 'preview' (only browsers that opened a page with ?flash=1) | 'live' (everyone). -->
-<script>
-(function () {
-  var FLASH_MODE = 'preview', OFF = 60, HOURS = 12, LAST_START = '2026-12-01T17:00:00+05:30';
-  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
-  var q = location.search;
-  if (/[?&]flash=(1|reset)(&|$)/.test(q)) ls('fyt_flash_preview', '1');
-  if (/[?&]flash=off(&|$)/.test(q)) ls('fyt_flash_preview', null);
-  if (/[?&]flash=reset(&|$)/.test(q)) ls('fyt_flash_start', null);
-  if (!(FLASH_MODE === 'live' || (FLASH_MODE === 'preview' && ls('fyt_flash_preview') === '1'))) return;
-  if (document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) return;
-  var now = Date.now(), start = Number(ls('fyt_flash_start')) || 0;
-  if (!start) { if (now > new Date(LAST_START).getTime()) return; start = now; ls('fyt_flash_start', String(start)); }
-  var end = start + HOURS * 36e5;
-  if (now >= end) return;
-  window.FYT_FLASH = { off: OFF, end: end };
-  var cfg = window.FYT_BF_CONFIG || {}, f = {
-    theme: 'flash', brand: ['BLACK FRIDAY', 'UPGRADED'], endDate: new Date(end).toISOString(), endsText: 'Your 12 hrs end in', soonHours: 0,
-    hero: OFF + '% OFF EVERYTHING', heroShort: OFF + '% OFF ALL',
-    ticker: ['BUY 1 GET 2 INSTANTLY', 'BUY 2 GET 5 INSTANTLY'], tickerShort: ['BUY 1 GET 2', 'BUY 2 GET 5'],
-    ctaText: 'Claim ' + OFF + '% Off', ctaTextShort: 'Claim', whenEnded: 'hide',
-    srText: 'Black Friday upgraded: ' + OFF + '% off everything for your next 12 hours. Buy 1 get 2 instantly, buy 2 get 5 instantly.'
-  };
-  for (var k in f) cfg[k] = f[k];
-  window.FYT_BF_CONFIG = cfg;
-  // Sign the start time on the server so the checkout gives the same 60% (the earliest start always wins).
-  try {
-    fetch('/wp-admin/admin-ajax.php?action=fyt_flash_start&s=' + Math.floor(start / 1000), { credentials: 'include' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { if (j && j.start) ls('fyt_flash_start', String(j.start * 1000)); })
-      .catch(function () {});
-  } catch (e) {}
-  // Back to the normal Black Friday bar the moment their 12 hours end.
-  setTimeout(function () { if (!document.hidden) location.reload(); else document.addEventListener('visibilitychange', function () { location.reload(); }, { once: true }); }, end - now + 1500);
-})();
-</script>
-
 <script>
 (function(){
   /* ============================ CONFIG (edit here) ============================ */
@@ -272,6 +263,8 @@
   if (window.FYT_BF_CONFIG) for (var k in window.FYT_BF_CONFIG) CONFIG[k] = window.FYT_BF_CONFIG[k];
   var bar = document.getElementById('fyt-bf-bar');
   if (!bar || bar.getAttribute('data-init')) return; bar.setAttribute('data-init', '1');
+  // During a visitor's 12-hour flash sale the flash bar (fyt-fs60) shows instead.
+  if (window.FYT_FLASH && window.FYT_FLASH.end > Date.now() && !CONFIG.theme) { if (bar.parentNode) bar.parentNode.removeChild(bar); return; }
   // No promo bar on the checkout: nothing should pull the eye away from paying.
   if (document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) { if (bar.parentNode) bar.parentNode.removeChild(bar); return; }
   var $ = function(s){ return bar.querySelector(s); };
@@ -364,6 +357,451 @@
 })();
 </script>
 <!-- /FYT BLACK FRIDAY TOP BAR -->
+
+<!-- ======================================================================
+  FYT 12-HOUR FLASH SALE TOP BAR  (fyt-fs60)  "Black Friday Upgraded", based on the fyt-flash60 design
+  Shows ONLY while window.FYT_FLASH is set (the visitor's own 12 hours, set by the flash script before it).
+  Otherwise it removes itself and the normal Black Friday bar shows.
+  HTML + CSS + vanilla JS. No images, no libraries. Fonts: Unbounded + Inter (Google Fonts).
+  Paste once: WordPress Custom HTML block / header-footer hook (wp_body_open or wp_footer) / GTM Custom HTML.
+  It moves itself to the top of <body>, stays fixed while scrolling and pads <body> so nothing is covered.
+  It sets --fyt-fs60-h (bar height) on <html>: give a sticky site header  top: var(--fyt-fs60-h, 0px).
+  To change the end time, edit CONFIG.endDate in the <script> (ISO string WITH an offset, e.g. +05:30).
+  No close button by design. Every class and ID is prefixed fyt-fs60-.
+====================================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+#fyt-fs60-bar,#fyt-fs60-bar *,#fyt-fs60-bar *::before,#fyt-fs60-bar *::after{box-sizing:border-box;margin:0;padding:0}
+#fyt-fs60-bar{--gd1:#FFF1B8;--gd2:#FFD25A;--gd3:#F2A81D;--gd4:#B8730A;--gold:#FFC845;--blue:#348CFC;--blue2:#0767F7;--ok:#3BE38B;
+  position:relative;z-index:99990;width:100%;overflow:hidden;isolation:isolate;color:#fff;background:#000;
+  font:500 13px/1.2 Inter,Arial,Helvetica,sans-serif;text-align:left;-webkit-font-smoothing:antialiased;
+  box-shadow:0 10px 30px rgba(0,0,0,.65),0 1px 0 rgba(255,200,69,.18)}
+#fyt-fs60-bar.fyt-fs60-fixed{position:fixed;left:0;right:0;top:var(--fyt-fs60-top,0px)}
+#fyt-fs60-bar.fyt-fs60-sticky{position:sticky;top:var(--fyt-fs60-top,0px)}
+#fyt-fs60-bar.fyt-fs60-hide{display:none!important}
+/* ---------- background lights ---------- */
+#fyt-fs60-bar .fyt-fs60-bg{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(34% 190% at 5% 55%,rgba(52,140,252,.42),transparent 70%),
+             radial-gradient(30% 170% at 56% 130%,rgba(255,176,32,.22),transparent 70%),
+             radial-gradient(26% 150% at 96% 20%,rgba(255,200,69,.14),transparent 70%),
+             linear-gradient(180deg,#07090e 0%,#000 55%,#05070b 100%)}
+#fyt-fs60-bar .fyt-fs60-topline{position:absolute;left:0;right:0;top:0;height:1px;z-index:5;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(52,140,252,.8) 14%,rgba(255,225,140,.85) 50%,rgba(255,200,69,.5) 86%,transparent)}
+#fyt-fs60-bar .fyt-fs60-sweep{position:absolute;top:-10%;bottom:-10%;left:0;width:18%;z-index:4;pointer-events:none;opacity:0;
+  background:linear-gradient(100deg,transparent 0,rgba(255,226,150,.10) 40%,rgba(255,244,210,.22) 50%,rgba(255,226,150,.10) 60%,transparent 100%);
+  transform:translate3d(-120%,0,0) skewX(-20deg);animation:fyt-fs60-sweep 7.5s cubic-bezier(.45,.05,.3,1) 1.2s infinite;will-change:transform,opacity}
+#fyt-fs60-bar .fyt-fs60-spk{position:absolute;z-index:1;width:3px;height:3px;border-radius:50%;background:#FFE9A8;box-shadow:0 0 7px 2px rgba(255,200,69,.8);opacity:0;pointer-events:none;animation:fyt-fs60-tw 3.6s ease-in-out infinite}
+/* ---------- edge progress (depleting bar) ---------- */
+#fyt-fs60-bar .fyt-fs60-edge{position:absolute;left:0;right:0;bottom:0;height:3px;z-index:6;background:rgba(255,255,255,.07);pointer-events:none;overflow:hidden}
+#fyt-fs60-bar .fyt-fs60-edgefill{position:absolute;inset:0;transform-origin:0 50%;transform:scaleX(1);transition:transform 1s linear;
+  background:linear-gradient(90deg,var(--blue2),var(--blue) 35%,#FFE08A 78%,var(--gold));box-shadow:0 0 12px rgba(255,200,69,.55)}
+/* ---------- layout ---------- */
+#fyt-fs60-bar .fyt-fs60-in{position:relative;z-index:3;max-width:1360px;margin:0 auto;padding:8px 24px 11px;min-height:84px;display:flex;align-items:center;justify-content:center;gap:20px;animation:fyt-fs60-enter .8s cubic-bezier(.2,.8,.2,1) both}
+/* ---------- dial ---------- */
+#fyt-fs60-bar .fyt-fs60-dialw{--d:68px;--w:3px;position:relative;flex:none;grid-area:dial;width:var(--d);height:var(--d)}
+#fyt-fs60-bar .fyt-fs60-rim{position:absolute;inset:0;filter:drop-shadow(0 0 5px rgba(52,140,252,.85)) drop-shadow(0 0 12px rgba(52,140,252,.35))}
+#fyt-fs60-bar .fyt-fs60-rbase{position:absolute;inset:0;border-radius:50%;border:var(--w) solid rgba(52,140,252,.16)}
+#fyt-fs60-bar .fyt-fs60-hf{position:absolute;top:0;height:100%;width:50%;overflow:hidden}
+#fyt-fs60-bar .fyt-fs60-hf-r{right:0}#fyt-fs60-bar .fyt-fs60-hf-l{left:0}
+#fyt-fs60-bar .fyt-fs60-hf i{position:absolute;top:0;width:100%;height:100%;display:block;border:var(--w) solid var(--blue);transition:transform 1s linear}
+#fyt-fs60-bar .fyt-fs60-hf-r i{left:0;border-left:0;border-radius:0 calc(var(--d)/2) calc(var(--d)/2) 0;transform-origin:0 50%}
+#fyt-fs60-bar .fyt-fs60-hf-l i{right:0;border-right:0;border-radius:calc(var(--d)/2) 0 0 calc(var(--d)/2);transform-origin:100% 50%}
+#fyt-fs60-bar .fyt-fs60-tipw{position:absolute;left:0;top:0;width:100%;height:100%;transition:transform 1s linear;transform-origin:50% 50%}
+#fyt-fs60-bar .fyt-fs60-tip{position:absolute;left:50%;top:calc(var(--w)/2 - 3px);width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#FFD66B;box-shadow:0 0 6px 2px rgba(255,190,50,.95),0 0 14px 3px rgba(255,176,32,.45);animation:fyt-fs60-tip 1.6s ease-in-out infinite}
+#fyt-fs60-bar .fyt-fs60-face{position:absolute;inset:calc(var(--w) + 2px);border-radius:50%;overflow:hidden;background:#000}
+#fyt-fs60-bar .fyt-fs60-face svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#fyt-fs60-bar .fyt-fs60-face svg .t{stroke:url(#fyt-fs60-gld);stroke-linecap:round}
+#fyt-fs60-bar .fyt-fs60-face svg .s{stroke:rgba(255,214,120,.7);stroke-linecap:round}
+#fyt-fs60-bar .fyt-fs60-glint{position:absolute;inset:-6%;border-radius:50%;opacity:.9;background:conic-gradient(from 0deg,transparent 0 62%,rgba(120,180,255,.0) 62%,rgba(120,180,255,.22) 86%,rgba(255,226,150,.5) 100%);animation:fyt-fs60-spin 5s linear infinite;will-change:transform}
+#fyt-fs60-bar .fyt-fs60-hand{position:absolute;left:50%;top:15%;width:2px;height:35%;margin-left:-1px;transform-origin:50% 100%;transition:transform .32s cubic-bezier(.3,1.7,.5,1);border-radius:2px;background:linear-gradient(180deg,#FFF1B8,#FFC845)}
+#fyt-fs60-bar .fyt-fs60-hub{position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF3C4,#E8A317 60%,#7a4a05);box-shadow:0 0 6px rgba(255,200,69,.7)}
+/* ---------- main text ---------- */
+#fyt-fs60-bar .fyt-fs60-main{grid-area:main;flex:none;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+#fyt-fs60-bar .fyt-fs60-eb{display:flex;align-items:center;gap:9px;font:700 10px/1 Inter,Arial,sans-serif;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
+#fyt-fs60-bar .fyt-fs60-eb i{display:block;width:22px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+#fyt-fs60-bar .fyt-fs60-eb i:last-child{transform:scaleX(-1)}
+#fyt-fs60-bar .fyt-fs60-hl{display:flex;align-items:baseline;gap:9px;white-space:nowrap}
+#fyt-fs60-bar .fyt-fs60-every{font:700 13px/1 Unbounded,"Arial Black",Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff;text-shadow:0 1px 10px rgba(120,170,255,.45)}
+#fyt-fs60-bar .fyt-fs60-big{position:relative;display:inline-block;overflow:hidden;padding:12px 18px;margin:-12px -18px;font:800 33px/1 Unbounded,"Arial Black",Arial,sans-serif;letter-spacing:-.02em;text-transform:uppercase;animation:fyt-fs60-breathe 3.2s ease-in-out infinite}
+#fyt-fs60-bar .fyt-fs60-shm{position:absolute;left:18px;right:18px;top:12px;bottom:12px;display:block;pointer-events:none;white-space:nowrap;font:inherit;letter-spacing:inherit;text-transform:inherit;color:transparent;-webkit-text-fill-color:transparent;opacity:0;
+  background:linear-gradient(100deg,transparent calc(var(--p) - 15%),#FFFBE6 var(--p),transparent calc(var(--p) + 15%));-webkit-background-clip:text;background-clip:text;animation:fyt-fs60-shm 4.4s linear infinite;animation-delay:calc(var(--i)*.085s + .6s)}
+#fyt-fs60-bar .fyt-fs60-bigt{display:block;background:linear-gradient(180deg,var(--gd1) 0%,var(--gd2) 28%,var(--gd3) 56%,var(--gd4) 78%,#F7C948 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 2px 0 rgba(90,50,0,.55)) drop-shadow(0 0 7px rgba(255,176,32,.38))}
+/* ---------- code pill ---------- */
+#fyt-fs60-bar .fyt-fs60-code{grid-area:code;position:relative;flex:none;display:inline-grid;align-items:center;height:40px;padding:0 15px;border:1.5px dashed rgba(255,200,69,.85);border-radius:999px;cursor:pointer;color:#DCE6FF;
+  background:linear-gradient(180deg,rgba(255,200,69,.16),rgba(120,70,0,.22));box-shadow:inset 0 1px 0 rgba(255,235,170,.28),0 0 18px rgba(255,176,32,.14);font:600 12px/1 Inter,Arial,sans-serif;letter-spacing:.04em;transition:transform .2s,background .2s,border-color .2s}
+#fyt-fs60-bar .fyt-fs60-code:hover{transform:translateY(-1px);background:linear-gradient(180deg,rgba(255,200,69,.26),rgba(120,70,0,.3))}
+#fyt-fs60-bar .fyt-fs60-code>span{grid-area:1/1;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:opacity .22s,transform .22s}
+#fyt-fs60-bar .fyt-fs60-code b{font:800 15px/1 Unbounded,"Arial Black",Arial,sans-serif;letter-spacing:.02em;color:var(--gold);text-shadow:0 0 12px rgba(255,200,69,.35)}
+#fyt-fs60-bar .fyt-fs60-code svg{width:15px;height:15px;flex:none;color:var(--gold);opacity:.9}
+#fyt-fs60-bar .fyt-fs60-code .fyt-fs60-cp-on{opacity:0;transform:translate3d(0,60%,0);justify-content:center;color:var(--ok);font:800 13px/1 Unbounded,"Arial Black",Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase}
+#fyt-fs60-bar .fyt-fs60-code .fyt-fs60-cp-on svg{color:var(--ok);opacity:1}
+#fyt-fs60-bar .fyt-fs60-code.fyt-fs60-copied{border-style:solid;border-color:var(--ok);background:rgba(59,227,139,.14);box-shadow:0 0 18px rgba(59,227,139,.3)}
+#fyt-fs60-bar .fyt-fs60-code.fyt-fs60-copied .fyt-fs60-cp-off{opacity:0;transform:translate3d(0,-60%,0)}
+#fyt-fs60-bar .fyt-fs60-code.fyt-fs60-copied .fyt-fs60-cp-on{opacity:1;transform:none}
+/* ---------- timer ---------- */
+#fyt-fs60-bar .fyt-fs60-timer{grid-area:timer;flex:none;display:flex;align-items:center;gap:10px}
+#fyt-fs60-bar .fyt-fs60-ends{font:700 9.5px/1.3 Inter,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#9CC4FF;width:38px}
+#fyt-fs60-bar .fyt-fs60-tiles{display:flex;align-items:center;gap:3px}
+#fyt-fs60-bar .fyt-fs60-tile{position:relative;width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:linear-gradient(180deg,#101a2e 0%,#04070d 100%);border:1px solid rgba(80,150,255,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 14px rgba(52,140,252,.18)}
+#fyt-fs60-bar .fyt-fs60-tile.fyt-fs60-t-s{border-color:rgba(255,200,69,.6);box-shadow:inset 0 1px 0 rgba(255,240,190,.2),0 0 14px rgba(255,200,69,.2)}
+#fyt-fs60-bar .fyt-fs60-dgs{display:flex;height:21px;overflow:hidden}
+#fyt-fs60-bar .fyt-fs60-dg{position:relative;display:block;width:15px;height:21px;overflow:hidden;text-align:center;font:800 20px/21px Unbounded,"Arial Black",Arial,sans-serif;font-variant-numeric:tabular-nums}
+#fyt-fs60-bar .fyt-fs60-dg .fyt-fs60-n{position:absolute;left:0;right:0;top:0;display:block;color:#fff}
+#fyt-fs60-bar .fyt-fs60-t-s .fyt-fs60-dg .fyt-fs60-n{color:var(--gd2)}
+#fyt-fs60-bar .fyt-fs60-dg .fyt-fs60-n.fyt-fs60-in-n{animation:fyt-fs60-dgin .38s cubic-bezier(.2,.9,.2,1) both}
+#fyt-fs60-bar .fyt-fs60-dg .fyt-fs60-n.fyt-fs60-out-n{animation:fyt-fs60-dgout .32s cubic-bezier(.5,0,.8,.4) both}
+#fyt-fs60-bar .fyt-fs60-tile small{font:700 7px/1 Inter,Arial,sans-serif;letter-spacing:.18em;color:#7FA9E8}
+#fyt-fs60-bar .fyt-fs60-t-s small{color:#C9A24A}
+#fyt-fs60-bar .fyt-fs60-colon{font:800 16px/1 Unbounded,Arial,sans-serif;color:var(--gold);margin-bottom:10px;animation:fyt-fs60-blink 1s steps(1,end) infinite}
+/* ---------- CTA ---------- */
+#fyt-fs60-bar .fyt-fs60-cta{grid-area:cta;position:relative;flex:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;height:48px;padding:0 24px;border-radius:999px;font:800 13px/1 Unbounded,"Arial Black",Arial,sans-serif;letter-spacing:.01em;white-space:nowrap;
+  color:#1A1000!important;text-decoration:none!important;background:linear-gradient(180deg,#FFF0B0 0%,#FFCB45 45%,#F0A010 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(150,80,0,.35),0 6px 20px rgba(255,176,32,.38);transition:transform .2s,box-shadow .2s}
+#fyt-fs60-bar .fyt-fs60-cta:hover{transform:translateY(-1px) scale(1.03)}
+#fyt-fs60-bar .fyt-fs60-cta:focus-visible,#fyt-fs60-bar .fyt-fs60-code:focus-visible{outline:2px solid #fff;outline-offset:3px}
+#fyt-fs60-bar .fyt-fs60-cta-t{position:relative;z-index:2}
+#fyt-fs60-bar .fyt-fs60-cta svg{position:relative;z-index:2;width:15px;height:15px;flex:none}
+#fyt-fs60-bar .fyt-fs60-cta-clip{position:absolute;inset:0;border-radius:inherit;overflow:hidden;z-index:1;pointer-events:none}
+#fyt-fs60-bar .fyt-fs60-cta-shine{position:absolute;top:0;bottom:0;left:0;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);transform:translate3d(-150%,0,0) skewX(-20deg);animation:fyt-fs60-shine 3.4s ease-in-out 1.4s infinite}
+#fyt-fs60-bar .fyt-fs60-cta-ring{position:absolute;inset:0;border-radius:inherit;border:2px solid rgba(255,200,69,.85);pointer-events:none;opacity:0;animation:fyt-fs60-pulse 2.4s ease-out infinite}
+#fyt-fs60-bar .fyt-fs60-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* ---------- desktop grid ---------- */
+#fyt-fs60-bar .fyt-fs60-in{display:grid;grid-template-columns:auto auto auto auto auto;grid-template-areas:"dial main code timer cta";justify-content:center;column-gap:22px;align-items:center}
+/* ---------- states ---------- */
+#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-timer,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-code,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-ends,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-colon,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-tiles,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-sweep,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-spk,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-shm,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-glint,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-tipw,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-cta-ring,#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-cta-shine{display:none}
+#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-bigt{animation:none;background:linear-gradient(180deg,#d8d8d8,#8d8d8d 60%,#5e5e5e);-webkit-background-clip:text;background-clip:text;filter:none}
+#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-dialw{filter:grayscale(1) brightness(.75)}
+#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-hand{display:none}
+#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-bg{filter:grayscale(1)}
+#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-eb{color:#9aa4b6}
+#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-eb i{background:linear-gradient(90deg,transparent,#9aa4b6)}
+#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-cta{animation:none;background:linear-gradient(180deg,#f4f6fa,#c4cad6);box-shadow:inset 0 1px 0 #fff,0 4px 14px rgba(0,0,0,.4)}
+#fyt-fs60-bar.fyt-fs60-paused *,#fyt-fs60-bar.fyt-fs60-paused *::before,#fyt-fs60-bar.fyt-fs60-paused *::after{animation-play-state:paused!important}
+/* ---------- tablet ---------- */
+@media (max-width:1179px){
+ #fyt-fs60-bar .fyt-fs60-in{grid-template-columns:auto minmax(0,auto) auto auto;grid-template-areas:"dial main timer cta" "dial main code cta";column-gap:18px;row-gap:6px;padding:9px 18px 12px;min-height:96px;justify-content:center}
+ #fyt-fs60-bar .fyt-fs60-dialw{--d:66px}
+ #fyt-fs60-bar .fyt-fs60-big{font-size:27px}
+ #fyt-fs60-bar .fyt-fs60-every{font-size:11px;letter-spacing:.1em}
+ #fyt-fs60-bar .fyt-fs60-code{height:30px;padding:0 12px;justify-self:end}
+ #fyt-fs60-bar .fyt-fs60-code b{font-size:12px}
+ #fyt-fs60-bar .fyt-fs60-code svg{width:13px;height:13px}
+ #fyt-fs60-bar .fyt-fs60-timer{justify-self:end}
+ #fyt-fs60-bar .fyt-fs60-tile{width:40px;height:40px;gap:3px;border-radius:9px}
+ #fyt-fs60-bar .fyt-fs60-dgs,#fyt-fs60-bar .fyt-fs60-dg{height:18px}
+ #fyt-fs60-bar .fyt-fs60-dg{width:13px;font-size:17px;line-height:18px}
+ #fyt-fs60-bar .fyt-fs60-colon{font-size:14px;margin-bottom:8px}
+ #fyt-fs60-bar .fyt-fs60-ends{width:30px;font-size:8.5px}
+ #fyt-fs60-bar .fyt-fs60-cta{height:44px;padding:0 18px;font-size:12px}
+}
+@media (max-width:860px){
+ #fyt-fs60-bar .fyt-fs60-in{column-gap:14px;padding:9px 14px 12px}
+ #fyt-fs60-bar .fyt-fs60-big{font-size:23px}
+ #fyt-fs60-bar .fyt-fs60-every{font-size:10px}
+ #fyt-fs60-bar .fyt-fs60-eb{font-size:9px;letter-spacing:.2em}
+ #fyt-fs60-bar .fyt-fs60-eb i{width:12px}
+ #fyt-fs60-bar .fyt-fs60-cta{padding:0 15px}
+ #fyt-fs60-bar .fyt-fs60-ends{display:none}
+}
+/* ---------- mobile: CTA sits below the timer ---------- */
+@media (max-width:600px){
+ #fyt-fs60-bar .fyt-fs60-in{grid-template-columns:58px minmax(0,1fr) auto;grid-template-areas:"dial main main" "dial timer timer" "code code cta";column-gap:12px;row-gap:6px;padding:8px 14px 11px;min-height:0;justify-content:stretch}
+ #fyt-fs60-bar .fyt-fs60-dialw{--d:58px;--w:3px}
+ #fyt-fs60-bar .fyt-fs60-main{gap:4px}
+ #fyt-fs60-bar .fyt-fs60-eb{font-size:9px}
+ #fyt-fs60-bar .fyt-fs60-big{font-size:24px}
+ #fyt-fs60-bar .fyt-fs60-every{font-size:10px}
+ #fyt-fs60-bar .fyt-fs60-timer{justify-self:start;gap:8px}
+ #fyt-fs60-bar .fyt-fs60-ends{display:block;width:auto;font-size:8.5px;letter-spacing:.14em}
+ #fyt-fs60-bar .fyt-fs60-tile{width:44px;height:38px;flex-direction:row;gap:3px;align-items:center;justify-content:center;border-radius:8px}
+ #fyt-fs60-bar .fyt-fs60-tile small{font-size:6px;letter-spacing:.1em;align-self:flex-end;margin-bottom:8px}
+ #fyt-fs60-bar .fyt-fs60-dgs,#fyt-fs60-bar .fyt-fs60-dg{height:17px}
+ #fyt-fs60-bar .fyt-fs60-dg{width:11px;font-size:15px;line-height:17px}
+ #fyt-fs60-bar .fyt-fs60-colon{font-size:13px;margin-bottom:2px}
+ #fyt-fs60-bar .fyt-fs60-code{height:40px;padding:0 12px;justify-self:stretch;justify-content:center}
+ #fyt-fs60-bar .fyt-fs60-code>span{justify-content:center;gap:6px;font-size:11px}
+ #fyt-fs60-bar .fyt-fs60-code b{font-size:12px}
+ #fyt-fs60-bar .fyt-fs60-cta{height:40px;padding:0 14px;font-size:12px;justify-self:stretch}
+ #fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-in{grid-template-areas:"dial main main" "cta cta cta"}
+ }
+@media (max-width:340px){
+ #fyt-fs60-bar .fyt-fs60-code svg,#fyt-fs60-bar .fyt-fs60-cta svg{display:none}
+ #fyt-fs60-bar .fyt-fs60-code{padding:0 8px}
+ #fyt-fs60-bar .fyt-fs60-cta{padding:0 10px;font-size:11px}
+}
+@media (max-width:370px){
+ #fyt-fs60-bar .fyt-fs60-big{font-size:21px}
+ #fyt-fs60-bar .fyt-fs60-tile{width:40px}
+ #fyt-fs60-bar .fyt-fs60-dg{width:10px;font-size:14px}
+ #fyt-fs60-bar .fyt-fs60-ends{display:none}
+ #fyt-fs60-bar .fyt-fs60-code>span{font-size:10px}
+ #fyt-fs60-bar .fyt-fs60-code b{font-size:11px}
+}
+/* ---------- motion (transform + opacity only) ---------- */
+@keyframes fyt-fs60-enter{from{opacity:0;transform:translate3d(0,-14px,0)}to{opacity:1;transform:none}}
+@keyframes fyt-fs60-sweep{0%{opacity:0;transform:translate3d(-120%,0,0) skewX(-20deg)}8%{opacity:1}42%{opacity:1}55%,100%{opacity:0;transform:translate3d(620%,0,0) skewX(-20deg)}}
+@keyframes fyt-fs60-shm{0%{opacity:0}2.5%{opacity:1}6%{opacity:.55}9%,100%{opacity:0}}
+@keyframes fyt-fs60-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+@keyframes fyt-fs60-spin{to{transform:rotate(360deg)}}
+@keyframes fyt-fs60-tip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.35)}}
+@keyframes fyt-fs60-tw{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.15)}}
+@keyframes fyt-fs60-blink{0%{opacity:1}50%{opacity:.25}}
+@keyframes fyt-fs60-dgin{from{opacity:0;transform:translate3d(0,-75%,0)}to{opacity:1;transform:none}}
+@keyframes fyt-fs60-dgout{from{opacity:1;transform:none}to{opacity:0;transform:translate3d(0,75%,0)}}
+@keyframes fyt-fs60-shine{0%{transform:translate3d(-150%,0,0) skewX(-20deg)}55%,100%{transform:translate3d(420%,0,0) skewX(-20deg)}}
+@keyframes fyt-fs60-pulse{0%{opacity:.8;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.22,1.5)}}
+@media (prefers-reduced-motion:reduce){
+ #fyt-fs60-bar,#fyt-fs60-bar *,#fyt-fs60-bar *::before,#fyt-fs60-bar *::after{animation:none!important;transition:none!important}
+ #fyt-fs60-bar .fyt-fs60-sweep,#fyt-fs60-bar .fyt-fs60-shm,#fyt-fs60-bar .fyt-fs60-glint,#fyt-fs60-bar .fyt-fs60-cta-shine,#fyt-fs60-bar .fyt-fs60-cta-ring,#fyt-fs60-bar .fyt-fs60-spk{display:none}
+}
+</style>
+
+<div id="fyt-fs60-bar" class="fyt-fs60-fixed" role="region" aria-label="24-hour flash sale">
+  <div class="fyt-fs60-bg" aria-hidden="true"></div>
+  <span class="fyt-fs60-spk" style="left:35%;top:80%;animation-delay:.3s" aria-hidden="true"></span>
+  <span class="fyt-fs60-spk" style="left:43%;top:70%;animation-delay:1.4s" aria-hidden="true"></span>
+  <span class="fyt-fs60-spk" style="left:58%;top:22%;animation-delay:2.2s" aria-hidden="true"></span>
+  <span class="fyt-fs60-spk" style="left:74%;top:68%;animation-delay:.9s" aria-hidden="true"></span>
+  <span class="fyt-fs60-spk" style="left:90%;top:30%;animation-delay:1.9s" aria-hidden="true"></span>
+  <div class="fyt-fs60-sweep" aria-hidden="true"></div>
+  <div class="fyt-fs60-topline" aria-hidden="true"></div>
+
+  <div class="fyt-fs60-in">
+    <!-- 24h dial: blue rim = time left in the 24h (depletes), gold hand ticks each second -->
+    <div class="fyt-fs60-dialw" aria-hidden="true">
+      <div class="fyt-fs60-rim">
+        <div class="fyt-fs60-rbase"></div>
+        <div class="fyt-fs60-hf fyt-fs60-hf-r"><i id="fyt-fs60-rr"></i></div>
+        <div class="fyt-fs60-hf fyt-fs60-hf-l"><i id="fyt-fs60-rl"></i></div>
+        <div class="fyt-fs60-tipw" id="fyt-fs60-tipw"><span class="fyt-fs60-tip"></span></div>
+      </div>
+      <div class="fyt-fs60-face">
+        <svg viewBox="0 0 100 100" focusable="false">
+          <defs>
+            <radialGradient id="fyt-fs60-face" cx="50%" cy="34%" r="75%"><stop offset="0" stop-color="#1b2335"/><stop offset=".55" stop-color="#06080d"/><stop offset="1" stop-color="#000"/></radialGradient>
+            <linearGradient id="fyt-fs60-gld" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF1B8"/><stop offset=".5" stop-color="#FFC845"/><stop offset="1" stop-color="#B8730A"/></linearGradient>
+          </defs>
+          <circle cx="50" cy="50" r="50" fill="url(#fyt-fs60-face)"/>
+          <g class="t">
+<line x1="50.00" y1="6.00" x2="50.00" y2="15.00" stroke-width="2.6"/>
+<line x1="61.39" y1="7.50" x2="60.48" y2="10.88" stroke-width="1.3"/>
+<line x1="72.00" y1="11.89" x2="70.25" y2="14.93" stroke-width="1.3"/>
+<line x1="81.11" y1="18.89" x2="77.58" y2="22.42" stroke-width="1.3"/>
+<line x1="88.11" y1="28.00" x2="85.07" y2="29.75" stroke-width="1.3"/>
+<line x1="92.50" y1="38.61" x2="89.12" y2="39.52" stroke-width="1.3"/>
+<line x1="94.00" y1="50.00" x2="85.00" y2="50.00" stroke-width="2.6"/>
+<line x1="92.50" y1="61.39" x2="89.12" y2="60.48" stroke-width="1.3"/>
+<line x1="88.11" y1="72.00" x2="85.07" y2="70.25" stroke-width="1.3"/>
+<line x1="81.11" y1="81.11" x2="77.58" y2="77.58" stroke-width="1.3"/>
+<line x1="72.00" y1="88.11" x2="70.25" y2="85.07" stroke-width="1.3"/>
+<line x1="61.39" y1="92.50" x2="60.48" y2="89.12" stroke-width="1.3"/>
+<line x1="50.00" y1="94.00" x2="50.00" y2="85.00" stroke-width="2.6"/>
+<line x1="38.61" y1="92.50" x2="39.52" y2="89.12" stroke-width="1.3"/>
+<line x1="28.00" y1="88.11" x2="29.75" y2="85.07" stroke-width="1.3"/>
+<line x1="18.89" y1="81.11" x2="22.42" y2="77.58" stroke-width="1.3"/>
+<line x1="11.89" y1="72.00" x2="14.93" y2="70.25" stroke-width="1.3"/>
+<line x1="7.50" y1="61.39" x2="10.88" y2="60.48" stroke-width="1.3"/>
+<line x1="6.00" y1="50.00" x2="15.00" y2="50.00" stroke-width="2.6"/>
+<line x1="7.50" y1="38.61" x2="10.88" y2="39.52" stroke-width="1.3"/>
+<line x1="11.89" y1="28.00" x2="14.93" y2="29.75" stroke-width="1.3"/>
+<line x1="18.89" y1="18.89" x2="22.42" y2="22.42" stroke-width="1.3"/>
+<line x1="28.00" y1="11.89" x2="29.75" y2="14.93" stroke-width="1.3"/>
+<line x1="38.61" y1="7.50" x2="39.52" y2="10.88" stroke-width="1.3"/>
+          </g>
+          <circle cx="50" cy="50" r="16" fill="none" stroke="rgba(255,214,120,.35)" stroke-width=".8"/>
+          <g class="s">
+<line x1="50.00" y1="35.00" x2="50.00" y2="37.50" stroke-width="0.9"/>
+<line x1="57.50" y1="37.01" x2="56.25" y2="39.17" stroke-width="0.9"/>
+<line x1="62.99" y1="42.50" x2="60.83" y2="43.75" stroke-width="0.9"/>
+<line x1="65.00" y1="50.00" x2="62.50" y2="50.00" stroke-width="0.9"/>
+<line x1="62.99" y1="57.50" x2="60.83" y2="56.25" stroke-width="0.9"/>
+<line x1="57.50" y1="62.99" x2="56.25" y2="60.83" stroke-width="0.9"/>
+<line x1="50.00" y1="65.00" x2="50.00" y2="62.50" stroke-width="0.9"/>
+<line x1="42.50" y1="62.99" x2="43.75" y2="60.83" stroke-width="0.9"/>
+<line x1="37.01" y1="57.50" x2="39.17" y2="56.25" stroke-width="0.9"/>
+<line x1="35.00" y1="50.00" x2="37.50" y2="50.00" stroke-width="0.9"/>
+<line x1="37.01" y1="42.50" x2="39.17" y2="43.75" stroke-width="0.9"/>
+<line x1="42.50" y1="37.01" x2="43.75" y2="39.17" stroke-width="0.9"/>
+          </g>
+          <text x="50" y="31" text-anchor="middle" font-family="Unbounded,Arial Black,Arial,sans-serif" font-weight="800" font-size="13" fill="url(#fyt-fs60-gld)">12</text>
+        </svg>
+        <div class="fyt-fs60-glint"></div>
+        <div class="fyt-fs60-hand" id="fyt-fs60-hand"></div>
+        <div class="fyt-fs60-hub"></div>
+      </div>
+    </div>
+
+    <div class="fyt-fs60-main">
+      <div class="fyt-fs60-eb"><i aria-hidden="true"></i><span id="fyt-fs60-eb"></span><i aria-hidden="true"></i></div>
+      <div class="fyt-fs60-hl"><span class="fyt-fs60-every" id="fyt-fs60-every"></span><span class="fyt-fs60-big"><span class="fyt-fs60-bigt" id="fyt-fs60-big"></span><span id="fyt-fs60-shms" aria-hidden="true"></span></span></div>
+    </div>
+
+    <button type="button" class="fyt-fs60-code" id="fyt-fs60-code" aria-label="Copy code">
+      <span class="fyt-fs60-cp-off"><span id="fyt-fs60-codelabel"></span><b id="fyt-fs60-codeval"></b>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></svg></span>
+      <span class="fyt-fs60-cp-on" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg><i id="fyt-fs60-copiedtxt" style="font-style:normal"></i></span>
+    </button>
+
+    <div class="fyt-fs60-timer" id="fyt-fs60-timer">
+      <div class="fyt-fs60-ends" id="fyt-fs60-ends"></div>
+      <div class="fyt-fs60-tiles" aria-hidden="true">
+        <div class="fyt-fs60-tile"><span class="fyt-fs60-dgs"><span class="fyt-fs60-dg"></span><span class="fyt-fs60-dg"></span></span><small id="fyt-fs60-lh"></small></div>
+        <span class="fyt-fs60-colon">:</span>
+        <div class="fyt-fs60-tile"><span class="fyt-fs60-dgs"><span class="fyt-fs60-dg"></span><span class="fyt-fs60-dg"></span></span><small id="fyt-fs60-lm"></small></div>
+        <span class="fyt-fs60-colon">:</span>
+        <div class="fyt-fs60-tile fyt-fs60-t-s"><span class="fyt-fs60-dgs"><span class="fyt-fs60-dg"></span><span class="fyt-fs60-dg"></span></span><small id="fyt-fs60-ls"></small></div>
+      </div>
+    </div>
+
+    <a class="fyt-fs60-cta" id="fyt-fs60-cta" href="#">
+      <span class="fyt-fs60-cta-clip" aria-hidden="true"><i class="fyt-fs60-cta-shine"></i></span>
+      <i class="fyt-fs60-cta-ring" aria-hidden="true"></i>
+      <span class="fyt-fs60-cta-t" id="fyt-fs60-ctat"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <div class="fyt-fs60-edge" aria-hidden="true"><i class="fyt-fs60-edgefill" id="fyt-fs60-edgefill"></i></div>
+  <span class="fyt-fs60-sr" id="fyt-fs60-sr" role="timer" aria-live="off"></span>
+</div>
+
+<script>
+(function(){
+  /* ============================ CONFIG: edit here ============================ */
+  var CONFIG = {
+    endDate:   '',                           // set from window.FYT_FLASH.end (each visitor's own deadline)
+    saleHours: 12,                           // length of the sale, drives the progress ring + bar
+    whenEnded: 'hide',                       // 'hide' | 'message'
+    couponCode:'BLACKFRIDAY',                // shown on the pill and copied on click
+    ctaUrl:    'https://fundingyourtrades.com/#challenge',
+    stickyMode:'fixed',                      // 'fixed' (default) | 'sticky' | 'none'
+    copy: {
+      eyebrow:'Black Friday upgraded', every:'Everything', big:'60% off',
+      codeLabel:'Code', copied:'Copied', endsIn:'Ends in', hrs:'HRS', min:'MIN', sec:'SEC',
+      cta:'Claim 60% Off',
+      endedEyebrow:'Black Friday upgraded', endedEvery:'Flash sale', endedBig:'ended',
+      endedText:'The flash sale has ended', endedCta:'View Challenges'
+    }
+  };
+  /* Optional override without editing this file: set window.FYT_FS60_CONFIG = {...} before this snippet. */
+  var ov = window.FYT_FS60_CONFIG || {};
+  for (var k in ov){ if(k==='copy'){ for (var c in ov.copy) CONFIG.copy[c]=ov.copy[c]; } else CONFIG[k]=ov[k]; }
+  /* ========================================================================== */
+
+  var bar = document.getElementById('fyt-fs60-bar');
+  if (!bar || bar.getAttribute('data-fyt-fs60-init')) return;
+  // Only during the visitor's 12 hours, and never on the checkout.
+  var FL = window.FYT_FLASH;
+  if (!FL || !(FL.end > Date.now()) || document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) { if (bar.parentNode) bar.parentNode.removeChild(bar); return; }
+  if (!CONFIG.endDate) CONFIG.endDate = new Date(FL.end).toISOString();
+  bar.setAttribute('data-fyt-fs60-init','1');
+  var $ = function(id){ return document.getElementById('fyt-fs60-'+id); };
+  var T = CONFIG.copy, root = document.documentElement, body = document.body;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var endMs = Date.parse(CONFIG.endDate);
+  var totalMs = CONFIG.saleHours*3600000, startMs = endMs - totalMs;
+
+  // move to top of <body>, positioning
+  if (CONFIG.stickyMode !== 'none' && (bar.parentNode !== body || body.firstChild !== bar)) body.insertBefore(bar, body.firstChild);
+  bar.classList.remove('fyt-fs60-fixed');
+  if (CONFIG.stickyMode==='fixed') bar.classList.add('fyt-fs60-fixed');
+  else if (CONFIG.stickyMode==='sticky') bar.classList.add('fyt-fs60-sticky');
+
+  // copy
+  $('eb').textContent=T.eyebrow; $('every').textContent=T.every; $('big').textContent=T.big;
+  (function(){ var w=$('shms'), n=9, i, s; w.style.display='contents';
+    for (i=0;i<n;i++){ s=document.createElement('span'); s.className='fyt-fs60-shm'; s.style.setProperty('--i',i); s.style.setProperty('--p',(-6+i*14)+'%'); s.textContent=T.big; w.appendChild(s); } })();
+  $('codelabel').textContent=T.codeLabel; $('codeval').textContent=CONFIG.couponCode; $('copiedtxt').textContent=T.copied;
+  $('ends').textContent=T.endsIn; $('lh').textContent=T.hrs; $('lm').textContent=T.min; $('ls').textContent=T.sec;
+  $('ctat').textContent=T.cta; $('cta').href=CONFIG.ctaUrl;
+  $('code').setAttribute('aria-label','Copy code '+CONFIG.couponCode);
+
+  // padding so the fixed bar never covers the page
+  var basePad = parseFloat(getComputedStyle(body).paddingTop)||0;
+  function fit(){
+    var h = bar.classList.contains('fyt-fs60-hide') ? 0 : Math.round(bar.getBoundingClientRect().height);
+    root.style.setProperty('--fyt-fs60-h', h+'px');
+    root.style.setProperty('--fyt-bf-h', h+'px'); // the site header already follows the Black Friday bar height
+    if (CONFIG.stickyMode==='fixed') body.style.paddingTop = (basePad+h)+'px';
+  }
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(bar); else window.addEventListener('resize',fit);
+  fit();
+
+  // digits
+  var cells = bar.querySelectorAll('.fyt-fs60-dg'); // h1 h2 m1 m2 s1 s2
+  var shown = ['','','','','',''];
+  function setDigit(i,ch,animate){
+    if (shown[i]===ch) return; shown[i]=ch;
+    var cell = cells[i], nw = document.createElement('span');
+    nw.className='fyt-fs60-n'; nw.textContent=ch;
+    var old = cell.querySelector('.fyt-fs60-n:not(.fyt-fs60-out-n)');
+    if (animate && !reduce && old){
+      old.classList.add('fyt-fs60-out-n'); nw.classList.add('fyt-fs60-in-n');
+      var rm = function(){ if(old.parentNode) old.parentNode.removeChild(old); };
+      old.addEventListener('animationend',rm); setTimeout(rm,600);
+      cell.appendChild(nw);
+    } else { cell.textContent=''; cell.appendChild(nw); }
+  }
+  function pad2(n){ return (n<10?'0':'')+n; }
+
+  // ring + edge + hand
+  var rr=$('rr'), rl=$('rl'), tipw=$('tipw'), hand=$('hand'), edge=$('edgefill');
+  function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+  function setProgress(frac){ // frac = share of the 24h still left (1 -> 0)
+    var th = clamp(frac,0,1)*360;
+    rr.style.transform='rotate('+(clamp(th,0,180)-180)+'deg)';
+    rl.style.transform='rotate('+(clamp(th,180,360)-360)+'deg)';
+    tipw.style.transform='rotate('+th+'deg)';
+    edge.style.transform='scaleX('+clamp(frac,0,1)+')';
+  }
+
+  var ended=false, lastSr=-1, handAngle=0;
+  function render(first){
+    var now = Date.now(), left = endMs-now;
+    if (left<=0){ if(!ended) showEnded(); return; }
+    var s = Math.floor(left/1000), h = Math.min(99,Math.floor(s/3600)), m = Math.floor(s%3600/60), sec = s%60;
+    var a = !first && !document.hidden;
+    var hh=pad2(h), mm=pad2(m), ss=pad2(sec);
+    setDigit(0,hh[0],a);setDigit(1,hh[1],a);setDigit(2,mm[0],a);setDigit(3,mm[1],a);setDigit(4,ss[0],a);setDigit(5,ss[1],a);
+    setProgress(left/totalMs);
+    handAngle = Math.floor((now-startMs)/1000)*6; hand.style.transform='rotate('+handAngle+'deg)';
+    var mins = Math.floor(s/60);
+    if (mins!==lastSr){ lastSr=mins; $('sr').textContent='Black Friday upgraded: everything 60% off with code '+CONFIG.couponCode+'. Your 12 hours end in '+h+' hours '+m+' minutes.'; }
+  }
+  function showEnded(){
+    ended=true;
+    if (CONFIG.whenEnded === 'hide') { clearInterval(timer); bar.classList.add('fyt-fs60-hide'); bar.style.display='none'; fit(); return; }
+    bar.classList.add('fyt-fs60-ended');
+    $('eb').textContent=T.endedEyebrow; $('every').textContent=T.endedEvery; $('big').textContent=T.endedBig; $('shms').textContent='';
+    $('ctat').textContent=T.endedCta;
+    for (var i=0;i<6;i++) setDigit(i,'0',false);
+    setProgress(0); $('sr').textContent=T.endedText+'.';
+    clearInterval(timer); fit();
+  }
+
+  // click-to-copy
+  var codeBtn=$('code'), copyT;
+  function done(){ codeBtn.classList.add('fyt-fs60-copied'); clearTimeout(copyT); copyT=setTimeout(function(){ codeBtn.classList.remove('fyt-fs60-copied'); },1800); }
+  function legacyCopy(txt){ try{ var ta=document.createElement('textarea'); ta.value=txt; ta.setAttribute('readonly',''); ta.style.cssText='position:fixed;top:0;left:0;opacity:0'; document.body.appendChild(ta); ta.select(); var ok=document.execCommand('copy'); document.body.removeChild(ta); return ok; }catch(e){ return false; } }
+  codeBtn.addEventListener('click',function(){
+    var txt=CONFIG.couponCode;
+    if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,function(){ if(legacyCopy(txt)) done(); }); }
+    else if (legacyCopy(txt)) done();
+  });
+
+  // pause animations in hidden tabs
+  function vis(){ bar.classList.toggle('fyt-fs60-paused',document.hidden); if(!document.hidden) render(false); }
+  document.addEventListener('visibilitychange',vis);
+
+  render(true);
+  // enable smooth transitions only after first paint (no ring sweep-in on load)
+  var timer = setInterval(function(){ if(!document.hidden) render(false); },1000);
+  if (ended) clearInterval(timer);
+  if (document.hidden) bar.classList.add('fyt-fs60-paused');
+})();
+</script>
+
 
 
 <!-- ===================== Site-wide: old offers in the WordPress header and footer -> current offer =====================

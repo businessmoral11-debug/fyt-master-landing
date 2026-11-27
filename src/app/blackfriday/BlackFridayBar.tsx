@@ -4,16 +4,40 @@ import { BF_CODE } from "@/app/data/blackfriday";
 // The same paste-in bar used on the WordPress pages (kept in one file so both stay identical).
 import { FLASH_OFF, useFlash } from "@/app/data/flash";
 import barHtml from "./topbar.html?raw";
+import flashHtml from "./flashbar.html?raw";
 
 /** Top bar: the 12-hour flash bar while this visitor's flash runs, the Black Friday bar otherwise. */
 export function BlackFridayBar(props: { compact?: boolean }) {
   const f = useFlash();
-  // Same bar in both cases; during the visitor's 12 hours it gets the flash look and counts down to their own deadline.
-  return f.on ? <BfBar key="flash" {...props} flashEnd={f.end} /> : <BfBar key="bf" {...props} />;
+  return f.on ? <FlashTopBar key="flash" end={f.end} /> : <BfBar key="bf" {...props} />;
+}
+
+type W = Window & { FYT_FLASH?: { off: number; end: number }; FYT_FS60_CONFIG?: Record<string, unknown> };
+
+/** The fyt-fs60 flash bar (same file the WordPress pages use), counting down to this visitor's own deadline. */
+function FlashTopBar({ end }: { end: number }) {
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = host.current;
+    const w = window as W;
+    if (!el || el.dataset.ready) return;
+    el.dataset.ready = "1";
+    w.FYT_FLASH = { off: FLASH_OFF, end };
+    w.FYT_FS60_CONFIG = { stickyMode: "none", ctaUrl: "#challenge", endDate: new Date(end).toISOString() };
+    const at = flashHtml.lastIndexOf("<script>");
+    const stop = flashHtml.lastIndexOf("</script>");
+    const js = at >= 0 && stop > at ? flashHtml.slice(at + 8, stop) : "";
+    el.innerHTML = at >= 0 ? flashHtml.slice(0, at) : flashHtml;
+    if (js) {
+      try { new Function(js)(); } catch { /* bar stays static if the script fails */ }
+    }
+    return () => { delete w.FYT_FLASH; delete w.FYT_FS60_CONFIG; };
+  }, [end]);
+  return <div ref={host} style={{ width: "100%" }} />;
 }
 
 /** Black Friday top bar. Full height at the top of the page, thin once the visitor scrolls. */
-function BfBar({ flashEnd }: { compact?: boolean; flashEnd?: number }) {
+function BfBar(_props: { compact?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = host.current;
@@ -30,23 +54,6 @@ function BfBar({ flashEnd }: { compact?: boolean; flashEnd?: number }) {
       couponCode: BF_CODE,
       ctaUrl: "#challenge",
       whenEnded: "message",
-      ...(flashEnd
-        ? {
-            theme: "flash",
-            brand: ["BLACK FRIDAY", "UPGRADED"],
-            endDate: new Date(flashEnd).toISOString(),
-            endsText: "Your 12 hrs end in",
-            hero: `${FLASH_OFF}% OFF EVERYTHING`,
-            heroShort: `${FLASH_OFF}% OFF ALL`,
-            ticker: ["BUY 1 GET 2 INSTANTLY", "BUY 2 GET 5 INSTANTLY"],
-            tickerShort: ["BUY 1 GET 2", "BUY 2 GET 5"],
-            ctaText: `Claim ${FLASH_OFF}% Off`,
-            ctaTextShort: "Claim",
-            srText: `Black Friday upgraded: ${FLASH_OFF}% off everything for your next 12 hours. Buy 1 get 2 instantly, buy 2 get 5 instantly.`,
-            whenEnded: "hide",
-            soonHours: 0,
-          }
-        : {}),
     };
     if (js) {
       try { new Function(js)(); } catch { /* bar stays static if the script fails */ }
