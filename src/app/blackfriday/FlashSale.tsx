@@ -116,7 +116,6 @@ export function FlashOffer() {
         })}
       </div>
       <div className="fyt-fl-chips2">
-        <span>Buy 3 Get 7 &middot; Buy 4 Get 10 <b>also {FLASH_OFF}% off</b></span>
         <span className="g"><i>100K</i>Daily funded account <b>giveaway</b></span>
       </div>
       <div id="fyt-bf-picker" />

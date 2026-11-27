@@ -157,6 +157,25 @@
 #fyt-bf-bar.fbf-thin .fbf-t{width:27px;height:26px}#fyt-bf-bar.fbf-thin .fbf-t b{font-size:11.5px}
 #fyt-bf-bar.fbf-thin .fbf-cta{height:28px;padding:0 11px}
 }
+/* ---- flash theme (12-hour "Black Friday Upgraded"): same bar, gold + red urgency ---- */
+#fyt-bf-bar.fbf-flash .fbf-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(28% 170% at 78% 120%,rgba(255,184,0,.28),transparent 70%),radial-gradient(18% 140% at 30% -30%,rgba(255,59,78,.22),transparent 70%)}
+#fyt-bf-bar.fbf-flash .fbf-brand{position:relative;padding-left:15px}
+#fyt-bf-bar.fbf-flash .fbf-brand::before{content:"";position:absolute;left:0;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#FF3B4E;animation:fbf-live 1.6s infinite}
+#fyt-bf-bar.fbf-flash .fbf-brand .fbf-bk{font-size:.78em;letter-spacing:.02em}
+#fyt-bf-bar.fbf-flash .fbf-fr{background:linear-gradient(90deg,#FFB800,#FFE08A 40%,#FFF6D6 50%,#FFE08A 60%,#FFB800);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+#fyt-bf-bar.fbf-flash .fbf-cards i:nth-child(n+2){background:linear-gradient(155deg,#FFE08A,#F0A93A);border-color:#FFF1C9}
+#fyt-bf-bar.fbf-flash .fbf-cards i:nth-child(1){background:linear-gradient(155deg,var(--b2),var(--b1));border-color:#8FC0FF}
+#fyt-bf-bar.fbf-flash .fbf-hero-t{background:linear-gradient(100deg,#FFFFFF,#FFF1C9 35%,#FFFFFF 50%,#FFE08A 65%,#FFFFFF);background-size:250% 100%;-webkit-background-clip:text;background-clip:text}
+#fyt-bf-bar.fbf-flash .fbf-hero-glow{text-shadow:0 0 12px rgba(255,236,190,.9),0 0 26px rgba(255,184,0,.45)}
+#fyt-bf-bar.fbf-flash .fbf-t[data-u="d"]{display:none}
+#fyt-bf-bar.fbf-flash .fbf-t{background:linear-gradient(180deg,#2A0A12,#0B0306);border-color:rgba(255,80,96,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 14px rgba(255,59,78,.28)}
+#fyt-bf-bar.fbf-flash .fbf-t small{color:#FFB3BB}
+#fyt-bf-bar.fbf-flash .fbf-ends{color:#FFB3BB;width:64px}
+#fyt-bf-bar.fbf-flash .fbf-cta{color:#241400!important;background:linear-gradient(100deg,#FFB800,#FFE08A 45%,#FFF6D6 52%,#FFC845);box-shadow:0 6px 18px rgba(255,184,0,.4),inset 0 1px 0 rgba(255,255,255,.6);animation:fbf-gpulse 2.2s infinite}
+#fyt-bf-bar.fbf-flash .fbf-line{background:linear-gradient(90deg,transparent,#FF3B4E 20%,var(--gd) 50%,#FF3B4E 80%,transparent);background-size:200% 100%}
+@keyframes fbf-live{0%{box-shadow:0 0 0 0 rgba(255,59,78,.75)}70%,100%{box-shadow:0 0 0 8px rgba(255,59,78,0)}}
+@keyframes fbf-gpulse{0%{box-shadow:0 0 0 0 rgba(255,200,69,.6),0 6px 18px rgba(255,184,0,.4)}70%,100%{box-shadow:0 0 0 12px rgba(255,200,69,0),0 6px 18px rgba(255,184,0,.4)}}
+@media (max-width:600px){#fyt-bf-bar.fbf-flash .fbf-brand{display:none}}
 @media (prefers-reduced-motion:reduce){#fyt-bf-bar *,#fyt-bf-bar *::after{animation:none!important;transition:none!important}#fyt-bf-bar .fbf-sweep,#fyt-bf-bar .fbf-spk{display:none}#fyt-bf-bar .fbf-cards i{transform:rotate(var(--r))}#fyt-bf-bar .fbf-hero-glow{opacity:.45;transform:none}}
 </style>
 <div id="fyt-bf-bar" role="region" aria-label="Black Friday offer">
@@ -203,7 +222,10 @@
     endedText: 'DEAL ENDED',
     stickyMode: 'fixed',      // 'fixed' (pads <body>) | 'sticky' | 'none' (stays where pasted)
     thinOnScroll: true, thinAfter: 80, // bar gets thin once the page is scrolled this many pixels
-    zIndex: 99990
+    zIndex: 99990,
+    brand: ['BLACK', 'FRIDAY'], // the two stacked words on the left
+    theme: '',                  // 'flash' = the 12-hour "Black Friday Upgraded" look (gold + red, no days tile)
+    endsText: ''                // label next to the timer (empty = "Deal ends in")
   };
   /* =========================================================================== */
   if (window.FYT_BF_CONFIG) for (var k in window.FYT_BF_CONFIG) CONFIG[k] = window.FYT_BF_CONFIG[k];
@@ -215,6 +237,13 @@
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var esc = function(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
   bar.style.zIndex = CONFIG.zIndex;
+  if (CONFIG.theme) bar.classList.add('fbf-' + CONFIG.theme);
+  if (CONFIG.brand && CONFIG.brand.length === 2) {
+    bar.querySelectorAll('.fbf-brand .fbf-bk, .fbf-eb .fbf-bk').forEach(function(e){ e.textContent = CONFIG.brand[0]; });
+    bar.querySelectorAll('.fbf-brand .fbf-fr, .fbf-eb .fbf-fr').forEach(function(e){ e.textContent = CONFIG.brand[1]; });
+    bar.setAttribute('aria-label', CONFIG.brand.join(' ') + ' offer');
+  }
+  if (CONFIG.endsText) $('.fbf-ends').textContent = CONFIG.endsText;
   $('.fbf-full').textContent = CONFIG.srText;
   $('.fbf-cv').textContent = CONFIG.couponCode;
   var code = $('.fbf-code'); code.setAttribute('aria-label', 'Copy coupon code ' + CONFIG.couponCode);

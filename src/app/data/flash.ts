@@ -91,7 +91,7 @@ function subscribe(f: () => void) {
 }
 const snap = () => state;
 
-export interface Flash { on: boolean; left: number; hh: string; mm: string; ss: string; share: number }
+export interface Flash { on: boolean; end: number; left: number; hh: string; mm: string; ss: string; share: number }
 
 /** Live flash state for this visitor. `on` turns false the second their 12 hours end. */
 export function useFlash(): Flash {
@@ -100,6 +100,7 @@ export function useFlash(): Flash {
   const pad = (n: number) => String(n).padStart(2, "0");
   return {
     on: left > 0,
+    end: s.end,
     left,
     hh: pad(Math.floor(left / 3600e3)),
     mm: pad(Math.floor(left / 60e3) % 60),
