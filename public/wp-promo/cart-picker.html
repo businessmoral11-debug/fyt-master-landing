@@ -517,6 +517,16 @@
         // BOGO_END: set a date to end it, e.g. new Date("2026-11-30T23:59:59+05:30").getTime(); 0 = no end.
         const DIWALI_END = new Date("2026-11-15T23:15:00-05:00").getTime();
         const BOGO_END = 0;
+        // Same rule as the promo bar and the home page. FLASH_MODE: 'off' | 'preview' (browsers that opened ?flash=1) | 'live'.
+        const FLASH_MODE = "preview", FLASH_HOURS = 24;
+        function fytFlashOn() {
+            try {
+                if (window.FYT_FLASH && window.FYT_FLASH.end > Date.now()) return true;
+                if (!(FLASH_MODE === "live" || (FLASH_MODE === "preview" && localStorage.getItem("fyt_flash_preview") === "1"))) return false;
+                const start = Number(localStorage.getItem("fyt_flash_start")) || 0;
+                return start > 0 && Date.now() < start + FLASH_HOURS * 36e5;
+            } catch (e) { return false; }
+        }
         function data() {
             const r = PLANS[S.product]?.[S.platform]?.[realType()]?.[S.amount] || null;
             if (!r) return null;
@@ -535,7 +545,10 @@
             // BF_END: 0 = no end.
             const BF_END = 0;
             if (!BF_END || now < BF_END) {
-                const bump = S.amount <= 5000 ? 10 : S.amount <= 10000 ? 14 : 20;
+                // 27 Nov: list price cut, 50K -5, 100K and 200K -10.
+                const bump = S.amount <= 5000 ? 10 : S.amount <= 10000 ? 14 : S.amount <= 25000 ? 20 : S.amount <= 50000 ? 15 : 10;
+                // 24-hour flash sale ("Black Friday Upgraded"): 60% off during this visitor's own 24 hours.
+                const flash = fytFlashOn();
                 // 1-Step Prime 10K MatchTrader was listed at $104 by mistake; its base is $114 like Classic.
                 const base = (r.priceOld === 104 && S.amount === 10000) ? 114 : r.priceOld;
                 const list = base + bump;
@@ -543,8 +556,9 @@
                     code: "BLACKFRIDAY",
                     url: (r.url || "") + (r.url ? "&coupon=BLACKFRIDAY" : ""),
                     priceOld: list,
-                    priceNew: Math.round(list * 0.5 * 100) / 100,
-                    coupon: "50% off + 1 Bonus Account + Daily 100K Giveaway Entry"
+                    priceNew: Math.round(list * (flash ? 0.4 : 0.5) * 100) / 100,
+                    coupon: flash ? "Black Friday Upgraded: 60% off + 1 Bonus Account + Daily 100K Giveaway Entry"
+                                  : "50% off + 1 Bonus Account + Daily 100K Giveaway Entry"
                 });
             }
             return Object.assign({}, r, { priceNew: r.priceOld, coupon: "", code: "" });
