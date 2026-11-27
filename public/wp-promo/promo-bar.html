@@ -1,11 +1,11 @@
 <!-- ===================== Flash sale ("Black Friday Upgraded") on every WordPress page =====================
-  60% off for everyone until FLASH_END (28 Nov 2026, 2:00 PM IST), the same end time as the checkout and the client
+  60% off for everyone until FLASH_END (28 Nov 2026, 3:00 PM IST), the same end time as the checkout and the client
   dashboard. While it runs the flash bar (fyt-fs60) shows instead of the Black Friday bar. At FLASH_END the page
   reloads once and the normal Black Friday bar comes back.
   FLASH_MODE: 'off' | 'preview' (only browsers that opened a page with ?flash=1) | 'live' (everyone). -->
 <script>
 (function () {
-  var FLASH_MODE = 'live', OFF = 60, FLASH_END = '2026-11-28T14:00:00+05:30';
+  var FLASH_MODE = 'live', OFF = 60, FLASH_END = '2026-11-28T15:00:00+05:30';
   function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
   var q = location.search;
   if (/[?&]flash=1(&|$)/.test(q)) ls('fyt_flash_preview', '1');
@@ -933,7 +933,7 @@
       [/47\.5%\s*off\s*with\s*crypto\s*\+\s*2\s*accounts\s*instantly(\s*same\s*size)?/gi, 'Buy 2 Get 5 Instantly'],
       [/200%\s*refund\s*\+\s*1st\s*reward\s*on\s*demand/gi, 'Buy 1 Get 2 Instantly'],
       [/40%\s*off\s*\+\s*2\s*accounts\s*instantly(\s*same\s*size)?/gi, FL.off + '% Off Everything'],
-      [/limited[-\s]*time\s*deal\s*[-\u2013\u00b7]\s*limited\s*spots/gi, 'Ends 28 Nov, 2 PM IST'],
+      [/limited[-\s]*time\s*deal\s*[-\u2013\u00b7]\s*limited\s*spots/gi, 'Ends 28 Nov, 3 PM IST'],
       [/summer\s*special/gi, 'Black Friday Upgraded']
     ],
     oldCodes: /\b(SUMMER40|FYT40|BOGO35|DIWALI45|FYTWEEN|NEWDASH)\b/gi

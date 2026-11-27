@@ -79,7 +79,7 @@ export function FlashOffer() {
   return (
     <div className="fyt-fl fyt-fl-hero">
       <div className="fyt-fl-rays" aria-hidden="true" />
-      <div className="fyt-fl-eye"><span className="fyt-fl-live" />LIVE <b>UNTIL 28 NOV, 2 PM IST</b></div>
+      <div className="fyt-fl-eye"><span className="fyt-fl-live" />LIVE <b>UNTIL 28 NOV, 3 PM IST</b></div>
       <h2 className="fyt-fl-h1">Black Friday, <b className="fyt-fl-gold">upgraded.</b></h2>
       <div className="fyt-fl-mega" aria-label={`Upgraded from 50% to ${FLASH_OFF}% off`}>
         <span className="fyt-fl-old">50%</span>
