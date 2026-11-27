@@ -235,6 +235,30 @@
  #fyt-fs60-bar .fyt-fs60-cta{padding:0 10px}
  #fyt-fs60-bar .fyt-fs60-cta svg{display:none}
 }
+/* ---------- thin while scrolling: one slim row ---------- */
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-dialw,#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-eb,#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-ends,#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-tile small,#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-spk,#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-cta-ring,#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-code>span>span:first-child{display:none!important}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-in{grid-template-columns:auto auto auto auto auto;grid-template-areas:"main deals code timer cta";min-height:46px;padding:5px 16px 7px;column-gap:18px;row-gap:0;animation:none}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-big{font-size:21px;padding-top:6px;padding-bottom:6px;margin-top:-6px;margin-bottom:-6px;animation:none}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-every{font-size:11px}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-deals{flex-direction:row;gap:12px;font-size:10.5px}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-code{height:30px;padding:0 12px}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-code b{font-size:12px}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-tile{width:34px;height:30px;border-radius:7px}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-dgs,#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-dg{height:16px}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-dg{width:10.5px;font-size:14px;line-height:16px}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-colon{font-size:12px;margin:0}
+#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-cta{height:32px;padding:0 15px;font-size:11.5px}
+@media (max-width:1179px){#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-in{grid-template-columns:auto auto auto auto;grid-template-areas:"main deals timer cta"}#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-code{display:none}}
+@media (max-width:860px){#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-in{grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"main timer cta";column-gap:12px}#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-deals{display:none}}
+@media (max-width:600px){
+ #fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-in{min-height:42px;padding:5px 12px 7px;column-gap:10px}
+ #fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-big{font-size:18px}
+ #fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-every{font-size:9.5px}
+ #fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-tile{width:29px;height:28px}
+ #fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-dg{width:9px;font-size:12.5px}
+ #fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-cta{height:30px;padding:0 12px}
+}
+@media (max-width:370px){#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-big{font-size:15.5px}#fyt-fs60-bar.fyt-fs60-thin .fyt-fs60-in{column-gap:7px;padding-left:9px;padding-right:9px}}
 /* ---------- motion (transform + opacity only) ---------- */
 @keyframes fyt-fs60-enter{from{opacity:0;transform:translate3d(0,-14px,0)}to{opacity:1;transform:none}}
 @keyframes fyt-fs60-sweep{0%{opacity:0;transform:translate3d(-120%,0,0) skewX(-20deg)}8%{opacity:1}42%{opacity:1}55%,100%{opacity:0;transform:translate3d(620%,0,0) skewX(-20deg)}}
@@ -372,6 +396,7 @@
     endDate:   '',                           // set from window.FYT_FLASH.end (each visitor's own deadline)
     saleHours: 24,                           // length of the sale, drives the progress ring + bar
     whenEnded: 'hide',                       // 'hide' | 'message'
+    thinOnScroll: true, thinAfter: 80,       // slim bar once the page is scrolled this many pixels
     couponCode:'BLACKFRIDAY',                // shown on the pill and copied on click
     ctaUrl:    'https://fundingyourtrades.com/#challenge',
     stickyMode:'fixed',                      // 'fixed' (default) | 'sticky' | 'none'
@@ -422,10 +447,17 @@
     var h = bar.classList.contains('fyt-fs60-hide') ? 0 : Math.round(bar.getBoundingClientRect().height);
     root.style.setProperty('--fyt-fs60-h', h+'px');
     root.style.setProperty('--fyt-bf-h', h+'px'); // the site header already follows the Black Friday bar height
-    if (CONFIG.stickyMode==='fixed') body.style.paddingTop = (basePad+h)+'px';
+    // The page padding always matches the full-height bar, so the page does not jump when the bar goes thin.
+    if (CONFIG.stickyMode==='fixed' && !bar.classList.contains('fyt-fs60-thin')) body.style.paddingTop = (basePad+h)+'px';
   }
   if (window.ResizeObserver) new ResizeObserver(fit).observe(bar); else window.addEventListener('resize',fit);
   fit();
+
+  if (CONFIG.thinOnScroll) {
+    var onScroll = function(){ var thin = (window.pageYOffset || root.scrollTop || 0) > CONFIG.thinAfter;
+      if (thin !== bar.classList.contains('fyt-fs60-thin')) { bar.classList.toggle('fyt-fs60-thin', thin); fit(); setTimeout(fit, 320); } };
+    window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  }
 
   // digits
   var cells = bar.querySelectorAll('.fyt-fs60-dg'); // h1 h2 m1 m2 s1 s2
