@@ -2,25 +2,24 @@ import { useSyncExternalStore } from "react";
 import { BF_TIERS, type BfTier } from "@/app/data/blackfriday";
 
 /**
- * 24-hour Black Friday flash sale ("Black Friday Upgraded").
- * Every visitor gets their own 24 hours from the first time they open the site, in their own time zone.
- * During those 24 hours every bundle is 60% off. When their 24 hours end, the normal Black Friday tiers
- * (50 / 51 / 53 / 55) come back on their own.
+ * Black Friday flash sale ("Black Friday Upgraded"): 60% off every account and every bundle, for everyone,
+ * until FLASH_END (one fixed time; the checkout and the client dashboard count down to the same moment).
+ * After FLASH_END the normal Black Friday tiers (50 / 51 / 53 / 55) come back on their own.
  *
  * FLASH_MODE
  *  "off"     nobody sees it
- *  "preview" only a browser that opened the site once with ?flash=1 (test page); ?flash=reset starts a fresh 24 hours
+ *  "preview" only a browser that opened the site once with ?flash=1 (test page)
  *  "live"    everyone
  */
 export const FLASH_MODE: "off" | "preview" | "live" = "live";
 export const FLASH_OFF = 60;
+/** 28 Nov 2026, 2:00 PM IST. */
+export const FLASH_END = "2026-11-28T14:00:00+05:30";
+/** Length shown on the drain bar / dial. */
 export const FLASH_HOURS = 24;
-/** No new 24-hour windows start after this moment (windows already running finish normally). */
-export const FLASH_LAST_START = "2026-12-01T17:00:00+05:30";
-/** The checkout snippet hands out a signed start time here, so the checkout can check the same deadline. */
+/** The checkout snippet answers here whether it is charging 60% right now, and until when. */
 export const FLASH_START_URL = "/wp-admin/admin-ajax.php?action=fyt_flash_start";
 
-const KEY = "fyt_flash_start";
 const PREVIEW_KEY = "fyt_flash_preview";
 const OK_KEY = "fyt_flash_ok";
 const MS = FLASH_HOURS * 3600e3;
@@ -36,65 +35,53 @@ function emit(next: Partial<State>) {
   subs.forEach((f) => f());
 }
 
-function readLocal(): number {
-  try { return Number(window.localStorage.getItem(KEY)) || 0; } catch { return 0; }
-}
-function writeLocal(start: number) {
-  try { window.localStorage.setItem(KEY, String(start)); } catch { /* storage blocked: this visit only */ }
-}
-
 function boot() {
   if (booted || typeof window === "undefined") return;
   booted = true;
   const sp = new URLSearchParams(window.location.search);
   let preview = false;
   try {
-    if (sp.get("flash") === "1" || sp.get("flash") === "reset") window.localStorage.setItem(PREVIEW_KEY, "1");
+    if (sp.get("flash") === "1") window.localStorage.setItem(PREVIEW_KEY, "1");
     if (sp.get("flash") === "off") window.localStorage.removeItem(PREVIEW_KEY);
-    if (sp.get("flash") === "reset") window.localStorage.removeItem(KEY);
     preview = window.localStorage.getItem(PREVIEW_KEY) === "1";
   } catch { preview = sp.get("flash") === "1"; }
   const live = FLASH_MODE === "live";
   if (!(live || (FLASH_MODE === "preview" && preview))) return;
 
-  // Live: the 60% only shows once the checkout has confirmed it is charging 60% too (the checkout snippet answers
-  // "live"). That answer is remembered in this browser, so later pages show the flash at once.
+  let end = new Date(FLASH_END).getTime();
+  if (Date.now() >= end) return;
+
+  // Live: show 60% once the checkout has confirmed it charges 60% (remembered in this browser).
   let ok = !live;
   try { if (live && window.localStorage.getItem(OK_KEY) === "1") ok = true; } catch { /* storage blocked */ }
 
-  let start = readLocal();
-  const now = Date.now();
-  const tick = () => {
+  let ticking = false;
+  const show = () => {
+    emit({ enabled: true, start: end - MS, end, now: Date.now() });
+    if (ticking) return;
+    ticking = true;
     const t = window.setInterval(() => {
       const n = Date.now();
       emit({ now: n });
       if (n >= state.end) window.clearInterval(t);
     }, 1000);
   };
-  if (ok) {
-    if (!start) {
-      if (now > new Date(FLASH_LAST_START).getTime()) return; // sale closed for new visitors
-      start = now;
-      writeLocal(start);
-    }
-    emit({ enabled: true, start, end: start + MS, now });
-    tick();
-  }
+  if (ok) show();
 
-  // Ask the site for the signed start time (same one the checkout checks). The server keeps the earliest.
-  const qs = (start ? `&s=${Math.floor(start / 1000)}` : "") + (sp.get("flash") === "reset" ? "&reset=1" : "");
-  fetch(`${FLASH_START_URL}${qs}`, { credentials: "include" })
+  fetch(FLASH_START_URL, { credentials: "include" })
     .then((r) => (r.ok ? r.json() : null))
     .then((j) => {
-      if (!j || !j.start) return;
-      if (live && !j.live) return; // checkout not live yet: keep the normal Black Friday prices
-      const s = Number(j.start) * 1000;
-      writeLocal(s);
+      if (!j) return;
+      if (live && !j.live) { // checkout is not charging 60%: show the normal Black Friday prices
+        try { window.localStorage.removeItem(OK_KEY); } catch { /* storage blocked */ }
+        if (ok) emit({ enabled: false });
+        return;
+      }
+      if (j.end) end = Number(j.end) * 1000; // the checkout's end time wins
       if (live) { try { window.localStorage.setItem(OK_KEY, "1"); } catch { /* storage blocked */ } }
-      if (ok) emit({ start: s, end: s + MS });
-      else if (Date.now() < s + MS) { ok = true; emit({ enabled: true, start: s, end: s + MS, now: Date.now() }); tick(); }
+      if (Date.now() < end) show();
     })
-    .catch(() => { /* no answer: test page keeps its local start; the live site stays on normal prices */ });
+    .catch(() => { /* no answer: test page shows the flash; the live site keeps what it knew */ });
 }
 
 function subscribe(f: () => void) {
@@ -106,7 +93,7 @@ const snap = () => state;
 
 export interface Flash { on: boolean; end: number; left: number; hh: string; mm: string; ss: string; share: number }
 
-/** Live flash state for this visitor. `on` turns false the second their 24 hours end. */
+/** Live flash state. `on` turns false the second the sale ends. */
 export function useFlash(): Flash {
   const s = useSyncExternalStore(subscribe, snap, snap);
   const left = s.enabled ? Math.max(0, s.end - s.now) : 0;

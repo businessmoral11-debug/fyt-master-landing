@@ -1,37 +1,34 @@
-<!-- ===================== 24-hour flash sale ("Black Friday Upgraded") on every WordPress page =====================
-  Same rules as the home page: each visitor gets their own 24 hours from their first visit (kept in this browser, and
-  signed by the checkout snippet so the checkout checks the same deadline). During those hours the flash bar (fyt-fs60) shows
-  instead of the Black Friday bar. When their 24 hours end, the page reloads once and the normal Black Friday bar comes back.
+<!-- ===================== Flash sale ("Black Friday Upgraded") on every WordPress page =====================
+  60% off for everyone until FLASH_END (28 Nov 2026, 2:00 PM IST), the same end time as the checkout and the client
+  dashboard. While it runs the flash bar (fyt-fs60) shows instead of the Black Friday bar. At FLASH_END the page
+  reloads once and the normal Black Friday bar comes back.
   FLASH_MODE: 'off' | 'preview' (only browsers that opened a page with ?flash=1) | 'live' (everyone). -->
 <script>
 (function () {
-  var FLASH_MODE = 'live', OFF = 60, HOURS = 24, LAST_START = '2026-12-01T17:00:00+05:30';
+  var FLASH_MODE = 'live', OFF = 60, FLASH_END = '2026-11-28T14:00:00+05:30';
   function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
   var q = location.search;
-  if (/[?&]flash=(1|reset)(&|$)/.test(q)) ls('fyt_flash_preview', '1');
+  if (/[?&]flash=1(&|$)/.test(q)) ls('fyt_flash_preview', '1');
   if (/[?&]flash=off(&|$)/.test(q)) ls('fyt_flash_preview', null);
-  if (/[?&]flash=reset(&|$)/.test(q)) ls('fyt_flash_start', null);
   if (!(FLASH_MODE === 'live' || (FLASH_MODE === 'preview' && ls('fyt_flash_preview') === '1'))) return;
   if (document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) return;
-  // Live: the flash only shows once the checkout has confirmed it charges 60% too (remembered in this browser).
-  var live = FLASH_MODE === 'live', ok = !live || ls('fyt_flash_ok') === '1';
-  var now = Date.now(), start = Number(ls('fyt_flash_start')) || 0;
-  function sign(s) {
-    try {
-      fetch('/wp-admin/admin-ajax.php?action=fyt_flash_start' + (s ? '&s=' + Math.floor(s / 1000) : ''), { credentials: 'include' })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (j) { if (j && j.start && (!live || j.live)) { ls('fyt_flash_start', String(j.start * 1000)); if (live) ls('fyt_flash_ok', '1'); } })
-        .catch(function () {});
-    } catch (e) {}
-  }
-  if (!ok) { sign(start); return; }
-  if (!start) { if (now > new Date(LAST_START).getTime()) return; start = now; ls('fyt_flash_start', String(start)); }
-  var end = start + HOURS * 36e5;
+  var live = FLASH_MODE === 'live', now = Date.now(), end = new Date(FLASH_END).getTime();
   if (now >= end) return;
+  // Ask the checkout whether it charges 60% right now (remembered, so the next page shows the flash at once).
+  try {
+    fetch('/wp-admin/admin-ajax.php?action=fyt_flash_start', { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j) return;
+        var was = ls('fyt_flash_ok') === '1';
+        if (j.live) { ls('fyt_flash_ok', '1'); if (live && !was && !window.FYT_FLASH) location.reload(); }
+        else if (live) { ls('fyt_flash_ok', null); if (was) location.reload(); }
+      })
+      .catch(function () {});
+  } catch (e) {}
+  if (live && ls('fyt_flash_ok') !== '1') return;
   window.FYT_FLASH = { off: OFF, end: end };
-  // Sign the start time on the server so the checkout gives the same 60% (the earliest start always wins).
-  sign(start);
-  // Back to the normal Black Friday bar the moment their 24 hours end.
+  // Back to the normal Black Friday bar the moment the sale ends.
   setTimeout(function () { if (!document.hidden) location.reload(); else document.addEventListener('visibilitychange', function () { location.reload(); }, { once: true }); }, end - now + 1500);
 })();
 </script>
@@ -365,8 +362,8 @@
 <!-- /FYT BLACK FRIDAY TOP BAR -->
 
 <!-- ======================================================================
-  FYT 24-HOUR FLASH SALE TOP BAR  (fyt-fs60)  "Black Friday Upgraded", based on the fyt-flash60 design
-  Shows ONLY while window.FYT_FLASH is set (the visitor's own 24 hours, set by the flash script before it).
+  FYT FLASH SALE TOP BAR  (fyt-fs60)  "Black Friday Upgraded", based on the fyt-flash60 design
+  Shows ONLY while window.FYT_FLASH is set (set by the flash script before it, until the fixed sale end).
   Otherwise it removes itself and the normal Black Friday bar shows.
   HTML + CSS + vanilla JS. No images, no libraries. Fonts: Unbounded + Inter (Google Fonts).
   Paste once: WordPress Custom HTML block / header-footer hook (wp_body_open or wp_footer) / GTM Custom HTML.
@@ -659,7 +656,7 @@
 }
 </style>
 
-<div id="fyt-fs60-bar" class="fyt-fs60-fixed" role="region" aria-label="24-hour flash sale">
+<div id="fyt-fs60-bar" class="fyt-fs60-fixed" role="region" aria-label="Black Friday upgraded flash sale">
   <div class="fyt-fs60-bg" aria-hidden="true"></div>
   <span class="fyt-fs60-spk" style="left:35%;top:80%;animation-delay:.3s" aria-hidden="true"></span>
   <span class="fyt-fs60-spk" style="left:43%;top:70%;animation-delay:1.4s" aria-hidden="true"></span>
@@ -797,7 +794,7 @@
 
   var bar = document.getElementById('fyt-fs60-bar');
   if (!bar || bar.getAttribute('data-fyt-fs60-init')) return;
-  // Only during the visitor's 24 hours, and never on the checkout.
+  // Only while the flash sale runs, and never on the checkout.
   var FL = window.FYT_FLASH;
   if (!FL || !(FL.end > Date.now()) || document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) { if (bar.parentNode) bar.parentNode.removeChild(bar); return; }
   if (!CONFIG.endDate) CONFIG.endDate = new Date(FL.end).toISOString();
@@ -887,7 +884,7 @@
     setProgress(left/totalMs);
     handAngle = Math.floor((now-startMs)/1000)*6; hand.style.transform='rotate('+handAngle+'deg)';
     var mins = Math.floor(s/60);
-    if (mins!==lastSr){ lastSr=mins; $('sr').textContent='Black Friday upgraded: 60% off everything instead of 50%, with code '+CONFIG.couponCode+'. Buy 1 get 2 instantly, buy 2 get 5 instantly. Your 24 hours end in '+h+' hours '+m+' minutes.'; }
+    if (mins!==lastSr){ lastSr=mins; $('sr').textContent='Black Friday upgraded: 60% off everything instead of 50%, with code '+CONFIG.couponCode+'. Buy 1 get 2 instantly, buy 2 get 5 instantly. Ends in '+h+' hours '+m+' minutes.'; }
   }
   function showEnded(){
     ended=true;
@@ -936,7 +933,7 @@
       [/47\.5%\s*off\s*with\s*crypto\s*\+\s*2\s*accounts\s*instantly(\s*same\s*size)?/gi, 'Buy 2 Get 5 Instantly'],
       [/200%\s*refund\s*\+\s*1st\s*reward\s*on\s*demand/gi, 'Buy 1 Get 2 Instantly'],
       [/40%\s*off\s*\+\s*2\s*accounts\s*instantly(\s*same\s*size)?/gi, FL.off + '% Off Everything'],
-      [/limited[-\s]*time\s*deal\s*[-\u2013\u00b7]\s*limited\s*spots/gi, 'Your 24 Hours Only'],
+      [/limited[-\s]*time\s*deal\s*[-\u2013\u00b7]\s*limited\s*spots/gi, 'Ends 28 Nov, 2 PM IST'],
       [/summer\s*special/gi, 'Black Friday Upgraded']
     ],
     oldCodes: /\b(SUMMER40|FYT40|BOGO35|DIWALI45|FYTWEEN|NEWDASH)\b/gi

@@ -517,15 +517,15 @@
         // BOGO_END: set a date to end it, e.g. new Date("2026-11-30T23:59:59+05:30").getTime(); 0 = no end.
         const DIWALI_END = new Date("2026-11-15T23:15:00-05:00").getTime();
         const BOGO_END = 0;
-        // Same rule as the promo bar and the home page. FLASH_MODE: 'off' | 'preview' (browsers that opened ?flash=1) | 'live'.
-        const FLASH_MODE = "live", FLASH_HOURS = 24;
+        // Flash sale: 60% for everyone until FLASH_END (28 Nov 2026, 2:00 PM IST), same as the promo bar and checkout.
+        // FLASH_MODE: 'off' | 'preview' (browsers that opened ?flash=1) | 'live' (once the checkout confirmed 60%).
+        const FLASH_MODE = "live", FLASH_END = new Date("2026-11-28T14:00:00+05:30").getTime();
         function fytFlashOn() {
             try {
+                if (Date.now() >= FLASH_END) return false;
                 if (window.FYT_FLASH && window.FYT_FLASH.end > Date.now()) return true;
-                // Live: only after the checkout has confirmed it charges 60% too (the promo bar script stores that).
-                if (!((FLASH_MODE === "live" && localStorage.getItem("fyt_flash_ok") === "1") || (FLASH_MODE === "preview" && localStorage.getItem("fyt_flash_preview") === "1"))) return false;
-                const start = Number(localStorage.getItem("fyt_flash_start")) || 0;
-                return start > 0 && Date.now() < start + FLASH_HOURS * 36e5;
+                if (FLASH_MODE === "live") return localStorage.getItem("fyt_flash_ok") === "1";
+                return FLASH_MODE === "preview" && localStorage.getItem("fyt_flash_preview") === "1";
             } catch (e) { return false; }
         }
         function data() {
@@ -548,7 +548,7 @@
             if (!BF_END || now < BF_END) {
                 // 27 Nov: list price cut, 50K -5, 100K and 200K -10.
                 const bump = S.amount <= 5000 ? 10 : S.amount <= 10000 ? 14 : S.amount <= 25000 ? 20 : S.amount <= 50000 ? 15 : 10;
-                // 24-hour flash sale ("Black Friday Upgraded"): 60% off during this visitor's own 24 hours.
+                // Flash sale ("Black Friday Upgraded"): 60% off for everyone until 28 Nov 2026, 2:00 PM IST.
                 const flash = fytFlashOn();
                 // 1-Step Prime 10K MatchTrader was listed at $104 by mistake; its base is $114 like Classic.
                 const base = (r.priceOld === 104 && S.amount === 10000) ? 114 : r.priceOld;

@@ -1,6 +1,6 @@
 <!-- ======================================================================
-  FYT 24-HOUR FLASH SALE TOP BAR  (fyt-fs60)  "Black Friday Upgraded", based on the fyt-flash60 design
-  Shows ONLY while window.FYT_FLASH is set (the visitor's own 24 hours, set by the flash script before it).
+  FYT FLASH SALE TOP BAR  (fyt-fs60)  "Black Friday Upgraded", based on the fyt-flash60 design
+  Shows ONLY while window.FYT_FLASH is set (set by the flash script before it, until the fixed sale end).
   Otherwise it removes itself and the normal Black Friday bar shows.
   HTML + CSS + vanilla JS. No images, no libraries. Fonts: Unbounded + Inter (Google Fonts).
   Paste once: WordPress Custom HTML block / header-footer hook (wp_body_open or wp_footer) / GTM Custom HTML.
@@ -293,7 +293,7 @@
 }
 </style>
 
-<div id="fyt-fs60-bar" class="fyt-fs60-fixed" role="region" aria-label="24-hour flash sale">
+<div id="fyt-fs60-bar" class="fyt-fs60-fixed" role="region" aria-label="Black Friday upgraded flash sale">
   <div class="fyt-fs60-bg" aria-hidden="true"></div>
   <span class="fyt-fs60-spk" style="left:35%;top:80%;animation-delay:.3s" aria-hidden="true"></span>
   <span class="fyt-fs60-spk" style="left:43%;top:70%;animation-delay:1.4s" aria-hidden="true"></span>
@@ -431,7 +431,7 @@
 
   var bar = document.getElementById('fyt-fs60-bar');
   if (!bar || bar.getAttribute('data-fyt-fs60-init')) return;
-  // Only during the visitor's 24 hours, and never on the checkout.
+  // Only while the flash sale runs, and never on the checkout.
   var FL = window.FYT_FLASH;
   if (!FL || !(FL.end > Date.now()) || document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) { if (bar.parentNode) bar.parentNode.removeChild(bar); return; }
   if (!CONFIG.endDate) CONFIG.endDate = new Date(FL.end).toISOString();
@@ -521,7 +521,7 @@
     setProgress(left/totalMs);
     handAngle = Math.floor((now-startMs)/1000)*6; hand.style.transform='rotate('+handAngle+'deg)';
     var mins = Math.floor(s/60);
-    if (mins!==lastSr){ lastSr=mins; $('sr').textContent='Black Friday upgraded: 60% off everything instead of 50%, with code '+CONFIG.couponCode+'. Buy 1 get 2 instantly, buy 2 get 5 instantly. Your 24 hours end in '+h+' hours '+m+' minutes.'; }
+    if (mins!==lastSr){ lastSr=mins; $('sr').textContent='Black Friday upgraded: 60% off everything instead of 50%, with code '+CONFIG.couponCode+'. Buy 1 get 2 instantly, buy 2 get 5 instantly. Ends in '+h+' hours '+m+' minutes.'; }
   }
   function showEnded(){
     ended=true;

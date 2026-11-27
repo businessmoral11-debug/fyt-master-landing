@@ -615,7 +615,7 @@ function heroFromPrice(flash = false): number {
   return Math.round(Math.min(...prices) * (1 - off));
 }
 
-/** Starting price on the hero button (drops to the flash price during the visitor's 24 hours). */
+/** Starting price on the hero button (drops to the flash price while the flash sale runs). */
 function HeroFrom() {
   const flash = useFlash().on;
   return <>${heroFromPrice(flash)}</>;
