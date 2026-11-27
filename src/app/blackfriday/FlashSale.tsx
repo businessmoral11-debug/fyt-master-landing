@@ -14,13 +14,13 @@ function Arrow({ className }: { className: string }) {
   );
 }
 
-/** Top bar during this visitor's 12 hours. */
+/** Top bar during this visitor's 24 hours. */
 export function FlashBar({ compact }: { compact?: boolean }) {
   const f = useFlash();
   useEffect(() => { ensureFlashAssets(); }, []);
   const go = () => document.getElementById("challenge")?.scrollIntoView({ behavior: "smooth" });
   return (
-    <div className={`fyt-fl fyt-fl-bar${compact ? " fyt-fl-compact" : ""}`} onClick={go} role="button" aria-label="Black Friday upgraded: 60% off everything for 12 hours">
+    <div className={`fyt-fl fyt-fl-bar${compact ? " fyt-fl-compact" : ""}`} onClick={go} role="button" aria-label="Black Friday upgraded: 60% off everything for 24 hours">
       <span className="fyt-fl-bolt" aria-hidden="true" />
       <div className="fyt-fl-in">
         <div className="fyt-fl-row">
@@ -71,7 +71,7 @@ function Fan({ buy, get }: { buy: number; get: number }) {
   );
 }
 
-/** Offer block above the pricing table during this visitor's 12 hours. */
+/** Offer block above the pricing table during this visitor's 24 hours. */
 export function FlashOffer() {
   const f = useFlash();
   const n = useUpgradeCount();
@@ -79,7 +79,7 @@ export function FlashOffer() {
   return (
     <div className="fyt-fl fyt-fl-hero">
       <div className="fyt-fl-rays" aria-hidden="true" />
-      <div className="fyt-fl-eye"><span className="fyt-fl-live" />LIVE <b>FOR 12 HOURS ONLY</b></div>
+      <div className="fyt-fl-eye"><span className="fyt-fl-live" />LIVE <b>FOR 24 HOURS ONLY</b></div>
       <h2 className="fyt-fl-h1">Black Friday, <b className="fyt-fl-gold">upgraded.</b></h2>
       <div className="fyt-fl-mega" aria-label={`Upgraded from 50% to ${FLASH_OFF}% off`}>
         <span className="fyt-fl-old">50%</span>
@@ -88,7 +88,7 @@ export function FlashOffer() {
         <span className="fyt-fl-offtxt"><b>OFF</b>EVERYTHING</span>
       </div>
       <div className="fyt-fl-time">
-        <div className="fyt-fl-time-l"><span className="fyt-fl-live" />YOUR 12 HOURS END IN</div>
+        <div className="fyt-fl-time-l"><span className="fyt-fl-live" />YOUR 24 HOURS END IN</div>
         <div className="fyt-fl-digits" role="timer">
           <div className="fyt-fl-dg"><b>{f.hh}</b><small>HRS</small></div><span className="fyt-fl-sep">:</span>
           <div className="fyt-fl-dg"><b>{f.mm}</b><small>MIN</small></div><span className="fyt-fl-sep">:</span>

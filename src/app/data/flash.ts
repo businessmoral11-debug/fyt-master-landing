@@ -2,20 +2,20 @@ import { useSyncExternalStore } from "react";
 import { BF_TIERS, type BfTier } from "@/app/data/blackfriday";
 
 /**
- * 12-hour Black Friday flash sale ("Black Friday Upgraded").
- * Every visitor gets their own 12 hours from the first time they open the site, in their own time zone.
- * During those 12 hours every bundle is 60% off. When their 12 hours end, the normal Black Friday tiers
+ * 24-hour Black Friday flash sale ("Black Friday Upgraded").
+ * Every visitor gets their own 24 hours from the first time they open the site, in their own time zone.
+ * During those 24 hours every bundle is 60% off. When their 24 hours end, the normal Black Friday tiers
  * (50 / 51 / 53 / 55) come back on their own.
  *
  * FLASH_MODE
  *  "off"     nobody sees it
- *  "preview" only a browser that opened the site once with ?flash=1 (test page); ?flash=reset starts a fresh 12 hours
+ *  "preview" only a browser that opened the site once with ?flash=1 (test page); ?flash=reset starts a fresh 24 hours
  *  "live"    everyone
  */
 export const FLASH_MODE: "off" | "preview" | "live" = "preview";
 export const FLASH_OFF = 60;
-export const FLASH_HOURS = 12;
-/** No new 12-hour windows start after this moment (windows already running finish normally). */
+export const FLASH_HOURS = 24;
+/** No new 24-hour windows start after this moment (windows already running finish normally). */
 export const FLASH_LAST_START = "2026-12-01T17:00:00+05:30";
 /** The checkout snippet hands out a signed start time here, so the checkout can check the same deadline. */
 export const FLASH_START_URL = "/wp-admin/admin-ajax.php?action=fyt_flash_start";
@@ -93,7 +93,7 @@ const snap = () => state;
 
 export interface Flash { on: boolean; end: number; left: number; hh: string; mm: string; ss: string; share: number }
 
-/** Live flash state for this visitor. `on` turns false the second their 12 hours end. */
+/** Live flash state for this visitor. `on` turns false the second their 24 hours end. */
 export function useFlash(): Flash {
   const s = useSyncExternalStore(subscribe, snap, snap);
   const left = s.enabled ? Math.max(0, s.end - s.now) : 0;

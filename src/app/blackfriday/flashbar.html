@@ -1,6 +1,6 @@
 <!-- ======================================================================
-  FYT 12-HOUR FLASH SALE TOP BAR  (fyt-fs60)  "Black Friday Upgraded", based on the fyt-flash60 design
-  Shows ONLY while window.FYT_FLASH is set (the visitor's own 12 hours, set by the flash script before it).
+  FYT 24-HOUR FLASH SALE TOP BAR  (fyt-fs60)  "Black Friday Upgraded", based on the fyt-flash60 design
+  Shows ONLY while window.FYT_FLASH is set (the visitor's own 24 hours, set by the flash script before it).
   Otherwise it removes itself and the normal Black Friday bar shows.
   HTML + CSS + vanilla JS. No images, no libraries. Fonts: Unbounded + Inter (Google Fonts).
   Paste once: WordPress Custom HTML block / header-footer hook (wp_body_open or wp_footer) / GTM Custom HTML.
@@ -178,11 +178,37 @@
  #fyt-fs60-bar .fyt-fs60-code>span{font-size:10px}
  #fyt-fs60-bar .fyt-fs60-code b{font-size:11px}
 }
+/* ---------- 50% struck out + the two deals ---------- */
+#fyt-fs60-bar .fyt-fs60-every{position:relative;color:rgba(214,226,255,.6);text-shadow:none;letter-spacing:.02em;font-size:15px}
+#fyt-fs60-bar .fyt-fs60-every::after{content:"";position:absolute;left:-4%;right:-4%;top:50%;height:2.5px;margin-top:-1px;border-radius:2px;background:#FF3B4E;transform:rotate(-7deg);box-shadow:0 0 8px rgba(255,59,78,.8)}
+#fyt-fs60-bar .fyt-fs60-deals{grid-area:deals;display:flex;flex-direction:column;gap:6px;font:600 11.5px/1 Inter,Arial,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#DCE6FF;white-space:nowrap}
+#fyt-fs60-bar .fyt-fs60-deals>span{display:flex;align-items:center;gap:7px}
+#fyt-fs60-bar .fyt-fs60-deals>span::before{content:"";width:6px;height:6px;border-radius:50%;background:#3F8CFF;box-shadow:0 0 8px rgba(63,140,255,.9);flex:none}
+#fyt-fs60-bar .fyt-fs60-deals>span.g::before{background:var(--gold);box-shadow:0 0 8px rgba(255,200,69,.9)}
+#fyt-fs60-bar .fyt-fs60-deals b{font-weight:800;color:#fff}
+#fyt-fs60-bar .fyt-fs60-deals .g b{color:var(--gold)}
+#fyt-fs60-bar .fyt-fs60-deals>i{display:none;font-style:normal;color:#5E6E90}
+#fyt-fs60-bar.fyt-fs60-ended .fyt-fs60-deals{display:none}
+@media (min-width:1180px){#fyt-fs60-bar .fyt-fs60-in{grid-template-columns:auto auto auto auto auto auto;grid-template-areas:"dial main deals code timer cta";column-gap:20px}}
+@media (min-width:1180px) and (max-width:1339px){#fyt-fs60-bar .fyt-fs60-in{column-gap:14px;padding-left:14px;padding-right:14px}#fyt-fs60-bar .fyt-fs60-ends,#fyt-fs60-bar .fyt-fs60-code>span>span:first-child{display:none}#fyt-fs60-bar .fyt-fs60-big{font-size:28px}#fyt-fs60-bar .fyt-fs60-dialw{--d:62px}}
+@media (max-width:1179px){
+ #fyt-fs60-bar .fyt-fs60-in{grid-template-areas:"dial main timer cta" "dial deals code cta"}
+ #fyt-fs60-bar .fyt-fs60-deals{flex-direction:row;gap:10px;font-size:10.5px;align-self:center}
+ #fyt-fs60-bar .fyt-fs60-every{font-size:12px}
+}
+@media (max-width:860px){#fyt-fs60-bar .fyt-fs60-deals{font-size:9.5px;gap:8px;letter-spacing:.04em}#fyt-fs60-bar .fyt-fs60-every{font-size:11px}}
 /* ---------- phones: one neat row (offer | timer | Claim). No dial, no code pill. ---------- */
 #fyt-fs60-bar .fyt-fs60-cta-ts{display:none}
 @media (max-width:600px){
- #fyt-fs60-bar .fyt-fs60-in{grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"main timer cta";column-gap:10px;row-gap:0;padding:9px 12px 11px;align-items:center}
- #fyt-fs60-bar .fyt-fs60-dialw,#fyt-fs60-bar .fyt-fs60-code,#fyt-fs60-bar .fyt-fs60-ends,#fyt-fs60-bar .fyt-fs60-every,#fyt-fs60-bar .fyt-fs60-eb i,#fyt-fs60-bar .fyt-fs60-spk,#fyt-fs60-bar .fyt-fs60-tile small,#fyt-fs60-bar .fyt-fs60-cta-ring{display:none!important}
+ #fyt-fs60-bar .fyt-fs60-in{grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"main timer cta" "deals deals deals";column-gap:10px;row-gap:7px;padding:8px 12px 10px;align-items:center}
+ #fyt-fs60-bar .fyt-fs60-deals{flex-direction:row;justify-content:center;gap:7px;font-size:9.5px;letter-spacing:.05em;padding-top:6px;border-top:1px solid rgba(255,255,255,.1)}
+ #fyt-fs60-bar .fyt-fs60-deals>span{gap:0}
+ #fyt-fs60-bar .fyt-fs60-deals>span::before{display:none}
+ #fyt-fs60-bar .fyt-fs60-deals>i{display:inline}
+ #fyt-fs60-bar .fyt-fs60-deals>span{display:inline}
+ #fyt-fs60-bar .fyt-fs60-every{display:inline-block!important;font-size:10.5px}
+ #fyt-fs60-bar .fyt-fs60-hl{gap:7px;align-items:center}
+ #fyt-fs60-bar .fyt-fs60-dialw,#fyt-fs60-bar .fyt-fs60-code,#fyt-fs60-bar .fyt-fs60-ends,#fyt-fs60-bar .fyt-fs60-eb i,#fyt-fs60-bar .fyt-fs60-spk,#fyt-fs60-bar .fyt-fs60-tile small,#fyt-fs60-bar .fyt-fs60-cta-ring{display:none!important}
  #fyt-fs60-bar .fyt-fs60-main{gap:3px;align-items:flex-start;text-align:left;min-width:0}
  #fyt-fs60-bar .fyt-fs60-eb{font-size:7.5px;letter-spacing:.14em;white-space:nowrap;justify-content:flex-start}
  #fyt-fs60-bar .fyt-fs60-hl{justify-content:flex-start}
@@ -201,7 +227,9 @@
 }
 @media (max-width:370px){
  #fyt-fs60-bar .fyt-fs60-in{column-gap:7px;padding:8px 9px 10px}
- #fyt-fs60-bar .fyt-fs60-big{font-size:18px}
+ #fyt-fs60-bar .fyt-fs60-big{font-size:17px}
+ #fyt-fs60-bar .fyt-fs60-every{font-size:9px}
+ #fyt-fs60-bar .fyt-fs60-deals{font-size:8.5px;gap:5px;letter-spacing:.02em}
  #fyt-fs60-bar .fyt-fs60-eb{font-size:6.5px;letter-spacing:.1em}
  #fyt-fs60-bar .fyt-fs60-tile{width:28px}
  #fyt-fs60-bar .fyt-fs60-cta{padding:0 10px}
@@ -293,7 +321,7 @@
 <line x1="37.01" y1="42.50" x2="39.17" y2="43.75" stroke-width="0.9"/>
 <line x1="42.50" y1="37.01" x2="43.75" y2="39.17" stroke-width="0.9"/>
           </g>
-          <text x="50" y="31" text-anchor="middle" font-family="Unbounded,Arial Black,Arial,sans-serif" font-weight="800" font-size="13" fill="url(#fyt-fs60-gld)">12</text>
+          <text x="50" y="31" text-anchor="middle" font-family="Unbounded,Arial Black,Arial,sans-serif" font-weight="800" font-size="13" fill="url(#fyt-fs60-gld)">24</text>
         </svg>
         <div class="fyt-fs60-glint"></div>
         <div class="fyt-fs60-hand" id="fyt-fs60-hand"></div>
@@ -305,6 +333,8 @@
       <div class="fyt-fs60-eb"><i aria-hidden="true"></i><span id="fyt-fs60-eb"></span><i aria-hidden="true"></i></div>
       <div class="fyt-fs60-hl"><span class="fyt-fs60-every" id="fyt-fs60-every"></span><span class="fyt-fs60-big"><span class="fyt-fs60-bigt" id="fyt-fs60-big"></span><span id="fyt-fs60-shms" aria-hidden="true"></span></span></div>
     </div>
+
+    <div class="fyt-fs60-deals"><span>Buy 1 <b>Get 2</b> Instantly</span><i aria-hidden="true">&middot;</i><span class="g">Buy 2 <b>Get 5</b> Instantly</span></div>
 
     <button type="button" class="fyt-fs60-code" id="fyt-fs60-code" aria-label="Copy code">
       <span class="fyt-fs60-cp-off"><span id="fyt-fs60-codelabel"></span><b id="fyt-fs60-codeval"></b>
@@ -340,13 +370,13 @@
   /* ============================ CONFIG: edit here ============================ */
   var CONFIG = {
     endDate:   '',                           // set from window.FYT_FLASH.end (each visitor's own deadline)
-    saleHours: 12,                           // length of the sale, drives the progress ring + bar
+    saleHours: 24,                           // length of the sale, drives the progress ring + bar
     whenEnded: 'hide',                       // 'hide' | 'message'
     couponCode:'BLACKFRIDAY',                // shown on the pill and copied on click
     ctaUrl:    'https://fundingyourtrades.com/#challenge',
     stickyMode:'fixed',                      // 'fixed' (default) | 'sticky' | 'none'
     copy: {
-      eyebrow:'Black Friday upgraded', every:'Everything', big:'60% off',
+      eyebrow:'Black Friday upgraded', every:'50% off', big:'60% off',
       codeLabel:'Code', copied:'Copied', endsIn:'Ends in', hrs:'HRS', min:'MIN', sec:'SEC',
       cta:'Claim 60% Off',
       endedEyebrow:'Black Friday upgraded', endedEvery:'Flash sale', endedBig:'ended',
@@ -360,7 +390,7 @@
 
   var bar = document.getElementById('fyt-fs60-bar');
   if (!bar || bar.getAttribute('data-fyt-fs60-init')) return;
-  // Only during the visitor's 12 hours, and never on the checkout.
+  // Only during the visitor's 24 hours, and never on the checkout.
   var FL = window.FYT_FLASH;
   if (!FL || !(FL.end > Date.now()) || document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) { if (bar.parentNode) bar.parentNode.removeChild(bar); return; }
   if (!CONFIG.endDate) CONFIG.endDate = new Date(FL.end).toISOString();
@@ -436,7 +466,7 @@
     setProgress(left/totalMs);
     handAngle = Math.floor((now-startMs)/1000)*6; hand.style.transform='rotate('+handAngle+'deg)';
     var mins = Math.floor(s/60);
-    if (mins!==lastSr){ lastSr=mins; $('sr').textContent='Black Friday upgraded: everything 60% off with code '+CONFIG.couponCode+'. Your 12 hours end in '+h+' hours '+m+' minutes.'; }
+    if (mins!==lastSr){ lastSr=mins; $('sr').textContent='Black Friday upgraded: 60% off everything instead of 50%, with code '+CONFIG.couponCode+'. Buy 1 get 2 instantly, buy 2 get 5 instantly. Your 24 hours end in '+h+' hours '+m+' minutes.'; }
   }
   function showEnded(){
     ended=true;

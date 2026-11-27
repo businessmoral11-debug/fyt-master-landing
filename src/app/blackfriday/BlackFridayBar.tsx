@@ -6,7 +6,7 @@ import { FLASH_OFF, useFlash } from "@/app/data/flash";
 import barHtml from "./topbar.html?raw";
 import flashHtml from "./flashbar.html?raw";
 
-/** Top bar: the 12-hour flash bar while this visitor's flash runs, the Black Friday bar otherwise. */
+/** Top bar: the 24-hour flash bar while this visitor's flash runs, the Black Friday bar otherwise. */
 export function BlackFridayBar(props: { compact?: boolean }) {
   const f = useFlash();
   return f.on ? <FlashTopBar key="flash" end={f.end} /> : <BfBar key="bf" {...props} />;

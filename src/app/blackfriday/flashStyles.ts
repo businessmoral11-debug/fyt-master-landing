@@ -1,4 +1,4 @@
-/** Styles for the 12-hour "Black Friday Upgraded" flash sale. Same light Inter look as Black Friday, FYT blue + gold, a red live pulse. */
+/** Styles for the 24-hour "Black Friday Upgraded" flash sale. Same light Inter look as Black Friday, FYT blue + gold, a red live pulse. */
 import { ensureBfAssets } from "./bfStyles";
 
 export const FLASH_CSS = `
