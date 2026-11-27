@@ -75,7 +75,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
       { size: 10000, mt: [114, 68.4, 1217], p5: [124, 74.4, 12379] },
       { size: 25000, mt: [219, 131.4, 1218], p5: [229, 137.4, 12381] },
       { size: 50000, mt: [309, 185.4, 1219], p5: [319, 191.4, 12382] },
-      { size: 100000, mt: [505, 303, 1220], p5: [515, 309, 12378] },
+      { size: 100000, mt: [482.5, 303, 1220], p5: [487.5, 309, 12378] }, // list 492.50 / 497.50 = 197 / 199 at 60% (27 Nov)
       { size: 200000, mt: [902, 545.4, 1221], p5: [912, 551.4, 12380] }, // -7 (27 Nov evening)
     ]),
     prime: build(RULES_1STEP, [
@@ -83,7 +83,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
       { size: 10000, mt: [114, 68.4, 21264], p5: [124, 74.4, 21265] },
       { size: 25000, mt: [219, 131.4, 21268], p5: [229, 137.4, 21269] },
       { size: 50000, mt: [309, 185.4, 21270], p5: [319, 191.4, 21271] },
-      { size: 100000, mt: [500, 303, 21262], p5: [510, 309, 21263] }, // -5 (27 Nov evening)
+      { size: 100000, mt: [482.5, 303, 21262], p5: [487.5, 309, 21263] }, // list 492.50 / 497.50 = 197 / 199 at 60% (27 Nov)
       { size: 200000, mt: [902, 545.4, 21266], p5: [912, 551.4, 21267] }, // -7 (27 Nov evening)
     ]),
   },
@@ -112,7 +112,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
       { size: 10000, mt: [209, 114.95, 20613], p5: [219, 120.45, 20614] },
       { size: 25000, mt: [239, 131.45, 20615], p5: [249, 136.95, 20616] },
       { size: 50000, mt: [469, 257.95, 20617], p5: [479, 263.45, 20618] },
-      { size: 100000, mt: [939, 516.45, 20621], p5: [949, 521.95, 20622] },
+      { size: 100000, mt: [902.5, 516.45, 20621], p5: [902.5, 521.95, 20622] }, // list 912.50 = 365 at 60% (27 Nov)
     ]),
     // fyt-pro INSTANT (Prime) — product IDs from live PRODUCTS_CONFIG; sale = 40% off
     prime: build(RULES_INSTANT_PRIME, [
@@ -120,7 +120,7 @@ export const PRICING_DATA: Record<StepId, Partial<Record<PlanId, PlatformTable>>
       { size: 10000, mt: [239, 131.45, 22213], p5: [239, 131.45, 22206] },
       { size: 25000, mt: [309, 169.95, 22212], p5: [309, 169.95, 22207] },
       { size: 50000, mt: [599, 329.45, 22211], p5: [599, 329.45, 22208] },
-      { size: 100000, mt: [1004, 554.95, 22210], p5: [1004, 554.95, 22205] }, // -5 (27 Nov evening)
+      { size: 100000, mt: [987.5, 554.95, 22210], p5: [987.5, 554.95, 22205] }, // list 997.50 = 399 at 60% (27 Nov)
     ]),
   },
 };
