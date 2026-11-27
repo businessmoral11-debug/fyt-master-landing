@@ -258,6 +258,7 @@ export const VIDEO_URLS = {
     hongKong: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Trader-video-2025-10-b.mp4",
     hiren: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Trader-video-2026-10-c.mp4",
     roy: "https://fundingyourtrades.com/wp-content/uploads/2026/10/Roy-Indonesia.mp4",
+    chris: "https://fundingyourtrades.com/wp-content/uploads/2026/11/Chris-UK.mp4",
   },
   misc: {
     howToPurchase: "https://fundingyourtrades.com/wp-content/uploads/2025/05/How-to-make-a-Successful-Purchase-at-FYT.mp4",

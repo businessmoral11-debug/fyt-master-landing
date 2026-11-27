@@ -57,8 +57,8 @@ describe("TESTIMONIAL_REVIEWS", () => {
 });
 
 describe("TESTIMONIAL_VIDEOS", () => {
-  it("has all 23 real video testimonials", () => {
-    expect(TESTIMONIAL_VIDEOS).toHaveLength(23);
+  it("has all 24 real video testimonials", () => {
+    expect(TESTIMONIAL_VIDEOS).toHaveLength(24);
   });
 
   it("matches the first video exactly", () => {
@@ -120,7 +120,7 @@ describe("buildTestimonialPages", () => {
     expect(pages).toHaveLength(2);
   });
 
-  it("produces exactly 8 pages for the real 20-review/23-video dataset, using every item exactly once", () => {
+  it("produces exactly 8 pages for the real 20-review/24-video dataset, using every item exactly once", () => {
     const pages = buildTestimonialPages(TESTIMONIAL_REVIEWS, TESTIMONIAL_VIDEOS);
     expect(pages).toHaveLength(8);
 
@@ -129,9 +129,9 @@ describe("buildTestimonialPages", () => {
     const videoNames = allSlides.filter((s) => s.kind === "video").map((s) => (s as { kind: "video"; video: TestimonialVideo }).video.videoUrl);
 
     expect(reviewNames).toHaveLength(20);
-    expect(videoNames).toHaveLength(23);
+    expect(videoNames).toHaveLength(24);
     expect(new Set(reviewNames).size).toBe(20);
-    expect(new Set(videoNames).size).toBe(23);
+    expect(new Set(videoNames).size).toBe(24);
   });
 
   it("keeps the first 5 pages in the mixed [R,R,V]/[V,R,R] pattern and the remaining pages as video-only rows", () => {
