@@ -157,6 +157,25 @@
 #fyt-bf-bar.fbf-thin .fbf-t{width:27px;height:26px}#fyt-bf-bar.fbf-thin .fbf-t b{font-size:11.5px}
 #fyt-bf-bar.fbf-thin .fbf-cta{height:28px;padding:0 11px}
 }
+/* ---- flash theme (12-hour "Black Friday Upgraded"): same bar, gold + red urgency ---- */
+#fyt-bf-bar.fbf-flash .fbf-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(28% 170% at 78% 120%,rgba(255,184,0,.28),transparent 70%),radial-gradient(18% 140% at 30% -30%,rgba(255,59,78,.22),transparent 70%)}
+#fyt-bf-bar.fbf-flash .fbf-brand{position:relative;padding-left:15px}
+#fyt-bf-bar.fbf-flash .fbf-brand::before{content:"";position:absolute;left:0;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#FF3B4E;animation:fbf-live 1.6s infinite}
+#fyt-bf-bar.fbf-flash .fbf-brand .fbf-bk{font-size:.78em;letter-spacing:.02em}
+#fyt-bf-bar.fbf-flash .fbf-fr{background:linear-gradient(90deg,#FFB800,#FFE08A 40%,#FFF6D6 50%,#FFE08A 60%,#FFB800);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+#fyt-bf-bar.fbf-flash .fbf-cards i:nth-child(n+2){background:linear-gradient(155deg,#FFE08A,#F0A93A);border-color:#FFF1C9}
+#fyt-bf-bar.fbf-flash .fbf-cards i:nth-child(1){background:linear-gradient(155deg,var(--b2),var(--b1));border-color:#8FC0FF}
+#fyt-bf-bar.fbf-flash .fbf-hero-t{background:linear-gradient(100deg,#FFFFFF,#FFF1C9 35%,#FFFFFF 50%,#FFE08A 65%,#FFFFFF);background-size:250% 100%;-webkit-background-clip:text;background-clip:text}
+#fyt-bf-bar.fbf-flash .fbf-hero-glow{text-shadow:0 0 12px rgba(255,236,190,.9),0 0 26px rgba(255,184,0,.45)}
+#fyt-bf-bar.fbf-flash .fbf-t[data-u="d"]{display:none}
+#fyt-bf-bar.fbf-flash .fbf-t{background:linear-gradient(180deg,#2A0A12,#0B0306);border-color:rgba(255,80,96,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 14px rgba(255,59,78,.28)}
+#fyt-bf-bar.fbf-flash .fbf-t small{color:#FFB3BB}
+#fyt-bf-bar.fbf-flash .fbf-ends{color:#FFB3BB;width:64px}
+#fyt-bf-bar.fbf-flash .fbf-cta{color:#241400!important;background:linear-gradient(100deg,#FFB800,#FFE08A 45%,#FFF6D6 52%,#FFC845);box-shadow:0 6px 18px rgba(255,184,0,.4),inset 0 1px 0 rgba(255,255,255,.6);animation:fbf-gpulse 2.2s infinite}
+#fyt-bf-bar.fbf-flash .fbf-line{background:linear-gradient(90deg,transparent,#FF3B4E 20%,var(--gd) 50%,#FF3B4E 80%,transparent);background-size:200% 100%}
+@keyframes fbf-live{0%{box-shadow:0 0 0 0 rgba(255,59,78,.75)}70%,100%{box-shadow:0 0 0 8px rgba(255,59,78,0)}}
+@keyframes fbf-gpulse{0%{box-shadow:0 0 0 0 rgba(255,200,69,.6),0 6px 18px rgba(255,184,0,.4)}70%,100%{box-shadow:0 0 0 12px rgba(255,200,69,0),0 6px 18px rgba(255,184,0,.4)}}
+@media (max-width:600px){#fyt-bf-bar.fbf-flash .fbf-brand{display:none}}
 @media (prefers-reduced-motion:reduce){#fyt-bf-bar *,#fyt-bf-bar *::after{animation:none!important;transition:none!important}#fyt-bf-bar .fbf-sweep,#fyt-bf-bar .fbf-spk{display:none}#fyt-bf-bar .fbf-cards i{transform:rotate(var(--r))}#fyt-bf-bar .fbf-hero-glow{opacity:.45;transform:none}}
 </style>
 <div id="fyt-bf-bar" role="region" aria-label="Black Friday offer">
@@ -183,6 +202,47 @@
   <span class="fbf-line" aria-hidden="true"></span>
   <span class="fbf-sr fbf-csr" aria-live="polite"></span>
 </div>
+<!-- ===================== 12-hour flash sale ("Black Friday Upgraded") on every WordPress page =====================
+  Same rules as the home page: each visitor gets their own 12 hours from their first visit (kept in this browser, and
+  signed by the checkout snippet so the checkout checks the same deadline). During those hours the bar below switches to
+  the flash look. When their 12 hours end, the page reloads once and the normal Black Friday bar comes back.
+  FLASH_MODE: 'off' | 'preview' (only browsers that opened a page with ?flash=1) | 'live' (everyone). -->
+<script>
+(function () {
+  var FLASH_MODE = 'preview', OFF = 60, HOURS = 12, LAST_START = '2026-12-01T17:00:00+05:30';
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
+  var q = location.search;
+  if (/[?&]flash=(1|reset)(&|$)/.test(q)) ls('fyt_flash_preview', '1');
+  if (/[?&]flash=off(&|$)/.test(q)) ls('fyt_flash_preview', null);
+  if (/[?&]flash=reset(&|$)/.test(q)) ls('fyt_flash_start', null);
+  if (!(FLASH_MODE === 'live' || (FLASH_MODE === 'preview' && ls('fyt_flash_preview') === '1'))) return;
+  if (document.getElementById('fyt-custom-checkout') || /\/checkout(\/|$)/.test(location.pathname)) return;
+  var now = Date.now(), start = Number(ls('fyt_flash_start')) || 0;
+  if (!start) { if (now > new Date(LAST_START).getTime()) return; start = now; ls('fyt_flash_start', String(start)); }
+  var end = start + HOURS * 36e5;
+  if (now >= end) return;
+  window.FYT_FLASH = { off: OFF, end: end };
+  var cfg = window.FYT_BF_CONFIG || {}, f = {
+    theme: 'flash', brand: ['BLACK FRIDAY', 'UPGRADED'], endDate: new Date(end).toISOString(), endsText: 'Your 12 hrs end in', soonHours: 0,
+    hero: OFF + '% OFF EVERYTHING', heroShort: OFF + '% OFF ALL',
+    ticker: ['BUY 1 GET 2 INSTANTLY', 'BUY 2 GET 5 INSTANTLY'], tickerShort: ['BUY 1 GET 2', 'BUY 2 GET 5'],
+    ctaText: 'Claim ' + OFF + '% Off', ctaTextShort: 'Claim', whenEnded: 'hide',
+    srText: 'Black Friday upgraded: ' + OFF + '% off everything for your next 12 hours. Buy 1 get 2 instantly, buy 2 get 5 instantly.'
+  };
+  for (var k in f) cfg[k] = f[k];
+  window.FYT_BF_CONFIG = cfg;
+  // Sign the start time on the server so the checkout gives the same 60% (the earliest start always wins).
+  try {
+    fetch('/wp-admin/admin-ajax.php?action=fyt_flash_start&s=' + Math.floor(start / 1000), { credentials: 'include' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.start) ls('fyt_flash_start', String(j.start * 1000)); })
+      .catch(function () {});
+  } catch (e) {}
+  // Back to the normal Black Friday bar the moment their 12 hours end.
+  setTimeout(function () { if (!document.hidden) location.reload(); else document.addEventListener('visibilitychange', function () { location.reload(); }, { once: true }); }, end - now + 1500);
+})();
+</script>
+
 <script>
 (function(){
   /* ============================ CONFIG (edit here) ============================ */
@@ -203,7 +263,10 @@
     endedText: 'DEAL ENDED',
     stickyMode: 'fixed',      // 'fixed' (pads <body>) | 'sticky' | 'none' (stays where pasted)
     thinOnScroll: true, thinAfter: 80, // bar gets thin once the page is scrolled this many pixels
-    zIndex: 99990
+    zIndex: 99990,
+    brand: ['BLACK', 'FRIDAY'], // the two stacked words on the left
+    theme: '',                  // 'flash' = the 12-hour "Black Friday Upgraded" look (gold + red, no days tile)
+    endsText: ''                // label next to the timer (empty = "Deal ends in")
   };
   /* =========================================================================== */
   if (window.FYT_BF_CONFIG) for (var k in window.FYT_BF_CONFIG) CONFIG[k] = window.FYT_BF_CONFIG[k];
@@ -215,6 +278,13 @@
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var esc = function(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
   bar.style.zIndex = CONFIG.zIndex;
+  if (CONFIG.theme) bar.classList.add('fbf-' + CONFIG.theme);
+  if (CONFIG.brand && CONFIG.brand.length === 2) {
+    bar.querySelectorAll('.fbf-brand .fbf-bk, .fbf-eb .fbf-bk').forEach(function(e){ e.textContent = CONFIG.brand[0]; });
+    bar.querySelectorAll('.fbf-brand .fbf-fr, .fbf-eb .fbf-fr').forEach(function(e){ e.textContent = CONFIG.brand[1]; });
+    bar.setAttribute('aria-label', CONFIG.brand.join(' ') + ' offer');
+  }
+  if (CONFIG.endsText) $('.fbf-ends').textContent = CONFIG.endsText;
   $('.fbf-full').textContent = CONFIG.srText;
   $('.fbf-cv').textContent = CONFIG.couponCode;
   var code = $('.fbf-code'); code.setAttribute('aria-label', 'Copy coupon code ' + CONFIG.couponCode);
@@ -295,12 +365,25 @@
 </script>
 <!-- /FYT BLACK FRIDAY TOP BAR -->
 
+
 <!-- ===================== Site-wide: old offers in the WordPress header and footer -> current offer =====================
   The Elementor header still carries an old scrolling offer line (Summer40, 47.5% off with crypto, 200% refund...).
   This swaps those words for the current offer on every WordPress page. When the offer changes, edit FYT_CURRENT_OFFER only. -->
 <script>
 (function () {
-  var FYT_CURRENT_OFFER = {
+  var FL = window.FYT_FLASH;
+  var FYT_CURRENT_OFFER = FL ? {
+    code: 'BLACKFRIDAY',
+    swaps: [
+      [/summer\s*special[^<>]*?40%\s*off\s*\+\s*2\s*accounts\s*instantly/gi, 'Black Friday Upgraded: ' + FL.off + '% Off Everything'],
+      [/47\.5%\s*off\s*with\s*crypto\s*\+\s*2\s*accounts\s*instantly(\s*same\s*size)?/gi, 'Buy 2 Get 5 Instantly'],
+      [/200%\s*refund\s*\+\s*1st\s*reward\s*on\s*demand/gi, 'Buy 1 Get 2 Instantly'],
+      [/40%\s*off\s*\+\s*2\s*accounts\s*instantly(\s*same\s*size)?/gi, FL.off + '% Off Everything'],
+      [/limited[-\s]*time\s*deal\s*[-\u2013\u00b7]\s*limited\s*spots/gi, 'Your 12 Hours Only'],
+      [/summer\s*special/gi, 'Black Friday Upgraded']
+    ],
+    oldCodes: /\b(SUMMER40|FYT40|BOGO35|DIWALI45|FYTWEEN|NEWDASH)\b/gi
+  } : {
     code: 'BLACKFRIDAY',
     swaps: [
       [/summer\s*special[^<>]*?40%\s*off\s*\+\s*2\s*accounts\s*instantly/gi, 'Black Friday: 50% Off + 1 Free Account'],
