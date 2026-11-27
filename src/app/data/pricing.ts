@@ -42,8 +42,9 @@ export const SALE_DISCOUNT_FRACTION = 0.5;
 export function priceBump(size: number): number {
   if (size <= 5000) return 10; // +7, +5, then -2
   if (size <= 10000) return 14; // +7, then +7 more
-  if (size <= 100000) return 20; // +10, then +10 more
-  return 20; // 200K: +15, +10, then -5
+  if (size <= 25000) return 20; // +10, then +10 more
+  if (size <= 50000) return 15; // +10, +10, then -5 (27 Nov)
+  return 10; // 100K: +10, +10, then -10 (27 Nov). 200K: +15, +10, -5, then -10 (27 Nov)
 }
 
 export function salePrice(priceOld: number): number {
