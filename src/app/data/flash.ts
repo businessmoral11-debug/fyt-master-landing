@@ -13,8 +13,8 @@ import { BF_TIERS, type BfTier } from "@/app/data/blackfriday";
  */
 export const FLASH_MODE: "off" | "preview" | "live" = "live";
 export const FLASH_OFF = 60;
-/** 28 Nov 2026, 3:00 PM IST. */
-export const FLASH_END = "2026-11-28T15:00:00+05:30";
+/** 28 Nov 2026, 4:00 PM IST. */
+export const FLASH_END = "2026-11-28T16:00:00+05:30";
 /** Length shown on the drain bar / dial. */
 export const FLASH_HOURS = 24;
 /** The checkout snippet answers here whether it is charging 60% right now, and until when. */

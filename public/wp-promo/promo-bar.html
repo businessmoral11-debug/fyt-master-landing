@@ -1,11 +1,11 @@
 <!-- ===================== Flash sale ("Black Friday Upgraded") on every WordPress page =====================
-  60% off for everyone until FLASH_END (28 Nov 2026, 3:00 PM IST), the same end time as the checkout and the client
+  60% off for everyone until FLASH_END (28 Nov 2026, 4:00 PM IST), the same end time as the checkout and the client
   dashboard. While it runs the flash bar (fyt-fs60) shows instead of the Black Friday bar. At FLASH_END the page
   reloads once and the normal Black Friday bar comes back.
   FLASH_MODE: 'off' | 'preview' (only browsers that opened a page with ?flash=1) | 'live' (everyone). -->
 <script>
 (function () {
-  var FLASH_MODE = 'live', OFF = 60, FLASH_END = '2026-11-28T15:00:00+05:30';
+  var FLASH_MODE = 'live', OFF = 60, FLASH_END = '2026-11-28T16:00:00+05:30';
   function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
   var q = location.search;
   if (/[?&]flash=1(&|$)/.test(q)) ls('fyt_flash_preview', '1');
