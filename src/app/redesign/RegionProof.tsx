@@ -21,7 +21,7 @@ const DAY = 86_400_000;
 const DISCORD_INVITE_CODE = "6NYNSAwxeZ";
 const DISCORD_URL = `https://discord.gg/${DISCORD_INVITE_CODE}`;
 
-import { REGION_CHIP, REGION_NAME, countryPlain, countryThe, detectVisitor, lookupIpCountry, regionOf, type RegionId } from "@/app/data/visitorGeo";
+import { REGION_CHIP, REGION_NAME, countryPlain, countryThe, detectVisitor, lookupIpCountry, mixMode, regionOf, type RegionId } from "@/app/data/visitorGeo";
 
 /* ------------------------------- helpers -------------------------------- */
 
@@ -357,7 +357,7 @@ export function RegionProof({ fallback = null }: { fallback?: ReactNode }) {
   const [visitor, setVisitor] = useState<{ code: string | null; region: RegionId | null }>({ code: null, region: null });
   const [allRows, setAllRows] = useState<ProofItem[]>([]);
   const [state, setState] = useState<"loading" | "ready" | "empty">("loading");
-  const [worldwide, setWorldwide] = useState(false);
+  const [worldwide, setWorldwide] = useState(() => mixMode()); // mix mode: start on worldwide payouts
   const [pick, setPick] = useState(0);
   const [auto, setAuto] = useState(true);
   const [more, setMore] = useState(false);

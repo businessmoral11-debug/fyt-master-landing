@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { TESTIMONIAL_VIDEOS, type TestimonialVideo } from "@/app/data/testimonials";
 import { testimonialVideoSource } from "@/app/motion/videoLightbox";
 import { countryFlagUrl } from "@/app/api/rewardsApi";
-import { REGION_NAME, countryPlain, detectVisitor, lookupIpCountry, regionOf, type RegionId } from "@/app/data/visitorGeo";
+import { REGION_NAME, countryPlain, detectVisitor, lookupIpCountry, mixMode, regionOf, type RegionId } from "@/app/data/visitorGeo";
 
 const VideoLightbox = lazy(() => import("@/app/BelowFold").then((m) => ({ default: m.VideoLightbox })));
 
@@ -68,7 +68,29 @@ const ASIA_REGIONS: RegionId[] = ["south-asia", "southeast-asia", "east-asia", "
  * (Europe, Americas, Africa, Oceania) sees the non-Asian traders next
  * (USA, South Africa, Kenya, New Zealand, Germany) and Asian ones last.
  */
+/** Mix mode: a fresh shuffle with countries spread out (never the same country twice in a row when avoidable). */
+function mixDeck(videos: TestimonialVideo[]): { order: number[]; scope: string; scopes: string[] } {
+  const low = videos.map((_, i) => i).filter((i) => LOW_PRIORITY.has(videos[i].name));
+  const all = shuffle(videos.map((_, i) => i).filter((i) => !low.includes(i)));
+  const cc = (i: number) => VIDEO_COUNTRY[videos[i].name] ?? "?";
+  const groups = new Map<string, number[]>();
+  for (const i of all) groups.set(cc(i), [...(groups.get(cc(i)) ?? []), i]);
+  const order: number[] = [];
+  let last = "";
+  while (order.length < all.length) {
+    // take from the country with the most left that is not the one just shown
+    const pick = [...groups.entries()].filter(([c, l]) => l.length && c !== last).sort((a, b) => b[1].length - a[1].length + (Math.random() - 0.5) * 1.5)[0]
+      ?? [...groups.entries()].find(([, l]) => l.length)!;
+    order.push(pick[1].shift()!);
+    last = pick[0];
+  }
+  const tail = Math.random() < LOW_SHOW_CHANCE ? shuffle(low) : [];
+  const full = [...order, ...tail];
+  return { order: full, scope: "worldwide", scopes: full.map(() => "worldwide") };
+}
+
 function buildDeck(videos: TestimonialVideo[], v: Visitor): { order: number[]; scope: string; scopes: string[] } {
+  if (mixMode()) return mixDeck(videos);
   const low = videos.map((_, i) => i).filter((i) => LOW_PRIORITY.has(videos[i].name));
   const all = videos.map((_, i) => i).filter((i) => !low.includes(i));
   const cc = (i: number) => VIDEO_COUNTRY[videos[i].name];

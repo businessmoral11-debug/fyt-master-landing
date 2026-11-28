@@ -158,3 +158,32 @@ export function countryThe(code: string): string {
   return NAME_THE[code] ?? countryPlain(code);
 }
 
+
+/**
+ * Temporary "mix" mode (until MIX_UNTIL): trader videos and payouts are shown mixed across countries instead of
+ * the visitor's own country first. Visits alternate: 1st visit mixed, 2nd visit country-wise, 3rd mixed again
+ * (a new shuffle each time). After MIX_UNTIL everything is country-wise again on its own.
+ * ?mix=1 / ?mix=0 force it on or off for testing.
+ */
+export const MIX_UNTIL = "2026-11-29T00:30:00+05:30";
+let mixMemo: boolean | null = null;
+export function mixMode(): boolean {
+  if (mixMemo !== null) return mixMemo;
+  mixMemo = false;
+  if (typeof window === "undefined") return false;
+  try {
+    const q = new URLSearchParams(window.location.search).get("mix");
+    if (q === "1" || q === "0") return (mixMemo = q === "1");
+    if (Date.now() >= new Date(MIX_UNTIL).getTime()) return false;
+    let n = Number(window.localStorage.getItem("fyt_visit_n")) || 0;
+    if (!window.sessionStorage.getItem("fyt_visit_counted")) {
+      n += 1;
+      window.localStorage.setItem("fyt_visit_n", String(n));
+      window.sessionStorage.setItem("fyt_visit_counted", "1");
+    }
+    mixMemo = n % 2 === 1;
+  } catch {
+    mixMemo = true;
+  }
+  return mixMemo;
+}
